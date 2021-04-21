@@ -149,8 +149,8 @@ def checkSS(playerID):
 async def SSLoop():
     await client.wait_until_ready()
     global config
-    #lastchecked = datetime.utcnow() - timedelta(minutes=1)
-    lastchecked = dateutil.parser.isoparse("2021-04-21T01:49:21.000Z").replace(tzinfo=None)
+    lastchecked = datetime.utcnow() - timedelta(minutes=1)
+    #lastchecked = dateutil.parser.isoparse("2021-04-21T01:49:21.000Z").replace(tzinfo=None)
     #print(lastchecked)
     for guildID in config:
         for playerID in config[guildID]["playerIDs"]:
