@@ -82,13 +82,13 @@ async def on_message(message):
 
 async def helpfunc(message, action):
     if action == "69":
-        message.channel.send('420')
+        await message.channel.send('420')
     else:
         m1 = '**To add/remove player:**\n`!player add/remove playerID`\n'
         m2 = '**To add/remove current channel:**\n`!channel add/remove`\n'
         m3 = '**To add/remove another channel in the same Discord server:**\n`!channel add channelID`'
         msg = m1+m2+m3
-        message.channel.send(msg)
+        await message.channel.send(msg)
 
 async def playerfunc(playerID, message, action):
     msg_guild = message.guild
