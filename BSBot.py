@@ -174,7 +174,7 @@ diffsdict = {
     9: "ExpertPlus"
 }
 
-sentmessages = []
+sentmessages = {}
 
 @tasks.loop(seconds = 60)
 async def SSLoop():
@@ -232,9 +232,15 @@ async def SSLoop():
                                     s1 = f'{playername} set a score of {score} on {songCombinedName} ({diff})\n'
                                     s2 = f'**Rank:** {rank}, **Raw PP:** {rawpp}, **PP:** {pp}, **ACC:** {acc}%\n{leaderboardLink}'
                                     s = s1+s2
-                                    if s not in sentmessages:
+                                    if guildID not in sentmessages:
+                                        sentmessages[guildID] = {}
+                                    if channelID not in sentmessages[guildID]:
+                                        sentmessages[guildID][channelID] = []
+                                    if s not in sentmessages[guildID][channelID]:
                                         await channel.send(s)
-                                        sentmessages.append(s)
+                                        sentmessages[guildID][channelID].append(s)
+                                        if len(sentmessages[guildID][channelID]) > 10:
+                                            sentmessages[guildID][channelID].pop(0)
                                         print(f'Sent {playername}\'s score to {channelID} in {guildID}!')
                                     else:
                                         print(f'{playername}\'s score has already been sent to {channelID} in {guildID}!')
