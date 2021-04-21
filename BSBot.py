@@ -50,6 +50,13 @@ async def on_message(message):
     if message.content.startswith('!hello'):
         await message.channel.send('Hello there!')
 
+    if message.content.startswith('!help'):
+        pattern = re.compile(r'!help *(\w*)')
+        match = re.match(pattern, message.content)
+        if match:
+            action = match.group(1)
+            helpfunc(message, action)
+
     if message.content.startswith('!player '):
         pattern = re.compile(r"!player *(\w+) *(https?://scoresaber\.com/u/)?(\d{17})")
         match = re.match(pattern, message.content)
@@ -72,6 +79,16 @@ async def on_message(message):
 
         else:
             await format_error_message(message)
+
+async def helpfunc(message, action):
+    if action == "69":
+        message.channel.send('420')
+    else:
+        m1 = '**To add/remove player:**\n`!player add/remove playerID`\n'
+        m2 = '**To add/remove current channel:**\n`!channel add/remove`\n'
+        m3 = '**To add/remove another channel in the same Discord server:**\n`!channel add channelID`'
+        msg = m1+m2+m3
+        message.channel.send(msg)
 
 async def playerfunc(playerID, message, action):
     msg_guild = message.guild
@@ -157,6 +174,8 @@ diffsdict = {
     9: "ExpertPlus"
 }
 
+sentmessages = []
+
 @tasks.loop(seconds = 60)
 async def SSLoop():
     await client.wait_until_ready()
@@ -212,8 +231,13 @@ async def SSLoop():
                                     channel = client.get_channel(channelID)
                                     s1 = f'{playername} set a score of {score} on {songCombinedName} ({diff})\n'
                                     s2 = f'**Rank:** {rank}, **Raw PP:** {rawpp}, **PP:** {pp}, **ACC:** {acc}%\n{leaderboardLink}'
-                                    await channel.send(s1+s2)
-                                    print(f'Sent {playername}\'s score to {channelID} in {guildID}!')
+                                    s = s1+s2
+                                    if s not in sentmessages:
+                                        await channel.send(s)
+                                        sentmessages.append(s)
+                                        print(f'Sent {playername}\'s score to {channelID} in {guildID}!')
+                                    else:
+                                        print(f'{playername}\'s score has already been sent to {channelID} in {guildID}!')
                                 except Exception as e:
                                     print(f'{datetime.utcnow()} Channel: {channelID}, player: {playername}, discord: {guildID}, Error: {e}')
 
