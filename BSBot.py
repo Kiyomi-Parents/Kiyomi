@@ -55,7 +55,7 @@ async def on_message(message):
         match = re.match(pattern, message.content)
         if match:
             action = match.group(1)
-            helpfunc(message, action)
+            await helpfunc(message, action)
 
     if message.content.startswith('!player '):
         pattern = re.compile(r"!player *(\w+) *(https?://scoresaber\.com/u/)?(\d{17})")
