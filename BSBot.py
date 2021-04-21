@@ -51,7 +51,7 @@ async def on_message(message):
         await message.channel.send('Hello there!')
 
     if message.content.startswith('!player '):
-        pattern = re.compile(r"!player *(\w+) *(https://scoresaber\.com/u/)?(\d{17})")
+        pattern = re.compile(r"!player *(\w+) *(https?://scoresaber\.com/u/)?(\d{17})")
         match = re.match(pattern, message.content)
         if match:
             playerID = int(match.group(3))
@@ -145,53 +145,77 @@ def checkSS(playerID):
     recentscores.reverse()
     return recentscores
 
+diffsdict = {
+    1: "Easy",
+    2: "2?",
+    3: "Normal",
+    4: "4?",
+    5: "Hard",
+    6: "6?",
+    7: "Expert",
+    8: "8?",
+    9: "ExpertPlus"
+}
+
 @tasks.loop(seconds = 60)
 async def SSLoop():
     await client.wait_until_ready()
     global config
-    lastchecked = datetime.utcnow() - timedelta(minutes=1)
-    #lastchecked = dateutil.parser.isoparse("2021-04-21T01:49:21.000Z").replace(tzinfo=None)
+    lastchecked = datetime.utcnow() - timedelta(seconds=80)
+    #lastchecked = dateutil.parser.isoparse("2021-04-21T11:32:19.000Z").replace(tzinfo=None)
     #print(lastchecked)
     for guildID in config:
         for playerID in config[guildID]["playerIDs"]:
-            recentscores = checkSS(playerID)
-            for recentscore in recentscores:
-                timeSet = dateutil.parser.isoparse(recentscore["timeSet"]).replace(tzinfo=None)
-                # I'm removing time zone info because I'm assuming ScoreSaber has everything in UTC anyway
-                # and when comparing 2 datetime objects either both of them need to have timezone info available
-                # or both of them need to lack it.
-                print(timeSet)
-                print(lastchecked)
-                if timeSet > lastchecked:
-                    playername = get_player(playerID)["playerInfo"]["playerName"]
-                    songName = recentscore["songName"]
-                    songSubName = recentscore["songSubName"]
-                    if songSubName:
-                        songCombinedName = f'{songName}: {songSubName}'
-                    else:
-                        songCombinedName = songName
-                    #songHash = recentscore["songHash"]
-                    leaderboardId = recentscore["leaderboardId"]
-                    rank = recentscore["rank"]
-                    score = recentscore["score"]
-                    maxScore = recentscore["maxScore"]
-                    if maxScore:
-                        acc = round(score/maxScore*100, 3)
-                    else:
-                        acc = "N/A"
-                    rawpp = round(recentscore["pp"], 3)
-                    weight = recentscore["weight"]
-                    pp = round(rawpp*weight, 3)
-                    leaderboardPage = (rank-1)//12 + 1
-                    leaderboardLink = f"http://scoresaber.com/leaderboard/{leaderboardId}?page={leaderboardPage}"
-                    for channelID in config[guildID]["channelIDs"]:
-                        try:
-                            channel = client.get_channel(channelID)
-                            s1 = f'{playername} set a score of {score} on {songCombinedName}\n'
-                            s2 = f'**Rank:** {rank}, **Raw PP:** {rawpp}, **PP:** {pp}, **ACC:** {acc}%\n{leaderboardLink}'
-                            await channel.send(s1+s2)
-                        except Exception as e:
-                            print(e)
+            attempt = 0
+            attempting = True
+            while attempting and attempt < 6:
+                try:
+                    recentscores = checkSS(playerID)
+                    attempting = False
+                except Exception as e:
+                    print(f'{playerID}\n{e}')
+                    attempt += 1
+                else:
+                    #print(recentscores)
+                    for recentscore in recentscores:
+                        timeSet = dateutil.parser.isoparse(recentscore["timeSet"]).replace(tzinfo=None)
+                        # I'm removing time zone info because I'm assuming ScoreSaber has everything in UTC anyway
+                        # and when comparing 2 datetime objects either both of them need to have timezone info available
+                        # or both of them need to lack it.
+                        if timeSet > lastchecked:
+                            print("found valid time")
+                            global diffsdict
+                            playername = get_player(playerID)["playerInfo"]["playerName"]
+                            songName = recentscore["songName"]
+                            songSubName = recentscore["songSubName"]
+                            if songSubName:
+                                songCombinedName = f'{songName}: {songSubName}'
+                            else:
+                                songCombinedName = songName
+                            diff = diffsdict[recentscore["difficulty"]]
+                            #songHash = recentscore["songHash"]
+                            leaderboardId = recentscore["leaderboardId"]
+                            rank = recentscore["rank"]
+                            score = recentscore["score"]
+                            maxScore = recentscore["maxScore"]
+                            if maxScore:
+                                acc = round(score/maxScore*100, 3)
+                            else:
+                                acc = "N/A"
+                            rawpp = round(recentscore["pp"], 3)
+                            weight = recentscore["weight"]
+                            pp = round(rawpp*weight, 3)
+                            leaderboardPage = (rank-1)//12 + 1
+                            leaderboardLink = f"http://scoresaber.com/leaderboard/{leaderboardId}?page={leaderboardPage}"
+                            for channelID in config[guildID]["channelIDs"]:
+                                try:
+                                    channel = client.get_channel(channelID)
+                                    s1 = f'{playername} set a score of {score} on {songCombinedName} ({diff})\n'
+                                    s2 = f'**Rank:** {rank}, **Raw PP:** {rawpp}, **PP:** {pp}, **ACC:** {acc}%\n{leaderboardLink}'
+                                    await channel.send(s1+s2)
+                                    print(f'Sent {playername}\'s score to {channelID} in {guildID}!')
+                                except Exception as e:
+                                    print(f'{datetime.utcnow()} Channel: {channelID}, player: {playername}, discord: {guildID}, Error: {e}')
 
 
 SSLoop.start()
