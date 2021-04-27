@@ -32,14 +32,14 @@ class Player:
     def avatar_url(self):
         return f"https://new.scoresaber.com{self.avatar}"
 
-    def get_new_scores(self):
+    def get_new_scores(self, guildID):
         scores = self._scoresaber.get_recent_scores(self.playerId)
         new_scores = []
-
+        
         for score in scores:
-            if not score.is_saved:
+            if not score.is_saved(guildID):
                 new_scores.append(score)
-                score.save()
+                score.save(guildID)
 
         return new_scores
 

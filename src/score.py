@@ -31,27 +31,39 @@ class Score:
     def get_scores(self):
         if os.path.isfile(self._save_file):
             with open(self._save_file, "r") as file:
-                return json.load(file)
+                try:
+                    return json.load(file)
+                except:
+                    return {}
+        else:
+            return {}
 
-    def save(self):
+    def save(self, guildID):
         scores = self.get_scores()
 
-        if scores:
-            scores["scoreIds"].append(self.scoreId)
-        else:
-            scores = {"scoreIds": [self.scoreId]}
+        try:
+            scores[str(guildID)]["scoreIds"].append(self.scoreId)
+        except KeyError:
+            scores = {str(guildID): {"scoreIds": [self.scoreId]}}
+        
+        if len(scores[str(guildID)]["scoreIds"]) > 150:
+            scores[str(guildID)]["scoreIds"].pop(0)
 
         with open(self._save_file, "w") as file:
             json.dump(scores, file)
+            #print(f'saved {self.scoreId} to {guildID}')
 
-    @property
-    def is_saved(self):
+    #@property
+    def is_saved(self, guildID):
         scores = self.get_scores()
 
         if not scores:
             return False
 
-        return self.scoreId in scores["scoreIds"]
+        try:
+            return self.scoreId in scores[str(guildID)]["scoreIds"]
+        except KeyError:
+            return False
 
     @property
     def leaderboard_url(self):

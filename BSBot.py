@@ -169,11 +169,11 @@ async def SSLoop():
             while attempting and attempt < 6:
                 try:
                     player = scoresaber.get_player(playerID)
-                    new_scores = player.get_new_scores()
+                    new_scores = player.get_new_scores(guildID)
                     attempting = False
                 except Exception as e:
-                    print(f'{playerID}\n{e}')
                     attempt += 1
+                    #print(f'{datetime.utcnow()} {playerID}, attempt {attempt}\n{e}')
                 else:
                     for new_score in new_scores:
                         if timeran < dateutil.parser.isoparse(new_score.timeSet).replace(tzinfo=None):
@@ -183,11 +183,10 @@ async def SSLoop():
                                     embed = player.get_score_embed(new_score, new_score.get_song())
 
                                     await channel.send(embed=embed)
-                                    print(f'Sent {player.playerName}\'s score ({new_score.scoreId}) to {channelID} in {guildID}!')
+                                    print(f'{datetime.utcnow()} Sent {player.playerName}\'s score ({new_score.scoreId}) to {channelID} in {guildID}!')
                                 except Exception as e:
                                     print(f'{datetime.utcnow()} Channel: {channelID}, player: {player.playerName}, discord: {guildID}, Error: {e}')
                         else:
-                            print("score too old")
                             pass
 
 
