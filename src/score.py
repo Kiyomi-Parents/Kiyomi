@@ -44,9 +44,9 @@ class Score:
         try:
             scores[str(guildID)]["scoreIds"].append(self.scoreId)
         except KeyError:
-            scores = {str(guildID): {"scoreIds": [self.scoreId]}}
+            scores[str(guildID)] = {"scoreIds": [self.scoreId]}
         
-        if len(scores[str(guildID)]["scoreIds"]) > 150:
+        if len(scores[str(guildID)]["scoreIds"]) > 500:
             scores[str(guildID)]["scoreIds"].pop(0)
 
         with open(self._save_file, "w") as file:
