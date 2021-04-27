@@ -163,6 +163,7 @@ async def SSLoop():
     await client.wait_until_ready()
     global config
     for guildID in config:
+        guild_check(guildID)
         for playerID in config[guildID]["playerIDs"]:
             attempt = 0
             attempting = True
