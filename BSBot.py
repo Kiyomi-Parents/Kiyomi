@@ -3,6 +3,7 @@ import json
 import os
 import re
 from datetime import datetime
+import dateutil.parser
 
 import discord
 from discord.ext import tasks, commands
@@ -155,6 +156,7 @@ async def channel_func(channel_id, guild_id, message, action):
             await message.channel.send(f'Channel ID {channel_id} already doesn\'t exist in the channel list for server {guild}.')
     del channel_list
 
+timeran = datetime.utcnow()
 
 @tasks.loop(seconds=60)
 async def SSLoop():
@@ -174,15 +176,19 @@ async def SSLoop():
                     attempt += 1
                 else:
                     for new_score in new_scores:
-                        for channelID in config[guildID]["channelIDs"]:
-                            try:
-                                channel = client.get_channel(channelID)
-                                embed = player.get_score_embed(new_score, new_score.get_song())
+                        if timeran < dateutil.parser.isoparse(new_score.timeSet).replace(tzinfo=None):
+                            for channelID in config[guildID]["channelIDs"]:
+                                try:
+                                    channel = client.get_channel(channelID)
+                                    embed = player.get_score_embed(new_score, new_score.get_song())
 
-                                await channel.send(embed=embed)
-                                print(f'Sent {player.playerName}\'s score ({new_score.scoreId}) to {channelID} in {guildID}!')
-                            except Exception as e:
-                                print(f'{datetime.utcnow()} Channel: {channelID}, player: {player.playerName}, discord: {guildID}, Error: {e}')
+                                    await channel.send(embed=embed)
+                                    print(f'Sent {player.playerName}\'s score ({new_score.scoreId}) to {channelID} in {guildID}!')
+                                except Exception as e:
+                                    print(f'{datetime.utcnow()} Channel: {channelID}, player: {player.playerName}, discord: {guildID}, Error: {e}')
+                        else:
+                            print("score too old")
+                            pass
 
 
 SSLoop.start()
