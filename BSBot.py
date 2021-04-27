@@ -17,6 +17,8 @@ client = commands.Bot('!')
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 
+timeran = datetime.utcnow()
+
 try:
     with open("config.json", "r") as configfile:
         config = json.load(configfile)
@@ -28,10 +30,23 @@ def save_config(config):
     with open("config.json", "w") as configfile:
         json.dump(config, configfile)
 
+def log_init():
+    if os.path.isfile('log.txt'):
+        os.rename('log.txt', 'prev_log.txt')
+
+log_init()
+
+def log_add(message):
+    sendmessage = f'\n{datetime.utcnow()} {message}'
+    print(sendmessage)
+    with open('log.txt', 'a') as f:
+        f.write(sendmessage)
+
 
 @client.event
 async def on_ready():
-    print(f'{client.user} has connected to Discord!')
+    joinmessage = f'{client.user} has connected to Discord!'
+    log_add(joinmessage)
 
 
 def guild_check(guild):
@@ -86,6 +101,7 @@ async def on_message(message):
 
 
 async def help_func(message, action):
+    log_add(f'help_func(action: {action})')
     if action == "69":
         await message.channel.send('420')
     else:
@@ -97,6 +113,7 @@ async def help_func(message, action):
 
 
 async def player_func(playerID, message, action):
+    log_add(f'player_func(playerID: {playerID}, action: {action})')
     msg_guild = message.guild
     guild_check(msg_guild.id)
     global config
@@ -126,6 +143,7 @@ async def player_func(playerID, message, action):
 
 
 async def channel_func(channel_id, guild_id, message, action):
+    log_add(f'channel_func(channel: {channel_id}, guild: {guild_id}, action: {action})')
     guild_id = str(guild_id)
     guild_check(guild_id)
     guild = client.get_guild(guild_id)
@@ -156,11 +174,9 @@ async def channel_func(channel_id, guild_id, message, action):
             await message.channel.send(f'Channel ID {channel_id} already doesn\'t exist in the channel list for server {guild}.')
     del channel_list
 
-timeran = datetime.utcnow()
-
 @tasks.loop(seconds=60)
 async def SSLoop():
-    await client.wait_until_ready()
+    log_add('ran SSloop()')
     global config
     for guildID in config:
         guild_check(guildID)
@@ -174,7 +190,7 @@ async def SSLoop():
                     attempting = False
                 except Exception as e:
                     attempt += 1
-                    #print(f'{datetime.utcnow()} {playerID}, attempt {attempt}\n{e}')
+                    log_add(f'Getting player {playerID}\'s scores failed, attempt: {attempt}, error: {e}')
                 else:
                     for new_score in new_scores:
                         if timeran < dateutil.parser.isoparse(new_score.timeSet).replace(tzinfo=None):
@@ -182,11 +198,11 @@ async def SSLoop():
                                 try:
                                     channel = client.get_channel(channelID)
                                     embed = player.get_score_embed(new_score, new_score.get_song())
-
                                     await channel.send(embed=embed)
                                     print(f'{datetime.utcnow()} Sent {player.playerName}\'s score ({new_score.scoreId}) to {channelID} in {guildID}!')
                                 except Exception as e:
-                                    print(f'{datetime.utcnow()} Channel: {channelID}, player: {player.playerName}, discord: {guildID}, Error: {e}')
+                                    exceptionmessage = f'Channel: {channelID}, player: {player.playerName}, discord: {guildID}, Error: {e}'
+                                    log_add(exceptionmessage)
                         else:
                             pass
 

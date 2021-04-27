@@ -5,3 +5,4 @@ venv
 test.env
 config.json
 scores.json
+*log.txt

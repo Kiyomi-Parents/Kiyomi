@@ -47,11 +47,12 @@ class Score:
             scores[str(guildID)] = {"scoreIds": [self.scoreId]}
         
         if len(scores[str(guildID)]["scoreIds"]) > 500:
-            scores[str(guildID)]["scoreIds"].pop(0)
+            popped = scores[str(guildID)]["scoreIds"].pop(0)
+            print(f'File: score.py, in Score.save(): popped {popped} from {guildID} in {self._save_file}')
 
         with open(self._save_file, "w") as file:
             json.dump(scores, file)
-            #print(f'saved {self.scoreId} to {guildID}')
+            print(f'saved {self.scoreId} to {guildID}')
 
     #@property
     def is_saved(self, guildID):
