@@ -126,7 +126,7 @@ async def player_func(playerID, message, action):
 
 
 async def channel_func(channel_id, guild_id, message, action):
-    guild_id = guild_id
+    guild_id = str(guild_id)
     guild_check(guild_id)
     guild = client.get_guild(guild_id)
     global config
