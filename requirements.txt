@@ -1,0 +1,6 @@
+requests~=2.21.0
+python-dateutil~=2.7.5
+python-dotenv~=0.17.0
+timeago~=1.0.15
+cfscrape~=2.1.1
+discord.py~=1.7.1

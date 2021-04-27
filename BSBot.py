@@ -1,16 +1,17 @@
-# bot.py
-import os
-
-import requests
+# good bot.py
 import json
-import discord
-from dotenv import load_dotenv
+import os
 import re
 from datetime import datetime
-from datetime import timedelta
-import dateutil.parser
-import asyncio
+
+import discord
 from discord.ext import tasks, commands
+from dotenv import load_dotenv
+
+from src.scoresaber import Scoresaber
+
+scoresaber = Scoresaber()
+client = commands.Bot('!')
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -18,29 +19,31 @@ TOKEN = os.getenv('DISCORD_TOKEN')
 try:
     with open("config.json", "r") as configfile:
         config = json.load(configfile)
-except:
+except FileNotFoundError:
     config = {}
 
-def saveconfig(config):
+
+def save_config(config):
     with open("config.json", "w") as configfile:
         json.dump(config, configfile)
 
-#client = discord.Client()
-client = commands.Bot(('!'))
 
 @client.event
 async def on_ready():
     print(f'{client.user} has connected to Discord!')
 
-def guildcheck(guild):
+
+def guild_check(guild):
     global config
     if type(guild) == discord.Guild:
         guild = guild.id
     if str(guild) not in config:
         config[str(guild)] = {}
 
+
 async def format_error_message(message):
     await message.channel.send('Sorry, something went wrong! Make sure your message is in the correct format.')
+
 
 @client.event
 async def on_message(message):
@@ -55,199 +58,132 @@ async def on_message(message):
         match = re.match(pattern, message.content)
         if match:
             action = match.group(1)
-            await helpfunc(message, action)
+            await help_func(message, action)
 
     if message.content.startswith('!player '):
         pattern = re.compile(r"!player *(\w+) *(https?://scoresaber\.com/u/)?(\d{17})")
         match = re.match(pattern, message.content)
         if match:
-            playerID = int(match.group(3))
+            player_id = int(match.group(3))
             action = match.group(1)
-            await playerfunc(playerID, message, action)
+            await player_func(player_id, message, action)
         else:
             await format_error_message(message)
-    
+
     if message.content.startswith('!channel '):
         pattern = re.compile(r'!channel *(\w+) *(\d{18})?')
         match = re.match(pattern, message.content)
-        inputchannelID = message.channel.id
+        input_channel_id = message.channel.id
         if match:
             if bool(match.group(2)):
-                inputchannelID = int(match.group(2))
+                input_channel_id = int(match.group(2))
             action = match.group(1)
-            await channelfunc(inputchannelID, message.channel.guild.id, message, action)
+            await channel_func(input_channel_id, message.channel.guild.id, message, action)
 
         else:
             await format_error_message(message)
 
-async def helpfunc(message, action):
+
+async def help_func(message, action):
     if action == "69":
         await message.channel.send('420')
     else:
         m1 = '**To add/remove player:**\n`!player add/remove playerID`\n'
         m2 = '**To add/remove current channel:**\n`!channel add/remove`\n'
         m3 = '**To add/remove another channel in the same Discord server:**\n`!channel add/remove channelID`'
-        msg = m1+m2+m3
+        msg = m1 + m2 + m3
         await message.channel.send(msg)
 
-async def playerfunc(playerID, message, action):
+
+async def player_func(playerID, message, action):
     msg_guild = message.guild
-    guildcheck(msg_guild.id)
+    guild_check(msg_guild.id)
     global config
     try:
-        playerIDs = config[str(msg_guild.id)]["playerIDs"]
+        player_ids = config[str(msg_guild.id)]["playerIDs"]
     except KeyError:
-        playerIDs = config[str(msg_guild.id)]["playerIDs"] = []
+        player_ids = config[str(msg_guild.id)]["playerIDs"] = []
     if action == "add":
-        if playerID not in playerIDs:
-            playerID_check = get_player(playerID)
+        if playerID not in player_ids:
+            player = scoresaber.get_player(playerID)
             try:
-                playername = playerID_check["playerInfo"]["playerName"]
-                await message.channel.send(f'Player {playername} successfully added!')
-                playerIDs.append(playerID)
-                saveconfig(config)
+                await message.channel.send(f'Player {player.playerName} successfully added!')
+                player_ids.append(playerID)
+                save_config(config)
             except KeyError:
                 await message.channel.send(f'Couldn\'t find a player with ID {playerID}')
         else:
             await message.channel.send(f'Player ID {playerID} has already been added!')
     elif action == "remove":
-        if playerID in playerIDs:
-            playerIDs.pop(playerIDs.index(playerID))
-            saveconfig(config)
+        if playerID in player_ids:
+            player_ids.pop(player_ids.index(playerID))
+            save_config(config)
             await message.channel.send(f'Player ID {playerID} successfully removed!')
         else:
             await message.channel.send(f'Player ID {playerID} already doesn\'t exist in this Discord server\'s player list.')
-    del playerIDs
+    del player_ids
 
-def get_player(playerID):
-    playerID_request = requests.get(f'https://new.scoresaber.com/api/player/{playerID}/basic')
-    playerID_text = json.loads(playerID_request.text)
-    return playerID_text
 
-async def channelfunc(channelID, guildID, message, action):
-    guildID = str(guildID)
-    guildcheck(guildID)
-    guild = client.get_guild(guildID)
+async def channel_func(channel_id, guild_id, message, action):
+    guild_id = guild_id
+    guild_check(guild_id)
+    guild = client.get_guild(guild_id)
     global config
     try:
-        channellist = config[guildID]["channelIDs"]
+        channel_list = config[guild_id]["channelIDs"]
     except:
-        channellist = config[guildID]["channelIDs"] = []
+        channel_list = config[guild_id]["channelIDs"] = []
     if action == "add":
-        currentguildchannels = [channel.id for channel in message.channel.guild.channels]
-        if channelID not in channellist and channelID in currentguildchannels:
-            channellist.append(channelID)
-            saveconfig(config)
-            await message.channel.send(f'Channel ID {channelID} successfully added!')
-        elif channelID not in currentguildchannels:
-            if channelID in channellist:
-                channellist.pop(channellist.index(channelID))
-                saveconfig(config)
-            await message.channel.send(f'Channel ID {channelID} doesn\'t exist in this Discord server (or isn\'t visible to the bot).')
+        current_guild_channels = [channel.id for channel in message.channel.guild.channels]
+        if channel_id not in channel_list and channel_id in current_guild_channels:
+            channel_list.append(channel_id)
+            save_config(config)
+            await message.channel.send(f'Channel ID {channel_id} successfully added!')
+        elif channel_id not in current_guild_channels:
+            if channel_id in channel_list:
+                channel_list.pop(channel_list.index(channel_id))
+                save_config(config)
+            await message.channel.send(f'Channel ID {channel_id} doesn\'t exist in this Discord server (or isn\'t visible to the bot).')
         else:
-            await message.channel.send(f'Channel ID {channelID} has already been added!')
+            await message.channel.send(f'Channel ID {channel_id} has already been added!')
     elif action == "remove":
-        if channelID in channellist:
-            channellist.pop(channellist.index(channelID))
-            saveconfig(config)
-            await message.channel.send(f'Channel ID {channelID} successfully removed!')
+        if channel_id in channel_list:
+            channel_list.pop(channel_list.index(channel_id))
+            save_config(config)
+            await message.channel.send(f'Channel ID {channel_id} successfully removed!')
         else:
-            await message.channel.send(f'Channel ID {channelID} already doesn\'t exist in the channel list for server {guild}.')
-    del channellist
+            await message.channel.send(f'Channel ID {channel_id} already doesn\'t exist in the channel list for server {guild}.')
+    del channel_list
 
-def checkSS(playerID):
-    url = f"https://new.scoresaber.com/api/player/{playerID}/scores/recent"
-    scoresrequest = requests.get(url)
-    recentscores = json.loads(scoresrequest.text)["scores"]
-    recentscores.reverse()
-    return recentscores
 
-diffsdict = {
-    1: "Easy",
-    2: "2?",
-    3: "Normal",
-    4: "4?",
-    5: "Hard",
-    6: "6?",
-    7: "Expert",
-    8: "8?",
-    9: "ExpertPlus"
-}
-
-sentmessages = {}
-
-@tasks.loop(seconds = 60)
+@tasks.loop(seconds=60)
 async def SSLoop():
     await client.wait_until_ready()
     global config
-    lastchecked = datetime.utcnow() - timedelta(seconds=80)
-    #lastchecked = dateutil.parser.isoparse("2021-04-21T11:32:19.000Z").replace(tzinfo=None)
-    #print(lastchecked)
     for guildID in config:
         for playerID in config[guildID]["playerIDs"]:
             attempt = 0
             attempting = True
             while attempting and attempt < 6:
                 try:
-                    recentscores = checkSS(playerID)
+                    player = scoresaber.get_player(playerID)
+                    new_scores = player.get_new_scores()
                     attempting = False
                 except Exception as e:
                     print(f'{playerID}\n{e}')
                     attempt += 1
                 else:
-                    #print(recentscores)
-                    for recentscore in recentscores:
-                        timeSet = dateutil.parser.isoparse(recentscore["timeSet"]).replace(tzinfo=None)
-                        # I'm removing time zone info because I'm assuming ScoreSaber has everything in UTC anyway
-                        # and when comparing 2 datetime objects either both of them need to have timezone info available
-                        # or both of them need to lack it.
-                        if timeSet > lastchecked:
-                            print("found valid time")
-                            global diffsdict
-                            playername = get_player(playerID)["playerInfo"]["playerName"]
-                            songName = recentscore["songName"]
-                            songSubName = recentscore["songSubName"]
-                            if songSubName:
-                                songCombinedName = f'{songName}: {songSubName}'
-                            else:
-                                songCombinedName = songName
-                            diff = diffsdict[recentscore["difficulty"]]
-                            #songHash = recentscore["songHash"]
-                            leaderboardId = recentscore["leaderboardId"]
-                            rank = recentscore["rank"]
-                            score = recentscore["score"]
-                            maxScore = recentscore["maxScore"]
-                            if maxScore:
-                                acc = round(score/maxScore*100, 3)
-                            else:
-                                acc = "N/A"
-                            rawpp = round(recentscore["pp"], 3)
-                            weight = recentscore["weight"]
-                            pp = round(rawpp*weight, 3)
-                            leaderboardPage = (rank-1)//12 + 1
-                            leaderboardLink = f"http://scoresaber.com/leaderboard/{leaderboardId}?page={leaderboardPage}"
-                            for channelID in config[guildID]["channelIDs"]:
-                                try:
-                                    channel = client.get_channel(channelID)
-                                    s1 = f'{playername} set a score of {score} on {songCombinedName} ({diff})\n'
-                                    s2 = f'**Rank:** {rank}, **Raw PP:** {rawpp}, **PP:** {pp}, **ACC:** {acc}%\n{leaderboardLink}'
-                                    s = s1+s2
-                                    if guildID not in sentmessages:
-                                        sentmessages[guildID] = {}
-                                    if channelID not in sentmessages[guildID]:
-                                        sentmessages[guildID][channelID] = []
-                                    if s not in sentmessages[guildID][channelID]:
-                                        await channel.send(s)
-                                        sentmessages[guildID][channelID].append(s)
-                                        if len(sentmessages[guildID][channelID]) > 10:
-                                            sentmessages[guildID][channelID].pop(0)
-                                        print(f'Sent {playername}\'s score to {channelID} in {guildID}!')
-                                    else:
-                                        print(f'{playername}\'s score has already been sent to {channelID} in {guildID}!')
-                                except Exception as e:
-                                    print(f'{datetime.utcnow()} Channel: {channelID}, player: {playername}, discord: {guildID}, Error: {e}')
+                    for new_score in new_scores:
+                        for channelID in config[guildID]["channelIDs"]:
+                            try:
+                                channel = client.get_channel(channelID)
+                                embed = player.get_score_embed(new_score, new_score.get_song())
+
+                                await channel.send(embed=embed)
+                                print(f'Sent {player.playerName}\'s score ({new_score.scoreId}) to {channelID} in {guildID}!')
+                            except Exception as e:
+                                print(f'{datetime.utcnow()} Channel: {channelID}, player: {player.playerName}, discord: {guildID}, Error: {e}')
 
 
 SSLoop.start()
-
 client.run(TOKEN)
