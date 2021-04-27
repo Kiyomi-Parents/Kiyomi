@@ -32,7 +32,11 @@ def save_config(config):
 
 def log_init():
     if os.path.isfile('log.txt'):
-        os.rename('log.txt', 'prev_log.txt')
+        try:
+            os.rename('log.txt', 'prev_log.txt')
+        except FileExistsError:
+            os.remove('prev_log.txt')
+            os.rename('log.txt', 'prev_log.txt')
 
 log_init()
 
