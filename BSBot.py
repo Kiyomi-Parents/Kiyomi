@@ -91,7 +91,7 @@ async def help_func(message, action):
         m1 = '**To add/remove player:**\n`!player add/remove playerID`\n'
         m2 = '**To add/remove current channel:**\n`!channel add/remove`\n'
         m3 = '**To add/remove another channel in the same Discord server:**\n`!channel add/remove channelID`'
-        msg = m1+m2+m3
+        msg = m1 + m2 + m3
         await message.channel.send(msg)
 
 

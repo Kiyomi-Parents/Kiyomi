@@ -1,12 +1,13 @@
-# BSBot  
-cool bot 
+# BSBot
 
-### Install  
+cool bot
+
+### Install
 
     # Install requirements  
 	python3 -m pip install -r requirements.txt  
 
-### Usage  
+### Usage
 
     # Set discord token  
 	export DISCORD_TOKEN=<My very secret token>  

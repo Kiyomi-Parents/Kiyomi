@@ -1,7 +1,7 @@
 import json
 import os
 
-from dateutil import parser
+from dateutil import parser, tz
 
 
 class Score:
@@ -97,7 +97,8 @@ class Score:
         return round(self.pp * self.weight, 2)
 
     def get_date(self):
-        return parser.isoparse(self.timeSet).replace(tzinfo=None)
+        timestamp = parser.isoparse(self.timeSet).replace(tzinfo=tz.gettz('UTC'))
+        return timestamp.astimezone(tz.tzlocal())
 
     def get_song(self):
         return self._beatsaver.get_song_by_hash(self.songHash)

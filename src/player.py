@@ -1,7 +1,8 @@
 from datetime import datetime
+from dateutil import tz
 
-from discord import Embed, Colour
 import timeago
+from discord import Embed, Colour
 
 
 class Player:
@@ -61,7 +62,6 @@ class Player:
 
         embed.add_field(name="\u200b", value=f"[Beat Saver]({song.beatsaver_url})")
         embed.add_field(name="\u200b", value=f"[Preview Map]({song.preview_url})")
-        embed.set_footer(text=timeago.format(score.get_date(), datetime.now()))
+        embed.set_footer(text=timeago.format(score.get_date(), datetime.now(tz=tz.tzlocal())))
 
         return embed
-
