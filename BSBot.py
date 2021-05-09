@@ -224,11 +224,13 @@ if __name__ == '__main__':
     tasks = Tasks(uow)
     Logger.log_init()
 
-    load_dotenv()
-    TOKEN = os.getenv('DISCORD_TOKEN')
-    client.run(TOKEN)
-
     tasks.update_players.start()
     tasks.update_all_player_roles.start()
     tasks.update_players_scores.start()
     tasks.send_notifications.start()
+
+    load_dotenv()
+    TOKEN = os.getenv('DISCORD_TOKEN')
+    client.run(TOKEN)
+
+    
