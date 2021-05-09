@@ -6,3 +6,4 @@ test.env
 config.json
 scores.json
 *log.txt
+bot.db

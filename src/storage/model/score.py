@@ -1,13 +1,45 @@
-import json
-import os
-
 from dateutil import parser, tz
+from sqlalchemy import Column, String, Integer, ForeignKey, DateTime, Float, Table
+from sqlalchemy.orm import relationship
+
+from src.storage.base import Base
+
+score_guild_table = Table('score_guild', Base.metadata,
+                          Column('score_id', Integer, ForeignKey('score.id')),
+                          Column('guild_id', Integer, ForeignKey('guild.id'))
+                          )
 
 
-class Score:
-    _save_file = "scores.json"
+class Score(Base):
+    """Score data from ScoreSaber"""
+    __tablename__ = "score"
 
-    def __init__(self, scoreJson, beatsaver):
+    id = Column(Integer, primary_key=True)
+    player_id = Column(Integer, ForeignKey('player.id'))
+
+    # ScoreSaber info
+    rank = Column(Integer)
+    scoreId = Column(Integer)
+    score = Column(Integer)
+    unmodififiedScore = Column(Integer)
+    mods = Column(String)
+    pp = Column(Float)
+    weight = Column(Float)
+    timeSet = Column(DateTime)
+    leaderboardId = Column(Integer)
+    songHash = Column(String)
+    songName = Column(String)
+    songSubName = Column(String)
+    songAuthorName = Column(String)
+    levelAuthorName = Column(String)
+    difficulty = Column(Integer)
+    difficultyRaw = Column(String)
+    maxScore = Column(Integer)
+
+    msg_guilds = relationship("DiscordGuild", secondary=score_guild_table)
+    song = relationship("Song", uselist=False)
+
+    def __init__(self, scoreJson):
         self.rank = scoreJson["rank"]
         self.scoreId = scoreJson["scoreId"]
         self.score = scoreJson["score"]
@@ -15,7 +47,7 @@ class Score:
         self.mods = scoreJson["mods"]
         self.pp = scoreJson["pp"]
         self.weight = scoreJson["weight"]
-        self.timeSet = scoreJson["timeSet"]
+        self.timeSet = parser.isoparse(scoreJson["timeSet"]).replace(tzinfo=tz.gettz('UTC'))
         self.leaderboardId = scoreJson["leaderboardId"]
         self.songHash = scoreJson["songHash"]
         self.songName = scoreJson["songName"]
@@ -25,46 +57,6 @@ class Score:
         self.difficulty = scoreJson["difficulty"]
         self.difficultyRaw = scoreJson["difficultyRaw"]
         self.maxScore = scoreJson["maxScore"]
-
-        self._beatsaver = beatsaver
-
-    def get_scores(self):
-        if os.path.isfile(self._save_file):
-            with open(self._save_file, "r") as file:
-                try:
-                    return json.load(file)
-                except:
-                    return {}
-        else:
-            return {}
-
-    def save(self, guildID):
-        scores = self.get_scores()
-
-        try:
-            scores[str(guildID)]["scoreIds"].append(self.scoreId)
-        except KeyError:
-            scores[str(guildID)] = {"scoreIds": [self.scoreId]}
-        
-        if len(scores[str(guildID)]["scoreIds"]) > 500:
-            popped = scores[str(guildID)]["scoreIds"].pop(0)
-            print(f'File: score.py, in Score.save(): popped {popped} from {guildID} in {self._save_file}')
-
-        with open(self._save_file, "w") as file:
-            json.dump(scores, file)
-            print(f'saved {self.scoreId} to {guildID}')
-
-    #@property
-    def is_saved(self, guildID):
-        scores = self.get_scores()
-
-        if not scores:
-            return False
-
-        try:
-            return self.scoreId in scores[str(guildID)]["scoreIds"]
-        except KeyError:
-            return False
 
     @property
     def leaderboard_url(self):
@@ -109,15 +101,9 @@ class Score:
     def weighted_pp(self):
         return round(self.pp * self.weight, 2)
 
+    @property
     def get_date(self):
-        timestamp = parser.isoparse(self.timeSet).replace(tzinfo=tz.gettz('UTC'))
-        return timestamp.astimezone(tz.tzlocal())
-
-    def get_song(self):
-        return self._beatsaver.get_song_by_hash(self.songHash)
+        return self.timeSet.astimezone(tz.tzlocal())
 
     def __str__(self):
-        return self.scoreId
-
-    def __repr__(self):
-        return str(self.scoreId)
+        return f"Score {self.songName} ({self.scoreId})"
