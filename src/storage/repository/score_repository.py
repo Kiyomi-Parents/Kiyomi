@@ -19,6 +19,7 @@ class ScoreRepository:
         unsent_scores = []
 
         for score in scores:
+            print(f'{score.scoreId} {score.msg_guilds}')
             if guild not in score.msg_guilds:
                 unsent_scores.append(score)
 
