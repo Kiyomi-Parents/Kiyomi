@@ -27,6 +27,6 @@ class Message:
 
         embed.add_field(name="\u200b", value=f"[Beat Saver]({song.beatsaver_url})")
         embed.add_field(name="\u200b", value=f"[Preview Map]({song.preview_url})")
-        embed.set_footer(text=timeago.format(score.get_date, datetime.now(tz=tz.tzlocal())))
+        #embed.set_footer(text=timeago.format(score.get_date, datetime.utcnow()))
 
         return embed
