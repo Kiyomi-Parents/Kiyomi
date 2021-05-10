@@ -109,11 +109,11 @@ async def help_func(message, action):
 async def player_func(guild_id, playerID, discord_user_id, message, action):
     Logger.log_add(f'player_func(guild_id: {guild_id}, playerID: {playerID}, discord_user_id: {discord_user_id}, action: {action})')
 
-    discord_guild = uow.guild_repo.get_guild_by_id(guild_id)
-    player = uow.player_repo.get_player_by_player_id(playerID)
+    db_guild = uow.guild_repo.get_guild_by_id(guild_id)
+    db_player = uow.player_repo.get_player_by_player_id(playerID)
 
     if action == "add":
-        if player is not None:
+        if db_player in db_guild.players:
             await message.channel.send(f'Player ID {playerID} has already been added!')
             return
 
@@ -129,24 +129,24 @@ async def player_func(guild_id, playerID, discord_user_id, message, action):
             new_player.discord_user_id = message.author.id
 
         uow.player_repo.add_player(new_player)
-        uow.player_repo.add_to_guild(new_player.playerId, discord_guild)
+        uow.player_repo.add_to_guild(new_player.playerId, db_guild)
 
         # Get player scores and marked them sent to decrease spam
         await tasks.update_player_scores(new_player)
         await tasks.mark_all_player_scores_sent(new_player)
 
         # Add role to player if enabled
-        if discord_guild.pp_roles:
-            # db_player = uow.player_repo.get_player_by_player_id(new_player.playerId)
-            await tasks.update_player_roles(discord_guild, new_player)
+        if db_guild.pp_roles:
+            await tasks.update_player_roles(db_guild, new_player)
 
         await message.channel.send(f'Player {new_player.playerName} successfully added!')
     elif action == "remove":
         is_removed = False
 
-        for player in discord_guild.players:
-            if playerID == player.playerId:
-                uow.guild_repo.remove_player(guild_id, player)
+        for db_player in db_guild.players:
+            if playerID == db_player.playerId:
+                uow.guild_repo.remove_player(db_guild.discord_guild_id, db_player)
+                await tasks.remove_player_roles(db_guild, db_player)
                 await message.channel.send(f'Player ID {playerID} successfully removed!')
                 is_removed = True
 
@@ -156,20 +156,20 @@ async def player_func(guild_id, playerID, discord_user_id, message, action):
 
 async def channel_func(channel_id, guild_id, message, action):
     Logger.log_add(f'channel_func(channel: {channel_id}, guild: {guild_id}, action: {action})')
-    discord_guild = uow.guild_repo.get_guild_by_id(guild_id)
+    db_guild = uow.guild_repo.get_guild_by_id(guild_id)
 
     if action == "add":
-        if discord_guild.recent_scores_channel_id is not None:
+        if db_guild.recent_scores_channel_id is not None:
             await message.channel.send(f'Channel ID {message.channel.name} ({channel_id}) has already been added!')
             return
 
         uow.guild_repo.set_recent_score_channel_id(guild_id, channel_id)
 
-        await tasks.mark_all_guild_scores_sent(discord_guild)
+        await tasks.mark_all_guild_scores_sent(db_guild)
 
         await message.channel.send(f'Channel ID {message.channel.name} ({channel_id}) successfully added!')
     elif action == "remove":
-        if discord_guild.recent_scores_channel_id is None:
+        if db_guild.recent_scores_channel_id is None:
             await message.channel.send(f"Channel ID {message.channel.name} ({channel_id}) already doesn't exist in the channel list for server {client.get_guild(guild_id)}.")
 
         uow.guild_repo.set_recent_score_channel_id(guild_id, None)
@@ -190,7 +190,7 @@ async def enable_feature(message, action, feature_flag):
     elif action == "remove":
         if feature_flag == "ppRoles":
             uow.guild_repo.set_feature(guild.id, feature_flag, False)
-            await tasks.remove_player_roles(guild)
+            await tasks.remove_guild_roles(guild)
             await message.channel.send("Disabled pp roles feature")
     else:
         await message.channel.send("Usage: !feature add/remove [ppRoles]")
@@ -232,5 +232,3 @@ if __name__ == '__main__':
     load_dotenv()
     TOKEN = os.getenv('DISCORD_TOKEN')
     client.run(TOKEN)
-
-    
