@@ -55,11 +55,12 @@ async def on_message(message):
         else:
             await format_error_message(message)
 
-    # SECURITY
-    if not await can_execute(message):
-        return
+    
 
     if message.content.startswith("!feature"):
+        # SECURITY
+        if not await can_execute(message):
+            return
         pattern = re.compile(r'!feature *(\w+) *(\w+)')
         match = re.match(pattern, message.content)
 
@@ -70,6 +71,9 @@ async def on_message(message):
             await enable_feature(message, action, feature_flag)
 
     if message.content.startswith('!channel'):
+        # SECURITY
+        if not await can_execute(message):
+            return
         pattern = re.compile(r'!channel *(\w+)')
         match = re.match(pattern, message.content)
 
@@ -80,6 +84,9 @@ async def on_message(message):
             await format_error_message(message)
 
     if message.content.startswith("!update"):
+        # SECURITY
+        if not await can_execute(message):
+            return
         pattern = re.compile(r'!update *(\w+)')
         match = re.match(pattern, message.content)
 
