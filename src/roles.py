@@ -44,7 +44,8 @@ class Roles:
 
     async def remove_player_roles(self):
         for db_role in self.db_player.roles:
-            await self.remove_player_role(db_role)
+            if db_role.guild_id == self.db_guild.id:
+                await self.remove_player_role(db_role)
 
     async def remove_guild_role(self, db_role):
         role = await self.get_role(db_role)

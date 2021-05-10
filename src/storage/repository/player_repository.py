@@ -55,18 +55,11 @@ class PlayerRepository:
             for old_score in player.scores:
                 if old_score.scoreId == new_score.scoreId:
                     is_new = False
-                    if new_score.score > old_score.score:
-                        Logger.log_add(f'{new_score.score} > {old_score.score}')
-                        player.scores.pop(player.scores.index(old_score))
-                        is_new = True
-                        break
+
             if is_new:
                 new_score_list.append(new_score)
 
         player.scores += new_score_list
-        Logger.log_add(f'playerscores length: {len(player.scores)}')
-        Logger.log_add([score.scoreId for score in player.scores])
-
 
         self._db.commit_changes()
         Logger.log_add(f"Added {len(new_score_list)} new scores to {player}")
