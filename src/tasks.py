@@ -72,7 +72,7 @@ class Tasks:
 
         await self.__attempt(update, error)
 
-    @tasks.loop(seconds=10)
+    @tasks.loop(seconds=60)
     async def update_players_scores(self, guild=None):
         if not self.uow.client.is_ready():
             Logger.log_add("Discord client not ready, skipping task update player scores")
