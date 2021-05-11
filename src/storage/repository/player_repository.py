@@ -21,8 +21,17 @@ class PlayerRepository:
     def get_player_by_player_id(self, playerId):
         return self._db.session.query(Player).filter(Player.playerId == playerId).first()
 
+    def get_player_by_member_id(self, memberId):
+        return self._db.session.query(Player).filter(Player.discord_user_id == memberId).first()
+
     def add_player(self, player):
         self._db.add_entry(player)
+
+    def remove_player(self, db_player):
+        self._db.session.delete(db_player)
+
+        self._db.commit_changes()
+        Logger.log_add(f"Deleted {db_player}")
 
     def update_player(self, new_player):
         old_player = self.get_player_by_player_id(new_player.playerId)
@@ -79,3 +88,9 @@ class PlayerRepository:
 
         self._db.commit_changes()
         Logger.log_add(f"Removed {role} from {player}")
+
+    def remove_guild(self, db_player, db_guild):
+        db_player.guilds.remove(db_guild)
+
+        self._db.commit_changes()
+        Logger.log_add(f"Removed {db_guild} from {db_player}")

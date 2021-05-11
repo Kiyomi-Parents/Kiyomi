@@ -15,7 +15,7 @@ class Score(Base):
     __tablename__ = "score"
 
     id = Column(Integer, primary_key=True)
-    player_id = Column(Integer, ForeignKey('player.id'))
+    player_id = Column(Integer, ForeignKey('player.id', ondelete='CASCADE'))
 
     # ScoreSaber info
     rank = Column(Integer)
