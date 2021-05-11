@@ -224,7 +224,9 @@ async def run_task(message, args=False):
 async def get_pp(message, args=False):
     Logger.log_add(f'get_pp() ran by {message.author.name} ({message.author.id} in {message.channel.guild})')
     try:
-        await message.channel.send(uow.guild_repo.get_player_by_discord_id(message.channel.guild, message.author.id).pp)
+        db_player = uow.guild_repo.get_player_by_discord_id(message.channel.guild, message.author.id)
+        pp_size = round(db_player.pp / 100)
+        await message.channel.send(f"{message.author.name}'s PP is this big:\n8{'=' * pp_size}D")
     except Exception as e:
         Logger.log_add(f'Exception {e} in get_pp(), message.content: {message.content}, author: {message.author}')
 
@@ -238,7 +240,7 @@ async def command(message, command, args):
         "channel": [channel_func, 1],
         "feature": [enable_feature, 2],
         "update": [run_task, 0],
-        "pp": [get_pp, 0]
+        "showpp": [get_pp, 0]
     }
     func, required_args = [i for i in command_dict.get(command, invalid_command)]
     if len(args) >= required_args:
