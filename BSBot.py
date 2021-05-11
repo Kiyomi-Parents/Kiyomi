@@ -242,7 +242,7 @@ async def command(message, command, args):
         "update": [run_task, 0],
         "showpp": [get_pp, 0]
     }
-    func, required_args = [i for i in command_dict.get(command, invalid_command)]
+    func, required_args = [i for i in command_dict.get(command, [invalid_command, 0])]
     if len(args) >= required_args:
         await func(message, args)
     else:
