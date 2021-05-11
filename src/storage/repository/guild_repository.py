@@ -44,8 +44,8 @@ class GuildRepository:
         self._db.commit_changes()
         Logger.log_add(f"Removed {player} from {discord_guild}")
 
-    def get_players(self, guild):
-        discord_guild = self.get_guild_by_id(guild.id)
+    def get_players(self, guild_id):
+        discord_guild = self.get_guild_by_id(guild_id)
 
         return discord_guild.players
 

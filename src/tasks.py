@@ -112,9 +112,9 @@ class Tasks:
 
         Logger.log_add(f"Updated songs for {len(scores)} scores")
 
-    async def mark_all_guild_scores_sent(self, guild):
-        players = self.uow.guild_repo.get_players(guild)
-        Logger.log_add(f"Marking all {len(players)} players scores as sent in {guild}")
+    async def mark_all_guild_scores_sent(self, db_guild):
+        players = self.uow.guild_repo.get_players(db_guild.discord_guild_id)
+        Logger.log_add(f"Marking all {len(players)} players scores as sent in {db_guild}")
 
         for player in players:
             await self.mark_all_player_scores_sent(player)
