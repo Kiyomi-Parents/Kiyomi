@@ -1,8 +1,5 @@
-from sqlalchemy.orm import joinedload
-
 from src.log import Logger
 from src.storage.model.score import Score
-from src.storage.model.song import Song
 
 
 class ScoreRepository:
@@ -19,71 +16,64 @@ class ScoreRepository:
     def get_scores_without_song(self):
         return self._db.session.query(Score).filter(~Score.song.has()).all()
 
-    def update_score(self, score):
-        old_score = self.get_score(score.scoreId)
+    def update_score(self, new_db_score):
+        old_db_score = self.get_score(new_db_score.scoreId)
 
-        old_score.rank = score.rank
-        old_score.scoreId = score.scoreId
-        old_score.score = score.score
-        old_score.unmodififiedScore = score.unmodififiedScore
-        old_score.mods = score.mods
-        old_score.pp = score.pp
-        old_score.weight = score.weight
-        old_score.timeSet = score.timeSet
-        old_score.leaderboardId = score.leaderboardId
-        old_score.songHash = score.songHash
-        old_score.songName = score.songName
-        old_score.songSubName = score.songSubName
-        old_score.songAuthorName = score.songAuthorName
-        old_score.levelAuthorName = score.levelAuthorName
-        old_score.difficulty = score.difficulty
-        old_score.difficultyRaw = score.difficultyRaw
-        old_score.maxScore = score.maxScore
+        old_db_score.rank = new_db_score.rank
+        old_db_score.scoreId = new_db_score.scoreId
+        old_db_score.score = new_db_score.score
+        old_db_score.unmodififiedScore = new_db_score.unmodififiedScore
+        old_db_score.mods = new_db_score.mods
+        old_db_score.pp = new_db_score.pp
+        old_db_score.weight = new_db_score.weight
+        old_db_score.timeSet = new_db_score.timeSet
+        old_db_score.leaderboardId = new_db_score.leaderboardId
+        old_db_score.songHash = new_db_score.songHash
+        old_db_score.songName = new_db_score.songName
+        old_db_score.songSubName = new_db_score.songSubName
+        old_db_score.songAuthorName = new_db_score.songAuthorName
+        old_db_score.levelAuthorName = new_db_score.levelAuthorName
+        old_db_score.difficulty = new_db_score.difficulty
+        old_db_score.difficultyRaw = new_db_score.difficultyRaw
+        old_db_score.maxScore = new_db_score.maxScore
 
         self._db.commit_changes()
-        Logger.log_add(f"Updated {old_score}")
+        Logger.log_add(f"Updated {old_db_score}")
 
-        self.mark_score_unsent(score)
+        self.mark_score_unsent(old_db_score)
 
-    def update_scores(self, scores):
-        for new_score in scores:
-            old_score = self.get_score(new_score.scoreId)
+    def update_scores(self, new_scores):
+        for new_score in new_scores:
+            old_db_score = self.get_score(new_score.scoreId)
 
-            if new_score.score != old_score.score:
+            if new_score.score != old_db_score.score:
                 self.update_score(new_score)
 
-    def get_unsent_scores(self, player, guild):
-        scores = self.get_player_scores(player)
-
+    @staticmethod
+    def get_unsent_scores(db_player, db_guild):
         unsent_scores = []
 
-        for score in scores:
-            if guild not in score.msg_guilds:
-                unsent_scores.append(score)
+        for db_score in db_player.scores:
+            if db_guild not in db_score.msg_guilds:
+                unsent_scores.append(db_score)
 
         return unsent_scores
 
-    def mark_score_sent(self, score, guild):
-        current_score = self.get_score(score.scoreId)
-
-        current_score.msg_guilds.append(guild)
+    def mark_score_sent(self, db_score, db_guild):
+        db_score.msg_guilds.append(db_guild)
 
         self._db.commit_changes()
-        Logger.log_add(f"Marked {score} as sent for {guild}")
+        Logger.log_add(f"Marked {db_score} as sent for {db_guild}")
 
-    def mark_score_unsent(self, score):
-        current_score = self.get_score(score.scoreId)
-
-        current_score.msg_guilds = []
+    def mark_score_unsent(self, db_score):
+        db_score.msg_guilds = []
 
         self._db.commit_changes()
-        Logger.log_add(f"Marked {score} as unsent")
+        Logger.log_add(f"Marked {db_score} as unsent")
 
-    def add_song(self, score, song):
-        current_score = self.get_score(score.scoreId)
-
-        if current_score.song is None:
-            current_score.song = song
+    def add_song(self, db_score, db_song):
+        if db_score.song is None:
+            db_score.song = db_song
 
             self._db.commit_changes()
-            Logger.log_add(f"Added {song} to {score}")
+            Logger.log_add(f"Added {db_song} to {db_score}")

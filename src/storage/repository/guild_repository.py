@@ -13,73 +13,46 @@ class GuildRepository:
     def get_pp_guilds(self):
         return self._db.session.query(DiscordGuild).filter(DiscordGuild.pp_roles).all()
 
-    def get_guild_by_id(self, guild_id):
+    def get_guild_by_discord_id(self, guild_id):
         return self._db.session.query(DiscordGuild).filter(DiscordGuild.discord_guild_id == guild_id).first()
 
     def add_guild(self, guild):
         guild = DiscordGuild(guild)
         self._db.add_entry(guild)
 
-    def set_recent_score_channel_id(self, guild_id, channel_id):
-        discord_guild = self.get_guild_by_id(guild_id)
-
-        discord_guild.recent_scores_channel_id = channel_id
+    def set_recent_score_channel_id(self, db_guild, channel_id):
+        db_guild.recent_scores_channel_id = channel_id
 
         self._db.commit_changes()
-        Logger.log_add(f"Updated {discord_guild} recent scores channel to {channel_id}")
+        Logger.log_add(f"Updated {db_guild} recent scores channel to {channel_id}")
 
-    def add_player(self, guild_id, player):
-        discord_guild = self.get_guild_by_id(guild_id)
-
-        discord_guild.players.append(player)
+    def add_player(self, db_guild, db_player):
+        db_guild.players.append(db_player)
 
         self._db.commit_changes()
-        Logger.log_add(f"Added {player} to {discord_guild}")
+        Logger.log_add(f"Added {db_player} to {db_guild}")
 
-    def remove_player(self, guild_id, player):
-        discord_guild = self.get_guild_by_id(guild_id)
-
-        discord_guild.players.remove(player)
+    def remove_player(self, db_guild, db_player):
+        db_guild.players.remove(db_player)
 
         self._db.commit_changes()
-        Logger.log_add(f"Removed {player} from {discord_guild}")
+        Logger.log_add(f"Removed {db_player} from {db_guild}")
 
-    def get_players(self, guild_id):
-        discord_guild = self.get_guild_by_id(guild_id)
-
-        return discord_guild.players
-
-    def get_player_by_discord_id(self, guild, discord_id):
-        discord_guild = self.get_guild_by_id(guild.id)
-        players = discord_guild.players
-        for player in players:
-            if player.discord_user_id == discord_id:
-                return player
-        else:
-            return
-
-
-    def set_feature(self, guild_id, feature_flag, status):
-        discord_guild = self.get_guild_by_id(guild_id)
-
+    def set_feature(self, db_guild, feature_flag, status):
         if feature_flag == "ppRoles":
-            discord_guild.pp_roles = status
+            db_guild.pp_roles = status
 
         self._db.commit_changes()
-        Logger.log_add(f"Set {feature_flag} on {discord_guild} to {status}")
+        Logger.log_add(f"Set {feature_flag} on {db_guild} to {status}")
 
-    def add_role(self, guild_id, role):
-        discord_guild = self.get_guild_by_id(guild_id)
-
-        discord_guild.roles.append(role)
+    def add_role(self, db_guild, db_role):
+        db_guild.roles.append(db_role)
 
         self._db.commit_changes()
-        Logger.log_add(f"Added {role} to {discord_guild}")
+        Logger.log_add(f"Added {db_role} to {db_guild}")
 
-    def remove_role(self, guild_id, role):
-        discord_guild = self.get_guild_by_id(guild_id)
-
-        discord_guild.roles.remove(role)
+    def remove_role(self, db_guild, db_role):
+        db_guild.roles.remove(db_role)
 
         self._db.commit_changes()
-        Logger.log_add(f"Removed {role} from {discord_guild}")
+        Logger.log_add(f"Removed {db_role} from {db_guild}")

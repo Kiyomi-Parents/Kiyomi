@@ -29,7 +29,7 @@ async def global_block_dms(ctx):
 
 @client.check
 async def global_db_guild(ctx):
-    db_guild = uow.guild_repo.get_guild_by_id(ctx.guild.id)
+    db_guild = uow.guild_repo.get_guild_by_discord_id(ctx.guild.id)
 
     if db_guild is None:
         uow.guild_repo.add_guild(ctx.guild)

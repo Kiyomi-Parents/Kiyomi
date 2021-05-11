@@ -23,8 +23,8 @@ class BeatSaber(commands.Cog):
         """Link yourself to your ScoreSaber profile."""
         player_id = Utils.scoresaber_id_from_url(profile)
 
-        db_guild = self.uow.guild_repo.get_guild_by_id(ctx.guild.id)
-        db_player = self.uow.player_repo.get_player_by_player_id(player_id)
+        db_guild = self.uow.guild_repo.get_guild_by_discord_id(ctx.guild.id)
+        db_player = self.uow.player_repo.get_player_by_member_id(ctx.author.id)
 
         if db_player in db_guild.players:
             await ctx.send(f'Player **{db_player.playerName}** has already been added!')
@@ -39,7 +39,7 @@ class BeatSaber(commands.Cog):
         new_player.discord_user_id = ctx.author.id
 
         self.uow.player_repo.add_player(new_player)
-        self.uow.player_repo.add_to_guild(new_player.playerId, db_guild)
+        self.uow.player_repo.add_to_guild(new_player, db_guild)
 
         # Get player scores and marked them sent to decrease spam
         await self.tasks.update_player_scores(new_player)
@@ -58,6 +58,7 @@ class BeatSaber(commands.Cog):
 
         if db_player is None:
             await ctx.send(f"You don't have a ScoreSaber profile linked to yourself.")
+            return
 
         for db_guild in db_player.guilds:
             if ctx.guild.id == db_guild.discord_guild_id:
@@ -83,13 +84,13 @@ class BeatSaber(commands.Cog):
     @channel.command(name="add")
     async def channel_add(self, ctx):
         """Set current channel as the notification channel."""
-        db_guild = self.uow.guild_repo.get_guild_by_id(ctx.guild.id)
+        db_guild = self.uow.guild_repo.get_guild_by_discord_id(ctx.guild.id)
 
         if db_guild.recent_scores_channel_id is not None:
             await ctx.send(f'Channel **{ctx.channel.name}** has already been set as the notification channel!')
             return
 
-        self.uow.guild_repo.set_recent_score_channel_id(ctx.guild.id, ctx.channel.id)
+        self.uow.guild_repo.set_recent_score_channel_id(db_guild, ctx.channel.id)
         await self.tasks.mark_all_guild_scores_sent(db_guild)
 
         await ctx.send(f'Channel **{ctx.channel.name}** has successfully set as the notification channel!')
@@ -97,13 +98,13 @@ class BeatSaber(commands.Cog):
     @channel.command(name="remove")
     async def channel_remove(self, ctx):
         """Remove the currently set notification channel."""
-        db_guild = self.uow.guild_repo.get_guild_by_id(ctx.guild.id)
+        db_guild = self.uow.guild_repo.get_guild_by_discord_id(ctx.guild.id)
 
         if db_guild.recent_scores_channel_id is None:
             await ctx.send(f"There isn't a notification channel set for this Discord server.")
             return
 
-        self.uow.guild_repo.set_recent_score_channel_id(ctx.guild.id, None)
+        self.uow.guild_repo.set_recent_score_channel_id(db_guild, None)
         await ctx.send(f'Notifications channel successfully removed!')
 
     @commands.group(invoke_without_command=True)
@@ -114,16 +115,20 @@ class BeatSaber(commands.Cog):
     @feature.command(name="add")
     async def feature_add(self, ctx, feature_flag: str):
         """Available features: ppRoles"""
+        db_guild = self.uow.guild_repo.get_guild_by_discord_id(ctx.guild.id)
+
         if feature_flag == "ppRoles":
-            self.uow.guild_repo.set_feature(ctx.guild.id, feature_flag, True)
+            self.uow.guild_repo.set_feature(db_guild, feature_flag, True)
             await self.tasks.update_all_player_roles(ctx.guild)
             await ctx.send("Enabled pp roles feature")
 
     @feature.command(name="remove")
     async def feature_remove(self, ctx, feature_flag: str):
         """Available features: ppRoles"""
+        db_guild = self.uow.guild_repo.get_guild_by_discord_id(ctx.guild.id)
+
         if feature_flag == "ppRoles":
-            self.uow.guild_repo.set_feature(ctx.guild.id, feature_flag, False)
+            self.uow.guild_repo.set_feature(db_guild, feature_flag, False)
             await self.tasks.remove_guild_roles(ctx.guild)
             await ctx.send("Disabled pp roles feature")
 
@@ -161,10 +166,11 @@ class BeatSaber(commands.Cog):
     @commands.command(name="showpp")
     async def show_pp(self, ctx):
         """Gives bot permission to check the persons PP."""
-        db_player = self.uow.guild_repo.get_player_by_discord_id(ctx.guild, ctx.author.id)
+        db_player = self.uow.player_repo.get_player_by_member_id(ctx.author.id)
 
-        if db_player is None:
+        if db_player is None or not Utils.is_player_in_guild(db_player, ctx.guild.id):
             await ctx.send(f"**{ctx.author.name}** doesn't have a PP")
+            return
 
         pp_size = round(db_player.pp / 100)
         await ctx.send(f"**{ctx.author.name}**'s PP is this big:\n8{'=' * pp_size}D")

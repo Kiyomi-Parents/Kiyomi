@@ -18,7 +18,7 @@ class Song(Base):
     key = Column(String)
     name = Column(String)
     uploader = Column(JSON)
-    hash = Column(String, ForeignKey('score.songHash'))
+    hash = Column(String, ForeignKey('score.songHash', ondelete="CASCADE"))
     uploaded = Column(String)
     directDownload = Column(String)
     downloadURL = Column(String)
