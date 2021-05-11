@@ -1,4 +1,5 @@
 from src.log import Logger
+import re
 
 async def can_execute(message):
     if not message.author.guild_permissions.administrator:
