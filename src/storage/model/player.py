@@ -52,6 +52,7 @@ class Player(Base):
         self.permissions = playerJson["permissions"]
         self.inactive = playerJson["inactive"]
         self.banned = playerJson["banned"]
+        self.discord_user_id = None
 
     @property
     def profile_url(self):

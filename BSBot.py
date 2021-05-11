@@ -45,10 +45,7 @@ async def player_func(message, args):
             await message.channel.send(f'Failed to add player!')
             return
 
-        if discord_user_id is not None:
-            new_player.discord_user_id = discord_user_id
-        else:
-            new_player.discord_user_id = message.author.id
+        new_player.discord_user_id = discord_user_id
 
         uow.player_repo.add_player(new_player)
         uow.player_repo.add_to_guild(new_player.playerId, db_guild)
@@ -160,7 +157,6 @@ async def channel_func(message, args):
 
     await actionfunc()
 
-#async def enable_feature(message, action, feature_flag):
 async def enable_feature(message, args):
     if not await can_execute(message):
         return
@@ -225,6 +221,11 @@ async def run_task(message, args=False):
     Logger.log_add(f'update(guild: {message.guild}, args: {args})')
     await actionfunc(message.guild)
 
+async def get_pp(message, args=False):
+    Logger.log_add(f'get_pp() ran by {message.author.name} ({message.author.id} in {message.channel.guild})')
+    await message.channel.send(uow.guild_repo.get_player_by_discord_id(message.channel.guild, message.author.id).pp)
+
+
 
 async def command(message, command, args):
     command_dict = {
@@ -233,7 +234,8 @@ async def command(message, command, args):
         "player": [player_func, 2],
         "channel": [channel_func, 1],
         "feature": [enable_feature, 2],
-        "update": [run_task, 0]
+        "update": [run_task, 0],
+        "pp": [get_pp, 0]
     }
     func, required_args = [i for i in command_dict.get(command, invalid_command)]
     if len(args) >= required_args:

@@ -45,9 +45,19 @@ class GuildRepository:
         Logger.log_add(f"Removed {player} from {discord_guild}")
 
     def get_players(self, guild):
-        discord_guild = self.get_guild_by_id(guild.discord_guild_id)
+        discord_guild = self.get_guild_by_id(guild.id)
 
         return discord_guild.players
+
+    def get_player_by_discord_id(self, guild, discord_id):
+        discord_guild = self.get_guild_by_id(guild.id)
+        players = discord_guild.players
+        for player in players:
+            if player.discord_user_id == discord_id:
+                return player
+        else:
+            return
+
 
     def set_feature(self, guild_id, feature_flag, status):
         discord_guild = self.get_guild_by_id(guild_id)
