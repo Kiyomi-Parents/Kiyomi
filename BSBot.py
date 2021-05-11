@@ -223,7 +223,10 @@ async def run_task(message, args=False):
 
 async def get_pp(message, args=False):
     Logger.log_add(f'get_pp() ran by {message.author.name} ({message.author.id} in {message.channel.guild})')
-    await message.channel.send(uow.guild_repo.get_player_by_discord_id(message.channel.guild, message.author.id).pp)
+    try:
+        await message.channel.send(uow.guild_repo.get_player_by_discord_id(message.channel.guild, message.author.id).pp)
+    except Exception as e:
+        Logger.log_add(f'Exception {e} in get_pp(), message.content: {message.content}, author: {message.author}')
 
 
 
@@ -259,8 +262,12 @@ async def on_message(message):
     if message.content.startswith('!'):
         match = re.match(pattern, message.content)
         if match:
-            command_msg, *args = [match.group(i+1) for i in range(3) if bool(match.group(i+1))]
-            await command(message, command_msg, args)
+            try:
+                command_msg, *args = [match.group(i+1) for i in range(3) if bool(match.group(i+1))]
+                await command(message, command_msg, args)
+            except Exception as e:
+                Logger.log_add(f'Exception in on_message, message.content: {message.content}, exception: {e}')
+                await message.channel.send('Sorry, an error occurred')
 
 
 
