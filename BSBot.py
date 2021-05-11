@@ -49,7 +49,7 @@ if __name__ == '__main__':
     tasks.update_all_player_roles.start()
     tasks.update_players_scores.start()
     tasks.send_notifications.start()
-    commandobject = Commands(uow, tasks)
+    commandobject = Commands(uow, tasks, client)
 
     load_dotenv()
     TOKEN = os.getenv('DISCORD_TOKEN')

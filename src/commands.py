@@ -1,18 +1,20 @@
 from src.log import Logger
 import re
 
-async def can_execute(message):
-    if not message.author.guild_permissions.administrator:
-        await message.channel.send("You don't have access to this command")
-        return False
-
-    return True
-
 class Commands:
-    def __init__(self, uow, tasks):
+    def __init__(self, uow, tasks, client):
         self.uow = uow
         self.tasks = tasks
+        self.client = client
     
+    @staticmethod
+    async def can_execute(message):
+        if not message.author.guild_permissions.administrator:
+            await message.channel.send("You don't have access to this command")
+            return False
+
+        return True
+
     async def invalid_command(self, message, args=False):
         await message.channel.send('Sorry, something went wrong! Make sure your message is in the correct format.')
 
@@ -116,7 +118,7 @@ class Commands:
         await actionfunc()
 
     async def channel_func(self, message, args):
-        if not await can_execute(message):
+        if not await self.can_execute(message):
             return
         
         async def add_channel():
@@ -131,7 +133,8 @@ class Commands:
             await message.channel.send(f'Channel ID {message.channel.name} ({channel_id}) successfully added!')
         async def remove_channel():
             if db_guild.recent_scores_channel_id is None:
-                await message.channel.send(f"Channel ID {message.channel.name} ({channel_id}) already doesn't exist in the channel list for server {client.get_guild(guild_id)}.")
+                await message.channel.send(f"Channel ID {message.channel.name} ({channel_id}) already doesn't exist in the channel list for server {self.client.get_guild(guild_id)}.")
+                return
 
             self.uow.guild_repo.set_recent_score_channel_id(guild_id, None)
             await message.channel.send(f'Channel ID {message.channel.name} ({channel_id}) successfully removed!')
@@ -155,7 +158,7 @@ class Commands:
         await actionfunc()
 
     async def enable_feature(self, message, args):
-        if not await can_execute(message):
+        if not await self.can_execute(message):
             return
         
         async def add_feature():
@@ -193,7 +196,7 @@ class Commands:
         await actionfunc()
 
     async def run_task(self, message, args=False):
-        if not await can_execute(message):
+        if not await self.can_execute(message):
             return
 
         actiondict = {
