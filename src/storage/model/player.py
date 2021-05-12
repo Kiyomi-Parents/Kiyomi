@@ -32,7 +32,7 @@ class Player(Base):
     banned = Column(Integer)
 
     guilds = relationship("DiscordGuild", secondary=guild_player_table, back_populates="players")
-    scores = relationship("Score")
+    scores = relationship("Score", cascade="all, delete-orphan")
 
     # Discord info
     discord_user_id = Column(Integer)

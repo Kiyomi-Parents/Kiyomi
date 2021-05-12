@@ -50,7 +50,7 @@ class Roles:
     async def remove_guild_role(self, db_role):
         role = await self.get_role(db_role)
         await role.delete(reason="Disabled PP roles feature (BOT)")
-        self.uow.guild_repo.remove_role(self.guild.id, db_role)
+        self.uow.guild_repo.remove_role(self.db_guild, db_role)
 
     async def remove_guild_roles(self):
         for db_role in self.db_guild.roles:
@@ -86,6 +86,6 @@ class Roles:
         role = await self.guild.create_role(name=f"{self.get_pp_range_text}", colour=Colour.random(), hoist=True, reason="PP ranking (BOT)")
         db_role = await self.create_db_role(role)
 
-        self.uow.guild_repo.add_role(self.guild.id, db_role)
+        self.uow.guild_repo.add_role(self.db_guild, db_role)
 
         return role

@@ -42,8 +42,8 @@ class ScoreSaber:
         Logger.log_add(f"Got HTTP status code {response.status_code} for {response.url}")
         return None
 
-    def get_recent_scores(self, player):
-        response = requests.get(f"{self._url}/player/{player.playerId}/scores/recent", timeout=self._timeout)
+    def get_recent_scores(self, db_player):
+        response = requests.get(f"{self._url}/player/{db_player.playerId}/scores/recent", timeout=self._timeout)
 
         if response.status_code == 200:
             recent_scores = response.json()["scores"]
@@ -53,7 +53,7 @@ class ScoreSaber:
             for recent_score in recent_scores:
                 recent_score_list.append(Score(recent_score))
 
-            Logger.log_add(f"Got {len(recent_score_list)} recent scores for {player}")
+            Logger.log_add(f"Got {len(recent_score_list)} recent scores for {db_player}")
             return recent_score_list
 
         Logger.log_add(f"Got HTTP status code {response.status_code} for {response.url}")

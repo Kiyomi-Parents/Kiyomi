@@ -15,7 +15,7 @@ class Score(Base):
     __tablename__ = "score"
 
     id = Column(Integer, primary_key=True)
-    player_id = Column(Integer, ForeignKey('player.id'))
+    player_id = Column(Integer, ForeignKey('player.id', ondelete='CASCADE'))
 
     # ScoreSaber info
     rank = Column(Integer)
@@ -37,7 +37,7 @@ class Score(Base):
     maxScore = Column(Integer)
 
     msg_guilds = relationship("DiscordGuild", secondary=score_guild_table)
-    song = relationship("Song", uselist=False)
+    song = relationship("Song", uselist=False, cascade="all, delete-orphan")
 
     def __init__(self, scoreJson):
         self.rank = scoreJson["rank"]
