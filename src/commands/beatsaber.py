@@ -1,6 +1,7 @@
 from discord.ext import commands
-
+from src.log import Logger
 from src.utils import Utils
+from functools import wraps
 
 
 class BeatSaber(commands.Cog):
@@ -8,10 +9,28 @@ class BeatSaber(commands.Cog):
         self.uow = uow
         self.tasks = tasks
 
+    def admin(self, ctx):
+        def inner_func(func):
+            @wraps(func)
+            async def wrapper(self, ctx):
+                if ctx.author.guild_permissions.administrator:
+                    await func(self, ctx)
+                else:
+                    Logger.log_add(f'{ctx.author.name} doesn\'t have the necessary permission(s) to use this command. Message: {ctx.message.content}')
+                    await ctx.send('You don\'t have the necessary permission(s) to use this command!')
+            return wrapper
+        return inner_func
+
     @commands.command()
     async def hello(self, ctx):
         """Greet the bot."""
         await ctx.send('Hello there!')
+
+    @commands.command()
+    @admin("self", "ctx")
+    async def admintest(self, ctx):
+        """Command to test if security is working"""
+        await ctx.send('This message should only be seen if !admintest was called by a server admin.')
 
     @commands.group(invoke_without_command=True)
     async def player(self, ctx):
@@ -77,6 +96,7 @@ class BeatSaber(commands.Cog):
         await ctx.send(f"Player **{db_player.playerName}** has already been removed or didn't exist in the first place????")
 
     @commands.group(invoke_without_command=True)
+    @admin("self","ctx")
     async def channel(self, ctx):
         """Set the recent score notification channel for ScoreSaber scores."""
         await ctx.send_help(ctx.command)
@@ -108,6 +128,7 @@ class BeatSaber(commands.Cog):
         await ctx.send(f'Notifications channel successfully removed!')
 
     @commands.group(invoke_without_command=True)
+    @admin("self","ctx")
     async def feature(self, ctx):
         """To add/remove feature from Discord server."""
         await ctx.send_help(ctx.command)
@@ -133,6 +154,7 @@ class BeatSaber(commands.Cog):
             await ctx.send("Disabled pp roles feature")
 
     @commands.group()
+    @admin("self","ctx")
     async def update(self, ctx):
         """Run a task or run all tasks."""
         if ctx.subcommand_passed is None:
