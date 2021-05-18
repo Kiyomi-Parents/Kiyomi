@@ -26,10 +26,19 @@ class Song(Base):
 
     def __init__(self, songJson):
         if songJson is None:
-            s = "song not found"
-            self._metadata = self.stats = self.description = self.deletedAt = s
-            self._id = self.key = self.name = self.uploader = self.hash = s
-            self.uploaded = self.directDownload = self.downloadURL = self.coverURL = s
+            self._metadata = None
+            self.stats = None
+            self.description = None
+            self.deletedAt = None
+            self._id = None
+            self.key = None
+            self.name = None
+            self.uploader = None
+            self.hash = None
+            self.uploaded = None
+            self.directDownload = None
+            self.downloadURL = None
+            self.coverURL = None
         else:
             self._metadata = songJson["metadata"]
             self.stats = songJson["stats"]
