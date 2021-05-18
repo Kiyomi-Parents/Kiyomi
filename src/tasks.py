@@ -5,12 +5,18 @@ from discord.ext import tasks
 from src.log import Logger
 from src.message import Message
 from src.roles import Roles
+from src.storage.model.song import Song
 
+import json
+from datetime import datetime, timedelta
 
 class Tasks:
 
     def __init__(self, uow):
         self.uow = uow
+        self.wait = None
+        self.waitstart = None
+        self.waituntil = None
 
     @staticmethod
     async def __attempt(func, error_handler):
@@ -98,7 +104,32 @@ class Tasks:
             song = self.uow.song_repo.get_song_by_hash(db_score.songHash)
 
             if song is None:
-                song = self.uow.beatsaver.get_song_by_score(db_score)
+                if not self.wait:
+                    returntuple = self.uow.beatsaver.get_song_by_score(db_score)
+                    song = returntuple[0]
+                    code = returntuple[1]
+                    if song is None:
+                        if code == 404:
+                            song = Song(None)
+                        elif code == 429:
+                            self.waitstart = datetime.utcnow()
+                            try:
+                                response = json.loads(returntuple[2])
+                                self.wait = int(response["resetAfter"])
+                            except KeyError:
+                                if self.wait is None:
+                                    self.wait = 1000
+                                elif self.wait < 60*1000:
+                                    self.wait *= 2
+                                else:
+                                    self.wait = 60*1000
+                            self.waituntil = self.waitstart+timedelta(milliseconds=self.wait)
+                    else:
+                        self.wait = None
+                elif datetime.utcnow() > self.waituntil:
+                    print(self.waituntil-datetime.utcnow())
+                    self.wait = None
+                    self.waituntil = None
 
             self.uow.score_repo.add_song(db_score, song)
 

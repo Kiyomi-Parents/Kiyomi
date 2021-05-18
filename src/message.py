@@ -12,7 +12,8 @@ class Message:
         embed = Embed()
         embed.set_author(name=player.playerName, url=player.profile_url, icon_url=player.avatar_url)
         embed.title = f"New #{score.rank} for {score.song_name_full} on {score.difficulty_name}"
-        embed.description = F"Mapped by {song._metadata['levelAuthorName']}"
+        if song is not None:
+            embed.description = F"Mapped by {song._metadata['levelAuthorName']}"
 
         embed.add_field(name="PP", value=f"**{score.pp}pp** ({score.weighted_pp}pp)")
         embed.add_field(name="Accuracy", value=f"**{score.accuracy}%**")
@@ -25,8 +26,8 @@ class Message:
         embed.colour = Colour.random(seed=player.playerId)
         embed.url = score.leaderboard_url
 
-        embed.add_field(name="\u200b", value=f"[Beat Saver]({song.beatsaver_url})")
-        embed.add_field(name="\u200b", value=f"[Preview Map]({song.preview_url})")
-        #embed.set_footer(text=timeago.format(score.get_date, datetime.utcnow()))
+        if song is not None:
+            embed.add_field(name="\u200b", value=f"[Beat Saver]({song.beatsaver_url})")
+            embed.add_field(name="\u200b", value=f"[Preview Map]({song.preview_url})")
 
         return embed
