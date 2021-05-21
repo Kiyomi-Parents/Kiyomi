@@ -10,8 +10,21 @@ class ScoreRepository:
     def get_score(self, scoreId):
         return self._db.session.query(Score).filter(Score.scoreId == scoreId).first()
 
+    def get_scores(self, scores):
+        db_scores = []
+
+        for score in scores:
+            db_scores.append(self.get_score(score.scoreId))
+
+        return db_scores
+
     def get_player_scores(self, player):
         return self._db.session.query(Score).filter(Score.player_id == player.id).all()
+
+    def get_player_scores_without_song(self, player):
+        return self._db.session.query(Score)\
+            .filter(Score.player_id == player.id)\
+            .filter(~Score.song.has()).all()
 
     def get_scores_without_song(self):
         return self._db.session.query(Score).filter(~Score.song.has()).all()

@@ -1,5 +1,5 @@
-from src.beatsaver import BeatSaver
-from src.scoresaber import ScoreSaber
+from src.api.beatsaver import BeatSaver
+from src.api.scoresaber import ScoreSaber
 from src.storage.database import Database
 from src.storage.repository.guild_repository import GuildRepository
 from src.storage.repository.player_repository import PlayerRepository
