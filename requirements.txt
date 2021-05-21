@@ -5,4 +5,3 @@ timeago~=1.0.15
 cfscrape~=2.1.1
 discord.py~=1.7.1
 SQLAlchemy~=1.4.11
-beautifulsoup4~=4.9.3

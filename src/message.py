@@ -1,7 +1,3 @@
-from dateutil import tz
-from datetime import datetime
-
-import timeago
 from discord import Embed, Colour
 
 

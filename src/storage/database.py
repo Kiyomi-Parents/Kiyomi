@@ -10,12 +10,12 @@ class Database:
 
     def add_entry(self, entry):
         self.session.add(entry)
-        Logger.log_add(f"Added new entry: {entry}")
+        Logger.log(entry, f"Added")
         self.commit_changes()
 
     def add_entries(self, entries):
         self.session.add_all(entries)
-        Logger.log_add(f"Added {len(entries)} new entries of {type(entries[0])}")
+        Logger.log(type(entries[0]), f"Added {len(entries)} new entries")
         self.commit_changes()
 
     def commit_changes(self):

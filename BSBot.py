@@ -16,7 +16,7 @@ client = commands.Bot('!')
 
 @client.event
 async def on_ready():
-    Logger.log_add(f'{client.user} has connected to Discord!')
+    Logger.log(client.user.name, f'Connected to Discord!')
 
 
 @client.check
@@ -58,6 +58,7 @@ if __name__ == '__main__':
     tasks.update_all_player_roles.start()
     tasks.update_players_scores.start()
     tasks.send_notifications.start()
+
     client.add_cog(BeatSaber(uow, tasks))
 
     load_dotenv()

@@ -33,12 +33,12 @@ class Roles:
         if role not in member.roles:
             await member.add_roles(role)
 
-            db_role = await self.get_db_role(role)
+            db_role = self.get_db_role(role)
             self.uow.player_repo.add_role(self.db_player, db_role)
 
     async def remove_player_role(self, db_role):
         member = await self.member
-        role = await self.get_role(db_role)
+        role = self.get_role(db_role)
         await member.remove_roles(role, reason="Removed PP ranking (BOT)")
         self.uow.player_repo.remove_role(self.db_player, db_role)
 
@@ -48,7 +48,7 @@ class Roles:
                 await self.remove_player_role(db_role)
 
     async def remove_guild_role(self, db_role):
-        role = await self.get_role(db_role)
+        role = self.get_role(db_role)
         await role.delete(reason="Disabled PP roles feature (BOT)")
         self.uow.guild_repo.remove_role(self.db_guild, db_role)
 
@@ -61,10 +61,10 @@ class Roles:
             if db_role.pp_requirement != self.db_player.pp_class:
                 await self.remove_player_role(db_role)
 
-    async def get_role(self, db_role):
+    def get_role(self, db_role):
         return self.guild.get_role(db_role.role_id)
 
-    async def get_db_role(self, role):
+    def get_db_role(self, role):
         for db_role in self.db_guild.roles:
             if db_role.role_id == role.id:
                 return db_role
@@ -72,11 +72,11 @@ class Roles:
     async def get_pp_role(self):
         for db_role in self.db_guild.roles:
             if db_role.pp_requirement == self.db_player.pp_class:
-                return await self.get_role(db_role)
+                return self.get_role(db_role)
 
         return await self.create_role()
 
-    async def create_db_role(self, role):
+    def create_db_role(self, role):
         db_role = DiscordRole(role)
         db_role.pp_requirement = self.db_player.pp_class
 
@@ -84,7 +84,7 @@ class Roles:
 
     async def create_role(self):
         role = await self.guild.create_role(name=f"{self.get_pp_range_text}", colour=Colour.random(), hoist=True, reason="PP ranking (BOT)")
-        db_role = await self.create_db_role(role)
+        db_role = self.create_db_role(role)
 
         self.uow.guild_repo.add_role(self.db_guild, db_role)
 

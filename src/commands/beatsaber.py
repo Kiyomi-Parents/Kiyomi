@@ -1,4 +1,6 @@
 from discord.ext import commands
+
+from src.api.errors import NotFound
 from src.log import Logger
 from src.utils import Utils
 from functools import wraps
@@ -16,7 +18,7 @@ class BeatSaber(commands.Cog):
                 if ctx.author.guild_permissions.administrator:
                     await func(self, ctx)
                 else:
-                    Logger.log_add(f'{ctx.author.name} doesn\'t have the necessary permission(s) to use this command. Message: {ctx.message.content}')
+                    Logger.log(type(self).__name__, f"{ctx.author.name} doesn't have the necessary permission(s) to use this command. Message: {ctx.message.content}")
                     await ctx.send('You don\'t have the necessary permission(s) to use this command!')
             return wrapper
         return inner_func
@@ -45,30 +47,34 @@ class BeatSaber(commands.Cog):
         db_guild = self.uow.guild_repo.get_guild_by_discord_id(ctx.guild.id)
         db_player = self.uow.player_repo.get_player_by_member_id(ctx.author.id)
 
-        if db_player in db_guild.players:
+        if db_player is not None and db_player in db_guild.players:
             await ctx.send(f'Player **{db_player.playerName}** has already been added!')
             return
 
-        new_player = self.uow.scoresaber.get_player(player_id)
+        # Add new player to db if not found
+        if db_player is None:
+            try:
+                new_player = self.uow.scoresaber.get_player(player_id)
+                new_player.discord_user_id = ctx.author.id
 
-        if new_player is None:
-            await ctx.send(f'Failed to add player!')
-            return
+                self.uow.player_repo.add_player(new_player)
+            except NotFound:
+                await ctx.send(f"Could not find player!")
+                return
 
-        new_player.discord_user_id = ctx.author.id
+            db_player = self.uow.player_repo.get_player_by_member_id(ctx.author.id)
 
-        self.uow.player_repo.add_player(new_player)
-        self.uow.player_repo.add_to_guild(new_player, db_guild)
+        self.uow.player_repo.add_to_guild(db_player, db_guild)
 
         # Get player scores and marked them sent to decrease spam
-        await self.tasks.update_player_scores(new_player)
-        await self.tasks.mark_all_player_scores_sent(new_player)
+        self.tasks.update_player_scores(db_player)
+        self.tasks.mark_all_player_scores_sent(db_player)
 
         # Add role to player if enabled
         if db_guild.pp_roles:
-            await self.tasks.update_player_roles(db_guild, new_player)
+            await self.tasks.update_player_roles(db_guild, db_player)
 
-        await ctx.send(f'Player **{new_player.playerName}** successfully added!')
+        await ctx.send(f'Player **{db_player.playerName}** successfully added!')
 
     @player.command(name="remove")
     async def player_remove(self, ctx):
@@ -111,7 +117,7 @@ class BeatSaber(commands.Cog):
             return
 
         self.uow.guild_repo.set_recent_score_channel_id(db_guild, ctx.channel.id)
-        await self.tasks.mark_all_guild_scores_sent(db_guild)
+        self.tasks.mark_all_guild_scores_sent(db_guild)
 
         await ctx.send(f'Channel **{ctx.channel.name}** has successfully set as the notification channel!')
 
