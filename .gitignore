@@ -1,9 +1,8 @@
-.env
+*.env
 .idea
 __pycache__
 venv
-test.env
 config.json
 scores.json
 *log.txt
-bot.db
+*.db
