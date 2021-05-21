@@ -25,34 +25,19 @@ class Song(Base):
     coverURL = Column(String)
 
     def __init__(self, songJson):
-        if songJson is None:
-            self._metadata = None
-            self.stats = None
-            self.description = None
-            self.deletedAt = None
-            self._id = None
-            self.key = None
-            self.name = None
-            self.uploader = None
-            self.hash = None
-            self.uploaded = None
-            self.directDownload = None
-            self.downloadURL = None
-            self.coverURL = None
-        else:
-            self._metadata = songJson["metadata"]
-            self.stats = songJson["stats"]
-            self.description = songJson["description"]
-            self.deletedAt = songJson["deletedAt"]
-            self._id = songJson["_id"]
-            self.key = songJson["key"]
-            self.name = songJson["name"]
-            self.uploader = songJson["uploader"]
-            self.hash = songJson["hash"]
-            self.uploaded = songJson["uploaded"]
-            self.directDownload = songJson["directDownload"]
-            self.downloadURL = songJson["downloadURL"]
-            self.coverURL = songJson["coverURL"]
+        self._metadata = songJson["metadata"]
+        self.stats = songJson["stats"]
+        self.description = songJson["description"]
+        self.deletedAt = songJson["deletedAt"]
+        self._id = songJson["_id"]
+        self.key = songJson["key"]
+        self.name = songJson["name"]
+        self.uploader = songJson["uploader"]
+        self.hash = songJson["hash"]
+        self.uploaded = songJson["uploaded"]
+        self.directDownload = songJson["directDownload"]
+        self.downloadURL = songJson["downloadURL"]
+        self.coverURL = songJson["coverURL"]
 
     @property
     def beatsaver_url(self):
