@@ -28,9 +28,10 @@ class Utils:
     def time_task(func):
         @wraps(func)
         async def wrapper(self, *args, **kwargs):
+            Logger.log(func.__name__, "<===> Starting task <===>")
             start_time = time.process_time()
             res = await func(self, *args, **kwargs)
-            Logger.log_add(f"Ran task {func.__name__} in {time.process_time() - start_time} seconds")
+            Logger.log(func.__name__, f"Finished task in {round(time.process_time() - start_time, 2)} seconds\n")
 
             return res
 
@@ -41,7 +42,7 @@ class Utils:
         @wraps(func)
         async def wrapper(self, *args, **kwargs):
             if not self.uow.client.is_ready():
-                Logger.log_add("Discord client not ready, skipping task update players")
+                Logger.log(self.uow.client.user.name, "Discord client not ready, skipping task update players")
                 return
 
             return await func(self, *args, **kwargs)

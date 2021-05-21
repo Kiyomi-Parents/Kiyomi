@@ -24,35 +24,35 @@ class GuildRepository:
         db_guild.recent_scores_channel_id = channel_id
 
         self._db.commit_changes()
-        Logger.log_add(f"Updated {db_guild} recent scores channel to {channel_id}")
+        Logger.log(db_guild, f"Updated recent scores channel to {channel_id}")
 
     def add_player(self, db_guild, db_player):
         db_guild.players.append(db_player)
 
         self._db.commit_changes()
-        Logger.log_add(f"Added {db_player} to {db_guild}")
+        Logger.log(db_guild, f"Added {db_player}")
 
     def remove_player(self, db_guild, db_player):
         db_guild.players.remove(db_player)
 
         self._db.commit_changes()
-        Logger.log_add(f"Removed {db_player} from {db_guild}")
+        Logger.log(db_guild, f"Removed {db_player}")
 
     def set_feature(self, db_guild, feature_flag, status):
         if feature_flag == "ppRoles":
             db_guild.pp_roles = status
 
         self._db.commit_changes()
-        Logger.log_add(f"Set {feature_flag} on {db_guild} to {status}")
+        Logger.log(db_guild, f"Set {feature_flag} to {status}")
 
     def add_role(self, db_guild, db_role):
         db_guild.roles.append(db_role)
 
         self._db.commit_changes()
-        Logger.log_add(f"Added {db_role} to {db_guild}")
+        Logger.log(db_guild, f"Added {db_role}")
 
     def remove_role(self, db_guild, db_role):
         db_guild.roles.remove(db_role)
 
         self._db.commit_changes()
-        Logger.log_add(f"Removed {db_role} from {db_guild}")
+        Logger.log(db_guild, f"Removed {db_role}")

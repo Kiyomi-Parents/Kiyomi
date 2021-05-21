@@ -18,7 +18,7 @@ class BeatSaber(commands.Cog):
                 if ctx.author.guild_permissions.administrator:
                     await func(self, ctx)
                 else:
-                    Logger.log_add(f'{ctx.author.name} doesn\'t have the necessary permission(s) to use this command. Message: {ctx.message.content}')
+                    Logger.log(type(self).__name__, f"{ctx.author.name} doesn't have the necessary permission(s) to use this command. Message: {ctx.message.content}")
                     await ctx.send('You don\'t have the necessary permission(s) to use this command!')
             return wrapper
         return inner_func

@@ -51,7 +51,7 @@ class ScoreRepository:
         old_db_score.maxScore = new_db_score.maxScore
 
         self._db.commit_changes()
-        Logger.log_add(f"Updated {old_db_score}")
+        Logger.log(old_db_score, f"Updated")
 
         self.mark_score_unsent(old_db_score)
 
@@ -76,17 +76,17 @@ class ScoreRepository:
         db_score.msg_guilds.append(db_guild)
 
         self._db.commit_changes()
-        Logger.log_add(f"Marked {db_score} as sent for {db_guild}")
+        Logger.log(db_score, f"Marked as sent in {db_guild}")
 
     def mark_score_unsent(self, db_score):
         db_score.msg_guilds = []
 
         self._db.commit_changes()
-        Logger.log_add(f"Marked {db_score} as unsent")
+        Logger.log(db_score, f"Marked as unsent")
 
     def add_song(self, db_score, db_song):
         if db_score.song is None:
             db_score.song = db_song
 
             self._db.commit_changes()
-            Logger.log_add(f"Added {db_song} to {db_score}")
+            Logger.log(db_score, f"Added {db_song}")

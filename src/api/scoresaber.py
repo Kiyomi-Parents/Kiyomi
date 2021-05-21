@@ -30,5 +30,5 @@ class ScoreSaber:
         for recent_score in recent_scores:
             recent_score_list.append(Score(recent_score))
 
-        Logger.log_add(f"Got {len(recent_score_list)} recent scores for {db_player}")
+        Logger.log(db_player, f"Got {len(recent_score_list)} recent scores from ScoreSaber")
         return recent_score_list

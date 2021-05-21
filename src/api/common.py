@@ -39,11 +39,11 @@ class Common:
                 return result
             except ServerError as e:
                 attempt += 1
-                Logger.log_add(f"[Server Error] {e}")
-                Logger.log_add(f"[Server Error] Waiting {Common._wait_server_error} seconds...")
+                Logger.log("Server Error", {e})
+                Logger.log("Server Error", f"Waiting {Common._wait_server_error} seconds...")
                 time.sleep(Common._wait_server_error)
             except RateLimited as e:
                 attempt += 1
-                Logger.log_add(f"[Rate Limit] {e}")
-                Logger.log_add(f"[Rate Limit] Waiting {Common._wait_rate_limit} seconds...")
+                Logger.log("Rate Limit", {e})
+                Logger.log("Rate Limit", f"Waiting {Common._wait_rate_limit} seconds...")
                 time.sleep(Common._wait_rate_limit)
