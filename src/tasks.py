@@ -113,7 +113,7 @@ class Tasks:
             for db_guild in db_player.guilds:
                 if db_guild.recent_scores_channel_id is None:
                     Logger.log(db_guild, f"Missing recent scores channel, skipping!")
-                    return
+                    continue
 
                 channel = self.uow.client.get_channel(db_guild.recent_scores_channel_id)
                 db_scores = self.uow.score_repo.get_unsent_scores(db_player, db_guild)
