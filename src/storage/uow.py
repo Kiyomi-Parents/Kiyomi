@@ -1,10 +1,6 @@
-from src.api.beatsaver import BeatSaver
-from src.api.scoresaber import ScoreSaber
+from src.api import *
 from src.storage.database import Database
-from src.storage.repository.guild_repository import GuildRepository
-from src.storage.repository.player_repository import PlayerRepository
-from src.storage.repository.score_repository import ScoreRepository
-from src.storage.repository.song_repository import SongRepository
+from src.storage.repository import *
 
 
 class UnitOfWork:

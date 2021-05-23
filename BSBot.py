@@ -54,12 +54,18 @@ if __name__ == '__main__':
     tasks = Tasks(uow)
     Logger.log_init()
 
-    tasks.update_players.start()
-    tasks.update_all_player_roles.start()
-    tasks.update_players_scores.start()
-    tasks.send_notifications.start()
+    # tasks.update_players.start()
+    # tasks.update_all_player_roles.start()
+    # tasks.update_players_scores.start()
+    # tasks.send_notifications.start()
 
     client.add_cog(BeatSaber(uow, tasks))
+
+    players = uow.player_repo.get_players()
+
+    for player in players:
+        if player.id in [19, 13, 10, 8]:
+            uow.player_repo.remove_player(player)
 
     load_dotenv()
     TOKEN = os.getenv('DISCORD_TOKEN')

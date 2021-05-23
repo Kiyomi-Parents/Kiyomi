@@ -54,7 +54,8 @@ class Tasks:
 
     def update_player_scores(self, db_player):
         try:
-            recent_scores = self.uow.scoresaber.get_recent_scores(db_player)
+            recent_scores = self.uow.scoresaber.get_recent_scores(db_player.playerId)
+            Logger.log(db_player, f"Got {len(recent_scores)} recent scores from ScoreSaber")
 
             # Add new scores to player
             self.uow.player_repo.add_scores(db_player, recent_scores)

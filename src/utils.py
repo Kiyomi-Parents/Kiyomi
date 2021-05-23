@@ -42,7 +42,7 @@ class Utils:
         @wraps(func)
         async def wrapper(self, *args, **kwargs):
             if not self.uow.client.is_ready():
-                Logger.log(self.uow.client.user.name, "Discord client not ready, skipping task update players")
+                Logger.log("Discord", "Discord client not ready, skipping task update players")
                 return
 
             return await func(self, *args, **kwargs)
