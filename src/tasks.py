@@ -164,8 +164,11 @@ class Tasks:
         roles = Roles(self.uow, db_guild, db_player)
         role = await roles.get_pp_role()
 
-        await roles.give_member_role(role)
-        await roles.remove_obsolete_player_roles()
+        try:
+            await roles.give_member_role(role)
+            await roles.remove_obsolete_player_roles()
+        except Exception as e:
+            Logger.log_add(f'Exception {e} in update_player_roles')
 
     async def remove_player_roles(self, db_guild, db_player):
         roles = Roles(self.uow, db_guild, db_player)
