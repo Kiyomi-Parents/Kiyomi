@@ -1,11 +1,17 @@
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.declarative import declarative_base
+
 from src.log import Logger
-from src.storage.base import Session, engine, Base
+
+Base = declarative_base()
+Session = sessionmaker()
 
 
 class Database:
 
-    def __init__(self):
+    def __init__(self, engine):
         Base.metadata.create_all(engine)
+        Session.configure(bind=engine)
         self.session = Session()
 
     def add_entry(self, entry):
@@ -21,6 +27,6 @@ class Database:
     def commit_changes(self):
         try:
             self.session.commit()
-        except:
+        except Exception:
             self.session.rollback()
             raise

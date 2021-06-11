@@ -1,4 +1,5 @@
 from datetime import datetime
+from termcolor import colored
 import os
 
 
@@ -13,12 +14,27 @@ class Logger:
                 os.rename('log.txt', 'prev_log.txt')
 
     @staticmethod
-    def log_add(msg):
-        send_message = f'{datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")} | {msg}'
-        print(send_message)
+    def get_timestamp():
+        return f'{datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")}'
+
+    @staticmethod
+    def log_file(msg):
         with open('log.txt', 'a') as f:
-            f.write("\n" + send_message)
+            f.write("\n" + msg)
+
+    @staticmethod
+    def log_add(msg):
+        timestamp = Logger.get_timestamp()
+        final_msg = f"{timestamp} | {msg}"
+
+        print(final_msg)
+        Logger.log_file(final_msg)
 
     @staticmethod
     def log(tag, msg):
-        Logger.log_add(f"[{tag}] {msg}")
+        timestamp = Logger.get_timestamp()
+        tag_with_color = colored(f"[{tag}]", 'green')
+        final_msg = f"{timestamp} | {tag_with_color} {msg}"
+
+        print(final_msg)
+        Logger.log_file(final_msg)

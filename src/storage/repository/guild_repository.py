@@ -13,12 +13,14 @@ class GuildRepository:
     def get_pp_guilds(self):
         return self._db.session.query(DiscordGuild).filter(DiscordGuild.pp_roles).all()
 
-    def get_guild_by_discord_id(self, guild_id):
+    def get_guild_by_id(self, guild_id):
         return self._db.session.query(DiscordGuild).filter(DiscordGuild.discord_guild_id == guild_id).first()
 
     def add_guild(self, guild):
-        guild = DiscordGuild(guild)
-        self._db.add_entry(guild)
+        db_guild = DiscordGuild(guild)
+        self._db.add_entry(db_guild)
+
+        return self.get_guild_by_id(guild.id)
 
     def set_recent_score_channel_id(self, db_guild, channel_id):
         db_guild.recent_scores_channel_id = channel_id
@@ -39,8 +41,10 @@ class GuildRepository:
         Logger.log(db_guild, f"Removed {db_player}")
 
     def set_feature(self, db_guild, feature_flag, status):
-        if feature_flag == "ppRoles":
-            db_guild.pp_roles = status
+        if not hasattr(db_guild, feature_flag):
+            raise RuntimeError(f"{db_guild} doesn't have attribute {feature_flag}")
+
+        setattr(db_guild, feature_flag, status)
 
         self._db.commit_changes()
         Logger.log(db_guild, f"Set {feature_flag} to {status}")

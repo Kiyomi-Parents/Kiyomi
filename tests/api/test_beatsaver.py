@@ -1,6 +1,6 @@
 import unittest
 
-from src.api import BeatSaver, NotFound
+from src.api import BeatSaver, NotFoundException
 
 
 class TestBeatSaver(unittest.TestCase):
@@ -15,4 +15,4 @@ class TestBeatSaver(unittest.TestCase):
         self.assertEqual(song.hash, str.lower(self._valid_song_hash))
 
     def test_get_song_by_hash_invalid(self):
-        self.assertRaises(NotFound, self.beatsaver.get_song_by_hash, self._invalid_song_hash)
+        self.assertRaises(NotFoundException, self.beatsaver.get_song_by_hash, self._invalid_song_hash)

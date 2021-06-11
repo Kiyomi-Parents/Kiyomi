@@ -1,8 +1,10 @@
+from datetime import datetime
+
 from dateutil import parser, tz
 from sqlalchemy import Column, String, Integer, ForeignKey, DateTime, Float, Table
 from sqlalchemy.orm import relationship
 
-from src.storage.base import Base
+from src.storage.database import Base
 
 score_guild_table = Table('score_guild', Base.metadata,
                           Column('score_id', Integer, ForeignKey('score.id')),

@@ -17,8 +17,5 @@ cool bot
 
 
 ### Tests
-    # Install tools
-    python3 -m pip install pytest pytest-xdist
-    
     # Run tests
     pytest -v --numprocesses=auto

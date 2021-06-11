@@ -10,7 +10,10 @@ class ScoreRepository:
     def get_score(self, scoreId):
         return self._db.session.query(Score).filter(Score.scoreId == scoreId).first()
 
-    def get_scores(self, scores):
+    def get_scores(self, scores=None):
+        if scores is None:
+            return self._db.session.query(Score).all()
+
         db_scores = []
 
         for score in scores:

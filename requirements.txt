@@ -1,7 +1,13 @@
+pytest~=6.2.4
+pytest-asyncio~=0.15.1
+pytest-xdist~=2.2.1
+dpytest~=0.4.0
+cfscrape~=2.1.1
 requests~=2.21.0
+SQLAlchemy~=1.4.15
 python-dateutil~=2.7.5
 python-dotenv~=0.17.0
 timeago~=1.0.15
-cfscrape~=2.1.1
 discord.py~=1.7.1
-SQLAlchemy~=1.4.11
+termcolor~=1.1.0
+discord~=1.0.1

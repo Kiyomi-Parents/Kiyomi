@@ -5,68 +5,43 @@ from discord.ext import commands
 from discord.ext.commands import MissingRequiredArgument
 from dotenv import load_dotenv
 
-from src.commands.beatsaber import BeatSaber
-from src.commands.errors import NoPrivateMessages
+from src.commands.errors import NoPrivateMessagesException
 from src.log import Logger
-from src.storage.uow import UnitOfWork
-from src.tasks import Tasks
-
-client = commands.Bot('!')
 
 
-@client.event
-async def on_ready():
-    Logger.log(client.user.name, f'Connected to Discord!')
+class BSBot(commands.Bot):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
+    async def on_ready(self):
+        Logger.log(bot.user.name, f'Connected to Discord!')
 
-@client.check
-async def global_block_dms(ctx):
-    if ctx.guild is None:
-        raise NoPrivateMessages("no")
+    async def global_block_dms(self, ctx):
+        if ctx.guild is None:
+            raise NoPrivateMessagesException("no")
 
-    return True
+        return True
 
-
-@client.check
-async def global_db_guild(ctx):
-    db_guild = uow.guild_repo.get_guild_by_discord_id(ctx.guild.id)
-
-    if db_guild is None:
-        uow.guild_repo.add_guild(ctx.guild)
-
-    return True
-
-
-@client.event
-async def on_command_error(ctx, error):
-    if isinstance(error, MissingRequiredArgument):
-        await ctx.send_help(ctx.command)
-        await ctx.send(error)
-    elif isinstance(error, NoPrivateMessages):
-        await ctx.send(error)
-    else:
-        await ctx.send(f"Something went horribly wrong, check console!")
-        raise error
+    async def on_command_error(self, ctx, error):
+        if isinstance(error, commands.CommandNotFound):
+            return
+        elif isinstance(error, MissingRequiredArgument):
+            await ctx.send_help(ctx.command)
+            await ctx.send(error)
+        elif isinstance(error, NoPrivateMessagesException):
+            await ctx.send(error)
+        else:
+            await ctx.send(f"Something went horribly wrong, check console!")
+            raise error
 
 
 if __name__ == '__main__':
-    uow = UnitOfWork(client)
-    tasks = Tasks(uow)
+    bot = BSBot(command_prefix="!")
+
     Logger.log_init()
 
-    # tasks.update_players.start()
-    # tasks.update_all_player_roles.start()
-    # tasks.update_players_scores.start()
-    # tasks.send_notifications.start()
-
-    client.add_cog(BeatSaber(uow, tasks))
-
-    players = uow.player_repo.get_players()
-
-    for player in players:
-        if player.id in [19, 13, 10, 8]:
-            uow.player_repo.remove_player(player)
+    bot.load_extension(name="src.commands.beatsaber")
 
     load_dotenv()
     TOKEN = os.getenv('DISCORD_TOKEN')
-    client.run(TOKEN)
+    bot.run(TOKEN)
