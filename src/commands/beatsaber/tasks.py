@@ -12,7 +12,7 @@ class Tasks:
     def __init__(self, uow):
         self.uow = uow
 
-    @tasks.loop(seconds=90)
+    @tasks.loop(minutes=30)
     @Utils.time_task
     @Utils.discord_ready
     async def update_players(self, db_guild=None):
@@ -38,7 +38,7 @@ class Tasks:
         except NotFoundException:
             Logger.log(db_player, f"Could not find at ScoreSaber")
 
-    @tasks.loop(seconds=60)
+    @tasks.loop(minutes=2)
     @Utils.time_task
     @Utils.discord_ready
     async def update_players_scores(self, db_guild=None):
@@ -88,7 +88,7 @@ class Tasks:
 
             self.uow.score_repo.add_song(db_score, song)
 
-    @tasks.loop(seconds=10)
+    @tasks.loop(minutes=1)
     @Utils.time_task
     @Utils.discord_ready
     async def send_notifications(self, db_guild=None):
@@ -122,7 +122,7 @@ class Tasks:
             await channel.send(embed=embed)
             self.uow.score_repo.mark_score_sent(db_score, db_guild)
 
-    @tasks.loop(seconds=90)
+    @tasks.loop(minutes=1)
     @Utils.time_task
     @Utils.discord_ready
     async def update_all_player_roles(self, db_guild=None):
