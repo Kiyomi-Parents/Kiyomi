@@ -1,3 +1,6 @@
+from src.log import Logger
+
+
 class AlreadyHasRoleException(Exception):
     pass
 
@@ -39,7 +42,12 @@ class Roles:
 
             raise AlreadyHasRoleException(f"{db_player} already has {db_role}")
 
-        await member.add_roles(role)
+        try:
+            await member.add_roles(role)
+        except Exception as e:
+            Logger.log(db_player, f"Failed to add {db_role}")
+            raise e
+
         self.uow.player_repo.add_role(db_player, db_role)
 
     async def remove_player_role(self, db_player, db_role):
@@ -54,7 +62,12 @@ class Roles:
 
             raise RoleNotFoundException(f"{db_player} doesn't have {db_role}")
 
-        await member.remove_roles(role, reason="Removed PP ranking (BOT)")
+        try:
+            await member.remove_roles(role, reason="Removed PP ranking (BOT)")
+        except Exception as e:
+            Logger.log(db_player, f"Failed to remove {db_role}")
+            raise e
+
         self.uow.player_repo.remove_role(db_player, db_role)
 
     async def remove_player_roles(self, db_player, db_roles):
@@ -66,7 +79,13 @@ class Roles:
             raise RoleNotFoundException(f"{self.db_guild} doesn't have {db_role}")
 
         role = self.get_role(db_role)
-        await role.delete(reason="Disabled PP roles feature (BOT)")
+
+        try:
+            await role.delete(reason="Removing PP role (BOT)")
+        except Exception as e:
+            Logger.log(self.db_guild, f"Failed to remove {db_role}")
+            raise e
+
         self.uow.guild_repo.remove_role(self.db_guild, db_role)
 
     async def remove_guild_roles(self, db_roles):
