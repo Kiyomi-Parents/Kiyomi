@@ -141,6 +141,7 @@ class Tasks:
         roles_class = BeatSaberUtils.get_enabled_roles(self.uow, db_guild)
 
         if len(roles_class) == 0:
+            Logger.log("task", f"Skipping roles update for {db_guild}, no roles enabled!")
             return
 
         for db_player in db_guild.players:

@@ -6,6 +6,10 @@ class RoleNotFoundException(Exception):
     pass
 
 
+class PermissionDenied(Exception):
+    pass
+
+
 class Roles:
 
     def __init__(self, uow, db_guild):
@@ -13,9 +17,18 @@ class Roles:
         self.guild = self.uow.bot.get_guild(db_guild.discord_guild_id)
         self.db_guild = db_guild
 
+    # TODO: Make into wrapper
+    def check_permissions(self):
+        guild = self.uow.bot.get_guild(self.db_guild.discord_guild_id)
+
+        if not guild.me.guild_permissions.manage_roles:
+            raise PermissionDenied(f"{self.uow.bot.name} doesn't have permission to manage roles!")
+
     async def give_player_role(self, db_player, db_role):
         member = await self.guild.fetch_member(db_player.discord_user_id)
         role = self.get_role(db_role)
+
+        self.check_permissions()
 
         if role not in self.guild.roles:
             raise RoleNotFoundException(f"{self.db_guild} doesn't have {db_role}")
@@ -32,6 +45,11 @@ class Roles:
     async def remove_player_role(self, db_player, db_role):
         member = await self.guild.fetch_member(db_player.discord_user_id)
         role = self.get_role(db_role)
+
+        self.check_permissions()
+
+        if db_role not in self.db_guild:
+            raise RoleNotFoundException(f"{self.db_guild} doesn't have {db_role}")
 
         if role not in member.roles:
             if db_role in db_player.roles:
@@ -79,6 +97,9 @@ class Roles:
 
     def find_player_role(self, db_player):
         for db_role in db_player.roles:
+            if db_role not in self.db_guild:
+                continue
+
             if self.get_role_skill_class(db_role) is not None:
                 return db_role
 
@@ -88,6 +109,9 @@ class Roles:
         db_roles = []
 
         for db_role in db_player.roles:
+            if db_role not in self.db_guild:
+                continue
+
             if self.get_role_skill_class(db_role) is None:
                 continue
 
