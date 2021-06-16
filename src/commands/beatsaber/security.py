@@ -2,12 +2,10 @@ from discord.ext import commands
 
 
 class Security:
-    _running_tests = False
-
     @staticmethod
     def is_running_tests():
         def check(ctx):
-            return Security._running_tests
+            return ctx.bot.running_tests
 
         return commands.check(check)
 

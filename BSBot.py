@@ -10,6 +10,8 @@ from src.log import Logger
 
 
 class BSBot(commands.Bot):
+    running_tests = False
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
