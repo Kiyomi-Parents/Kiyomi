@@ -1,8 +1,8 @@
 import pytest
-from discord.ext.test import message, verify_message
+from discord.ext.test import message, verify
 
 
 @pytest.mark.asyncio
 async def test_admin_test(bot):
     await message("!admintest")
-    verify_message("admintest", contains=True)
+    assert verify().message().contains().content("admintest")

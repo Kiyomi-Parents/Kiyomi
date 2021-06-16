@@ -18,4 +18,6 @@ cool bot
 
 ### Tests
     # Run tests
+    pytest
+    # or
     pytest -v --numprocesses=auto

@@ -1,7 +1,7 @@
 pytest~=6.2.4
 pytest-asyncio~=0.15.1
 pytest-xdist~=2.2.1
-dpytest~=0.4.0
+dpytest~=0.5.2
 cfscrape~=2.1.1
 requests~=2.21.0
 SQLAlchemy~=1.4.15
@@ -10,4 +10,3 @@ python-dotenv~=0.17.0
 timeago~=1.0.15
 discord.py~=1.7.1
 termcolor~=1.1.0
-discord~=1.0.1

@@ -1,6 +1,7 @@
 from src.api import NotFoundException
 from src.commands.beatsaber.beatsaber_utils import BeatSaberUtils
 from src.commands.beatsaber.feature.feature import FeatureFlagNotFoundException
+from src.log import Logger
 
 
 class PlayerExistsException(Exception):
@@ -54,7 +55,7 @@ class Actions:
 
         # Get player scores and marked them sent to decrease spam
         self.tasks.update_player_scores(db_player)
-        self.tasks.mark_all_player_scores_sent(db_player)
+        self.mark_all_player_scores_sent(db_player)
 
         # Add role to player
         await self.update_player_roles(db_guild, db_player)
@@ -94,6 +95,26 @@ class Actions:
         for role_class in roles_class:
             await role_class.strip_player_role(db_player)
 
+    def mark_all_guild_scores_sent(self, db_guild):
+        Logger.log(db_guild, f"Marking scores sent for {len(db_guild.players)} players")
+
+        for db_player in db_guild.players:
+            self.mark_player_scores_sent(db_player, db_guild)
+
+    def mark_all_player_scores_sent(self, db_player):
+        Logger.log(db_player, f"Marking all scores as sent")
+
+        for db_guild in db_player.guilds:
+            self.mark_player_scores_sent(db_player, db_guild)
+
+    def mark_player_scores_sent(self, db_player, db_guild):
+        Logger.log(db_player, f"Marking all scores as sent in {db_guild}")
+
+        db_scores = self.uow.score_repo.get_unsent_scores(db_player, db_guild)
+
+        for db_score in db_scores:
+            self.uow.score_repo.mark_score_sent(db_score, db_guild)
+
     def add_recent_channel(self, guild_id, channel_id):
         guild = self.uow.bot.get_guild(guild_id)
         db_guild = self.uow.guild_repo.get_guild_by_id(guild_id)
@@ -108,7 +129,7 @@ class Actions:
                 f"Channel **{recent_scores_channel.name}** has already been set as the notification channel!")
 
         self.uow.guild_repo.set_recent_score_channel_id(db_guild, channel_id)
-        self.tasks.mark_all_guild_scores_sent(db_guild)
+        self.mark_all_guild_scores_sent(db_guild)
 
     def remove_recent_channel(self, guild_id):
         db_guild = self.uow.guild_repo.get_guild_by_id(guild_id)

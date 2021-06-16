@@ -76,20 +76,6 @@ class Tasks:
         except NotFoundException:
             Logger.log(db_player, f"Could not find scores on ScoreSaber")
 
-    def update_scores_song(self):
-        db_scores = self.uow.score_repo.get_scores_without_song()
-
-        if len(db_scores) == 0:
-            Logger.log("task", f"No song updates needed for scores")
-            return
-
-        Logger.log("task", f'Updating songs for {len(db_scores)} scores')
-
-        for db_score in db_scores:
-            self.update_score_song(db_score)
-
-        Logger.log("task", f"Updated songs for {len(db_scores)} scores")
-
     def update_score_song(self, db_score):
         if db_score.song is None:
             song = self.uow.song_repo.get_song_by_hash(db_score.songHash)
@@ -134,26 +120,6 @@ class Tasks:
         for db_score in db_scores:
             embed = Message.get_score_embed(db_player, db_score, db_score.song)
             await channel.send(embed=embed)
-            self.uow.score_repo.mark_score_sent(db_score, db_guild)
-
-    def mark_all_guild_scores_sent(self, db_guild):
-        Logger.log(db_guild, f"Marking scores sent for {len(db_guild.players)} players")
-
-        for db_player in db_guild.players:
-            self.mark_player_scores_sent(db_player, db_guild)
-
-    def mark_all_player_scores_sent(self, db_player):
-        Logger.log(db_player, f"Marking all scores as sent")
-
-        for db_guild in db_player.guilds:
-            self.mark_player_scores_sent(db_player, db_guild)
-
-    def mark_player_scores_sent(self, db_player, db_guild):
-        Logger.log(db_player, f"Marking all scores as sent in {db_guild}")
-
-        db_scores = self.uow.score_repo.get_unsent_scores(db_player, db_guild)
-
-        for db_score in db_scores:
             self.uow.score_repo.mark_score_sent(db_score, db_guild)
 
     @tasks.loop(seconds=90)

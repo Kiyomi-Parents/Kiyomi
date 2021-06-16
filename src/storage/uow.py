@@ -4,7 +4,7 @@ from src.storage.repository import *
 
 class UnitOfWork:
 
-    def __init__(self, bot, database):
+    def __init__(self, bot, database, scoresaber=None, beatsaver=None):
         self.db = database
 
         self.guild_repo = GuildRepository(self.db)
@@ -13,7 +13,14 @@ class UnitOfWork:
         self.score_repo = ScoreRepository(self.db)
         self.song_repo = SongRepository(self.db)
 
-        self.scoresaber = ScoreSaber()
-        self.beatsaver = BeatSaver()
+        if scoresaber is None:
+            self.scoresaber = ScoreSaber()
+        else:
+            self.scoresaber = scoresaber
+
+        if beatsaver is None:
+            self.beatsaver = BeatSaver()
+        else:
+            self.beatsaver = beatsaver
 
         self.bot = bot

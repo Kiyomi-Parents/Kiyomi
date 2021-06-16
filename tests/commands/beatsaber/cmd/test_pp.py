@@ -1,5 +1,5 @@
 import pytest
-from discord.ext.test import message, verify_message, empty_queue
+from discord.ext.test import message, verify, empty_queue
 
 
 @pytest.mark.asyncio
@@ -8,10 +8,16 @@ async def test_show_pp(bot):
     await empty_queue()
 
     await message("!showpp")
-    verify_message("PP is this big", contains=True)
+    assert verify() \
+        .message() \
+        .contains() \
+        .content("PP is this big")
 
 
 @pytest.mark.asyncio
 async def test_show_pp_no_profile(bot):
     await message("!showpp")
-    verify_message("doesn't have a PP", contains=True)
+    assert verify() \
+        .message() \
+        .contains() \
+        .content("doesn't have a PP")

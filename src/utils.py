@@ -5,6 +5,8 @@ from src.log import Logger
 
 
 class Utils:
+    running_tests = False
+
     @staticmethod
     def time_task(func):
         @wraps(func)
@@ -22,8 +24,8 @@ class Utils:
     def discord_ready(func):
         @wraps(func)
         async def wrapper(self, *args, **kwargs):
-            if not self.uow.bot.is_ready():
-                Logger.log("Discord", "Discord client not ready, skipping task update players")
+            if not self.uow.bot.is_ready() and not Utils.running_tests:
+                Logger.log("Discord", f"Discord client not ready, skipping task {func.__name__}")
                 return
 
             return await func(self, *args, **kwargs)
