@@ -1,7 +1,7 @@
 from sqlalchemy import Column, String, Integer, JSON, Float, Table, ForeignKey
 from sqlalchemy.orm import relationship
 
-from src.storage.base import Base
+from src.storage.database import Base
 from src.storage.model.discord_guild import guild_player_table
 
 player_role_table = Table('player_role', Base.metadata,
@@ -31,11 +31,11 @@ class Player(Base):
     inactive = Column(Integer)
     banned = Column(Integer)
 
-    guilds = relationship("DiscordGuild", secondary=guild_player_table, back_populates="players")
     scores = relationship("Score", cascade="all, delete-orphan")
 
     # Discord info
     discord_user_id = Column(Integer)
+    guilds = relationship("DiscordGuild", secondary=guild_player_table, back_populates="players")
     roles = relationship("DiscordRole", secondary=player_role_table)
 
     def __init__(self, playerJson):
@@ -64,7 +64,27 @@ class Player(Base):
 
     @property
     def pp_class(self):
-        return self.pp - (self.pp % 1000)
+        return int(self.pp - (self.pp % 1000))
+
+    @property
+    def rank_class(self):
+        # This way of getting the rank class is meh, could be better?
+        class_num = pow(5, len(str(self.rank))) * 2
+
+        if self.rank % class_num == 0:
+            return int(self.rank - (self.rank % class_num))
+        else:
+            return int(self.rank - (self.rank % class_num) + class_num)
+
+    @property
+    def country_rank_class(self):
+        # TODO: Probably needs to be better....
+        class_num = pow(5, len(str(self.rank)))
+
+        if self.rank % class_num == 0:
+            return int(self.rank - (self.rank % class_num))
+        else:
+            return int(self.rank - (self.rank % class_num) + class_num)
 
     def __str__(self):
         return f"Player {self.playerName} ({self.playerId})"

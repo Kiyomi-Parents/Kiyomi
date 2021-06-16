@@ -14,3 +14,10 @@ cool bot
   
 	# Start bot  
 	python3 BSBot.py  
+
+
+### Tests
+    # Run tests
+    pytest
+    # or
+    pytest -v --numprocesses=auto

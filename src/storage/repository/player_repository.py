@@ -25,6 +25,8 @@ class PlayerRepository:
     def add_player(self, db_player):
         self._db.add_entry(db_player)
 
+        return self.get_player_by_player_id(db_player.playerId)
+
     def remove_player(self, db_player):
         self._db.session.delete(db_player)
 

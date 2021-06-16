@@ -1,7 +1,7 @@
 from sqlalchemy import Column, String, Integer, ForeignKey, Table, Boolean
 from sqlalchemy.orm import relationship
 
-from src.storage.base import Base
+from src.storage.database import Base
 
 guild_player_table = Table('guild_player', Base.metadata,
                            Column('guild_id', Integer, ForeignKey('guild.id')),
@@ -21,7 +21,7 @@ class DiscordGuild(Base):
     name = Column(String)
 
     # Features
-    pp_roles = Column(Boolean)
+    pp_roles = Column(Boolean, default=False)
 
     players = relationship("Player", secondary=guild_player_table, back_populates="guilds")
     roles = relationship("DiscordRole", cascade="all, delete-orphan")

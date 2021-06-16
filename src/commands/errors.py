@@ -1,5 +1,5 @@
 from discord.ext import commands
 
 
-class NoPrivateMessages(commands.CheckFailure):
+class NoPrivateMessagesException(commands.CheckFailure):
     pass

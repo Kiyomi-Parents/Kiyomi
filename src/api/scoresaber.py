@@ -1,10 +1,9 @@
 import requests
 
 from src.api.beatsaver import BeatSaver
+from src.api.cache import Cache
 from src.api.common import Common
-from src.log import Logger
-from src.storage.model.player import Player
-from src.storage.model.score import Score
+from src.storage.model import *
 
 
 class ScoreSaber:
@@ -14,21 +13,29 @@ class ScoreSaber:
     def __init__(self):
         self._beatsaver = BeatSaver()
 
-    def get_player(self, playerID):
+    @Cache(minutes=2)
+    def _get_player(self, playerID):
         response = Common.request(requests.get, f"{self._url}/player/{playerID}/basic", timeout=self._timeout)
 
-        player_info = response.json()["playerInfo"]
-        return Player(player_info)
+        return response.json()
 
-    def get_recent_scores(self, db_player):
-        response = Common.request(requests.get, f"{self._url}/player/{db_player.playerId}/scores/recent", timeout=self._timeout)
+    def get_player(self, playerID):
+        response = self._get_player(playerID)
 
-        recent_scores = response.json()["scores"]
+        return Player(response["playerInfo"])
+
+    @Cache(minutes=2)
+    def _get_recent_scores(self, playerID):
+        response = Common.request(requests.get, f"{self._url}/player/{playerID}/scores/recent", timeout=self._timeout)
+
+        return response.json()
+
+    def get_recent_scores(self, playerID):
+        response = self._get_recent_scores(playerID)
 
         recent_score_list = []
 
-        for recent_score in recent_scores:
+        for recent_score in response["scores"]:
             recent_score_list.append(Score(recent_score))
 
-        Logger.log(db_player, f"Got {len(recent_score_list)} recent scores from ScoreSaber")
         return recent_score_list

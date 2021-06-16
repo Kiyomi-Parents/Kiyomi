@@ -11,13 +11,13 @@ class APIException(Exception):
         return self.message
 
 
-class NotFound(APIException):
+class NotFoundException(APIException):
     pass
 
 
-class RateLimited(APIException):
+class RateLimitedException(APIException):
     pass
 
 
-class ServerError(APIException):
+class ServerErrorException(APIException):
     pass

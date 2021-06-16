@@ -1,6 +1,6 @@
 from sqlalchemy import Column, String, Integer, ForeignKey
 
-from src.storage.base import Base
+from src.storage.database import Base
 
 
 class DiscordRole(Base):
