@@ -25,6 +25,9 @@ class BeatSaber(commands.Cog):
 
         return True
 
+    async def cog_before_invoke(self, ctx):
+        await ctx.trigger_typing()
+
     @commands.command()
     async def hello(self, ctx):
         """Greet the bot."""
