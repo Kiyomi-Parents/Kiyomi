@@ -127,8 +127,12 @@ class Roles:
             role_skill_class = self.get_role_skill_class(db_role)
 
             if player_skill_class != role_skill_class:
-                await self.assign_player_role(db_player)
-                await self.remove_old_player_roles(db_player)
+                try:
+                    await self.assign_player_role(db_player)
+                except AlreadyHasRoleException as e:
+                    raise e
+                finally:
+                    await self.remove_old_player_roles(db_player)
 
     async def assign_player_role(self, db_player):
         db_role = self.find_player_role(db_player)
