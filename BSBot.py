@@ -14,11 +14,13 @@ class BSBot(commands.Bot):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.add_check(self.global_block_dms)
 
     async def on_ready(self):
-        Logger.log(bot.user.name, f'Connected to Discord!')
+        Logger.log(self.user.name, f'Connected to Discord!')
 
-    async def global_block_dms(self, ctx):
+    @staticmethod
+    def global_block_dms(ctx):
         if ctx.guild is None:
             raise NoPrivateMessagesException("no")
 
