@@ -1,3 +1,4 @@
+from functools import wraps
 from src.log import Logger
 
 
@@ -13,6 +14,19 @@ class PermissionDenied(Exception):
     pass
 
 
+def check_permissions(func):
+    @wraps(func)
+    async def wrapper(self, *args, **kwargs):
+        guild = self.uow.bot.get_guild(self.db_guild.discord_guild_id)
+
+        if not guild.me.guild_permissions.manage_roles and not self.uow.bot.running_tests:
+            raise PermissionDenied(f"{self.uow.bot.user.name} doesn't have permission to manage roles!")
+
+        return await func(self, *args, **kwargs)
+
+    return wrapper
+
+
 class Roles:
 
     def __init__(self, uow, db_guild):
@@ -20,18 +34,10 @@ class Roles:
         self.guild = self.uow.bot.get_guild(db_guild.discord_guild_id)
         self.db_guild = db_guild
 
-    # TODO: Make into wrapper
-    def check_permissions(self):
-        guild = self.uow.bot.get_guild(self.db_guild.discord_guild_id)
-
-        if not guild.me.guild_permissions.manage_roles and not self.uow.bot.running_tests:
-            raise PermissionDenied(f"{self.uow.bot.user.name} doesn't have permission to manage roles!")
-
+    @check_permissions
     async def give_player_role(self, db_player, db_role):
         member = await self.guild.fetch_member(db_player.discord_user_id)
         role = self.get_role(db_role)
-
-        self.check_permissions()
 
         if role not in self.guild.roles:
             raise RoleNotFoundException(f"{self.db_guild} doesn't have {db_role}")
@@ -44,17 +50,16 @@ class Roles:
 
         try:
             await member.add_roles(role)
-        except Exception as e:
+        except Exception as error:
             Logger.log(db_player, f"Failed to add {db_role}")
-            raise e
+            raise error
 
         self.uow.player_repo.add_role(db_player, db_role)
 
+    @check_permissions
     async def remove_player_role(self, db_player, db_role):
         member = await self.guild.fetch_member(db_player.discord_user_id)
         role = self.get_role(db_role)
-
-        self.check_permissions()
 
         if role not in member.roles:
             if db_role in db_player.roles:
@@ -64,9 +69,9 @@ class Roles:
 
         try:
             await member.remove_roles(role, reason="Removed PP ranking (BOT)")
-        except Exception as e:
+        except Exception as error:
             Logger.log(db_player, f"Failed to remove {db_role}")
-            raise e
+            raise error
 
         self.uow.player_repo.remove_role(db_player, db_role)
 
@@ -82,9 +87,9 @@ class Roles:
 
         try:
             await role.delete(reason="Removing PP role (BOT)")
-        except Exception as e:
+        except Exception as error:
             Logger.log(self.db_guild, f"Failed to remove {db_role}")
-            raise e
+            raise error
 
         self.uow.guild_repo.remove_role(self.db_guild, db_role)
 
@@ -148,8 +153,8 @@ class Roles:
             if player_skill_class != role_skill_class:
                 try:
                     await self.assign_player_role(db_player)
-                except AlreadyHasRoleException as e:
-                    raise e
+                except AlreadyHasRoleException as error:
+                    raise error
                 finally:
                     await self.remove_old_player_roles(db_player)
 
@@ -195,8 +200,8 @@ class Roles:
         pass
 
     @staticmethod
-    def get_role_name(pp_class):
+    def get_role_name(skill_class):
         pass
 
-    async def create_role(self, pp_class):
+    async def create_role(self, skill_class):
         pass

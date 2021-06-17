@@ -1,10 +1,10 @@
 import time
 
-from src.api.errors import *
+from src.api.errors import RateLimitedException, NotFoundException, ServerErrorException
 from src.log import Logger
 
-wait_rate_limit = 60
-wait_server_error = 5
+WAIT_RATE_LIMIT = 60
+WAIT_SERVER_ERROR = 5
 
 
 class Common:
@@ -22,9 +22,11 @@ class Common:
     def verify_response(response):
         if response.status_code == 429:
             raise RateLimitedException(response)
-        elif 400 <= response.status_code < 500:
+
+        if 400 <= response.status_code < 500:
             raise NotFoundException(response)
-        elif 500 <= response.status_code < 600:
+
+        if 500 <= response.status_code < 600:
             raise ServerErrorException(response)
 
     @staticmethod
@@ -39,17 +41,18 @@ class Common:
 
                 attempting = False
                 return result
-            except ServerErrorException as e:
+            except ServerErrorException as error:
                 attempt += 1
-                Logger.log("Server Error", str(e))
-                Logger.log("Server Error", f"Waiting {wait_server_error} seconds...")
-                last_exception = e
-                time.sleep(wait_server_error)
-            except RateLimitedException as e:
+                Logger.log("Server Error", str(error))
+                Logger.log("Server Error", f"Waiting {WAIT_SERVER_ERROR} seconds...")
+                last_exception = error
+                time.sleep(WAIT_SERVER_ERROR)
+            except RateLimitedException as error:
                 attempt += 1
-                Logger.log("Rate Limit", str(e))
-                Logger.log("Rate Limit", f"Waiting {wait_rate_limit} seconds...")
-                last_exception = e
-                time.sleep(wait_rate_limit)
+                Logger.log("Rate Limit", str(error))
+                Logger.log("Rate Limit", f"Waiting {WAIT_RATE_LIMIT} seconds...")
+                last_exception = error
+                time.sleep(WAIT_RATE_LIMIT)
 
-        raise last_exception
+        if last_exception is not None:
+            raise last_exception

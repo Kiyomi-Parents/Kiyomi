@@ -16,11 +16,11 @@ class PlayerRepository:
     def get_players(self):
         return self._db.session.query(Player).all()
 
-    def get_player_by_player_id(self, playerId):
-        return self._db.session.query(Player).filter(Player.playerId == playerId).first()
+    def get_player_by_player_id(self, player_id):
+        return self._db.session.query(Player).filter(Player.playerId == player_id).first()
 
-    def get_player_by_member_id(self, memberId):
-        return self._db.session.query(Player).filter(Player.discord_user_id == memberId).first()
+    def get_player_by_member_id(self, member_id):
+        return self._db.session.query(Player).filter(Player.discord_user_id == member_id).first()
 
     def add_player(self, db_player):
         self._db.add_entry(db_player)
@@ -31,7 +31,7 @@ class PlayerRepository:
         self._db.session.delete(db_player)
 
         self._db.commit_changes()
-        Logger.log(db_player, f"Deleted")
+        Logger.log(db_player, "Deleted")
 
     def update_player(self, new_db_player):
         old_db_player = self.get_player_by_player_id(new_db_player.playerId)
@@ -51,7 +51,7 @@ class PlayerRepository:
         old_db_player.banned = new_db_player.banned
 
         self._db.commit_changes()
-        Logger.log(old_db_player, f"Updated")
+        Logger.log(old_db_player, "Updated")
 
     def add_scores(self, db_player, new_db_scores):
         new_score_list = []

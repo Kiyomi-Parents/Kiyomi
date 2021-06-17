@@ -5,7 +5,7 @@ import pytest
 
 @pytest.fixture
 def db_role_factory(uow, role_factory):
-    class factory:
+    class Factory:
         @staticmethod
         async def make(role=None):
             if role is not None:
@@ -13,7 +13,7 @@ def db_role_factory(uow, role_factory):
 
             return uow.role_repo.add_role(await role_factory.make())
 
-    yield factory()
+    yield Factory()
 
 
 @pytest.fixture
@@ -23,7 +23,7 @@ async def db_role(db_role_factory):
 
 @pytest.fixture
 async def db_role_class_factory(roles):
-    class factory:
+    class Factory:
         @staticmethod
         async def make(value_class=None):
             if value_class is not None:
@@ -31,7 +31,7 @@ async def db_role_class_factory(roles):
 
             return await roles.create_role(random.randint(1, 100000))
 
-    yield factory()
+    yield Factory()
 
 
 @pytest.fixture

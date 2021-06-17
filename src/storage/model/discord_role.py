@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Integer, ForeignKey, Table
+from sqlalchemy import Column, String, Integer, ForeignKey
 
 from src.storage.database import Base
 
@@ -8,7 +8,7 @@ class DiscordRole(Base):
     __tablename__ = "role"
 
     id = Column(Integer, primary_key=True)
-    guild_id = Column(Integer, ForeignKey('guild.id', ondelete='CASCADE'))
+    guild_id = Column(Integer, ForeignKey("guild.id", ondelete="CASCADE"))
 
     # Discord info
     name = Column(String)

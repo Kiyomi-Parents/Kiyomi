@@ -48,18 +48,18 @@ class BeatSaber(commands.Cog):
 
         try:
             db_player = await self.actions.add_player(ctx.guild.id, ctx.author.id, scoresaber_id)
-            await ctx.send(f'Successfully linked **{db_player.playerName}** ScoreSaber profile!')
-        except (PlayerExistsException, PlayerNotFoundException) as e:
-            await ctx.send(e)
+            await ctx.send(f"Successfully linked **{db_player.playerName}** ScoreSaber profile!")
+        except (PlayerExistsException, PlayerNotFoundException) as error:
+            await ctx.send(error)
 
     @player.command(name="remove")
     async def player_remove(self, ctx):
         """Remove the currently linked ScoreSaber profile from yourself."""
         try:
             await self.actions.remove_player(ctx.guild.id, ctx.author.id)
-            await ctx.send(f'Successfully unlinked your ScoreSaber account!')
-        except (PlayerNotFoundException, GuildNotFoundException) as e:
-            await ctx.send(e)
+            await ctx.send("Successfully unlinked your ScoreSaber account!")
+        except (PlayerNotFoundException, GuildNotFoundException) as error:
+            await ctx.send(error)
 
     @commands.group(invoke_without_command=True)
     @Security.owner_or_permissions(administrator=True)
@@ -72,18 +72,18 @@ class BeatSaber(commands.Cog):
         """Set current channel as the notification channel."""
         try:
             self.actions.add_recent_channel(ctx.guild.id, ctx.channel.id)
-            await ctx.send(f'Channel **{ctx.channel.name}** has successfully set as the notification channel!')
-        except GuildRecentChannelExistsException as e:
-            await ctx.send(e)
+            await ctx.send(f"Channel **{ctx.channel.name}** has successfully set as the notification channel!")
+        except GuildRecentChannelExistsException as error:
+            await ctx.send(error)
 
     @channel.command(name="remove")
     async def channel_remove(self, ctx):
         """Remove the currently set notification channel."""
         try:
             self.actions.remove_recent_channel(ctx.guild.id)
-            await ctx.send(f'Notifications channel successfully removed!')
-        except GuildRecentChannelNotFoundException as e:
-            await ctx.send(e)
+            await ctx.send("Notifications channel successfully removed!")
+        except GuildRecentChannelNotFoundException as error:
+            await ctx.send(error)
 
     @commands.group(invoke_without_command=True)
     @Security.owner_or_permissions(administrator=True)
@@ -97,8 +97,8 @@ class BeatSaber(commands.Cog):
         try:
             await self.actions.enable_feature(ctx.guild.id, feature_flag)
             await ctx.send(f"Enabled {feature_flag} feature!")
-        except (FeatureFlagNotFoundException, FeatureFlagException) as e:
-            await ctx.send(e)
+        except (FeatureFlagNotFoundException, FeatureFlagException) as error:
+            await ctx.send(error)
 
     @feature.command(name="disable")
     async def feature_disable(self, ctx, feature_flag: str):
@@ -106,8 +106,8 @@ class BeatSaber(commands.Cog):
         try:
             await self.actions.disable_feature(ctx.guild.id, feature_flag)
             await ctx.send(f"Disabled {feature_flag} feature!")
-        except (FeatureFlagNotFoundException, FeatureFlagException) as e:
-            await ctx.send(e)
+        except (FeatureFlagNotFoundException, FeatureFlagException) as error:
+            await ctx.send(error)
 
     @commands.group()
     @Security.owner_or_permissions(administrator=True)
@@ -126,26 +126,22 @@ class BeatSaber(commands.Cog):
     @update.command(name="players")
     async def update_players(self, ctx):
         """Get the latest player information from ScoreSaber."""
-        db_guild = self.uow.guild_repo.get_guild_by_id(ctx.guild.id)
-        await self.tasks.update_players(db_guild)
+        await self.actions.update_players(ctx.guild.id)
 
     @update.command(name="roles")
     async def update_roles(self, ctx):
         """Update player roles on Discord."""
-        db_guild = self.uow.guild_repo.get_guild_by_id(ctx.guild.id)
-        await self.tasks.update_all_player_roles(db_guild)
+        await self.actions.update_all_player_roles(ctx.guild.id)
 
     @update.command(name="scores")
     async def update_scores(self, ctx):
         """Get the latest recent scores for players from ScoreSaber."""
-        db_guild = self.uow.guild_repo.get_guild_by_id(ctx.guild.id)
-        await self.tasks.update_players_scores(db_guild)
+        await self.actions.update_players_scores(ctx.guild.id)
 
     @update.command(name="notifications")
     async def update_notifications(self, ctx):
         """Send recent score notifications."""
-        db_guild = self.uow.guild_repo.get_guild_by_id(ctx.guild.id)
-        await self.tasks.send_notifications(db_guild)
+        await self.actions.send_notifications(ctx.guild.id)
 
     @commands.command(name="showpp")
     async def show_pp(self, ctx):
@@ -161,7 +157,7 @@ class BeatSaber(commands.Cog):
 
 
 def setup(bot):
-    database = Database(create_engine('sqlite:///bot.db', echo=False))
+    database = Database(create_engine("sqlite:///bot.db", echo=False))
     uow = UnitOfWork(bot, database)
     tasks = Tasks(uow)
     actions = Actions(uow, tasks)

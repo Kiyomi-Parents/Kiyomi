@@ -12,7 +12,8 @@ class Utils:
             Logger.log(func.__name__, "<===> Starting task <===>")
             start_time = time.process_time()
             res = await func(self, *args, **kwargs)
-            Logger.log(func.__name__, f"Finished task in {round(time.process_time() - start_time, 2)} seconds\n")
+            Logger.log(func.__name__, "Finished task in "
+                                      f"{round(time.process_time() - start_time, 2)} seconds\n")
 
             return res
 

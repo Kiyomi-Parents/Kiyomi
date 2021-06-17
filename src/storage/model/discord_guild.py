@@ -3,9 +3,9 @@ from sqlalchemy.orm import relationship
 
 from src.storage.database import Base
 
-guild_player_table = Table('guild_player', Base.metadata,
-                           Column('guild_id', Integer, ForeignKey('guild.id')),
-                           Column('player_id', Integer, ForeignKey('player.id'))
+guild_player_table = Table("guild_player", Base.metadata,
+                           Column("guild_id", Integer, ForeignKey("guild.id")),
+                           Column("player_id", Integer, ForeignKey("player.id"))
                            )
 
 

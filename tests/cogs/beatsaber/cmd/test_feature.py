@@ -75,7 +75,7 @@ async def test_feature_remove(bot):
 
 @pytest.mark.asyncio
 async def test_feature_remove_feature_flag(bot, feature_flag):
-    await message(f"!player add 76561198029447509")
+    await message("!player add 76561198029447509")
     assert verify() \
         .message() \
         .contains() \

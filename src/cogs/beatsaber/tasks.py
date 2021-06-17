@@ -1,6 +1,5 @@
 from discord.ext import tasks
-
-from src.api.errors import *
+from src.api.errors import NotFoundException
 from src.cogs.beatsaber.beatsaber_utils import BeatSaberUtils
 from src.cogs.beatsaber.message import Message
 from src.log import Logger
@@ -15,17 +14,9 @@ class Tasks:
     @tasks.loop(minutes=30)
     @Utils.time_task
     @Utils.discord_ready
-    async def update_players(self, db_guild=None):
-        if db_guild is not None:
-            Logger.log("task", f'Updating {len(db_guild.players)} players in {db_guild}')
-
-            for db_player in db_guild.players:
-                self.update_player(db_player)
-
-            return
-
+    async def update_players(self):
         db_players = self.uow.player_repo.get_players()
-        Logger.log("task", f'Updating {len(db_players)} players')
+        Logger.log("task", f"Updating {len(db_players)} players")
 
         for db_player in db_players:
             self.update_player(db_player)
@@ -36,22 +27,14 @@ class Tasks:
 
             self.uow.player_repo.update_player(new_player)
         except NotFoundException:
-            Logger.log(db_player, f"Could not find at ScoreSaber")
+            Logger.log(db_player, "Could not find at ScoreSaber")
 
     @tasks.loop(minutes=2)
     @Utils.time_task
     @Utils.discord_ready
-    async def update_players_scores(self, db_guild=None):
-        if db_guild is not None:
-            Logger.log("task", f'Updating scores for {len(db_guild.players)} players in {db_guild}')
-
-            for db_player in db_guild.players:
-                self.update_player_scores(db_player)
-
-            return
-
+    async def update_players_scores(self):
         db_players = self.uow.player_repo.get_players()
-        Logger.log("task", f'Updating scores for {len(db_players)} players')
+        Logger.log("task", f"Updating scores for {len(db_players)} players")
 
         for db_player in db_players:
             self.update_player_scores(db_player)
@@ -74,7 +57,7 @@ class Tasks:
             for db_score in db_scores:
                 self.update_score_song(db_score)
         except NotFoundException:
-            Logger.log(db_player, f"Could not find scores on ScoreSaber")
+            Logger.log(db_player, "Could not find scores on ScoreSaber")
 
     def update_score_song(self, db_score):
         if db_score.song is None:
@@ -84,22 +67,14 @@ class Tasks:
                 try:
                     song = self.uow.beatsaver.get_song_by_score(db_score)
                 except NotFoundException:
-                    Logger.log(db_score, f"Could not find song on BeatSaver")
+                    Logger.log(db_score, "Could not find song on BeatSaver")
 
             self.uow.score_repo.add_song(db_score, song)
 
     @tasks.loop(minutes=1)
     @Utils.time_task
     @Utils.discord_ready
-    async def send_notifications(self, db_guild=None):
-        if db_guild is not None:
-            Logger.log("task", f"Sending notifications for {len(db_guild.players)} players in {db_guild}")
-
-            for db_player in db_guild.players:
-                await self.send_notification(db_guild, db_player)
-
-            return
-
+    async def send_notifications(self):
         db_players = self.uow.player_repo.get_players()
         Logger.log("task", f"Sending notifications for {len(db_players)} players")
 
@@ -109,7 +84,7 @@ class Tasks:
 
     async def send_notification(self, db_guild, db_player):
         if db_guild.recent_scores_channel_id is None:
-            Logger.log(db_guild, f"Missing recent scores channel, skipping!")
+            Logger.log(db_guild, "Missing recent scores channel, skipping!")
             return
 
         channel = self.uow.bot.get_channel(db_guild.recent_scores_channel_id)
@@ -125,12 +100,7 @@ class Tasks:
     @tasks.loop(minutes=1)
     @Utils.time_task
     @Utils.discord_ready
-    async def update_all_player_roles(self, db_guild=None):
-        if db_guild is not None:
-            Logger.log("task", f"Updating roles for {db_guild}")
-            await self.update_guild_roles(db_guild)
-            return
-
+    async def update_all_player_roles(self):
         db_guilds = self.uow.guild_repo.get_guilds()
         Logger.log("task", f"Updating roles for {len(db_guilds)} guilds")
 

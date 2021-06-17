@@ -1,17 +1,17 @@
-from src.api import *
 from src.storage.repository import *
+from src.api import ScoreSaber, BeatSaver
 
 
 class UnitOfWork:
 
     def __init__(self, bot, database, scoresaber=None, beatsaver=None):
-        self.db = database
+        self.database = database
 
-        self.guild_repo = GuildRepository(self.db)
-        self.role_repo = RoleRepository(self.db)
-        self.player_repo = PlayerRepository(self.db)
-        self.score_repo = ScoreRepository(self.db)
-        self.song_repo = SongRepository(self.db)
+        self.guild_repo = GuildRepository(self.database)
+        self.role_repo = RoleRepository(self.database)
+        self.player_repo = PlayerRepository(self.database)
+        self.score_repo = ScoreRepository(self.database)
+        self.song_repo = SongRepository(self.database)
 
         if scoresaber is None:
             self.scoresaber = ScoreSaber()

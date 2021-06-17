@@ -1,4 +1,3 @@
-# good bot.py
 import os
 
 from discord.ext import commands
@@ -17,7 +16,7 @@ class BSBot(commands.Bot):
         self.add_check(self.global_block_dms)
 
     async def on_ready(self):
-        Logger.log(self.user.name, f'Connected to Discord!')
+        Logger.log(self.user.name, "Connected to Discord!")
 
     @staticmethod
     def global_block_dms(ctx):
@@ -26,20 +25,21 @@ class BSBot(commands.Bot):
 
         return True
 
-    async def on_command_error(self, ctx, error):
-        if isinstance(error, commands.CommandNotFound):
+    async def on_command_error(self, context, exception):
+        if isinstance(exception, commands.CommandNotFound):
             return
-        elif isinstance(error, MissingRequiredArgument):
-            await ctx.send_help(ctx.command)
-            await ctx.send(error)
-        elif isinstance(error, NoPrivateMessagesException):
-            await ctx.send(error)
+
+        if isinstance(exception, MissingRequiredArgument):
+            await context.send_help(context.command)
+            await context.send(exception)
+        elif isinstance(exception, NoPrivateMessagesException):
+            await context.send(exception)
         else:
-            await ctx.send(f"Something went horribly wrong, check console!")
-            raise error
+            await context.send("Something went horribly wrong, check console!")
+            raise exception
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     bot = BSBot(command_prefix="!")
 
     Logger.log_init()
@@ -48,5 +48,5 @@ if __name__ == '__main__':
     bot.load_extension(name="src.cogs.beatsaber")
 
     load_dotenv()
-    TOKEN = os.getenv('DISCORD_TOKEN')
+    TOKEN = os.getenv("DISCORD_TOKEN")
     bot.run(TOKEN)

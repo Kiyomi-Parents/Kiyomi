@@ -75,5 +75,3 @@ async def test_channel_add_add_different(text_channel_factory):
         .message()\
         .contains()\
         .content(f"Channel **{text_channel_a.name}** has already been set as the notification channel!")
-
-

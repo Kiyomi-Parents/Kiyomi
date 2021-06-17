@@ -3,12 +3,12 @@ import pytest
 
 @pytest.fixture
 async def role_factory(guild):
-    class factory:
+    class Factory:
         @staticmethod
         async def make():
             return await guild.create_role(name="Test Role")
 
-    return factory()
+    return Factory()
 
 
 @pytest.fixture

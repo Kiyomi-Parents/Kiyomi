@@ -1,3 +1,3 @@
-from .roles_pp import *
-from .roles_rank import *
-from .roles_country_rank import *
+from .roles_pp import RolesPP
+from .roles_rank import RolesRank
+from .roles_country_rank import RolesCountryRank

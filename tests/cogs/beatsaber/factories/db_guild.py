@@ -3,12 +3,12 @@ import pytest
 
 @pytest.fixture
 def db_guild_factory(uow):
-    class factory:
+    class Factory:
         @staticmethod
         def make(guild):
             return uow.guild_repo.add_guild(guild)
 
-    yield factory()
+    yield Factory()
 
 
 @pytest.fixture

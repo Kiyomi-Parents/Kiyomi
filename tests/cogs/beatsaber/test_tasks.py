@@ -2,8 +2,6 @@ import itertools
 
 import pytest
 
-from src.utils import Utils
-
 
 def pytest_generate_tests(metafunc):
     if "players" in metafunc.fixturenames:
@@ -58,11 +56,6 @@ async def test_update_players(tasks):
 
 
 @pytest.mark.asyncio
-async def test_update_players_guild(tasks, db_guild):
-    await tasks.update_players(db_guild)
-
-
-@pytest.mark.asyncio
 async def test_update_player(tasks, db_player):
     tasks.update_player(db_player)
 
@@ -73,16 +66,11 @@ async def test_update_players_scores(tasks):
 
 
 @pytest.mark.asyncio
-async def test_update_players_scores_guild(tasks, db_guild):
-    await tasks.update_players_scores(db_guild)
-
-
-@pytest.mark.asyncio
 async def test_update_player_scores(tasks, db_player):
     tasks.update_player_scores(db_player)
 
 
-# TODO: Implement score factory
+@pytest.mark.skip(reason="Implement score factory")
 @pytest.mark.asyncio
 async def test_update_score_song(tasks):
     pass
@@ -94,11 +82,6 @@ async def test_send_notifications(tasks):
 
 
 @pytest.mark.asyncio
-async def test_send_notifications_guild(tasks, db_guild):
-    await tasks.send_notifications(db_guild)
-
-
-@pytest.mark.asyncio
 async def test_send_notification(tasks, db_guild, db_player):
     await tasks.send_notification(db_guild, db_player)
 
@@ -106,11 +89,6 @@ async def test_send_notification(tasks, db_guild, db_player):
 @pytest.mark.asyncio
 async def test_update_all_player_roles(tasks):
     await tasks.update_all_player_roles()
-
-
-@pytest.mark.asyncio
-async def test_update_all_player_roles_guild(tasks, db_guild):
-    await tasks.update_all_player_roles(db_guild)
 
 
 @pytest.mark.asyncio

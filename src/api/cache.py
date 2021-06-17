@@ -6,7 +6,7 @@ class UnSupportedDataTypeException(Exception):
     pass
 
 
-class Cache(object):
+class Cache:
     _cache = []
 
     def __init__(self, hours=None, minutes=None, seconds=None):
@@ -41,14 +41,14 @@ class Cache(object):
             raise UnSupportedDataTypeException(f"{type(data)} is unsupported!")
 
         self._cache.append({
-            'expire': datetime.now() + timedelta(seconds=self._time),
-            'key': key,
-            'data': data.copy()
+            "expire": datetime.now() + timedelta(seconds=self._time),
+            "key": key,
+            "data": data.copy()
         })
 
     def __get(self, key):
         for item in self._cache:
-            if item['key'] == key:
+            if item["key"] == key:
                 return item
 
         return None
@@ -59,9 +59,9 @@ class Cache(object):
         if cache is None:
             return None
 
-        if cache['expire'] < datetime.now():
+        if cache["expire"] < datetime.now():
             self._cache.remove(cache)
 
             return None
 
-        return cache['data']
+        return cache["data"]

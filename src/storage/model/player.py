@@ -4,9 +4,9 @@ from sqlalchemy.orm import relationship
 from src.storage.database import Base
 from src.storage.model.discord_guild import guild_player_table
 
-player_role_table = Table('player_role', Base.metadata,
-                          Column('player_id', Integer, ForeignKey('player.id')),
-                          Column('role_id', Integer, ForeignKey('role.id'))
+player_role_table = Table("player_role", Base.metadata,
+                          Column("player_id", Integer, ForeignKey("player.id")),
+                          Column("role_id", Integer, ForeignKey("role.id"))
                           )
 
 
@@ -38,20 +38,20 @@ class Player(Base):
     guilds = relationship("DiscordGuild", secondary=guild_player_table, back_populates="players")
     roles = relationship("DiscordRole", secondary=player_role_table)
 
-    def __init__(self, playerJson):
-        self.playerId = playerJson["playerId"]
-        self.playerName = playerJson["playerName"]
-        self.avatar = playerJson["avatar"]
-        self.rank = playerJson["rank"]
-        self.countryRank = playerJson["countryRank"]
-        self.pp = playerJson["pp"]
-        self.country = playerJson["country"]
-        self.role = playerJson["role"]
-        self.badges = playerJson["badges"]
-        self.history = playerJson["history"]
-        self.permissions = playerJson["permissions"]
-        self.inactive = playerJson["inactive"]
-        self.banned = playerJson["banned"]
+    def __init__(self, player_json):
+        self.playerId = player_json["playerId"]
+        self.playerName = player_json["playerName"]
+        self.avatar = player_json["avatar"]
+        self.rank = player_json["rank"]
+        self.countryRank = player_json["countryRank"]
+        self.pp = player_json["pp"]
+        self.country = player_json["country"]
+        self.role = player_json["role"]
+        self.badges = player_json["badges"]
+        self.history = player_json["history"]
+        self.permissions = player_json["permissions"]
+        self.inactive = player_json["inactive"]
+        self.banned = player_json["banned"]
         self.discord_user_id = None
 
     @property
@@ -73,8 +73,8 @@ class Player(Base):
 
         if self.rank % class_num == 0:
             return int(self.rank - (self.rank % class_num))
-        else:
-            return int(self.rank - (self.rank % class_num) + class_num)
+
+        return int(self.rank - (self.rank % class_num) + class_num)
 
     @property
     def country_rank_class(self):
@@ -83,8 +83,8 @@ class Player(Base):
 
         if self.rank % class_num == 0:
             return int(self.rank - (self.rank % class_num))
-        else:
-            return int(self.rank - (self.rank % class_num) + class_num)
+
+        return int(self.rank - (self.rank % class_num) + class_num)
 
     def __str__(self):
         return f"Player {self.playerName} ({self.playerId})"

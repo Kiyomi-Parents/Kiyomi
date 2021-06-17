@@ -7,8 +7,8 @@ class ScoreRepository:
     def __init__(self, database):
         self._db = database
 
-    def get_score(self, scoreId):
-        return self._db.session.query(Score).filter(Score.scoreId == scoreId).first()
+    def get_score(self, score_id):
+        return self._db.session.query(Score).filter(Score.scoreId == score_id).first()
 
     def get_scores(self, scores=None):
         if scores is None:
@@ -54,7 +54,7 @@ class ScoreRepository:
         old_db_score.maxScore = new_db_score.maxScore
 
         self._db.commit_changes()
-        Logger.log(old_db_score, f"Updated")
+        Logger.log(old_db_score, "Updated")
 
         self.mark_score_unsent(old_db_score)
 
@@ -85,7 +85,7 @@ class ScoreRepository:
         db_score.msg_guilds = []
 
         self._db.commit_changes()
-        Logger.log(db_score, f"Marked as unsent")
+        Logger.log(db_score, "Marked as unsent")
 
     def add_song(self, db_score, db_song):
         if db_score.song is None:

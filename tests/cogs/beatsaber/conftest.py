@@ -14,7 +14,7 @@ from src.cogs.general import General
 from src.storage.database import Database
 from src.storage.uow import UnitOfWork
 from tests.cogs import *
-from . import *
+from .factories import *
 
 
 @pytest.fixture
@@ -40,7 +40,7 @@ def beatsaver():
 
 @pytest.fixture
 def uow(pre_bot, scoresaber, beatsaver):
-    engine = create_engine('sqlite:///:memory:')
+    engine = create_engine("sqlite:///:memory:")
     database = Database(engine)
 
     return UnitOfWork(pre_bot, database, scoresaber, beatsaver)
@@ -73,9 +73,9 @@ def bot(pre_bot, beatsaber_cog):
 def pytest_sessionfinish():
     # dat files are created when using attachements
     print("\n-------------------------\nClean dpytest_*.dat files")
-    file_list = glob.glob('./dpytest_*.dat')
+    file_list = glob.glob("./dpytest_*.dat")
     for file_path in file_list:
         try:
             os.remove(file_path)
         except Exception:
-            print("Error while deleting file : ", file_path)
+            print(f"Error while deleting file: {file_path}")

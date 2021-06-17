@@ -8,5 +8,5 @@ class SongRepository:
     def get_songs(self):
         return self._db.session.query(Song).all()
 
-    def get_song_by_hash(self, songHash):
-        return self._db.session.query(Song).filter(Song.hash == songHash).first()
+    def get_song_by_hash(self, song_hash):
+        return self._db.session.query(Song).filter(Song.hash == song_hash).first()

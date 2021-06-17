@@ -4,7 +4,7 @@ import discord.ext.test as dpytest
 
 @pytest.fixture
 def member_factory(guild):
-    class factory:
+    class Factory:
         @staticmethod
         async def make():
             member_count = len(guild.members)
@@ -12,7 +12,7 @@ def member_factory(guild):
             await dpytest.member_join()
             return guild.members[member_count]
 
-    yield factory()
+    yield Factory()
 
 
 @pytest.fixture

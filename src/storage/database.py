@@ -16,7 +16,7 @@ class Database:
 
     def add_entry(self, entry):
         self.session.add(entry)
-        Logger.log(entry, f"Added")
+        Logger.log(entry, "Added")
         self.commit_changes()
 
     def add_entries(self, entries):

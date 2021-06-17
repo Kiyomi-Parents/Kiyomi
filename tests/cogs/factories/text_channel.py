@@ -3,7 +3,7 @@ import pytest
 
 @pytest.fixture
 async def text_channel_factory(guild):
-    class factory:
+    class Factory:
         @staticmethod
         async def make(override_guild=None):
             if override_guild is not None:
@@ -11,7 +11,7 @@ async def text_channel_factory(guild):
 
             return await guild.create_text_channel(f"Channel_{len(guild.text_channels)}")
 
-    return factory()
+    return Factory()
 
 
 @pytest.fixture

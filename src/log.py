@@ -1,26 +1,27 @@
-from datetime import datetime
-from termcolor import colored
 import os
+from datetime import datetime
+
+from termcolor import colored
 
 
 class Logger:
     @staticmethod
     def log_init():
-        if os.path.isfile('log.txt'):
+        if os.path.isfile("log.txt"):
             try:
-                os.rename('log.txt', 'prev_log.txt')
+                os.rename("log.txt", "prev_log.txt")
             except FileExistsError:
-                os.remove('prev_log.txt')
-                os.rename('log.txt', 'prev_log.txt')
+                os.remove("prev_log.txt")
+                os.rename("log.txt", "prev_log.txt")
 
     @staticmethod
     def get_timestamp():
-        return f'{datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")}'
+        return f"{datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')}"
 
     @staticmethod
     def log_file(msg):
-        with open('log.txt', 'a') as f:
-            f.write("\n" + msg)
+        with open("log.txt", "a", encoding="utf-8") as file:
+            file.write("\n" + msg)
 
     @staticmethod
     def log_add(msg):
@@ -33,7 +34,7 @@ class Logger:
     @staticmethod
     def log(tag, msg):
         timestamp = Logger.get_timestamp()
-        tag_with_color = colored(f"[{tag}]", 'green')
+        tag_with_color = colored(f"[{tag}]", "green")
         final_msg = f"{timestamp} | {tag_with_color} {msg}"
 
         print(final_msg)

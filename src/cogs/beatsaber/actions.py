@@ -37,7 +37,7 @@ class Actions:
             raise GuildNotFoundException(f"Failed to find {guild_id}")
 
         if db_player is not None and db_player in db_guild.players:
-            raise PlayerExistsException(f'Player **{db_player.playerName}** has already been added!')
+            raise PlayerExistsException(f"Player **{db_player.playerName}** has already been added!")
 
         # Add new player to db if not found
         if db_player is None:
@@ -46,8 +46,8 @@ class Actions:
                 new_player.discord_user_id = member_id
 
                 self.uow.player_repo.add_player(new_player)
-            except NotFoundException:
-                raise PlayerNotFoundException(f"Could not find player!")
+            except NotFoundException as error:
+                raise PlayerNotFoundException("Could not find player!") from error
 
             db_player = self.uow.player_repo.get_player_by_member_id(member_id)
 
@@ -67,10 +67,10 @@ class Actions:
         db_player = self.uow.player_repo.get_player_by_member_id(member_id)
 
         if db_player is None:
-            raise PlayerNotFoundException(f"You don't have a ScoreSaber profile linked to yourself.")
+            raise PlayerNotFoundException("You don't have a ScoreSaber profile linked to yourself.")
 
         if db_guild is None:
-            raise GuildNotFoundException(f"Your ScoreSaber profile isn't linked to this Discord server.")
+            raise GuildNotFoundException("Your ScoreSaber profile isn't linked to this Discord server.")
 
         self.uow.player_repo.remove_guild(db_player, db_guild)
 
@@ -102,7 +102,7 @@ class Actions:
             self.mark_player_scores_sent(db_player, db_guild)
 
     def mark_all_player_scores_sent(self, db_player):
-        Logger.log(db_player, f"Marking all scores as sent")
+        Logger.log(db_player, "Marking all scores as sent")
 
         for db_guild in db_player.guilds:
             self.mark_player_scores_sent(db_player, db_guild)
@@ -125,8 +125,7 @@ class Actions:
         if db_guild.recent_scores_channel_id is not None:
             recent_scores_channel = guild.get_channel(db_guild.recent_scores_channel_id)
 
-            raise GuildRecentChannelExistsException(
-                f"Channel **{recent_scores_channel.name}** has already been set as the notification channel!")
+            raise GuildRecentChannelExistsException(f"Channel **{recent_scores_channel.name}** has already been set as the notification channel!")
 
         self.uow.guild_repo.set_recent_score_channel_id(db_guild, channel_id)
         self.mark_all_guild_scores_sent(db_guild)
@@ -135,8 +134,7 @@ class Actions:
         db_guild = self.uow.guild_repo.get_guild_by_id(guild_id)
 
         if db_guild.recent_scores_channel_id is None:
-            raise GuildRecentChannelNotFoundException(
-                f"There isn't a notification channel set for this Discord server.")
+            raise GuildRecentChannelNotFoundException("There isn't a notification channel set for this Discord server.")
 
         self.uow.guild_repo.set_recent_score_channel_id(db_guild, None)
 
@@ -161,3 +159,33 @@ class Actions:
         feature = feature_class(self.uow, db_guild)
 
         await feature.set(False)
+
+    async def update_players(self, guild_id):
+        db_guild = self.uow.guild_repo.get_guild_by_id(guild_id)
+
+        Logger.log(db_guild, f"Updating {len(db_guild.players)} players")
+
+        for db_player in db_guild.players:
+            self.tasks.update_player(db_player)
+
+    async def update_players_scores(self, guild_id):
+        db_guild = self.uow.guild_repo.get_guild_by_id(guild_id)
+
+        Logger.log(db_guild, f"Updating scores for {len(db_guild.players)} players")
+
+        for db_player in db_guild.players:
+            self.tasks.update_player_scores(db_player)
+
+    async def send_notifications(self, guild_id):
+        db_guild = self.uow.guild_repo.get_guild_by_id(guild_id)
+
+        Logger.log(db_guild, f"Sending notifications for {len(db_guild.players)} players")
+
+        for db_player in db_guild.players:
+            await self.tasks.send_notification(db_guild, db_player)
+
+    async def update_all_player_roles(self, guild_id):
+        db_guild = self.uow.guild_repo.get_guild_by_id(guild_id)
+
+        Logger.log(db_guild, f"Updating roles for {len(db_guild.players)} players")
+        await self.tasks.update_guild_roles(db_guild)

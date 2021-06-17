@@ -1,37 +1,32 @@
 import requests
-
-from src.api.beatsaver import BeatSaver
 from src.api.cache import Cache
 from src.api.common import Common
-from src.storage.model import *
+from src.storage.model import Player, Score
 
 
 class ScoreSaber:
     _timeout = 10
     _url = "https://new.scoresaber.com/api"
 
-    def __init__(self):
-        self._beatsaver = BeatSaver()
-
     @Cache(minutes=2)
-    def _get_player(self, playerID):
-        response = Common.request(requests.get, f"{self._url}/player/{playerID}/basic", timeout=self._timeout)
+    def _get_player(self, player_id):
+        response = Common.request(requests.get, f"{self._url}/player/{player_id}/basic", timeout=self._timeout)
 
         return response.json()
 
-    def get_player(self, playerID):
-        response = self._get_player(playerID)
+    def get_player(self, player_id):
+        response = self._get_player(player_id)
 
         return Player(response["playerInfo"])
 
     @Cache(minutes=2)
-    def _get_recent_scores(self, playerID):
-        response = Common.request(requests.get, f"{self._url}/player/{playerID}/scores/recent", timeout=self._timeout)
+    def _get_recent_scores(self, player_id):
+        response = Common.request(requests.get, f"{self._url}/player/{player_id}/scores/recent", timeout=self._timeout)
 
         return response.json()
 
-    def get_recent_scores(self, playerID):
-        response = self._get_recent_scores(playerID)
+    def get_recent_scores(self, player_id):
+        response = self._get_recent_scores(player_id)
 
         recent_score_list = []
 

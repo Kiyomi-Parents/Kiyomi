@@ -3,12 +3,12 @@ import pytest
 
 @pytest.fixture
 def guild_factory(bot):
-    class factory:
+    class Factory:
         @staticmethod
         def make(index):
             return bot.guilds[index]
 
-    yield factory()
+    yield Factory()
 
 
 @pytest.fixture

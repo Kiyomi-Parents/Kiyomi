@@ -17,5 +17,3 @@ class TestUtils(unittest.TestCase):
         assert BeatSaberUtils.get_max_score(533) == 483115
         assert BeatSaberUtils.get_max_score(1598) == 1462915
         assert BeatSaberUtils.get_max_score(1406) == 1286275
-
-

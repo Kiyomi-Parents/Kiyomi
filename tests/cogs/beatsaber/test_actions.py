@@ -1,8 +1,7 @@
 import pytest
 
 from src.cogs.beatsaber import BeatSaberUtils, FeatureFlagException
-from src.cogs.beatsaber.actions import GuildNotFoundException, PlayerExistsException, \
-    GuildRecentChannelExistsException, GuildRecentChannelNotFoundException
+from src.cogs.beatsaber.actions import GuildNotFoundException, GuildRecentChannelExistsException, GuildRecentChannelNotFoundException
 
 
 def pytest_generate_tests(metafunc):
@@ -120,7 +119,7 @@ async def test_remove_recent_channel_empty(actions, db_guild):
 
 
 @pytest.mark.asyncio
-async def test_remove_recent_channel_empty(actions, db_guild, text_channel):
+async def test_remove_recent_channel(actions, db_guild, text_channel):
     actions.add_recent_channel(db_guild.discord_guild_id, text_channel.id)
 
     actions.remove_recent_channel(db_guild.discord_guild_id)

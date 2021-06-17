@@ -3,7 +3,7 @@ import pytest
 
 @pytest.fixture
 def db_player_factory(uow, member):
-    class factory:
+    class Factory:
         @staticmethod
         def make(scoresaber_id, override_member=None):
             new_player = uow.scoresaber.get_player(scoresaber_id)
@@ -15,7 +15,7 @@ def db_player_factory(uow, member):
 
             return uow.player_repo.add_player(new_player)
 
-    yield factory()
+    yield Factory()
 
 
 @pytest.fixture

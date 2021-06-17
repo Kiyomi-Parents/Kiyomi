@@ -1,14 +1,12 @@
-from datetime import datetime
-
 from dateutil import parser, tz
 from sqlalchemy import Column, String, Integer, ForeignKey, DateTime, Float, Table
 from sqlalchemy.orm import relationship
 
 from src.storage.database import Base
 
-score_guild_table = Table('score_guild', Base.metadata,
-                          Column('score_id', Integer, ForeignKey('score.id')),
-                          Column('guild_id', Integer, ForeignKey('guild.id'))
+score_guild_table = Table("score_guild", Base.metadata,
+                          Column("score_id", Integer, ForeignKey("score.id")),
+                          Column("guild_id", Integer, ForeignKey("guild.id"))
                           )
 
 
@@ -17,7 +15,7 @@ class Score(Base):
     __tablename__ = "score"
 
     id = Column(Integer, primary_key=True)
-    player_id = Column(Integer, ForeignKey('player.id', ondelete='CASCADE'))
+    player_id = Column(Integer, ForeignKey("player.id", ondelete="CASCADE"))
 
     # ScoreSaber info
     rank = Column(Integer)
@@ -41,24 +39,24 @@ class Score(Base):
     msg_guilds = relationship("DiscordGuild", secondary=score_guild_table)
     song = relationship("Song", uselist=False, cascade="all, delete-orphan")
 
-    def __init__(self, scoreJson):
-        self.rank = scoreJson["rank"]
-        self.scoreId = scoreJson["scoreId"]
-        self.score = scoreJson["score"]
-        self.unmodififiedScore = scoreJson["unmodififiedScore"]
-        self.mods = scoreJson["mods"]
-        self.pp = scoreJson["pp"]
-        self.weight = scoreJson["weight"]
-        self.timeSet = parser.isoparse(scoreJson["timeSet"]).replace(tzinfo=tz.gettz('UTC'))
-        self.leaderboardId = scoreJson["leaderboardId"]
-        self.songHash = scoreJson["songHash"]
-        self.songName = scoreJson["songName"]
-        self.songSubName = scoreJson["songSubName"]
-        self.songAuthorName = scoreJson["songAuthorName"]
-        self.levelAuthorName = scoreJson["levelAuthorName"]
-        self.difficulty = scoreJson["difficulty"]
-        self.difficultyRaw = scoreJson["difficultyRaw"]
-        self.maxScore = scoreJson["maxScore"]
+    def __init__(self, score_json):
+        self.rank = score_json["rank"]
+        self.scoreId = score_json["scoreId"]
+        self.score = score_json["score"]
+        self.unmodififiedScore = score_json["unmodififiedScore"]
+        self.mods = score_json["mods"]
+        self.pp = score_json["pp"]
+        self.weight = score_json["weight"]
+        self.timeSet = parser.isoparse(score_json["timeSet"]).replace(tzinfo=tz.gettz("UTC"))
+        self.leaderboardId = score_json["leaderboardId"]
+        self.songHash = score_json["songHash"]
+        self.songName = score_json["songName"]
+        self.songSubName = score_json["songSubName"]
+        self.songAuthorName = score_json["songAuthorName"]
+        self.levelAuthorName = score_json["levelAuthorName"]
+        self.difficulty = score_json["difficulty"]
+        self.difficultyRaw = score_json["difficultyRaw"]
+        self.maxScore = score_json["maxScore"]
 
     @property
     def leaderboard_url(self):
@@ -69,8 +67,8 @@ class Score(Base):
     def song_name_full(self):
         if self.songSubName:
             return f"{self.songName}: {self.songSubName}"
-        else:
-            return self.songName
+
+        return self.songName
 
     @property
     def difficulty_name(self):
@@ -96,8 +94,8 @@ class Score(Base):
     def accuracy(self):
         if self.maxScore:
             return round(self.score / self.maxScore * 100, 3)
-        else:
-            return "N/A"
+
+        return "N/A"
 
     @property
     def weighted_pp(self):

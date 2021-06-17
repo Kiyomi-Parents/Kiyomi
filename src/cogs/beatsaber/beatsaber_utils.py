@@ -8,7 +8,7 @@ from src.cogs.beatsaber.roles import RolesPP
 class BeatSaberUtils:
     @staticmethod
     def scoresaber_id_from_url(url):
-        pattern = re.compile(r'(https?://scoresaber\.com/u/)?(\d{16,17})')
+        pattern = re.compile(r"(https?://scoresaber\.com/u/)?(\d{16,17})")
         match = re.match(pattern, url)
 
         if match:
@@ -17,19 +17,19 @@ class BeatSaberUtils:
         return None
 
     @staticmethod
-    def get_max_score(blocks, maxScorePerBlock=115):
+    def get_max_score(blocks, max_score_per_block=115):
         max_score = 0
 
         if blocks >= 14:
-            max_score += 8 * maxScorePerBlock * (blocks - 13)
+            max_score += 8 * max_score_per_block * (blocks - 13)
 
         if blocks >= 6:
-            max_score += 4 * maxScorePerBlock * (min(blocks, 13) - 5)
+            max_score += 4 * max_score_per_block * (min(blocks, 13) - 5)
 
         if blocks >= 2:
-            max_score += 2 * maxScorePerBlock * (min(blocks, 5) - 1)
+            max_score += 2 * max_score_per_block * (min(blocks, 5) - 1)
 
-        max_score += min(blocks, 1) * maxScorePerBlock
+        max_score += min(blocks, 1) * max_score_per_block
 
         return math.floor(max_score)
 
@@ -75,8 +75,8 @@ class BeatSaberUtils:
             # }
         ]
 
-        for ff in feature_flags:
-            if ff['flag'] == feature_flag:
-                return ff['feature']
+        for item in feature_flags:
+            if item["flag"] == feature_flag:
+                return item["feature"]
 
         return None

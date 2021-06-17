@@ -21,3 +21,7 @@ cool bot
     pytest
     # or
     pytest -v --numprocesses=auto
+
+### Lint
+    # Run pylint
+    pylint BSBot.py src tests
