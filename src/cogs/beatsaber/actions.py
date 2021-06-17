@@ -1,6 +1,6 @@
 from src.api import NotFoundException
-from src.commands.beatsaber.beatsaber_utils import BeatSaberUtils
-from src.commands.beatsaber.feature.feature import FeatureFlagNotFoundException
+from src.cogs.beatsaber.beatsaber_utils import BeatSaberUtils
+from src.cogs.beatsaber.feature.feature import FeatureFlagNotFoundException
 from src.log import Logger
 
 

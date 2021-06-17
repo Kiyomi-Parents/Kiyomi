@@ -1,8 +1,8 @@
 import math
 import re
 
-from src.commands.beatsaber.feature.feature_pp_roles import FeaturePPRoles
-from src.commands.beatsaber.roles import RolesPP
+from src.cogs.beatsaber.feature.feature_pp_roles import FeaturePPRoles
+from src.cogs.beatsaber.roles import RolesPP
 
 
 class BeatSaberUtils:

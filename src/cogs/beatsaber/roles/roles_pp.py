@@ -1,6 +1,6 @@
 from discord import Colour
 
-from src.commands.beatsaber.roles.roles import Roles
+from src.cogs.beatsaber.roles.roles import Roles
 
 
 class RolesPP(Roles):

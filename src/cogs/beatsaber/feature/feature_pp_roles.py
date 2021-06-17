@@ -1,11 +1,11 @@
-from src.commands.beatsaber.feature.feature import Feature
-from src.commands.beatsaber.roles import RolesRank
+from src.cogs.beatsaber.feature.feature import Feature
+from src.cogs.beatsaber.roles import RolesPP
 
 
-class FeatureRankRoles(Feature):
+class FeaturePPRoles(Feature):
     def __init__(self, uow, db_guild):
-        super().__init__(uow, db_guild, "rank_roles")
-        self.roles = RolesRank(self.uow, self.db_guild)
+        super().__init__(uow, db_guild, "pp_roles")
+        self.roles = RolesPP(uow, db_guild)
 
     async def on_enable(self):
         await self.update_guild_roles()

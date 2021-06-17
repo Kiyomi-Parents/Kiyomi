@@ -1,6 +1,8 @@
-from src.commands.beatsaber.roles import RolesPP, RolesRank, RolesCountryRank
-from src.commands.beatsaber.roles.roles import Roles, AlreadyHasRoleException, RoleNotFoundException
-from tests.commands.beatsaber import *
+import pytest
+
+from src.cogs.beatsaber.roles import RolesPP, RolesRank, RolesCountryRank
+from src.cogs.beatsaber.roles.roles import Roles, AlreadyHasRoleException, RoleNotFoundException
+from tests.cogs.beatsaber import *
 
 
 def pytest_generate_tests(metafunc):

@@ -1,7 +1,7 @@
 import pytest
 
-from src.commands.beatsaber import BeatSaberUtils, FeatureFlagException
-from src.commands.beatsaber.actions import GuildNotFoundException, PlayerExistsException, \
+from src.cogs.beatsaber import BeatSaberUtils, FeatureFlagException
+from src.cogs.beatsaber.actions import GuildNotFoundException, PlayerExistsException, \
     GuildRecentChannelExistsException, GuildRecentChannelNotFoundException
 
 

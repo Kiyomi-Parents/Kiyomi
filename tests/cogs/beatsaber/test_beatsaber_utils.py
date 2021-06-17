@@ -1,6 +1,6 @@
 import unittest
 
-from src.commands.beatsaber.beatsaber_utils import BeatSaberUtils
+from src.cogs.beatsaber.beatsaber_utils import BeatSaberUtils
 
 
 class TestUtils(unittest.TestCase):

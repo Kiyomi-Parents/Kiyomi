@@ -5,7 +5,7 @@ from discord.ext import commands
 from discord.ext.commands import MissingRequiredArgument
 from dotenv import load_dotenv
 
-from src.commands.errors import NoPrivateMessagesException
+from src.cogs.errors import NoPrivateMessagesException
 from src.log import Logger
 
 
@@ -44,7 +44,8 @@ if __name__ == '__main__':
 
     Logger.log_init()
 
-    bot.load_extension(name="src.commands.beatsaber")
+    bot.load_extension(name="src.cogs.general")
+    bot.load_extension(name="src.cogs.beatsaber")
 
     load_dotenv()
     TOKEN = os.getenv('DISCORD_TOKEN')

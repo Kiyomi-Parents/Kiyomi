@@ -7,12 +7,14 @@ from sqlalchemy import create_engine
 
 from BSBot import BSBot
 from src.api import ScoreSaber, BeatSaver
-from src.commands.beatsaber.actions import Actions
-from src.commands.beatsaber.beatsaber import BeatSaber
-from src.commands.beatsaber.tasks import Tasks
+from src.cogs.beatsaber.actions import Actions
+from src.cogs.beatsaber.beatsaber import BeatSaber
+from src.cogs.beatsaber.tasks import Tasks
+from src.cogs.general import General
 from src.storage.database import Database
 from src.storage.uow import UnitOfWork
-from .factories import *
+from tests.cogs import *
+from . import *
 
 
 @pytest.fixture
@@ -62,6 +64,7 @@ def beatsaber_cog(uow, tasks, actions):
 @pytest.fixture
 def bot(pre_bot, beatsaber_cog):
     pre_bot.add_cog(beatsaber_cog)
+    pre_bot.add_cog(General())
 
     dpytest.configure(pre_bot, num_guilds=2, num_channels=1, num_members=1)
     return pre_bot

@@ -1,8 +1,8 @@
 from discord.ext import tasks
 
 from src.api.errors import *
-from src.commands.beatsaber.beatsaber_utils import BeatSaberUtils
-from src.commands.beatsaber.message import Message
+from src.cogs.beatsaber.beatsaber_utils import BeatSaberUtils
+from src.cogs.beatsaber.message import Message
 from src.log import Logger
 from src.utils import Utils
 

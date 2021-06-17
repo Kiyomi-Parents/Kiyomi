@@ -1,12 +1,14 @@
 from discord.ext import commands
 from sqlalchemy import create_engine
+from termcolor import colored
 
-from src.commands.beatsaber.actions import PlayerExistsException, PlayerNotFoundException, \
+from src.cogs.beatsaber.actions import PlayerExistsException, PlayerNotFoundException, \
     GuildRecentChannelExistsException, GuildRecentChannelNotFoundException, GuildNotFoundException, Actions
-from src.commands.beatsaber.beatsaber_utils import BeatSaberUtils
-from src.commands.beatsaber.feature.feature import FeatureFlagException, FeatureFlagNotFoundException
-from src.commands.beatsaber.security import Security
-from src.commands.beatsaber.tasks import Tasks
+from src.cogs.beatsaber.beatsaber_utils import BeatSaberUtils
+from src.cogs.beatsaber.feature.feature import FeatureFlagException, FeatureFlagNotFoundException
+from src.cogs.security import Security
+from src.cogs.beatsaber.tasks import Tasks
+from src.log import Logger
 from src.storage.database import Database
 from src.storage.uow import UnitOfWork
 
@@ -26,18 +28,13 @@ class BeatSaber(commands.Cog):
         return True
 
     async def cog_before_invoke(self, ctx):
+        Logger.log(self.qualified_name,
+                   f"{colored(ctx.author.name, 'blue')} executed command "
+                   f"{colored(ctx.message.content, 'blue')} in "
+                   f"{colored(ctx.channel.name, 'blue')} at "
+                   f"{colored(ctx.guild.name, 'blue')}")
+
         await ctx.trigger_typing()
-
-    @commands.command()
-    async def hello(self, ctx):
-        """Greet the bot."""
-        await ctx.send('Hello there!')
-
-    @commands.command(name="admintest")
-    @Security.owner_or_permissions(administrator=True)
-    async def admin_test(self, ctx):
-        """Command to test if security is working"""
-        await ctx.send('This message should only be seen if !admintest was called by a server admin.')
 
     @commands.group(invoke_without_command=True)
     async def player(self, ctx):
