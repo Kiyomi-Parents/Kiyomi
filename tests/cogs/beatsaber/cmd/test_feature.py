@@ -8,13 +8,13 @@ def pytest_generate_tests(metafunc):
         metafunc.parametrize("feature_flag", ["pp_roles"], indirect=True)
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def feature_flag(request):
     return request.param
 
 
 @pytest.mark.asyncio
-async def test_feature(bot):
+async def test_feature():
     await message("!feature")
     assert verify() \
         .message() \
@@ -23,7 +23,7 @@ async def test_feature(bot):
 
 
 @pytest.mark.asyncio
-async def test_feature_enable(bot):
+async def test_feature_enable():
     with pytest.raises(MissingRequiredArgument):
         await message("!feature enable")
 
@@ -31,7 +31,7 @@ async def test_feature_enable(bot):
 
 
 @pytest.mark.asyncio
-async def test_feature_enable_feature_flag(bot, feature_flag):
+async def test_feature_enable_feature_flag(feature_flag):
     await message(f"!feature enable {feature_flag}")
     assert verify() \
         .message() \
@@ -39,7 +39,7 @@ async def test_feature_enable_feature_flag(bot, feature_flag):
 
 
 @pytest.mark.asyncio
-async def test_feature_enable_feature_flag_player(bot, feature_flag):
+async def test_feature_enable_feature_flag_player(feature_flag):
     await message(f"!player add 76561198029447509")
     assert verify() \
         .message() \
@@ -53,7 +53,7 @@ async def test_feature_enable_feature_flag_player(bot, feature_flag):
 
 
 @pytest.mark.asyncio
-async def test_feature_enable_feature_flag_already_enabled(bot, feature_flag):
+async def test_feature_enable_feature_flag_already_enabled(feature_flag):
     await message(f"!feature enable {feature_flag}")
     assert verify() \
         .message() \
@@ -66,7 +66,7 @@ async def test_feature_enable_feature_flag_already_enabled(bot, feature_flag):
 
 
 @pytest.mark.asyncio
-async def test_feature_remove(bot):
+async def test_feature_remove():
     with pytest.raises(MissingRequiredArgument):
         await message("!feature disable")
 
@@ -74,7 +74,7 @@ async def test_feature_remove(bot):
 
 
 @pytest.mark.asyncio
-async def test_feature_remove_feature_flag(bot, feature_flag):
+async def test_feature_remove_feature_flag(feature_flag):
     await message("!player add 76561198029447509")
     assert verify() \
         .message() \
@@ -93,7 +93,7 @@ async def test_feature_remove_feature_flag(bot, feature_flag):
 
 
 @pytest.mark.asyncio
-async def test_feature_remove_feature_flag_player(bot, feature_flag):
+async def test_feature_remove_feature_flag_player(feature_flag):
     await message(f"!feature enable {feature_flag}")
     assert verify() \
         .message() \
@@ -106,7 +106,7 @@ async def test_feature_remove_feature_flag_player(bot, feature_flag):
 
 
 @pytest.mark.asyncio
-async def test_feature_remove_feature_flag_already_disabled(bot, feature_flag):
+async def test_feature_remove_feature_flag_already_disabled(feature_flag):
     await message(f"!feature disable {feature_flag}")
     assert verify() \
         .message() \

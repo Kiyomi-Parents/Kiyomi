@@ -9,7 +9,7 @@ def pytest_generate_tests(metafunc):
         metafunc.parametrize("feature_flag", ["pp_roles"], indirect=True)
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def feature_flag(request):
     return request.param
 

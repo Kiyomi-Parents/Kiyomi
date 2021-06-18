@@ -1,8 +1,7 @@
 import pytest
 
 from src.cogs.beatsaber.roles import RolesPP, RolesRank, RolesCountryRank
-from src.cogs.beatsaber.roles.roles import Roles, AlreadyHasRoleException, RoleNotFoundException
-from tests.cogs.beatsaber import *
+from src.cogs.beatsaber.roles.roles import AlreadyHasRoleException, RoleNotFoundException
 
 
 def pytest_generate_tests(metafunc):
@@ -185,7 +184,7 @@ async def test_update_player_role_update(roles, db_player):
 
 
 @pytest.mark.asyncio
-async def test_assign_player_role( roles, db_player):
+async def test_assign_player_role(roles, db_player):
     await roles.assign_player_role(db_player)
 
     assert roles.find_player_role(db_player) is not None

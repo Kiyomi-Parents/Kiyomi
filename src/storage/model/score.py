@@ -61,7 +61,7 @@ class Score(Base):
     @property
     def leaderboard_url(self):
         page = (self.rank - 1) // 12 + 1
-        return f"http://scoresaber.com/leaderboard/{self.leaderboardId}?page={page}"
+        return f"https://scoresaber.com/leaderboard/{self.leaderboardId}?page={page}"
 
     @property
     def song_name_full(self):

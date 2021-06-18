@@ -3,7 +3,7 @@ from discord.ext.test import message, verify
 
 
 @pytest.mark.asyncio
-async def test_channel(bot):
+async def test_channel():
     await message("!channel")
     assert verify()\
         .message()\

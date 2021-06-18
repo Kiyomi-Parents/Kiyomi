@@ -16,8 +16,6 @@ def pytest_generate_tests(metafunc):
     for size in range(len(available_features)):
         all_features_combos += list(itertools.combinations(available_features, size))
 
-    print(all_features_combos)
-
     if "features" in metafunc.fixturenames:
         metafunc.parametrize("features", all_features_combos, indirect=True)
 

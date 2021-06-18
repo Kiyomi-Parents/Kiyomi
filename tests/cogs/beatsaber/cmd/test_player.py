@@ -4,7 +4,7 @@ from discord.ext.test import message, verify, empty_queue
 
 
 @pytest.mark.asyncio
-async def test_player(bot):
+async def test_player():
     await message("!player")
     assert verify() \
         .message() \
@@ -13,7 +13,7 @@ async def test_player(bot):
 
 
 @pytest.mark.asyncio
-async def test_player_add(bot):
+async def test_player_add():
     await message("!player add 76561198029447509")
     assert verify() \
         .message() \
@@ -22,7 +22,7 @@ async def test_player_add(bot):
 
 
 @pytest.mark.asyncio
-async def test_player_add_add(bot):
+async def test_player_add_add():
     await message("!player add 76561198029447509")
     assert verify() \
         .message() \
@@ -37,7 +37,7 @@ async def test_player_add_add(bot):
 
 
 @pytest.mark.asyncio
-async def test_player_add_empty(bot):
+async def test_player_add_empty():
     with pytest.raises(MissingRequiredArgument):
         await message("!player add")
     await empty_queue()
@@ -65,7 +65,7 @@ async def test_player_add_multi_guild(guild_factory, text_channel_factory):
 
 
 @pytest.mark.asyncio
-async def test_player_remove(bot):
+async def test_player_remove():
     await message("!player add 76561198029447509")
     assert verify() \
         .message() \
@@ -80,7 +80,7 @@ async def test_player_remove(bot):
 
 
 @pytest.mark.asyncio
-async def test_player_remove_empty(bot):
+async def test_player_remove_empty():
     await message("!player remove")
     assert verify() \
         .message() \

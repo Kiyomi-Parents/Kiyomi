@@ -3,7 +3,7 @@ from discord.ext.test import message, verify, empty_queue
 
 
 @pytest.mark.asyncio
-async def test_show_pp(bot):
+async def test_show_pp():
     await message("!player add 76561198029447509")
     await empty_queue()
 
@@ -15,7 +15,7 @@ async def test_show_pp(bot):
 
 
 @pytest.mark.asyncio
-async def test_show_pp_no_profile(bot):
+async def test_show_pp_no_profile():
     await message("!showpp")
     assert verify() \
         .message() \
