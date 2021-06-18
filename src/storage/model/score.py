@@ -47,7 +47,7 @@ class Score(Base):
         self.mods = score_json["mods"]
         self.pp = score_json["pp"]
         self.weight = score_json["weight"]
-        self.timeSet = parser.isoparse(score_json["timeSet"]).replace(tzinfo=tz.gettz("UTC"))
+        self.timeSet = parser.isoparse(score_json["timeSet"]).replace(tzinfo=None)
         self.leaderboardId = score_json["leaderboardId"]
         self.songHash = score_json["songHash"]
         self.songName = score_json["songName"]
@@ -93,7 +93,7 @@ class Score(Base):
     @property
     def accuracy(self):
         if self.maxScore:
-            return round(self.score / self.maxScore * 100, 3)
+            return round(self.score / self.maxScore * 100, 2)
 
         return "N/A"
 

@@ -47,9 +47,6 @@ class Tasks:
             # Add new scores to player
             self.uow.player_repo.add_scores(db_player, recent_scores)
 
-            # Update existing scores
-            self.uow.score_repo.update_scores(recent_scores)
-
             # Get db scores from recent scores
             db_scores = self.uow.score_repo.get_scores(recent_scores)
 
@@ -93,9 +90,18 @@ class Tasks:
         Logger.log(db_guild, f"{db_player} has {len(db_scores)} scores to notify")
 
         for db_score in db_scores:
-            embed = Message.get_score_embed(db_player, db_score, db_score.song)
-            await channel.send(embed=embed)
-            self.uow.score_repo.mark_score_sent(db_score, db_guild)
+            if self.uow.score_repo.is_score_new(db_score):
+                # Post as new score
+                embed = Message.get_new_score_embed(db_player, db_score, db_score.song)
+                await channel.send(embed=embed)
+                self.uow.score_repo.mark_score_sent(db_score, db_guild)
+            else:
+                # Post as improvement
+                previous_db_score = self.uow.score_repo.get_previous_score(db_score)
+
+                embed = Message.get_improvement_score_embed(db_player, previous_db_score, db_score, db_score.song)
+                await channel.send(embed=embed)
+                self.uow.score_repo.mark_score_sent(db_score, db_guild)
 
     @tasks.loop(minutes=1)
     @Utils.time_task

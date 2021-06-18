@@ -21,6 +21,27 @@ class ScoreRepository:
 
         return db_scores
 
+    def get_all_scores_by_id(self, score_id):
+        return self._db.session.query(Score).filter(Score.scoreId == score_id).all()
+
+    def get_previous_score(self, db_score):
+        db_scores = self.get_all_scores_by_id(db_score.scoreId)
+
+        previous_score = None
+
+        for old_db_score in db_scores:
+            if old_db_score.score == db_score.score:
+                continue
+
+            if previous_score is None:
+                previous_score = old_db_score
+                continue
+
+            if old_db_score.score > previous_score.score:
+                previous_score = old_db_score
+
+        return previous_score
+
     def get_player_scores(self, player):
         return self._db.session.query(Score).filter(Score.player_id == player.id).all()
 
@@ -74,6 +95,11 @@ class ScoreRepository:
                 unsent_scores.append(db_score)
 
         return unsent_scores
+
+    def is_score_new(self, db_score):
+        db_scores = self.get_all_scores_by_id(db_score.scoreId)
+
+        return 1 >= len(db_scores)
 
     def mark_score_sent(self, db_score, db_guild):
         db_score.msg_guilds.append(db_guild)

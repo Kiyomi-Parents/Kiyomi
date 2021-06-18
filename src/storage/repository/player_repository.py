@@ -60,7 +60,10 @@ class PlayerRepository:
             is_new = True
 
             for old_db_score in db_player.scores:
-                if old_db_score.scoreId == new_score.scoreId:
+                if old_db_score.scoreId != new_score.scoreId:
+                    continue
+
+                if old_db_score.timeSet == new_score.timeSet:
                     is_new = False
 
             if is_new:
