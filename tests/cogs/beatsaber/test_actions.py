@@ -1,7 +1,8 @@
 import pytest
 
 from src.cogs.beatsaber import BeatSaberUtils, FeatureFlagException
-from src.cogs.beatsaber.actions import GuildNotFoundException, GuildRecentChannelExistsException, GuildRecentChannelNotFoundException
+from src.cogs.beatsaber.actions import GuildNotFoundException, GuildRecentChannelExistsException, \
+    GuildRecentChannelNotFoundException, SongNotFound
 
 
 def pytest_generate_tests(metafunc):
@@ -149,3 +150,15 @@ async def test_disable_feature(actions, db_guild, feature_flag):
 
     assert hasattr(db_guild, feature_flag)
     assert not getattr(db_guild, feature_flag)
+
+
+@pytest.mark.asyncio
+async def test_get_song(actions):
+    valid_song_key = "19487"
+    invalid_song_key = "153423234235"
+
+    db_song = await actions.get_song(valid_song_key)
+    assert db_song.key == valid_song_key
+
+    with pytest.raises(SongNotFound):
+        await actions.get_song(invalid_song_key)

@@ -10,7 +10,7 @@ class Message:
         embed.title = f"New #{score.rank} for {score.song_name_full} on {score.difficulty_name}"
 
         if song is not None:
-            embed.description = F"Mapped by {song._metadata['levelAuthorName']}"
+            embed.description = F"Mapped by {song.author}"
 
         embed.add_field(name="PP", value=f"**{round(score.pp, 2)}pp** _({score.weighted_pp}pp)_")
         embed.add_field(name="Accuracy", value=f"**{score.accuracy}%**")
@@ -36,7 +36,7 @@ class Message:
         embed.title = f"Improved from #{previous_score.rank} to #{score.rank} for {score.song_name_full} on {score.difficulty_name}"
 
         if song is not None:
-            embed.description = F"Mapped by {song._metadata['levelAuthorName']}"
+            embed.description = F"Mapped by {song.author}"
 
         pp_improvement = round(score.pp - previous_score.pp, 2)
         weighted_pp_improvement = round(score.weighted_pp - previous_score.weighted_pp, 2)
@@ -59,5 +59,30 @@ class Message:
         if song is not None:
             embed.add_field(name="\u200b", value=f"[Beat Saver]({song.beatsaver_url})")
             embed.add_field(name="\u200b", value=f"[Preview Map]({song.preview_url})")
+
+        return embed
+
+    @staticmethod
+    def get_song_embed(song):
+        embed = Embed()
+
+        embed.set_author(name=song.author, url=song.author_url)
+        embed.title = f"{song.name}"
+
+        embed.add_field(name="Rating", value=f"{song.rating}%")
+        embed.add_field(name="Downloads", value=f"{song.downloads}")
+        embed.add_field(name="Length", value=f"{song.length}")
+        embed.add_field(name="BPM", value=f"{song.bpm}")
+
+        embed.add_field(name="difficulties", value=" ".join(f"**{diff}**" for diff in song.difficulties_short))
+
+        # Should make a simple website that redirects the user to the right links
+        # discord doesn't want to make app links clickable
+        # This will include OneClick links and beatmap download links
+        embed.add_field(name="\u200b", value=f"[Preview Map]({song.preview_url})")
+
+        embed.set_thumbnail(url=song.cover_url)
+        embed.colour = Colour.random(seed=song.author_id)
+        embed.url = song.beatsaver_url
 
         return embed

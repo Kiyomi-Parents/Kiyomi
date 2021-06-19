@@ -1,3 +1,5 @@
+import time
+
 from sqlalchemy import Column, String, Integer, ForeignKey, JSON, DateTime
 
 from src.storage.database import Base
@@ -46,6 +48,63 @@ class Song(Base):
     @property
     def preview_url(self):
         return f"https://skystudioapps.com/bs-viewer/?id={self.key}"
+
+    @property
+    def cover_url(self):
+        return f"https://beatsaver.com{self.coverURL}"
+
+    @property
+    def one_click_install(self):
+        return f"https://beatsaver://{self.key}"
+
+    @property
+    def author(self):
+        return self._metadata["levelAuthorName"]
+
+    @property
+    def author_id(self):
+        return self.uploader['_id']
+
+    @property
+    def author_url(self):
+        return f"https://beatsaver.com/uploader/{self.author_id}"
+
+    @property
+    def rating(self):
+        return round(self.stats["rating"] * 100, 1)
+
+    @property
+    def downloads(self):
+        return self.stats["downloads"]
+
+    @property
+    def length(self):
+        return time.strftime("%H:%M:%S", time.gmtime(self._metadata['duration']))
+
+    @property
+    def bpm(self):
+        return self._metadata["bpm"]
+
+    @property
+    def difficulties_short(self):
+        diffs = [
+            "easy",
+            "normal",
+            "hard",
+            "expert",
+            "expertPlus"
+        ]
+
+        valid_diffs = []
+
+        for diff in diffs:
+            if diff in self._metadata["difficulties"] and self._metadata["difficulties"][diff]:
+                if diff == "expertPlus":
+                    valid_diffs.append("Expert+")
+                else:
+                    valid_diffs.append(diff.capitalize())
+
+        return valid_diffs
 
     def __str__(self):
         return f"Song {self.name} ({self.key})"

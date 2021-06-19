@@ -24,6 +24,10 @@ class GuildRecentChannelNotFoundException(Exception):
     pass
 
 
+class SongNotFound(Exception):
+    pass
+
+
 class Actions:
     def __init__(self, uow, tasks):
         self.uow = uow
@@ -189,3 +193,15 @@ class Actions:
 
         Logger.log(db_guild, f"Updating roles for {len(db_guild.players)} players")
         await self.tasks.update_guild_roles(db_guild)
+
+    async def get_song(self, song_key):
+        db_song = self.uow.song_repo.get_song_by_key(song_key)
+
+        if db_song is None:
+            try:
+                db_song = self.uow.beatsaver.get_song_by_key(song_key)
+                self.uow.song_repo.add_song(db_song)
+            except NotFoundException as error:
+                raise SongNotFound(f"Could not find song with key {song_key}") from error
+
+        return db_song

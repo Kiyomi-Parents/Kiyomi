@@ -9,6 +9,7 @@ from src.storage.model.song import Song
 
 class BeatSaver:
     _url = "https://beatsaver.com/api"
+    _timeout = 10
 
     def __init__(self):
         self._session = cfscrape.create_scraper()
@@ -18,11 +19,22 @@ class BeatSaver:
 
     @Cache(hours=24)
     def _get_song_by_hash(self, song_hash):
-        response = Common.request(self._session.get, f"{self._url}/maps/by-hash/{song_hash}", cookies={}, timeout=10)
+        response = Common.request(self._session.get, f"{self._url}/maps/by-hash/{song_hash}", cookies={}, timeout=self._timeout)
 
         return json.loads(response.content)
 
     def get_song_by_hash(self, song_hash):
         song_info = self._get_song_by_hash(song_hash)
+
+        return Song(song_info)
+
+    @Cache(hours=24)
+    def _get_song_by_key(self, song_key):
+        response = Common.request(self._session.get, f"{self._url}/maps/detail/{song_key}", cookies={}, timeout=self._timeout)
+
+        return json.loads(response.content)
+
+    def get_song_by_key(self, song_key):
+        song_info = self._get_song_by_key(song_key)
 
         return Song(song_info)

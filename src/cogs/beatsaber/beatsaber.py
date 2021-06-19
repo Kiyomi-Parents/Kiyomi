@@ -3,9 +3,11 @@ from sqlalchemy import create_engine
 from termcolor import colored
 
 from src.cogs.beatsaber.actions import PlayerExistsException, PlayerNotFoundException, \
-    GuildRecentChannelExistsException, GuildRecentChannelNotFoundException, GuildNotFoundException, Actions
+    GuildRecentChannelExistsException, GuildRecentChannelNotFoundException, GuildNotFoundException, Actions, \
+    SongNotFound
 from src.cogs.beatsaber.beatsaber_utils import BeatSaberUtils
 from src.cogs.beatsaber.feature.feature import FeatureFlagException, FeatureFlagNotFoundException
+from src.cogs.beatsaber.message import Message
 from src.cogs.security import Security
 from src.cogs.beatsaber.tasks import Tasks
 from src.log import Logger
@@ -154,6 +156,16 @@ class BeatSaber(commands.Cog):
 
         pp_size = round(db_player.pp / 100)
         await ctx.send(f"**{ctx.author.name}**'s PP is this big:\n8{'=' * pp_size}D")
+
+    @commands.command(aliases=["bsr", "song"])
+    async def map(self, ctx, key: str):
+        """Displays song info."""
+        try:
+            db_song = await self.actions.get_song(key)
+            embed = Message.get_song_embed(db_song)
+            await ctx.send(embed=embed)
+        except SongNotFound as error:
+            await ctx.send(error)
 
 
 def setup(bot):
