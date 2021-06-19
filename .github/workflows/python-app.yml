@@ -6,11 +6,11 @@ name: Python application
 on:
   push:
     branches:
-    - maser
+    - master
     - dev
   pull_request:
     branches:
-    - maser
+    - master
     - dev
 
 jobs:
