@@ -90,13 +90,13 @@ class Tasks:
         Logger.log(db_guild, f"{db_player} has {len(db_scores)} scores to notify")
 
         # TODO LATER: ADD THINGY THAT CHECKS IF GUILD_SNIPES IN ENABLED FOR CURRENT GUILD
-        guild_snipes = False
+        guild_snipes = True
 
         for db_score in db_scores:
             if guild_snipes:
                 # guild_scores_list = list of Score objects of scores set by registered members
                 # of the current guild on the same leaderboard as the current score 
-                guild_scores_list = self.uow.score_repo.get_all_scores_by_leaderboardId_and_guildId(db_score.leaderboardId, db_guild)
+                guild_scores_list = self.uow.score_repo.get_all_scores_by_leaderboardId_and_db_guild(db_score.leaderboardId, db_guild)
             else:
                 guild_scores_list = None
 

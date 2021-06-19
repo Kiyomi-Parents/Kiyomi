@@ -1,3 +1,4 @@
+from tests.cogs.factories.guild import guild
 from src.log import Logger
 from src.storage.model.score import Score
 
@@ -24,8 +25,11 @@ class ScoreRepository:
     def get_all_scores_by_id(self, score_id):
         return self._db.session.query(Score).filter(Score.scoreId == score_id).all()
 
-    def get_all_scores_by_leaderboardId_and_guildId(self, leaderboardId, guildId):
-        pass
+    def get_all_scores_by_leaderboardId_and_db_guild(self, leaderboardId, db_guild):
+        guild_player_ids = [player.id for player in db_guild.players]
+        lbscores = self._db.session.query(Score).filter(Score.leaderboardId == leaderboardId).all()
+        scores = [score for score in lbscores if score.player_id in guild_player_ids]
+        return scores
 
     def get_previous_score(self, db_score):
         db_scores = self.get_all_scores_by_id(db_score.scoreId)

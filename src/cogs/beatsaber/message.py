@@ -26,9 +26,8 @@ class Message:
         if song is not None:
             embed.add_field(name="\u200b", value=f"[Beat Saver]({song.beatsaver_url})")
             embed.add_field(name="\u200b", value=f"[Preview Map]({song.preview_url})")
-
-        if guild_scores_list is not None:
-            pass
+        
+        embed = Message.get_snipe_embed(embed, score, guild_scores_list)
 
         return embed
 
@@ -63,14 +62,30 @@ class Message:
             embed.add_field(name="\u200b", value=f"[Beat Saver]({song.beatsaver_url})")
             embed.add_field(name="\u200b", value=f"[Preview Map]({song.preview_url})")
 
-        if guild_scores_list is not None:
-            pass
+
+        embed = Message.get_snipe_embed(embed, score, guild_scores_list)
 
         return embed
     
     @staticmethod
-    def get_snipe_embed(score ,scores_list):
-        pass
+    def get_snipe_embed(embed:Embed, mainscore, scores_list):
+        if scores_list is not None:
+
+            mainscore_index = None
+            for index, score in enumerate(scores_list):
+                mainscore_index = None
+                if score.scoreId == mainscore.scoreId:
+                    mainscore_index = index
+                    break
+
+            if mainscore_index is None:
+                scores_list.append(mainscore)
+                scores_list.sort(key=lambda score : float(score.score), reverse=True)
+                mainscore_index = scores_list.index(mainscore)
+            
+            embed.add_field(name=f"Guild rank", value=f"{mainscore_index}")
+
+        return embed
 
     @staticmethod
     def get_song_embed(song):
