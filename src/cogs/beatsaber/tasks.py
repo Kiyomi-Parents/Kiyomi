@@ -89,17 +89,27 @@ class Tasks:
 
         Logger.log(db_guild, f"{db_player} has {len(db_scores)} scores to notify")
 
+        # TODO LATER: ADD THINGY THAT CHECKS IF GUILD_SNIPES IN ENABLED FOR CURRENT GUILD
+        guild_snipes = False
+
         for db_score in db_scores:
+            if guild_snipes:
+                # guild_scores_list = list of Score objects of scores set by registered members
+                # of the current guild on the same leaderboard as the current score 
+                guild_scores_list = self.uow.score_repo.get_all_scores_by_leaderboardId_and_guildId(db_score.leaderboardId, db_guild)
+            else:
+                guild_scores_list = None
+
             if self.uow.score_repo.is_score_new(db_score):
                 # Post as new score
-                embed = Message.get_new_score_embed(db_player, db_score, db_score.song)
+                embed = Message.get_new_score_embed(db_player, db_score, db_score.song, guild_scores_list)
                 await channel.send(embed=embed)
                 self.uow.score_repo.mark_score_sent(db_score, db_guild)
             else:
                 # Post as improvement
                 previous_db_score = self.uow.score_repo.get_previous_score(db_score)
 
-                embed = Message.get_improvement_score_embed(db_player, previous_db_score, db_score, db_score.song)
+                embed = Message.get_improvement_score_embed(db_player, previous_db_score, db_score, db_score.song, guild_scores_list)
                 await channel.send(embed=embed)
                 self.uow.score_repo.mark_score_sent(db_score, db_guild)
 

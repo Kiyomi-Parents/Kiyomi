@@ -24,6 +24,9 @@ class ScoreRepository:
     def get_all_scores_by_id(self, score_id):
         return self._db.session.query(Score).filter(Score.scoreId == score_id).all()
 
+    def get_all_scores_by_leaderboardId_and_guildId(self, leaderboardId, guildId):
+        pass
+
     def get_previous_score(self, db_score):
         db_scores = self.get_all_scores_by_id(db_score.scoreId)
 

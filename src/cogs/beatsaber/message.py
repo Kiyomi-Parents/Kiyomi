@@ -4,7 +4,7 @@ from discord import Embed, Colour
 class Message:
 
     @staticmethod
-    def get_new_score_embed(player, score, song):
+    def get_new_score_embed(player, score, song, guild_scores_list):
         embed = Embed()
         embed.set_author(name=player.playerName, url=player.profile_url, icon_url=player.avatar_url)
         embed.title = f"New #{score.rank} for {score.song_name_full} on {score.difficulty_name}"
@@ -27,10 +27,13 @@ class Message:
             embed.add_field(name="\u200b", value=f"[Beat Saver]({song.beatsaver_url})")
             embed.add_field(name="\u200b", value=f"[Preview Map]({song.preview_url})")
 
+        if guild_scores_list is not None:
+            pass
+
         return embed
 
     @staticmethod
-    def get_improvement_score_embed(player, previous_score, score, song):
+    def get_improvement_score_embed(player, previous_score, score, song, guild_scores_list):
         embed = Embed()
         embed.set_author(name=player.playerName, url=player.profile_url, icon_url=player.avatar_url)
         embed.title = f"Improved from #{previous_score.rank} to #{score.rank} for {score.song_name_full} on {score.difficulty_name}"
@@ -60,7 +63,14 @@ class Message:
             embed.add_field(name="\u200b", value=f"[Beat Saver]({song.beatsaver_url})")
             embed.add_field(name="\u200b", value=f"[Preview Map]({song.preview_url})")
 
+        if guild_scores_list is not None:
+            pass
+
         return embed
+    
+    @staticmethod
+    def get_snipe_embed(score ,scores_list):
+        pass
 
     @staticmethod
     def get_song_embed(song):
