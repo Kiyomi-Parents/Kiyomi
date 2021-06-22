@@ -169,11 +169,13 @@ class BeatSaber(commands.Cog):
             await ctx.send(error)
 
     @commands.command(aliases=["recentmap", "recent_song", "recent_map"], invoke_without_command=True)
-    async def recentsong(self, ctx, index:int=0):
+    async def recentsong(self, ctx, index:int=1):
         """Displays your most recent score"""
         db_player = self.uow.player_repo.get_player_by_member_id(ctx.author.id)
+        if index <= 0:
+            index += 1
         try:
-            db_score = self.uow.score_repo.get_player_scores(db_player)[index]
+            db_score = self.uow.score_repo.get_player_scores(db_player)[index-1]
             score_embed = Message.get_score_embed(db_player, db_score)
             await ctx.send(embed=score_embed)
         except IndexError as e:
