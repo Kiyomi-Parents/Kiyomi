@@ -6,7 +6,7 @@ from src.cogs.beatsaber.api.scoresaber import ScoreSaber
 from src.cogs.beatsaber.actions import Actions
 from src.cogs.beatsaber.beatsaber import BeatSaber
 from src.cogs.beatsaber.tasks import Tasks
-from src.cogs.beatsaber.storage.database import Database
+from src.cogs.beatsaber.storage.database import Database, Base
 from src.cogs.beatsaber.storage.uow import UnitOfWork
 from tests.cogs.beatsaber.factories import *
 
@@ -24,6 +24,7 @@ def beatsaver():
 @pytest.fixture
 def uow(bot, scoresaber, beatsaver):
     engine = create_engine("sqlite:///:memory:")
+    Base.metadata.create_all(engine)
     database = Database(engine)
 
     return UnitOfWork(bot, database, scoresaber, beatsaver)
