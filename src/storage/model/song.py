@@ -106,5 +106,9 @@ class Song(Base):
 
         return valid_diffs
 
+    @property
+    def difficulties_long(self):
+        return self._metadata["characteristics"][0]["difficulties"]
+
     def __str__(self):
         return f"Song {self.name} ({self.key})"

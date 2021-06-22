@@ -1,4 +1,9 @@
+from typing import Union, Optional
+
+from sqlalchemy import func, desc
+
 from src.log import Logger
+from src.storage.model import Player
 from src.storage.model.score import Score
 
 
@@ -24,13 +29,17 @@ class ScoreRepository:
     def get_all_scores_by_id(self, score_id):
         return self._db.session.query(Score).filter(Score.scoreId == score_id).all()
 
+    def get_leaderboard_id_by_hash(self, song_hash):
+        db_score = self._db.session.query(Score).filter(Score.songHash == song_hash).first()
+
+        return db_score.leaderboardId
+
     def get_previous_score(self, db_score):
         db_scores = self.get_all_scores_by_id(db_score.scoreId)
-
         previous_score = None
 
         for old_db_score in db_scores:
-            if old_db_score.score == db_score.score:
+            if old_db_score.score >= db_score.score:
                 continue
 
             if previous_score is None:
@@ -41,6 +50,26 @@ class ScoreRepository:
                 previous_score = old_db_score
 
         return previous_score
+
+    def get_player_scores_on_leaderboard(self, db_player, leaderboard_id):
+        return self._db.session.query(Score)\
+            .filter(Score.player_id == db_player.id)\
+            .filter(Score.leaderboardId == leaderboard_id)\
+            .all()
+
+    def get_player_best_score_on_leaderboard(self, db_player: Player, leaderboard_id: int) -> Optional[Score]:
+        db_scores = self.get_player_scores_on_leaderboard(db_player, leaderboard_id)
+        best_score = None
+
+        for other_db_score in db_scores:
+            if best_score is None:
+                best_score = other_db_score
+                continue
+
+            if other_db_score.score > best_score.score:
+                best_score = other_db_score
+
+        return best_score
 
     def get_player_scores(self, player):
         return self._db.session.query(Score).filter(Score.player_id == player.id).all()

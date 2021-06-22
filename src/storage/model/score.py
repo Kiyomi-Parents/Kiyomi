@@ -1,7 +1,10 @@
+from typing import Union
+
 from dateutil import parser, tz
 from sqlalchemy import Column, String, Integer, ForeignKey, DateTime, Float, Table
 from sqlalchemy.orm import relationship
 
+from src.cogs.beatsaber.beatsaber_utils import BeatSaberUtils
 from src.storage.database import Base
 
 score_guild_table = Table("score_guild", Base.metadata,
@@ -81,7 +84,23 @@ class Score(Base):
             6: "6?",
             7: "Expert",
             8: "8?",
-            9: "Expert Plus"
+            9: "Expert+"
+        }
+
+        return difficulties[self.difficulty]
+
+    @property
+    def beatsaver_difficulty_name(self):
+        difficulties = {
+            1: "easy",
+            2: "2?",
+            3: "normal",
+            4: "4?",
+            5: "hard",
+            6: "6?",
+            7: "expert",
+            8: "8?",
+            9: "expertPlus"
         }
 
         return difficulties[self.difficulty]
@@ -91,11 +110,19 @@ class Score(Base):
         return f"https://scoresaber.com/imports/images/songs/{self.songHash}.png"
 
     @property
-    def accuracy(self):
-        if self.maxScore:
-            return round(self.score / self.maxScore * 100, 2)
+    def accuracy(self) -> Union[Float, None]:
+        max_score = self.maxScore
 
-        return "N/A"
+        if not max_score:
+            song_diff = self.song.difficulties_long[self.beatsaver_difficulty_name]
+
+            if song_diff:
+                max_score = BeatSaberUtils.get_max_score(song_diff["notes"])
+
+        if max_score:
+            return round(self.score / max_score * 100, 2)
+
+        return None
 
     @property
     def weighted_pp(self):

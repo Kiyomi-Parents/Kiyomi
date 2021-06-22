@@ -1,4 +1,12 @@
+from datetime import datetime
+from typing import List
+
+import timeago
+from dateutil import tz
 from discord import Embed, Colour
+from prettytable import PrettyTable
+
+from src.cogs.beatsaber.leaderboard.leaderboard_score import LeaderboardScore
 
 
 class Message:
@@ -84,5 +92,34 @@ class Message:
         embed.set_thumbnail(url=song.cover_url)
         embed.colour = Colour.random(seed=song.author_id)
         embed.url = song.beatsaver_url
+
+        return embed
+
+    @staticmethod
+    def get_leaderboard_embed(leaderboard_scores: List[LeaderboardScore]):
+        embed = Embed()
+
+        embed.title = "Discord Leaderboard"
+
+        table = PrettyTable()
+        table.border = False
+        table.field_names = ["#", "Player", "Date", "Mods", "%", "PP"]
+
+        for index, leaderboard_score in enumerate(leaderboard_scores):
+            rank = f"#{index + 1}"
+            name = leaderboard_score.db_player.playerName
+            date = timeago.format(leaderboard_score.db_score.get_date, datetime.now(tz=tz.UTC))
+
+            if len(leaderboard_score.db_score.mods):
+                mods = leaderboard_score.db_score.mods
+            else:
+                mods = "-"
+
+            acc = f"{leaderboard_score.db_score.accuracy}%"
+            pp = f"{leaderboard_score.db_score.pp}pp"
+
+            table.add_row([rank, name, date, mods, acc, pp])
+
+        embed.description = f"```{table.get_string()}```"
 
         return embed

@@ -162,3 +162,12 @@ async def test_get_song(actions):
 
     with pytest.raises(SongNotFound):
         await actions.get_song(invalid_song_key)
+
+
+@pytest.mark.asyncio
+async def test_get_guild_leaderboard(actions, member, db_guild):
+    db_player = await actions.add_player(db_guild.discord_guild_id, member.id, "76561198029447509")
+
+    leaderboard = await actions.get_guild_leaderboard(db_guild.discord_guild_id, db_player.scores[0].song.key)
+
+    assert len(leaderboard) != 0

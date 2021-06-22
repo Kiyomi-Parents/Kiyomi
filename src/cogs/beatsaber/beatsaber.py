@@ -162,8 +162,14 @@ class BeatSaber(commands.Cog):
         """Displays song info."""
         try:
             db_song = await self.actions.get_song(key)
-            embed = Message.get_song_embed(db_song)
-            await ctx.send(embed=embed)
+            guild_leaderboard = await self.actions.get_guild_leaderboard(ctx.guild.id, db_song.key)
+
+            song_embed = Message.get_song_embed(db_song)
+            await ctx.send(embed=song_embed)
+
+            if len(guild_leaderboard) > 0:
+                guild_leaderboard_embed = Message.get_leaderboard_embed(guild_leaderboard)
+                await ctx.send(embed=guild_leaderboard_embed)
         except SongNotFound as error:
             await ctx.send(error)
 

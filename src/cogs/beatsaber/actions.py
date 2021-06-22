@@ -1,6 +1,7 @@
 from src.api import NotFoundException
 from src.cogs.beatsaber.beatsaber_utils import BeatSaberUtils
 from src.cogs.beatsaber.feature.feature import FeatureFlagNotFoundException
+from src.cogs.beatsaber.leaderboard.guild_leaderboard import GuildLeaderboard
 from src.log import Logger
 
 
@@ -205,3 +206,12 @@ class Actions:
                 raise SongNotFound(f"Could not find song with key {song_key}") from error
 
         return db_song
+
+    async def get_guild_leaderboard(self, guild_id, song_key):
+        db_guild = self.uow.guild_repo.get_guild_by_id(guild_id)
+        db_song = await self.get_song(song_key)
+        leaderboard_id = self.uow.score_repo.get_leaderboard_id_by_hash(db_song.hash)
+
+        leaderboard = GuildLeaderboard(self.uow, db_guild, leaderboard_id)
+
+        return leaderboard.leaderboard_scores
