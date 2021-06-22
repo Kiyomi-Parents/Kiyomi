@@ -1,5 +1,5 @@
+from src.cogs.beatsaber.storage.model.discord_role import DiscordRole
 from src.log import Logger
-from src.storage.model import DiscordRole
 
 
 class RoleRepository:

@@ -1,5 +1,5 @@
 from src.cogs.beatsaber.feature.feature import Feature
-from src.cogs.beatsaber.roles import RolesRank
+from src.cogs.beatsaber.roles.roles_rank import RolesRank
 
 
 class FeatureRankRoles(Feature):

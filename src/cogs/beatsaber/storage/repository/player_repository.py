@@ -1,5 +1,5 @@
 from src.log import Logger
-from src.storage.model.player import Player
+from src.cogs.beatsaber.storage.model.player import Player
 
 
 class PlayerRepository:

@@ -1,7 +1,7 @@
 import unittest
 
-from src.api.errors import NotFoundException
-from src.api.scoresaber import ScoreSaber
+from src.cogs.beatsaber.api.errors import NotFoundException
+from src.cogs.beatsaber.api.scoresaber import ScoreSaber
 
 
 class TestScoreSaber(unittest.TestCase):

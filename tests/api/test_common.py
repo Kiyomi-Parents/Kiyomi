@@ -1,7 +1,8 @@
 import unittest
 
-from src.api import common, NotFoundException, ServerErrorException, RateLimitedException
-from src.api.common import Common
+from src.cogs.beatsaber.api import common
+from src.cogs.beatsaber.api.common import Common
+from src.cogs.beatsaber.api.errors import NotFoundException, RateLimitedException, ServerErrorException
 
 
 class TestCommon(unittest.TestCase):

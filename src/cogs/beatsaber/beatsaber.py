@@ -1,18 +1,13 @@
 from discord.ext import commands
-from sqlalchemy import create_engine
 from termcolor import colored
 
 from src.cogs.beatsaber.actions import PlayerExistsException, PlayerNotFoundException, \
-    GuildRecentChannelExistsException, GuildRecentChannelNotFoundException, GuildNotFoundException, Actions, \
-    SongNotFound
+    GuildRecentChannelExistsException, GuildRecentChannelNotFoundException, GuildNotFoundException, SongNotFound
 from src.cogs.beatsaber.beatsaber_utils import BeatSaberUtils
 from src.cogs.beatsaber.feature.feature import FeatureFlagException, FeatureFlagNotFoundException
 from src.cogs.beatsaber.message import Message
 from src.cogs.security import Security
-from src.cogs.beatsaber.tasks import Tasks
 from src.log import Logger
-from src.storage.database import Database
-from src.storage.uow import UnitOfWork
 
 
 class BeatSaber(commands.Cog):
@@ -172,17 +167,3 @@ class BeatSaber(commands.Cog):
                 await ctx.send(embed=guild_leaderboard_embed)
         except SongNotFound as error:
             await ctx.send(error)
-
-
-def setup(bot):
-    database = Database(create_engine("sqlite:///bot.db", echo=False))
-    uow = UnitOfWork(bot, database)
-    tasks = Tasks(uow)
-    actions = Actions(uow, tasks)
-
-    tasks.update_players.start()
-    tasks.update_all_player_roles.start()
-    tasks.update_players_scores.start()
-    tasks.send_notifications.start()
-
-    bot.add_cog(BeatSaber(uow, tasks, actions))

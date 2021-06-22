@@ -1,7 +1,7 @@
 from sqlalchemy import Column, String, Integer, ForeignKey, Table, Boolean
 from sqlalchemy.orm import relationship
 
-from src.storage.database import Base
+from src.cogs.beatsaber.storage.database import Base
 
 guild_player_table = Table("guild_player", Base.metadata,
                            Column("guild_id", Integer, ForeignKey("guild.id")),

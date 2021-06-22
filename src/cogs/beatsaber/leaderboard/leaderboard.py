@@ -1,8 +1,8 @@
 from typing import List
 
 from src.cogs.beatsaber.leaderboard.leaderboard_score import LeaderboardScore
-from src.storage.model import DiscordGuild
-from src.storage.uow import UnitOfWork
+from src.cogs.beatsaber.storage.model.discord_guild import DiscordGuild
+from src.cogs.beatsaber.storage.uow import UnitOfWork
 
 
 class Leaderboard:

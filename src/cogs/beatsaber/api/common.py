@@ -1,6 +1,6 @@
 import time
 
-from src.api.errors import RateLimitedException, NotFoundException, ServerErrorException
+from src.cogs.beatsaber.api.errors import RateLimitedException, NotFoundException, ServerErrorException
 from src.log import Logger
 
 WAIT_RATE_LIMIT = 60

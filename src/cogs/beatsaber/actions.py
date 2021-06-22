@@ -1,4 +1,4 @@
-from src.api import NotFoundException
+from src.cogs.beatsaber.api.errors import NotFoundException
 from src.cogs.beatsaber.beatsaber_utils import BeatSaberUtils
 from src.cogs.beatsaber.feature.feature import FeatureFlagNotFoundException
 from src.cogs.beatsaber.leaderboard.guild_leaderboard import GuildLeaderboard

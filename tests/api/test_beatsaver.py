@@ -1,6 +1,7 @@
 import unittest
 
-from src.api import BeatSaver, NotFoundException
+from src.cogs.beatsaber.api.beatsaver import BeatSaver
+from src.cogs.beatsaber.api.errors import NotFoundException
 
 
 class TestBeatSaver(unittest.TestCase):

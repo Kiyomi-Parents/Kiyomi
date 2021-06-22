@@ -1,11 +1,8 @@
-from tests.cogs.factories.guild import guild
-from typing import Union, Optional
+from typing import Optional
 
-from sqlalchemy import func, desc
-
+from src.cogs.beatsaber.storage.model.player import Player
 from src.log import Logger
-from src.storage.model import Player
-from src.storage.model.score import Score
+from src.cogs.beatsaber.storage.model.score import Score
 
 
 class ScoreRepository:

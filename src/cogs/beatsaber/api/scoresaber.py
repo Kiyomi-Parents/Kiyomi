@@ -1,7 +1,8 @@
 import requests
-from src.api.cache import Cache
-from src.api.common import Common
-from src.storage.model import Player, Score
+from src.cogs.beatsaber.api.cache import Cache
+from src.cogs.beatsaber.api.common import Common
+from src.cogs.beatsaber.storage.model.player import Player
+from src.cogs.beatsaber.storage.model.score import Score
 
 
 class ScoreSaber:

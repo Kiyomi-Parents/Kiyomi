@@ -5,7 +5,7 @@ from sqlalchemy import Column, String, Integer, ForeignKey, DateTime, Float, Tab
 from sqlalchemy.orm import relationship
 
 from src.cogs.beatsaber.beatsaber_utils import BeatSaberUtils
-from src.storage.database import Base
+from src.cogs.beatsaber.storage.database import Base
 
 score_guild_table = Table("score_guild", Base.metadata,
                           Column("score_id", Integer, ForeignKey("score.id")),

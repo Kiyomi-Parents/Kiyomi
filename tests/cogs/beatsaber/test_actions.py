@@ -1,8 +1,9 @@
 import pytest
 
-from src.cogs.beatsaber import BeatSaberUtils, FeatureFlagException
 from src.cogs.beatsaber.actions import GuildNotFoundException, GuildRecentChannelExistsException, \
     GuildRecentChannelNotFoundException, SongNotFound
+from src.cogs.beatsaber.beatsaber_utils import BeatSaberUtils
+from src.cogs.beatsaber.feature.feature import FeatureFlagException
 
 
 def pytest_generate_tests(metafunc):

@@ -1,4 +1,5 @@
-from src.storage.model import Player, Score
+from src.cogs.beatsaber.storage.model.player import Player
+from src.cogs.beatsaber.storage.model.score import Score
 
 
 class LeaderboardScore:

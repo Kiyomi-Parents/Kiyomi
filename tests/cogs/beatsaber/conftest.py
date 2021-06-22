@@ -1,12 +1,13 @@
 import pytest
 from sqlalchemy import create_engine
 
-from src.api import ScoreSaber, BeatSaver
+from src.cogs.beatsaber.api.beatsaver import BeatSaver
+from src.cogs.beatsaber.api.scoresaber import ScoreSaber
 from src.cogs.beatsaber.actions import Actions
 from src.cogs.beatsaber.beatsaber import BeatSaber
 from src.cogs.beatsaber.tasks import Tasks
-from src.storage.database import Database
-from src.storage.uow import UnitOfWork
+from src.cogs.beatsaber.storage.database import Database
+from src.cogs.beatsaber.storage.uow import UnitOfWork
 from tests.cogs.beatsaber.factories import *
 
 

@@ -1,5 +1,5 @@
 from src.log import Logger
-from src.storage.model.discord_guild import DiscordGuild
+from src.cogs.beatsaber.storage.model.discord_guild import DiscordGuild
 
 
 class GuildRepository:

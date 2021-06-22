@@ -2,9 +2,9 @@ import json
 
 import cfscrape
 
-from src.api.cache import Cache
-from src.api.common import Common
-from src.storage.model.song import Song
+from src.cogs.beatsaber.api.cache import Cache
+from src.cogs.beatsaber.api.common import Common
+from src.cogs.beatsaber.storage.model.song import Song
 
 
 class BeatSaver:

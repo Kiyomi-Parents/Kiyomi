@@ -1,4 +1,4 @@
-from src.storage.model.song import Song
+from src.cogs.beatsaber.storage.model.song import Song
 
 
 class SongRepository:

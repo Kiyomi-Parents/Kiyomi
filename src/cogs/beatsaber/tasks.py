@@ -1,5 +1,5 @@
 from discord.ext import tasks
-from src.api.errors import NotFoundException
+from src.cogs.beatsaber.api.errors import NotFoundException
 from src.cogs.beatsaber.beatsaber_utils import BeatSaberUtils
 from src.cogs.beatsaber.message import Message
 from src.log import Logger

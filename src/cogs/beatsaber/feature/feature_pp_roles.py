@@ -1,5 +1,5 @@
 from src.cogs.beatsaber.feature.feature import Feature
-from src.cogs.beatsaber.roles import RolesPP
+from src.cogs.beatsaber.roles.roles_pp import RolesPP
 
 
 class FeaturePPRoles(Feature):

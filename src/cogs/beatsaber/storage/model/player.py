@@ -1,8 +1,8 @@
 from sqlalchemy import Column, String, Integer, JSON, Float, Table, ForeignKey
 from sqlalchemy.orm import relationship
 
-from src.storage.database import Base
-from src.storage.model.discord_guild import guild_player_table
+from src.cogs.beatsaber.storage.database import Base
+from src.cogs.beatsaber.storage.model.discord_guild import guild_player_table
 
 player_role_table = Table("player_role", Base.metadata,
                           Column("player_id", Integer, ForeignKey("player.id")),

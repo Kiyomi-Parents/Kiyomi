@@ -2,7 +2,7 @@ import math
 import re
 
 from src.cogs.beatsaber.feature.feature_pp_roles import FeaturePPRoles
-from src.cogs.beatsaber.roles import RolesPP
+from src.cogs.beatsaber.roles.roles_pp import RolesPP
 
 
 class BeatSaberUtils:
