@@ -178,7 +178,7 @@ class BeatSaber(commands.Cog):
         if index <= 0:
             index += 1
         try:
-            db_scores = self.uow.score_repo.get_player_scores(db_player)
+            db_scores = self.uow.score_repo.get_player_recent_scores(db_player)
             if db_scores is None:
                 await ctx.send("No scores found!")
                 return

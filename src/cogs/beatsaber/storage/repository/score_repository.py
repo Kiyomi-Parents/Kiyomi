@@ -3,6 +3,7 @@ from typing import Optional, List
 from src.cogs.beatsaber.storage.model.player import Player
 from src.log import Logger
 from src.cogs.beatsaber.storage.model.score import Score
+from sqlalchemy import desc
 
 
 class ScoreRepository:
@@ -79,6 +80,12 @@ class ScoreRepository:
         return self._db.session.query(Score)\
             .filter(Score.player_id == player.id)\
             .filter(~Score.song.has()).all()
+
+    def get_player_recent_scores(self, player):
+        return self._db.session.query(Score)\
+            .filter(Score.player_id == player.id)\
+            .order_by(Score.timeSet.desc())\
+            .all()
 
     def get_scores_without_song(self):
         return self._db.session.query(Score).filter(~Score.song.has()).all()
