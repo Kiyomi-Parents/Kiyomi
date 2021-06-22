@@ -1,3 +1,4 @@
+from tests.cogs.factories.guild import guild
 from typing import Union, Optional
 
 from sqlalchemy import func, desc
@@ -28,6 +29,12 @@ class ScoreRepository:
 
     def get_all_scores_by_id(self, score_id):
         return self._db.session.query(Score).filter(Score.scoreId == score_id).all()
+
+    def get_all_scores_by_leaderboard_id_and_db_guild(self, leaderboardId, db_guild):
+        guild_player_ids = [player.id for player in db_guild.players]
+        lbscores = self._db.session.query(Score).filter(Score.leaderboardId == leaderboardId).all()
+        scores = [score for score in lbscores if score.player_id in guild_player_ids]
+        return scores
 
     def get_leaderboard_id_by_hash(self, song_hash):
         db_score = self._db.session.query(Score).filter(Score.songHash == song_hash).first()
