@@ -212,6 +212,10 @@ class Actions:
         db_song = await self.get_song(song_key)
         leaderboard_id = self.uow.score_repo.get_leaderboard_id_by_hash(db_song.hash)
 
-        leaderboard = GuildLeaderboard(self.uow, db_guild, leaderboard_id)
+        if leaderboard_id is not None:
+            leaderboard = GuildLeaderboard(self.uow, db_guild, leaderboard_id)
 
-        return leaderboard.leaderboard_scores
+            if len(leaderboard.leaderboard_scores) > 0:
+                return leaderboard.leaderboard_scores
+
+        return None

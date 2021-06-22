@@ -1,6 +1,7 @@
 from discord.ext import tasks
 from src.cogs.beatsaber.api.errors import NotFoundException
 from src.cogs.beatsaber.beatsaber_utils import BeatSaberUtils
+from src.cogs.beatsaber.leaderboard.guild_leaderboard import GuildLeaderboard
 from src.cogs.beatsaber.message import Message
 from src.log import Logger
 from src.utils import Utils
@@ -93,25 +94,26 @@ class Tasks:
         guild_snipes = True
 
         for db_score in db_scores:
-            if guild_snipes:
-                # guild_scores_list = list of Score objects of scores set by registered members
-                # of the current guild on the same leaderboard as the current score 
-                guild_scores_list = self.uow.score_repo.get_all_scores_by_leaderboard_id_and_db_guild(db_score.leaderboardId, db_guild)
-            else:
-                guild_scores_list = None
-
             if self.uow.score_repo.is_score_new(db_score):
                 # Post as new score
-                embed = Message.get_new_score_embed(db_player, db_score, db_score.song, guild_scores_list)
+                embed = Message.get_new_score_embed(db_player, db_score, db_score.song)
                 await channel.send(embed=embed)
+
                 self.uow.score_repo.mark_score_sent(db_score, db_guild)
             else:
                 # Post as improvement
                 previous_db_score = self.uow.score_repo.get_previous_score(db_score)
 
-                embed = Message.get_improvement_score_embed(db_player, previous_db_score, db_score, db_score.song, guild_scores_list)
+                embed = Message.get_improvement_score_embed(db_player, previous_db_score, db_score, db_score.song)
                 await channel.send(embed=embed)
                 self.uow.score_repo.mark_score_sent(db_score, db_guild)
+
+            if guild_snipes:
+                leaderboard = GuildLeaderboard(self.uow, db_guild, db_score.leaderboardId)
+
+                if len(leaderboard.leaderboard_scores) > 0:
+                    guild_leaderboard_embed = Message.get_leaderboard_embed(leaderboard.leaderboard_scores)
+                    await channel.send(embed=guild_leaderboard_embed)
 
     @tasks.loop(minutes=1)
     @Utils.time_task

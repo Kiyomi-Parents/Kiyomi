@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 
 from src.cogs.beatsaber.storage.model.player import Player
 from src.log import Logger
@@ -27,16 +27,13 @@ class ScoreRepository:
     def get_all_scores_by_id(self, score_id):
         return self._db.session.query(Score).filter(Score.scoreId == score_id).all()
 
-    def get_all_scores_by_leaderboard_id_and_db_guild(self, leaderboardId, db_guild):
-        guild_player_ids = [player.id for player in db_guild.players]
-        lbscores = self._db.session.query(Score).filter(Score.leaderboardId == leaderboardId).all()
-        scores = [score for score in lbscores if score.player_id in guild_player_ids]
-        return scores
-
-    def get_leaderboard_id_by_hash(self, song_hash):
+    def get_leaderboard_id_by_hash(self, song_hash) -> Optional[int]:
         db_score = self._db.session.query(Score).filter(Score.songHash == song_hash).first()
 
-        return db_score.leaderboardId
+        if db_score is not None:
+            return db_score.leaderboardId
+
+        return None
 
     def get_previous_score(self, db_score):
         db_scores = self.get_all_scores_by_id(db_score.scoreId)
@@ -120,7 +117,7 @@ class ScoreRepository:
                 self.update_score(new_score)
 
     @staticmethod
-    def get_unsent_scores(db_player, db_guild):
+    def get_unsent_scores(db_player, db_guild) -> List[Score]:
         unsent_scores = []
 
         for db_score in db_player.scores:

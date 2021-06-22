@@ -12,7 +12,7 @@ from src.cogs.beatsaber.leaderboard.leaderboard_score import LeaderboardScore
 class Message:
 
     @staticmethod
-    def get_new_score_embed(player, score, song, guild_scores_list):
+    def get_new_score_embed(player, score, song):
         embed = Embed()
         embed.set_author(name=player.playerName, url=player.profile_url, icon_url=player.avatar_url)
         embed.title = f"New #{score.rank} for {score.song_name_full} on {score.difficulty_name}"
@@ -34,13 +34,11 @@ class Message:
         if song is not None:
             embed.add_field(name="\u200b", value=f"[Beat Saver]({song.beatsaver_url})")
             embed.add_field(name="\u200b", value=f"[Preview Map]({song.preview_url})")
-        
-        embed = Message.get_snipe_embed(embed, score, guild_scores_list)
 
         return embed
 
     @staticmethod
-    def get_improvement_score_embed(player, previous_score, score, song, guild_scores_list):
+    def get_improvement_score_embed(player, previous_score, score, song):
         embed = Embed()
         embed.set_author(name=player.playerName, url=player.profile_url, icon_url=player.avatar_url)
         embed.title = f"Improved from #{previous_score.rank} to #{score.rank} for {score.song_name_full} on {score.difficulty_name}"
@@ -69,29 +67,6 @@ class Message:
         if song is not None:
             embed.add_field(name="\u200b", value=f"[Beat Saver]({song.beatsaver_url})")
             embed.add_field(name="\u200b", value=f"[Preview Map]({song.preview_url})")
-
-
-        embed = Message.get_snipe_embed(embed, score, guild_scores_list)
-
-        return embed
-    
-    @staticmethod
-    def get_snipe_embed(embed:Embed, mainscore, scores_list):
-        if scores_list is not None:
-
-            mainscore_index = None
-            for index, score in enumerate(scores_list):
-                mainscore_index = None
-                if score.scoreId == mainscore.scoreId:
-                    mainscore_index = index
-                    break
-
-            if mainscore_index is None:
-                scores_list.append(mainscore)
-                scores_list.sort(key=lambda score : float(score.score), reverse=True)
-                mainscore_index = scores_list.index(mainscore)
-            
-            embed.add_field(name=f"Guild rank", value=f"{mainscore_index}")
 
         return embed
 

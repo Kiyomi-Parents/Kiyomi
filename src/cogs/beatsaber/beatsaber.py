@@ -162,7 +162,7 @@ class BeatSaber(commands.Cog):
             song_embed = Message.get_song_embed(db_song)
             await ctx.send(embed=song_embed)
 
-            if len(guild_leaderboard) > 0:
+            if guild_leaderboard is not None:
                 guild_leaderboard_embed = Message.get_leaderboard_embed(guild_leaderboard)
                 await ctx.send(embed=guild_leaderboard_embed)
         except SongNotFound as error:

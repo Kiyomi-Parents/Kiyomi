@@ -8,14 +8,8 @@ class FeatureRankRoles(Feature):
         self.roles = RolesRank(self.uow, self.db_guild)
 
     async def on_enable(self):
-        await self.update_guild_roles()
-
-    async def on_disable(self):
-        await self.remove_guild_roles()
-
-    async def update_guild_roles(self):
         for db_player in self.db_guild.players:
             await self.roles.assign_player_role(db_player)
 
-    async def remove_guild_roles(self):
+    async def on_disable(self):
         await self.roles.strip_guild_roles()
