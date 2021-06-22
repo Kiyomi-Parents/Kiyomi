@@ -5,6 +5,8 @@ from src.cogs.beatsaber.leaderboard.leaderboard_score import LeaderboardScore
 
 
 class GuildLeaderboard(Leaderboard):
+    def get_top_scores(self, top: int) -> List[LeaderboardScore]:
+        return self.leaderboard_scores[:top]
 
     @property
     def leaderboard_scores(self) -> List[LeaderboardScore]:

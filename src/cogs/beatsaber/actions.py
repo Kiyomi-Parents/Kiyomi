@@ -216,6 +216,6 @@ class Actions:
             leaderboard = GuildLeaderboard(self.uow, db_guild, leaderboard_id)
 
             if len(leaderboard.leaderboard_scores) > 0:
-                return leaderboard.leaderboard_scores
+                return leaderboard.get_top_scores(5)
 
         return None

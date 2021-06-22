@@ -110,7 +110,7 @@ class Tasks:
                 leaderboard = GuildLeaderboard(self.uow, db_guild, db_score.leaderboardId)
 
                 if len(leaderboard.leaderboard_scores) > 0:
-                    guild_leaderboard_embed = Message.get_leaderboard_embed(leaderboard.leaderboard_scores)
+                    guild_leaderboard_embed = Message.get_leaderboard_embed(leaderboard.get_top_scores(3))
                     await channel.send(embed=guild_leaderboard_embed)
 
     @tasks.loop(minutes=1)
