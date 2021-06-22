@@ -2,6 +2,7 @@ import os
 
 from discord.ext import commands
 from discord.ext.commands import MissingRequiredArgument
+from discord.ext.commands.errors import BadArgument
 from dotenv import load_dotenv
 
 from src.cogs.errors import NoPrivateMessagesException
@@ -34,6 +35,8 @@ class BSBot(commands.Bot):
             await context.send(exception)
         elif isinstance(exception, NoPrivateMessagesException):
             await context.send(exception)
+        elif isinstance(exception, BadArgument):
+            await context.send("I don't understand what you're trying to do (bad argument)")
         else:
             await context.send("Something went horribly wrong, check console!")
             raise exception
