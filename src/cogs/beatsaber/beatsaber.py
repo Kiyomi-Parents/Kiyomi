@@ -167,3 +167,14 @@ class BeatSaber(commands.Cog):
                 await ctx.send(embed=guild_leaderboard_embed)
         except SongNotFound as error:
             await ctx.send(error)
+
+    @commands.command(aliases=["recentmap", "recent_song", "recent_map"], invoke_without_command=True)
+    async def recentsong(self, ctx, index:int=0):
+        """Displays your most recent score"""
+        db_player = self.uow.player_repo.get_player_by_member_id(ctx.author.id)
+        try:
+            db_score = self.uow.score_repo.get_player_scores(db_player)[index]
+            score_embed = Message.get_score_embed(db_player, db_score)
+            await ctx.send(embed=score_embed)
+        except IndexError as e:
+            Logger.log_add(e)
