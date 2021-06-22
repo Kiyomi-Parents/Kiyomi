@@ -86,10 +86,15 @@ class Tasks:
             return
 
         channel = self.uow.bot.get_channel(db_guild.recent_scores_channel_id)
+
+        if channel is None:
+            Logger.log(db_guild, "Recent scores channel not found, skipping!")
+            return
+
         db_scores = self.uow.score_repo.get_unsent_scores(db_player, db_guild)
 
         Logger.log(db_guild, f"{db_player} has {len(db_scores)} scores to notify")
-
+        
         for db_score in db_scores:
             if self.uow.score_repo.is_score_new(db_score):
                 # Post as new score

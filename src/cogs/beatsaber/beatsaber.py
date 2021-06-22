@@ -111,12 +111,11 @@ class BeatSaber(commands.Cog):
     async def update(self, ctx):
         """Run a task or run all tasks."""
         if ctx.subcommand_passed is None:
-            db_guild = self.uow.guild_repo.get_guild_by_id(ctx.guild.id)
 
-            await self.tasks.update_players(db_guild)
-            await self.tasks.update_all_player_roles(db_guild)
-            await self.tasks.update_players_scores(db_guild)
-            await self.tasks.send_notifications(db_guild)
+            await self.tasks.update_players()
+            await self.tasks.update_all_player_roles()
+            await self.tasks.update_players_scores()
+            await self.tasks.send_notifications()
         elif ctx.invoked_subcommand is None:
             await ctx.send_help(ctx.command)
 
