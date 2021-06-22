@@ -10,7 +10,6 @@ Session = sessionmaker()
 class Database:
 
     def __init__(self, engine):
-        Base.metadata.create_all(engine)
         Session.configure(bind=engine)
         self.session = Session()
 

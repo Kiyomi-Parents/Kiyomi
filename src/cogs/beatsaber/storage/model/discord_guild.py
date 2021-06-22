@@ -22,6 +22,9 @@ class DiscordGuild(Base):
 
     # Features
     pp_roles = Column(Boolean, default=False)
+    country_rank_roles = Column(Boolean, default=False)
+    guild_snipes = Column(Boolean, default=False)
+    rank_roles = Column(Boolean, default=False)
 
     players = relationship("Player", secondary=guild_player_table, back_populates="guilds")
     roles = relationship("DiscordRole", cascade="all, delete-orphan")
