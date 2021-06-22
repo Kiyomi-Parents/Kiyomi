@@ -12,3 +12,4 @@ discord.py~=1.7.1
 termcolor~=1.1.0
 pylint~=2.8.3
 prettytable~=2.1.0
+alembic~=1.6.5
