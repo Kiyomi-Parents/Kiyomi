@@ -186,4 +186,4 @@ class BeatSaber(commands.Cog):
             score_embed = Message.get_score_embed(db_player, db_score)
             await ctx.send(embed=score_embed)
         except IndexError as e:
-            Logger.log_add(e)
+            await ctx.send("Song argument too large")

@@ -66,6 +66,20 @@ async def test_recentsong_6(player):
             .content("Player not found!")
 
 @pytest.mark.asyncio
+async def test_recentsong_huge(player):
+    await message("!recentsong 99999999999999999999999999999999999999999999999999999999")
+    if player:
+        assert verify() \
+            .message() \
+            .contains() \
+            .content("Song argument too large")
+    else:
+        assert verify() \
+            .message() \
+            .contains() \
+            .content("Player not found!")
+
+@pytest.mark.asyncio
 async def test_recentsong_negative(player):
     await message("!recentsong -1")
     if player:
