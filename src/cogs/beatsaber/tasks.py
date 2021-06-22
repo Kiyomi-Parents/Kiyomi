@@ -90,9 +90,6 @@ class Tasks:
 
         Logger.log(db_guild, f"{db_player} has {len(db_scores)} scores to notify")
 
-        # TODO LATER: ADD THINGY THAT CHECKS IF GUILD_SNIPES IN ENABLED FOR CURRENT GUILD
-        guild_snipes = True
-
         for db_score in db_scores:
             if self.uow.score_repo.is_score_new(db_score):
                 # Post as new score
@@ -108,7 +105,8 @@ class Tasks:
                 await channel.send(embed=embed)
                 self.uow.score_repo.mark_score_sent(db_score, db_guild)
 
-            if guild_snipes:
+            # Guild snipes leaderboard
+            if db_guild.guild_snipes:
                 leaderboard = GuildLeaderboard(self.uow, db_guild, db_score.leaderboardId)
 
                 if len(leaderboard.leaderboard_scores) > 0:
