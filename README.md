@@ -8,6 +8,8 @@ cool bot
 	python3 -m pip install -r requirements.txt  
 
 ### Usage
+    # Run database migrations
+    alembic upgrade head
 
     # Set discord token  
 	export DISCORD_TOKEN=<My very secret token>  
