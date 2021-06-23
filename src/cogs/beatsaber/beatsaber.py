@@ -170,14 +170,16 @@ class BeatSaber(commands.Cog):
     @commands.command(aliases=["recentmap", "recent_song", "recent_map"], invoke_without_command=True)
     async def recentsong(self, ctx, index:int=1):
         """Displays your most recent score"""
-        db_player = self.uow.player_repo.get_player_by_member_id(ctx.author.id)
+        player_repo = self.uow.player_repo
+        score_repo = self.uow.score_repo
+        db_player = player_repo.get_player_by_member_id(ctx.author.id)
         if db_player is None:
             await ctx.send("Player not found!")
             return
         if index <= 0:
             index += 1
         try:
-            db_scores = self.uow.score_repo.get_player_recent_scores(db_player)
+            db_scores = score_repo.get_player_recent_scores(db_player)
             if db_scores is None:
                 await ctx.send("No scores found!")
                 return
