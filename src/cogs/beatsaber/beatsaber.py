@@ -167,7 +167,7 @@ class BeatSaber(commands.Cog):
         except SongNotFound as error:
             await ctx.send(error)
 
-    @commands.command(aliases=["recentmap", "recent_song", "recent_map"], invoke_without_command=True)
+    @commands.command(aliases=["recentmap", "recentscore"], invoke_without_command=True)
     async def recentsong(self, ctx, index:int=1):
         """Displays your most recent score"""
         player_repo = self.uow.player_repo
