@@ -96,6 +96,10 @@ class Tasks:
         Logger.log(db_guild, f"{db_player} has {len(db_scores)} scores to notify")
         
         for db_score in db_scores:
+            if db_score is None:
+                Logger.log(db_guild, f"{db_player}'s score was None, skipping!")
+                continue
+
             if self.uow.score_repo.is_score_new(db_score):
                 # Post as new score
                 embed = Message.get_new_score_embed(db_player, db_score, db_score.song)
