@@ -110,10 +110,10 @@ class Score(Base):
         return f"https://scoresaber.com/imports/images/songs/{self.songHash}.png"
 
     @property
-    def accuracy(self) -> Union[Float, None]:
+    def accuracy(self) -> Union[Float, str]:
         max_score = self.maxScore
 
-        if not max_score:
+        if not max_score and self.song is not None:
             song_diff = self.song.difficulties_long[self.beatsaver_difficulty_name]
 
             if song_diff:
@@ -122,7 +122,7 @@ class Score(Base):
         if max_score:
             return round(self.score / max_score * 100, 2)
 
-        return None
+        return "N/A"
 
     @property
     def weighted_pp(self):
