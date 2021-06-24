@@ -168,11 +168,13 @@ class BeatSaber(commands.Cog):
             await ctx.send(error)
 
     @commands.command(aliases=["recentmap", "recentscore"], invoke_without_command=True)
-    async def recentsong(self, ctx, index:int=1):
+    async def recentsong(self, ctx, index:int=1, discord_user_id:int=None):
         """Displays your most recent score"""
         player_repo = self.uow.player_repo
         score_repo = self.uow.score_repo
-        db_player = player_repo.get_player_by_member_id(ctx.author.id)
+        if discord_user_id is None:
+            discord_user_id = ctx.author.id
+        db_player = player_repo.get_player_by_member_id(discord_user_id)
         if db_player is None:
             await ctx.send("Player not found!")
             return
