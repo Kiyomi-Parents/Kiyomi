@@ -18,7 +18,7 @@ class Message:
 
         embed.set_author(name=player.playerName, url=player.profile_url, icon_url=player.avatar_url)
         #TODO: maybe add a thing that also shows the score's current rank?
-        if country_rank is None:
+        if country_rank is None or not isinstance(country_rank, int):
             embed.title = f"#{score.rank} (at the time of setting) for {score.song_name_full} on {score.difficulty_name}"
         else:
             embed.title = f"#{score.rank} (#{country_rank} in country) (at the time of setting) for {score.song_name_full} on {score.difficulty_name}"
