@@ -47,7 +47,7 @@ class Message:
     def get_new_score_embed(player, score, song, country_rank=None):
         embed = Embed()
         embed.set_author(name=player.playerName, url=player.profile_url, icon_url=player.avatar_url)
-        if country_rank is None:
+        if country_rank is None or not isinstance(country_rank, int):
             embed.title = f"New #{score.rank} " \
                           f"for {score.song_name_full} on {score.difficulty_name}"
         else:
@@ -78,7 +78,7 @@ class Message:
     def get_improvement_score_embed(player, previous_score, score, song, country_rank=None):
         embed = Embed()
         embed.set_author(name=player.playerName, url=player.profile_url, icon_url=player.avatar_url)
-        if country_rank is None:
+        if country_rank is None or not isinstance(country_rank, int):
             embed.title = f"Improved from #{previous_score.rank} " \
                           f"to #{score.rank} (#{country_rank} in country) for {score.song_name_full} " \
                           f"on {score.difficulty_name}"
