@@ -109,8 +109,13 @@ class Tasks:
             else:
                 # Post as improvement
                 previous_db_score = self.uow.score_repo.get_previous_score(db_score)
-
-                embed = Message.get_improvement_score_embed(db_player, previous_db_score, db_score, db_score.song)
+                if previous_db_score is not None:
+                    embed = Message.get_improvement_score_embed(db_player, previous_db_score, db_score, db_score.song)
+                else:
+                    embed = Message.get_new_score_embed(db_player, db_score, db_score.song)
+                    Logger.log(db_guild, f"Score {db_score.scoreId} by {db_player} at {db_score.timeSet} "
+                                         f"was supposed to be posted as an "
+                                         f"improvement, but previous_db_score was None.")
                 await channel.send(embed=embed)
                 self.uow.score_repo.mark_score_sent(db_score, db_guild)
 
