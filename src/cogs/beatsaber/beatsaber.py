@@ -190,3 +190,18 @@ class BeatSaber(commands.Cog):
             await ctx.send(embed=score_embed)
         except IndexError as e:
             await ctx.send("Song argument too large")
+
+    # DEBUGGING COMMANDS
+    @commands.command(name="getscoresbyid")
+    @Security.is_owner()
+    async def get_scores_by_id(self, ctx, score_id:int):
+        score_repo = self.uow.score_repo
+        db_scores = score_repo.get_all_scores_by_id(score_id)
+        if len(db_scores) == 0:
+            await ctx.send("No scores found!")
+            return
+        for score in db_scores:
+            if score is not None:
+                await ctx.send(f"{score.score} on {score.songName} at {score.timeSet}")
+            else:
+                await ctx.send("Score was None")

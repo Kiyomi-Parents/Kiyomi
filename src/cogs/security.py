@@ -20,6 +20,10 @@ class Security:
         return commands.check(check)
 
     @staticmethod
+    def is_owner():
+        return commands.is_owner()
+
+    @staticmethod
     def owner_or_permissions(**perms):
         return commands.check_any(
             commands.has_permissions(**perms),
