@@ -1,3 +1,5 @@
+import asyncio
+
 from discord.ext import tasks
 from src.cogs.beatsaber.api.errors import NotFoundException
 from src.cogs.beatsaber.beatsaber_utils import BeatSaberUtils
@@ -11,16 +13,21 @@ class Tasks:
 
     def __init__(self, uow):
         self.uow = uow
+        self.update_players_lock = asyncio.Lock()
+        self.update_players_scores_lock = asyncio.Lock()
+        self.send_notifications_lock = asyncio.Lock()
+        self.update_all_player_roles_lock = asyncio.Lock()
 
     @tasks.loop(minutes=30)
     @Utils.time_task
     @Utils.discord_ready
     async def update_players(self):
-        db_players = self.uow.player_repo.get_players()
-        Logger.log("task", f"Updating {len(db_players)} players")
+        async with self.update_players_lock:
+            db_players = self.uow.player_repo.get_players()
+            Logger.log("task", f"Updating {len(db_players)} players")
 
-        for db_player in db_players:
-            self.update_player(db_player)
+            for db_player in db_players:
+                self.update_player(db_player)
 
     def update_player(self, db_player):
         try:
@@ -34,11 +41,12 @@ class Tasks:
     @Utils.time_task
     @Utils.discord_ready
     async def update_players_scores(self):
-        db_players = self.uow.player_repo.get_players()
-        Logger.log("task", f"Updating scores for {len(db_players)} players")
+        async with self.update_players_scores_lock:
+            db_players = self.uow.player_repo.get_players()
+            Logger.log("task", f"Updating scores for {len(db_players)} players")
 
-        for db_player in db_players:
-            self.update_player_scores(db_player)
+            for db_player in db_players:
+                self.update_player_scores(db_player)
 
     def update_player_scores(self, db_player):
         try:
@@ -73,12 +81,13 @@ class Tasks:
     @Utils.time_task
     @Utils.discord_ready
     async def send_notifications(self):
-        db_players = self.uow.player_repo.get_players()
-        Logger.log("task", f"Sending notifications for {len(db_players)} players")
+        async with self.send_notifications_lock:
+            db_players = self.uow.player_repo.get_players()
+            Logger.log("task", f"Sending notifications for {len(db_players)} players")
 
-        for db_player in db_players:
-            for db_guild in db_player.guilds:
-                await self.send_notification(db_guild, db_player)
+            for db_player in db_players:
+                for db_guild in db_player.guilds:
+                    await self.send_notification(db_guild, db_player)
 
     async def send_notification(self, db_guild, db_player):
         if db_guild.recent_scores_channel_id is None:
@@ -94,13 +103,11 @@ class Tasks:
         db_scores = self.uow.score_repo.get_unsent_scores(db_player, db_guild)
 
         Logger.log(db_guild, f"{db_player} has {len(db_scores)} scores to notify")
-        
-        for db_score in db_scores:
-            if db_score is None:
-                Logger.log(db_guild, f"{db_player}'s score was None, skipping!")
-                continue
 
-            if self.uow.score_repo.is_score_new(db_score):
+        for db_score in db_scores:
+            previous_db_score = self.uow.score_repo.get_previous_score(db_score)
+
+            if previous_db_score is None:
                 # Post as new score
                 embed = Message.get_new_score_embed(db_player, db_score, db_score.song)
                 await channel.send(embed=embed)
@@ -108,15 +115,9 @@ class Tasks:
                 self.uow.score_repo.mark_score_sent(db_score, db_guild)
             else:
                 # Post as improvement
-                previous_db_score = self.uow.score_repo.get_previous_score(db_score)
-                if previous_db_score is not None:
-                    embed = Message.get_improvement_score_embed(db_player, previous_db_score, db_score, db_score.song)
-                else:
-                    embed = Message.get_new_score_embed(db_player, db_score, db_score.song)
-                    Logger.log(db_guild, f"Score {db_score.scoreId} by {db_player} at {db_score.timeSet} "
-                                         f"was supposed to be posted as an "
-                                         f"improvement, but previous_db_score was None.")
+                embed = Message.get_improvement_score_embed(db_player, previous_db_score, db_score, db_score.song)
                 await channel.send(embed=embed)
+
                 self.uow.score_repo.mark_score_sent(db_score, db_guild)
 
             # Guild snipes leaderboard
@@ -131,11 +132,12 @@ class Tasks:
     @Utils.time_task
     @Utils.discord_ready
     async def update_all_player_roles(self):
-        db_guilds = self.uow.guild_repo.get_guilds()
-        Logger.log("task", f"Updating roles for {len(db_guilds)} guilds")
+        async with self.update_all_player_roles_lock:
+            db_guilds = self.uow.guild_repo.get_guilds()
+            Logger.log("task", f"Updating roles for {len(db_guilds)} guilds")
 
-        for db_guild in db_guilds:
-            await self.update_guild_roles(db_guild)
+            for db_guild in db_guilds:
+                await self.update_guild_roles(db_guild)
 
     async def update_guild_roles(self, db_guild):
         roles_class = BeatSaberUtils.get_enabled_roles(self.uow, db_guild)
