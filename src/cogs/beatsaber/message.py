@@ -95,8 +95,11 @@ class Message:
 
         embed.add_field(name="PP", value=f"**{round(score.pp, 2)}pp** +{pp_improvement}pp\n_({score.weighted_pp}pp +{weighted_pp_improvement}pp)_")
 
-        accuracy_improvement = round(score.accuracy - previous_score.accuracy, 2)
-        embed.add_field(name="Accuracy", value=f"**{score.accuracy}%** _+{accuracy_improvement}%_")
+        try:
+            accuracy_improvement = round(score.accuracy - previous_score.accuracy, 2)
+            embed.add_field(name="Accuracy", value=f"**{score.accuracy}%** _+{accuracy_improvement}%_")
+        except TypeError:
+            pass
 
         score_improvement = score.score - previous_score.score
         embed.add_field(name="Score", value=f"{score.score} _+{score_improvement}_")
