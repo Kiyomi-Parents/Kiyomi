@@ -17,16 +17,19 @@ class Message:
         embed = Embed()
 
         embed.set_author(name=player.playerName, url=player.profile_url, icon_url=player.avatar_url)
-        #TODO: maybe add a thing that also shows the score's current rank?
+        # TODO: maybe add a thing that also shows the score's current rank?
         if country_rank is None or not isinstance(country_rank, int):
-            embed.title = f"#{score.rank} (at the time of setting) for {score.song_name_full} on {score.difficulty_name}"
+            embed.title = f"#{score.rank} (at the time of setting) for " \
+                          f"{score.song_name_full} on {score.difficulty_name}"
         else:
-            embed.title = f"#{score.rank} (#{country_rank} in country) (at the time of setting) for {score.song_name_full} on {score.difficulty_name}"
+            embed.title = f"#{score.rank} (#{country_rank} in country) (at the time of setting) for " \
+                          f"{score.song_name_full} on {score.difficulty_name}"
         
         if song is not None:
             embed.description = F"Mapped by {song.author}"
 
-        embed.add_field(name="PP (at the time of setting)", value=f"**{round(score.pp, 2)}pp** _({score.weighted_pp}pp)_")
+        embed.add_field(name="PP (at the time of setting)",
+                        value=f"**{round(score.pp, 2)}pp** _({score.weighted_pp}pp)_")
         embed.add_field(name="Accuracy", value=f"**{score.accuracy}%**")
         embed.add_field(name="Score", value=f"{score.score}")
 
@@ -93,7 +96,8 @@ class Message:
         pp_improvement = round(score.pp - previous_score.pp, 2)
         weighted_pp_improvement = round(score.weighted_pp - previous_score.weighted_pp, 2)
 
-        embed.add_field(name="PP", value=f"**{round(score.pp, 2)}pp** +{pp_improvement}pp\n_({score.weighted_pp}pp +{weighted_pp_improvement}pp)_")
+        embed.add_field(name="PP", value=f"**{round(score.pp, 2)}pp** +{pp_improvement}pp\n"
+                                         f"_({score.weighted_pp}pp +{weighted_pp_improvement}pp)_")
 
         try:
             accuracy_improvement = round(score.accuracy - previous_score.accuracy, 2)
