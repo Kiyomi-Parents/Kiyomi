@@ -35,3 +35,13 @@ class ScoreSaber:
             recent_score_list.append(Score(recent_score))
 
         return recent_score_list
+
+    def get_top_scores(self, player_id, page: int = 1):
+        response = Common.request(requests.get, f"{self._url}/player/{player_id}/scores/top/{page}", timeout=self._timeout)
+
+        top_score_list = []
+
+        for top_score in response["scores"]:
+            top_score_list.append(Score(top_score))
+
+        return top_score_list

@@ -104,21 +104,23 @@ class Tasks:
 
         Logger.log(db_guild, f"{db_player} has {len(db_scores)} scores to notify")
 
+        score_repo = self.uow.score_repo
         for db_score in db_scores:
-            previous_db_score = self.uow.score_repo.get_previous_score(db_score)
+            previous_db_score = score_repo.get_previous_score(db_score)
 
             if previous_db_score is None:
                 # Post as new score
                 embed = Message.get_new_score_embed(db_player, db_score, db_score.song)
                 await channel.send(embed=embed)
 
-                self.uow.score_repo.mark_score_sent(db_score, db_guild)
+                score_repo.mark_score_sent(db_score, db_guild)
             else:
                 # Post as improvement
+                previous_db_score = score_repo.update_score_pp_weight(previous_db_score, self.uow.player_repo)
                 embed = Message.get_improvement_score_embed(db_player, previous_db_score, db_score, db_score.song)
                 await channel.send(embed=embed)
 
-                self.uow.score_repo.mark_score_sent(db_score, db_guild)
+                score_repo.mark_score_sent(db_score, db_guild)
 
             # Guild snipes leaderboard
             if db_guild.guild_snipes:

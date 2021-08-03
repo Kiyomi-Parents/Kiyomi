@@ -16,6 +16,9 @@ class PlayerRepository:
     def get_players(self):
         return self._db.session.query(Player).all()
 
+    def get_player_by_internal_player_id(self, internal_player_id):
+        return self._db.session.query(Player).filter(Player.id == internal_player_id).first()
+
     def get_player_by_player_id(self, player_id):
         return self._db.session.query(Player).filter(Player.playerId == player_id).first()
 

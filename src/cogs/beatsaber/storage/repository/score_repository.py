@@ -3,6 +3,8 @@ from typing import Optional, List
 from src.cogs.beatsaber.storage.model.player import Player
 from src.log import Logger
 from src.cogs.beatsaber.storage.model.score import Score
+from src.utils import Utils
+from src.cogs.beatsaber.api.scoresaber import ScoreSaber
 from sqlalchemy import desc
 
 
@@ -156,3 +158,31 @@ class ScoreRepository:
 
             self._db.commit_changes()
             Logger.log(db_score, f"Added {db_song}")
+
+    def update_score_pp_weight(self, db_score, player_repo):
+        pos = Utils.get_pos_from_pp_weight(db_score.weight)
+        player = player_repo.get_player_by_internal_player_id(db_score.player_id)
+        page = (pos-1)//8
+        if type(page) != int or page < 0:
+            starting_page = 0
+
+        new_pp_weight = None
+        not_found = True
+        while not_found:
+            page += 1
+            scores_list = ScoreSaber.get_top_scores(player.playerId, page)
+            for comparing_score in scores_list:
+                if comparing_score.pp < db_score.pp:
+                    new_pp_weight = Utils.get_pp_weight_from_pos(Utils.get_pos_from_pp_weight(comparing_score.weight)-1)
+                    not_found = False
+                    break
+
+        db_score.weight = new_pp_weight
+        self._db.commit_changes()
+        Logger.log(db_score, f"Updated weight to {new_pp_weight}")
+
+        return db_score
+
+
+
+
