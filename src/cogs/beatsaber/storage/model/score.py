@@ -1,6 +1,7 @@
 from typing import Union
 
-from dateutil import parser, tz
+import pyscoresaber
+from dateutil import tz
 from sqlalchemy import Column, String, Integer, ForeignKey, DateTime, Float, Table
 from sqlalchemy.orm import relationship
 
@@ -40,26 +41,26 @@ class Score(Base):
     maxScore = Column(Integer)
 
     msg_guilds = relationship("DiscordGuild", secondary=score_guild_table)
-    song = relationship("Song", uselist=False, cascade="all, delete-orphan")
+    beatmap_version = relationship("BeatmapVersion", uselist=False, cascade="all, delete-orphan")
 
-    def __init__(self, score_json):
-        self.rank = score_json["rank"]
-        self.scoreId = score_json["scoreId"]
-        self.score = score_json["score"]
-        self.unmodififiedScore = score_json["unmodififiedScore"]
-        self.mods = score_json["mods"]
-        self.pp = score_json["pp"]
-        self.weight = score_json["weight"]
-        self.timeSet = parser.isoparse(score_json["timeSet"]).replace(tzinfo=None)
-        self.leaderboardId = score_json["leaderboardId"]
-        self.songHash = score_json["songHash"]
-        self.songName = score_json["songName"]
-        self.songSubName = score_json["songSubName"]
-        self.songAuthorName = score_json["songAuthorName"]
-        self.levelAuthorName = score_json["levelAuthorName"]
-        self.difficulty = score_json["difficulty"]
-        self.difficultyRaw = score_json["difficultyRaw"]
-        self.maxScore = score_json["maxScore"]
+    def __init__(self, score_data: pyscoresaber.Score):
+        self.rank = score_data.rank
+        self.scoreId = score_data.score_id
+        self.score = score_data.score
+        self.unmodififiedScore = score_data.unmodified_score
+        self.mods = score_data.mods
+        self.pp = score_data.pp
+        self.weight = score_data.weight
+        self.timeSet = score_data.time_set
+        self.leaderboardId = score_data.leaderboard_id
+        self.songHash = score_data.song_hash
+        self.songName = score_data.song_name
+        self.songSubName = score_data.song_sub_name
+        self.songAuthorName = score_data.song_author_name
+        self.levelAuthorName = score_data.level_author_name
+        self.difficulty = score_data.difficulty
+        self.difficultyRaw = score_data.difficulty_raw
+        self.maxScore = score_data.max_score
 
     @property
     def leaderboard_url(self):

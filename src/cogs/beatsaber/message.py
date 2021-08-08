@@ -7,16 +7,19 @@ from discord import Embed, Colour
 from prettytable import PrettyTable
 
 from src.cogs.beatsaber.leaderboard.leaderboard_score import LeaderboardScore
+from src.cogs.beatsaber.storage.model.beatmap import Beatmap
+from src.cogs.beatsaber.storage.model.player import Player
+from src.cogs.beatsaber.storage.model.score import Score
 
 
 class Message:
 
     @staticmethod
-    def get_score_embed(player, score, country_rank=None):
-        song = score.song
+    def get_score_embed(player: Player, score: Score, country_rank=None):
         embed = Embed()
 
         embed.set_author(name=player.playerName, url=player.profile_url, icon_url=player.avatar_url)
+
         # TODO: maybe add a thing that also shows the score's current rank?
         if country_rank is None or not isinstance(country_rank, int):
             embed.title = f"#{score.rank} (at the time of setting) for " \
@@ -25,13 +28,21 @@ class Message:
             embed.title = f"#{score.rank} (#{country_rank} in country) (at the time of setting) for " \
                           f"{score.song_name_full} on {score.difficulty_name}"
         
-        if song is not None:
-            embed.description = F"Mapped by {song.author}"
+        if score.beatmap_version.beatmap is not None:
+            embed.description = F"Mapped by {score.beatmap_version.beatmap.metadata_level_author_name}"
 
-        embed.add_field(name="PP (at the time of setting)",
-                        value=f"**{round(score.pp, 2)}pp** _({score.weighted_pp}pp)_")
-        embed.add_field(name="Accuracy", value=f"**{score.accuracy}%**")
-        embed.add_field(name="Score", value=f"{score.score}")
+        embed.add_field(
+            name="PP (at the time of setting)",
+            value=f"**{round(score.pp, 2)}pp** _({score.weighted_pp}pp)_"
+        )
+        embed.add_field(
+            name="Accuracy",
+            value=f"**{score.accuracy}%**"
+        )
+        embed.add_field(
+            name="Score",
+            value=f"{score.score}"
+        )
 
         if score.mods:
             embed.add_field(name="Modifiers", value=f"{score.mods}")
@@ -40,14 +51,14 @@ class Message:
         embed.colour = Colour.random(seed=player.playerId)
         embed.url = score.leaderboard_url
 
-        if song is not None:
-            embed.add_field(name="\u200b", value=f"[Beat Saver]({song.beatsaver_url})")
-            embed.add_field(name="\u200b", value=f"[Preview Map]({song.preview_url})")
+        if score.beatmap_version.beatmap is not None:
+            embed.add_field(name="\u200b", value=f"[Beat Saver]({score.beatmap_version.beatmap.beatsaver_url})")
+            embed.add_field(name="\u200b", value=f"[Preview Map]({score.beatmap_version.beatmap.preview_url})")
 
         return embed
 
     @staticmethod
-    def get_new_score_embed(player, score, song, country_rank=None):
+    def get_new_score_embed(player: Player, score: Score, beatmap: Beatmap, country_rank=None):
         embed = Embed()
         embed.set_author(name=player.playerName, url=player.profile_url, icon_url=player.avatar_url)
         if country_rank is None or not isinstance(country_rank, int):
@@ -57,8 +68,8 @@ class Message:
             embed.title = f"New #{score.rank} (#{country_rank} in country) " \
                           f"for {score.song_name_full} on {score.difficulty_name}"
 
-        if song is not None:
-            embed.description = F"Mapped by {song.author}"
+        if beatmap is not None:
+            embed.description = F"Mapped by {beatmap.metadata_level_author_name}"
 
         embed.add_field(name="PP", value=f"**{round(score.pp, 2)}pp** _({score.weighted_pp}pp)_")
         embed.add_field(name="Accuracy", value=f"**{score.accuracy}%**")
@@ -71,16 +82,17 @@ class Message:
         embed.colour = Colour.random(seed=player.playerId)
         embed.url = score.leaderboard_url
 
-        if song is not None:
-            embed.add_field(name="\u200b", value=f"[Beat Saver]({song.beatsaver_url})")
-            embed.add_field(name="\u200b", value=f"[Preview Map]({song.preview_url})")
+        if beatmap is not None:
+            embed.add_field(name="\u200b", value=f"[Beat Saver]({beatmap.beatsaver_url})")
+            embed.add_field(name="\u200b", value=f"[Preview Map]({beatmap.preview_url})")
 
         return embed
 
     @staticmethod
-    def get_improvement_score_embed(player, previous_score, score, song, country_rank=None):
+    def get_improvement_score_embed(player: Player, previous_score: Score, score: Score, beatmap: Beatmap, country_rank=None):
         embed = Embed()
         embed.set_author(name=player.playerName, url=player.profile_url, icon_url=player.avatar_url)
+
         if country_rank is None or not isinstance(country_rank, int):
             embed.title = f"Improved from #{previous_score.rank} " \
                           f"to #{score.rank} for {score.song_name_full} " \
@@ -90,8 +102,8 @@ class Message:
                           f"to #{score.rank} (#{country_rank} in country) for {score.song_name_full} " \
                           f"on {score.difficulty_name}"
 
-        if song is not None:
-            embed.description = F"Mapped by {song.author}"
+        if beatmap is not None:
+            embed.description = F"Mapped by {beatmap.author}"
 
         pp_improvement = round(score.pp - previous_score.pp, 2)
         weighted_pp_improvement = round(score.weighted_pp - previous_score.weighted_pp, 2)
@@ -115,34 +127,34 @@ class Message:
         embed.colour = Colour.random(seed=player.playerId)
         embed.url = score.leaderboard_url
 
-        if song is not None:
-            embed.add_field(name="\u200b", value=f"[Beat Saver]({song.beatsaver_url})")
-            embed.add_field(name="\u200b", value=f"[Preview Map]({song.preview_url})")
+        if beatmap is not None:
+            embed.add_field(name="\u200b", value=f"[Beat Saver]({beatmap.beatsaver_url})")
+            embed.add_field(name="\u200b", value=f"[Preview Map]({beatmap.preview_url})")
 
         return embed
 
     @staticmethod
-    def get_song_embed(song):
+    def get_song_embed(beatmap: Beatmap):
         embed = Embed()
 
-        embed.set_author(name=song.author, url=song.author_url)
-        embed.title = f"{song.name}"
+        embed.set_author(name=beatmap.uploader_name, url=beatmap.mapper_url, icon_url=beatmap.uploader_avatar)
+        embed.title = f"{beatmap.name}"
 
-        embed.add_field(name="Rating", value=f"{song.rating}%")
-        embed.add_field(name="Downloads", value=f"{song.downloads}")
-        embed.add_field(name="Length", value=f"{song.length}")
-        embed.add_field(name="BPM", value=f"{song.bpm}")
+        embed.add_field(name="Rating", value=f"{beatmap.rating}%")
+        embed.add_field(name="Downloads", value=f"{beatmap.stats_downloads}")
+        embed.add_field(name="Length", value=f"{beatmap.length}")
+        embed.add_field(name="BPM", value=f"{beatmap.metadata_bpm}")
 
-        embed.add_field(name="difficulties", value=" ".join(f"**{diff}**" for diff in song.difficulties_short))
+        embed.add_field(name="difficulties", value=" ".join(f"**{diff}**" for diff in beatmap.difficulties_short))
 
         # Should make a simple website that redirects the user to the right links
         # discord doesn't want to make app links clickable
         # This will include OneClick links and beatmap download links
-        embed.add_field(name="\u200b", value=f"[Preview Map]({song.preview_url})")
+        embed.add_field(name="\u200b", value=f"[Preview Map]({beatmap.preview_url})")
 
-        embed.set_thumbnail(url=song.cover_url)
-        embed.colour = Colour.random(seed=song.author_id)
-        embed.url = song.beatsaver_url
+        embed.set_thumbnail(url=beatmap.cover_url)
+        embed.colour = Colour.random(seed=beatmap.uploader_id)
+        embed.url = beatmap.beatsaver_url
 
         return embed
 

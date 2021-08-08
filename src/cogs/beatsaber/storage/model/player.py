@@ -1,3 +1,4 @@
+import pyscoresaber
 from sqlalchemy import Column, String, Integer, JSON, Float, Table, ForeignKey
 from sqlalchemy.orm import relationship
 
@@ -38,21 +39,20 @@ class Player(Base):
     guilds = relationship("DiscordGuild", secondary=guild_player_table, back_populates="players")
     roles = relationship("DiscordRole", secondary=player_role_table)
 
-    def __init__(self, player_json):
-        self.playerId = player_json["playerId"]
-        self.playerName = player_json["playerName"]
-        self.avatar = player_json["avatar"]
-        self.rank = player_json["rank"]
-        self.countryRank = player_json["countryRank"]
-        self.pp = player_json["pp"]
-        self.country = player_json["country"]
-        self.role = player_json["role"]
-        self.badges = player_json["badges"]
-        self.history = player_json["history"]
-        self.permissions = player_json["permissions"]
-        self.inactive = player_json["inactive"]
-        self.banned = player_json["banned"]
-        self.discord_user_id = None
+    def __init__(self, player_data: pyscoresaber.Player):
+        self.playerId = player_data.player_id
+        self.playerName = player_data.player_name
+        self.avatar = player_data.avatar
+        self.rank = player_data.rank
+        self.countryRank = player_data.country_rank
+        self.pp = player_data.pp
+        self.country = player_data.country
+        self.role = player_data.role
+        self.badges = player_data.badges
+        self.history = player_data.history
+        self.permissions = player_data.permissions
+        self.inactive = player_data.inactive
+        self.banned = player_data.banned
 
     @property
     def profile_url(self):

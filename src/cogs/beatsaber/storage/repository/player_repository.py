@@ -1,3 +1,9 @@
+from typing import List
+
+import pybeatsaver
+import pyscoresaber
+
+from src.cogs.beatsaber.storage.model.score import Score
 from src.log import Logger
 from src.cogs.beatsaber.storage.model.player import Player
 
@@ -36,7 +42,7 @@ class PlayerRepository:
         self._db.commit_changes()
         Logger.log(db_player, "Deleted")
 
-    def update_player(self, new_db_player):
+    def update_player(self, new_db_player: pyscoresaber.Player):
         old_db_player = self.get_player_by_player_id(new_db_player.playerId)
 
         old_db_player.playerId = new_db_player.playerId
@@ -56,26 +62,11 @@ class PlayerRepository:
         self._db.commit_changes()
         Logger.log(old_db_player, "Updated")
 
-    def add_scores(self, db_player, new_db_scores):
-        new_score_list = []
-
-        for new_score in new_db_scores:
-            is_new = True
-
-            for old_db_score in db_player.scores:
-                if old_db_score.scoreId != new_score.scoreId:
-                    continue
-
-                if old_db_score.timeSet == new_score.timeSet:
-                    is_new = False
-
-            if is_new:
-                new_score_list.append(new_score)
-
-        db_player.scores += new_score_list
+    def add_scores(self, db_player: Player, scores: List[Score]):
+        db_player.scores += scores
 
         self._db.commit_changes()
-        Logger.log(db_player, f"Added {len(new_score_list)} new scores")
+        Logger.log(db_player, f"Added {len(scores)} new scores")
 
     def add_role(self, db_player, db_role):
         db_player.roles.append(db_role)

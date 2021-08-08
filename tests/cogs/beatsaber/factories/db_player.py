@@ -1,19 +1,22 @@
 import pytest
 
+from src.cogs.beatsaber.storage.model.player import Player
+
 
 @pytest.fixture
 def db_player_factory(uow, member):
     class Factory:
         @staticmethod
         def make(scoresaber_id, override_member=None):
-            new_player = uow.scoresaber.get_player(scoresaber_id)
+            new_player = uow.scoresaber.get_player_basic(scoresaber_id)
+            player = Player(new_player)
 
             if override_member is not None:
-                new_player.discord_user_id = override_member.id
+                player.discord_user_id = override_member.id
             else:
-                new_player.discord_user_id = member.id
+                player.discord_user_id = member.id
 
-            return uow.player_repo.add_player(new_player)
+            return uow.player_repo.add_player(player)
 
     yield Factory()
 

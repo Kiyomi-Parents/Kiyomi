@@ -1,10 +1,15 @@
 import asyncio
 
+import pybeatsaver
+import pyscoresaber
 from discord.ext import tasks
-from src.cogs.beatsaber.api.errors import NotFoundException
+
 from src.cogs.beatsaber.beatsaber_utils import BeatSaberUtils
 from src.cogs.beatsaber.leaderboard.guild_leaderboard import GuildLeaderboard
 from src.cogs.beatsaber.message import Message
+from src.cogs.beatsaber.storage.model.beatmap import Beatmap
+from src.cogs.beatsaber.storage.model.player import Player
+from src.cogs.beatsaber.storage.model.score import Score
 from src.log import Logger
 from src.utils import Utils
 
@@ -29,12 +34,13 @@ class Tasks:
             for db_player in db_players:
                 self.update_player(db_player)
 
-    def update_player(self, db_player):
+    def update_player(self, db_player: Player):
         try:
-            new_player = self.uow.scoresaber.get_player(db_player.playerId)
+            new_player = self.uow.scoresaber.get_player_basic(db_player.playerId)
+            player = Player(new_player)
 
-            self.uow.player_repo.update_player(new_player)
-        except NotFoundException:
+            self.uow.player_repo.update_player(player)
+        except pyscoresaber.NotFoundException:
             Logger.log(db_player, "Could not find at ScoreSaber")
 
     @tasks.loop(minutes=2)
@@ -48,34 +54,47 @@ class Tasks:
             for db_player in db_players:
                 self.update_player_scores(db_player)
 
-    def update_player_scores(self, db_player):
+    def update_player_scores(self, db_player: Player):
         try:
             recent_scores = self.uow.scoresaber.get_recent_scores(db_player.playerId)
             Logger.log(db_player, f"Got {len(recent_scores)} recent scores from ScoreSaber")
 
+            # Filter out already existing scores
+            new_scores = []
+
+            for recent_score in recent_scores:
+                new_score = Score(recent_score)
+
+                if self.uow.score_repo.is_score_new(new_score):
+                    new_scores.append(new_score)
+
             # Add new scores to player
-            self.uow.player_repo.add_scores(db_player, recent_scores)
+            self.uow.player_repo.add_scores(db_player, new_scores)
 
             # Get db scores from recent scores
-            db_scores = self.uow.score_repo.get_scores(recent_scores)
+            db_scores = self.uow.score_repo.get_scores(new_scores)
 
             # Update song for recent scores
             for db_score in db_scores:
                 self.update_score_song(db_score)
-        except NotFoundException:
+
+        except pyscoresaber.NotFoundException:
             Logger.log(db_player, "Could not find scores on ScoreSaber")
 
-    def update_score_song(self, db_score):
-        if db_score.song is None:
-            song = self.uow.song_repo.get_song_by_hash(db_score.songHash)
+    def update_score_song(self, score: Score):
+        if score.beatmap_version is None:
+            beatmap = self.uow.beatmap_repo.get_beatmap_by_hash(score.songHash)
 
-            if song is None:
+            if beatmap is None:
                 try:
-                    song = self.uow.beatsaver.get_song_by_score(db_score)
-                except NotFoundException:
-                    Logger.log(db_score, "Could not find song on BeatSaver")
+                    map_detail = self.uow.beatsaver.get_map_by_hash(score.songHash)
+                    beatmap = Beatmap(map_detail)
+                    self.uow.beatmap_repo.add_beatmap(beatmap)
 
-            self.uow.score_repo.add_song(db_score, song)
+                    self.uow.score_repo.add_beatmap(score, beatmap)
+                except pybeatsaver.NotFoundException:
+                    Logger.log(score, "Could not find song on BeatSaver")
+
 
     @tasks.loop(minutes=1)
     @Utils.time_task

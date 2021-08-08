@@ -155,10 +155,10 @@ class BeatSaber(commands.Cog):
     async def map(self, ctx, key: str):
         """Displays song info."""
         try:
-            db_song = await self.actions.get_song(key)
-            guild_leaderboard = await self.actions.get_guild_leaderboard(ctx.guild.id, db_song.key)
+            db_beatmap = await self.actions.get_beatmap(key)
+            guild_leaderboard = await self.actions.get_guild_leaderboard(ctx.guild.id, db_beatmap.id)
 
-            song_embed = Message.get_song_embed(db_song)
+            song_embed = Message.get_song_embed(db_beatmap)
             await ctx.send(embed=song_embed)
 
             if guild_leaderboard is not None:
@@ -168,26 +168,31 @@ class BeatSaber(commands.Cog):
             await ctx.send(error)
 
     @commands.command(aliases=["recentmap", "recentscore"], invoke_without_command=True)
-    async def recentsong(self, ctx, index:int=1, discord_user_id:int=None):
+    async def recentsong(self, ctx, index: int = 1, discord_user_id: int = None):
         """Displays your most recent score"""
-        player_repo = self.uow.player_repo
-        score_repo = self.uow.score_repo
         if discord_user_id is None:
             discord_user_id = ctx.author.id
-        db_player = player_repo.get_player_by_member_id(discord_user_id)
+
+        db_player = self.uow.player_repo.get_player_by_member_id(discord_user_id)
+
         if db_player is None:
             await ctx.send("Player not found!")
             return
+
         if index <= 0:
             index += 1
+
         try:
-            db_scores = score_repo.get_player_recent_scores(db_player)
+            db_scores = self.uow.score_repo.get_player_recent_scores(db_player)
+
             if db_scores is None:
                 await ctx.send("No scores found!")
                 return
+
             db_score = db_scores[index-1]
             score_embed = Message.get_score_embed(db_player, db_score)
             await ctx.send(embed=score_embed)
+
         except IndexError as e:
             await ctx.send("Song argument too large")
 
@@ -195,11 +200,12 @@ class BeatSaber(commands.Cog):
     @commands.command(name="getscoresbyid")
     @Security.is_owner()
     async def get_scores_by_id(self, ctx, score_id:int):
-        score_repo = self.uow.score_repo
-        db_scores = score_repo.get_all_scores_by_id(score_id)
+        db_scores = self.uow.score_repo.get_all_scores_by_id(score_id)
+
         if len(db_scores) == 0:
             await ctx.send("No scores found!")
             return
+
         for score in db_scores:
             if score is not None:
                 await ctx.send(f"{score.score} on {score.songName} at {score.timeSet}")

@@ -1,7 +1,11 @@
-from src.cogs.beatsaber.api.errors import NotFoundException
+import pybeatsaver
+import pyscoresaber
+
 from src.cogs.beatsaber.beatsaber_utils import BeatSaberUtils
 from src.cogs.beatsaber.feature.feature import FeatureFlagNotFoundException
 from src.cogs.beatsaber.leaderboard.guild_leaderboard import GuildLeaderboard
+from src.cogs.beatsaber.storage.model.beatmap import Beatmap
+from src.cogs.beatsaber.storage.model.player import Player
 from src.log import Logger
 
 
@@ -47,11 +51,12 @@ class Actions:
         # Add new player to db if not found
         if db_player is None:
             try:
-                new_player = self.uow.scoresaber.get_player(scoresaber_id)
-                new_player.discord_user_id = member_id
+                new_player = self.uow.scoresaber.get_player_basic(scoresaber_id)
+                player = Player(new_player)
+                player.discord_user_id = member_id
 
-                self.uow.player_repo.add_player(new_player)
-            except NotFoundException as error:
+                self.uow.player_repo.add_player(player)
+            except pyscoresaber.NotFoundException as error:
                 raise PlayerNotFoundException("Could not find player!") from error
 
             db_player = self.uow.player_repo.get_player_by_member_id(member_id)
@@ -195,22 +200,22 @@ class Actions:
         Logger.log(db_guild, f"Updating roles for {len(db_guild.players)} players")
         await self.tasks.update_guild_roles(db_guild)
 
-    async def get_song(self, song_key):
-        db_song = self.uow.song_repo.get_song_by_key(song_key)
+    async def get_beatmap(self, map_key: str) -> Beatmap:
+        beatmap = self.uow.beatmap_repo.get_beatmap_by_key(map_key)
 
-        if db_song is None:
+        if beatmap is None:
             try:
-                db_song = self.uow.beatsaver.get_song_by_key(song_key)
-                self.uow.song_repo.add_song(db_song)
-            except NotFoundException as error:
-                raise SongNotFound(f"Could not find song with key {song_key}") from error
+                map_detail = self.uow.beatsaver.get_map_by_key(map_key)
+                beatmap = self.uow.beatmap_repo.add_beatmap(Beatmap(map_detail))
+            except pybeatsaver.NotFoundException as error:
+                raise SongNotFound(f"Could not find song with key {map_key}") from error
 
-        return db_song
+        return beatmap
 
     async def get_guild_leaderboard(self, guild_id, song_key):
         db_guild = self.uow.guild_repo.get_guild_by_id(guild_id)
-        db_song = await self.get_song(song_key)
-        leaderboard_id = self.uow.score_repo.get_leaderboard_id_by_hash(db_song.hash)
+        db_map = await self.get_beatmap(song_key)
+        leaderboard_id = self.uow.score_repo.get_leaderboard_id_by_hash(db_map.latest_version.hash)
 
         if leaderboard_id is not None:
             leaderboard = GuildLeaderboard(self.uow, db_guild, leaderboard_id)

@@ -1,10 +1,13 @@
 from typing import Optional, List
 
+from pyscoresaber import ScoreSaber
+
+from src.cogs.beatsaber.storage.model.beatmap import Beatmap
+from src.cogs.beatsaber.storage.model.beatmap_version import BeatmapVersion
 from src.cogs.beatsaber.storage.model.player import Player
 from src.log import Logger
 from src.cogs.beatsaber.storage.model.score import Score
 from src.utils import Utils
-from src.cogs.beatsaber.api.scoresaber import ScoreSaber
 from sqlalchemy import desc
 
 
@@ -27,7 +30,7 @@ class ScoreRepository:
 
         return db_scores
 
-    def get_all_scores_by_id(self, score_id):
+    def get_all_scores_by_id(self, score_id: int) -> Optional[List[Score]]:
         return self._db.session.query(Score).filter(Score.scoreId == score_id).all()
 
     def get_leaderboard_id_by_hash(self, song_hash) -> Optional[int]:
@@ -135,10 +138,11 @@ class ScoreRepository:
 
         return unsent_scores
 
-    def is_score_new(self, db_score):
-        db_scores = self.get_all_scores_by_id(db_score.scoreId)
+    def is_score_new(self, db_score: Score) -> bool:
+        """Checks if the score already exists in the database by comparing scoreId and timeSet"""
+        db_scores = self._db.session.query(Score).filter(Score.scoreId == db_score.scoreId and Score.timeSet == db_score.timeSet).all()
 
-        return 1 >= len(db_scores)
+        return 1 > len(db_scores)
 
     def mark_score_sent(self, db_score, db_guild):
         db_score.msg_guilds.append(db_guild)
@@ -152,12 +156,12 @@ class ScoreRepository:
         self._db.commit_changes()
         Logger.log(db_score, "Marked as unsent")
 
-    def add_song(self, db_score, db_song):
-        if db_score.song is None:
-            db_score.song = db_song
+    def add_beatmap(self, score: Score, beatmap: Beatmap):
+        if score.beatmap_version is None:
+            score.beatmap_version = beatmap.latest_version
 
             self._db.commit_changes()
-            Logger.log(db_score, f"Added {db_song}")
+            Logger.log(score, f"Added {beatmap}")
 
     def update_score_pp_weight(self, db_score, player_repo):
         pos = Utils.get_pos_from_pp_weight(db_score.weight)
