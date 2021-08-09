@@ -1,11 +1,9 @@
 from typing import List
 
-import pybeatsaver
-import pyscoresaber
-
+from src.cogs.beatsaber.storage.model.player import Player
 from src.cogs.beatsaber.storage.model.score import Score
 from src.log import Logger
-from src.cogs.beatsaber.storage.model.player import Player
+from src.utils import Utils
 
 
 class PlayerRepository:
@@ -26,7 +24,7 @@ class PlayerRepository:
         return self._db.session.query(Player).filter(Player.id == internal_player_id).first()
 
     def get_player_by_player_id(self, player_id):
-        return self._db.session.query(Player).filter(Player.playerId == player_id).first()
+        return self._db.session.query(Player).filter(Player.player_id == player_id).first()
 
     def get_player_by_member_id(self, member_id):
         return self._db.session.query(Player).filter(Player.discord_user_id == member_id).first()
@@ -34,7 +32,7 @@ class PlayerRepository:
     def add_player(self, db_player):
         self._db.add_entry(db_player)
 
-        return self.get_player_by_player_id(db_player.playerId)
+        return self.get_player_by_player_id(db_player.player_id)
 
     def remove_player(self, db_player):
         self._db.session.delete(db_player)
@@ -42,22 +40,10 @@ class PlayerRepository:
         self._db.commit_changes()
         Logger.log(db_player, "Deleted")
 
-    def update_player(self, new_db_player: pyscoresaber.Player):
-        old_db_player = self.get_player_by_player_id(new_db_player.playerId)
+    def update_player(self, new_db_player: Player):
+        old_db_player = self.get_player_by_player_id(new_db_player.player_id)
 
-        old_db_player.playerId = new_db_player.playerId
-        old_db_player.playerName = new_db_player.playerName
-        old_db_player.avatar = new_db_player.avatar
-        old_db_player.rank = new_db_player.rank
-        old_db_player.countryRank = new_db_player.countryRank
-        old_db_player.pp = new_db_player.pp
-        old_db_player.country = new_db_player.country
-        old_db_player.role = new_db_player.role
-        old_db_player.badges = new_db_player.badges
-        old_db_player.history = new_db_player.history
-        old_db_player.permissions = new_db_player.permissions
-        old_db_player.inactive = new_db_player.inactive
-        old_db_player.banned = new_db_player.banned
+        Utils.update_class(old_db_player, new_db_player)
 
         self._db.commit_changes()
         Logger.log(old_db_player, "Updated")

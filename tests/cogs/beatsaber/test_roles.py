@@ -172,7 +172,7 @@ async def test_update_player_role_update(roles, db_player):
 
     db_player.pp = 1000000
     db_player.rank = 0
-    db_player.countryRank = 0
+    db_player.country_rank = 0
 
     await roles.update_player_role(db_player)
 
@@ -216,7 +216,7 @@ async def test_remove_old_player_roles(roles, db_player):
 
     db_player.pp = 1000000
     db_player.rank = 0
-    db_player.countryRank = 0
+    db_player.country_rank = 0
 
     await roles.remove_old_player_roles(db_player)
 

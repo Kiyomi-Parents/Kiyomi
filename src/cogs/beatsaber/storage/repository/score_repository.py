@@ -17,7 +17,7 @@ class ScoreRepository:
         self._db = database
 
     def get_score(self, score_id):
-        return self._db.session.query(Score).filter(Score.scoreId == score_id).first()
+        return self._db.session.query(Score).filter(Score.score_id == score_id).first()
 
     def get_scores(self, scores=None):
         if scores is None:
@@ -26,23 +26,23 @@ class ScoreRepository:
         db_scores = []
 
         for score in scores:
-            db_scores.append(self.get_score(score.scoreId))
+            db_scores.append(self.get_score(score.score_id))
 
         return db_scores
 
     def get_all_scores_by_id(self, score_id: int) -> Optional[List[Score]]:
-        return self._db.session.query(Score).filter(Score.scoreId == score_id).all()
+        return self._db.session.query(Score).filter(Score.score_id == score_id).all()
 
     def get_leaderboard_id_by_hash(self, song_hash) -> Optional[int]:
-        db_score = self._db.session.query(Score).filter(Score.songHash == song_hash).first()
+        db_score = self._db.session.query(Score).filter(Score.song_hash == song_hash).first()
 
         if db_score is not None:
-            return db_score.leaderboardId
+            return db_score.leaderboard_id
 
         return None
 
     def get_previous_score(self, db_score):
-        db_scores = self.get_all_scores_by_id(db_score.scoreId)
+        db_scores = self.get_all_scores_by_id(db_score.score_id)
         previous_score = None
 
         for old_db_score in db_scores:
@@ -61,7 +61,7 @@ class ScoreRepository:
     def get_player_scores_on_leaderboard(self, db_player, leaderboard_id):
         return self._db.session.query(Score)\
             .filter(Score.player_id == db_player.id)\
-            .filter(Score.leaderboardId == leaderboard_id)\
+            .filter(Score.leaderboard_id == leaderboard_id)\
             .all()
 
     def get_player_best_score_on_leaderboard(self, db_player: Player, leaderboard_id: int) -> Optional[Score]:
@@ -89,32 +89,16 @@ class ScoreRepository:
     def get_player_recent_scores(self, player):
         return self._db.session.query(Score)\
             .filter(Score.player_id == player.id)\
-            .order_by(Score.timeSet.desc())\
+            .order_by(Score.time_set.desc())\
             .all()
 
     def get_scores_without_song(self):
         return self._db.session.query(Score).filter(~Score.song.has()).all()
 
-    def update_score(self, new_db_score):
-        old_db_score = self.get_score(new_db_score.scoreId)
+    def update_score(self, new_db_score: Score):
+        old_db_score = self.get_score(new_db_score.score_id)
 
-        old_db_score.rank = new_db_score.rank
-        old_db_score.scoreId = new_db_score.scoreId
-        old_db_score.score = new_db_score.score
-        old_db_score.unmodififiedScore = new_db_score.unmodififiedScore
-        old_db_score.mods = new_db_score.mods
-        old_db_score.pp = new_db_score.pp
-        old_db_score.weight = new_db_score.weight
-        old_db_score.timeSet = new_db_score.timeSet
-        old_db_score.leaderboardId = new_db_score.leaderboardId
-        old_db_score.songHash = new_db_score.songHash
-        old_db_score.songName = new_db_score.songName
-        old_db_score.songSubName = new_db_score.songSubName
-        old_db_score.songAuthorName = new_db_score.songAuthorName
-        old_db_score.levelAuthorName = new_db_score.levelAuthorName
-        old_db_score.difficulty = new_db_score.difficulty
-        old_db_score.difficultyRaw = new_db_score.difficultyRaw
-        old_db_score.maxScore = new_db_score.maxScore
+        Utils.update_class(old_db_score, new_db_score)
 
         self._db.commit_changes()
         Logger.log(old_db_score, "Updated")
@@ -123,7 +107,7 @@ class ScoreRepository:
 
     def update_scores(self, new_scores):
         for new_score in new_scores:
-            old_db_score = self.get_score(new_score.scoreId)
+            old_db_score = self.get_score(new_score.score_id)
 
             if new_score.score != old_db_score.score:
                 self.update_score(new_score)
@@ -140,7 +124,7 @@ class ScoreRepository:
 
     def is_score_new(self, db_score: Score) -> bool:
         """Checks if the score already exists in the database by comparing scoreId and timeSet"""
-        db_scores = self._db.session.query(Score).filter(Score.scoreId == db_score.scoreId and Score.timeSet == db_score.timeSet).all()
+        db_scores = self._db.session.query(Score).filter(Score.score_id == db_score.score_id and Score.time_set == db_score.time_set).all()
 
         return 1 > len(db_scores)
 
@@ -174,7 +158,7 @@ class ScoreRepository:
         not_found = True
         while not_found:
             page += 1
-            scores_list = ScoreSaber.get_top_scores(player.playerId, page)
+            scores_list = ScoreSaber.get_top_scores(player.player_id, page)
             for comparing_score in scores_list:
                 if comparing_score.pp < db_score.pp:
                     new_pp_weight = Utils.get_pp_weight_from_pos(Utils.get_pos_from_pp_weight(comparing_score.weight)-1)

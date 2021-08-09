@@ -18,11 +18,11 @@ class Player(Base):
     id = Column(Integer, primary_key=True)
 
     # ScoreSaber info
-    playerId = Column(String)
-    playerName = Column(String)
+    player_id = Column(String)
+    player_name = Column(String)
     avatar = Column(String)
     rank = Column(Integer)
-    countryRank = Column(Integer)
+    country_rank = Column(Integer)
     pp = Column(Float)
     country = Column(String)
     role = Column(String)
@@ -40,11 +40,11 @@ class Player(Base):
     roles = relationship("DiscordRole", secondary=player_role_table)
 
     def __init__(self, player_data: pyscoresaber.Player):
-        self.playerId = player_data.player_id
-        self.playerName = player_data.player_name
+        self.player_id = player_data.player_id
+        self.player_name = player_data.player_name
         self.avatar = player_data.avatar
         self.rank = player_data.rank
-        self.countryRank = player_data.country_rank
+        self.country_rank = player_data.country_rank
         self.pp = player_data.pp
         self.country = player_data.country
         self.role = player_data.role
@@ -56,7 +56,7 @@ class Player(Base):
 
     @property
     def profile_url(self):
-        return f"https://scoresaber.com/u/{self.playerId}"
+        return f"https://scoresaber.com/u/{self.player_id}"
 
     @property
     def avatar_url(self):
@@ -87,4 +87,4 @@ class Player(Base):
         return int(self.rank - (self.rank % class_num) + class_num)
 
     def __str__(self):
-        return f"Player {self.playerName} ({self.playerId})"
+        return f"Player {self.player_name} ({self.player_id})"

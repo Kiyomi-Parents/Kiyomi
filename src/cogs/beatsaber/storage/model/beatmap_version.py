@@ -10,7 +10,7 @@ class BeatmapVersion(Base):
     """Map version data from BeatSaver"""
     __tablename__ = "beatmap_version"
 
-    hash = Column(String, ForeignKey("score.songHash", ondelete="CASCADE"), primary_key=True)
+    hash = Column(String, ForeignKey("score.song_hash", ondelete="CASCADE"), primary_key=True)
     map_id = Column(Integer, ForeignKey("beatmap.id", ondelete="CASCADE"))
 
     key = Column(String)

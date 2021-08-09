@@ -45,7 +45,7 @@ class BeatSaber(commands.Cog):
 
         try:
             db_player = await self.actions.add_player(ctx.guild.id, ctx.author.id, scoresaber_id)
-            await ctx.send(f"Successfully linked **{db_player.playerName}** ScoreSaber profile!")
+            await ctx.send(f"Successfully linked **{db_player.player_name}** ScoreSaber profile!")
         except (PlayerExistsException, PlayerNotFoundException) as error:
             await ctx.send(error)
 
@@ -208,6 +208,6 @@ class BeatSaber(commands.Cog):
 
         for score in db_scores:
             if score is not None:
-                await ctx.send(f"{score.score} on {score.songName} at {score.timeSet}")
+                await ctx.send(f"{score.score} on {score.song_name} at {score.time_set}")
             else:
                 await ctx.send("Score was None")

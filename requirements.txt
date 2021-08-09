@@ -13,5 +13,5 @@ termcolor~=1.1.0
 pylint~=2.8.3
 prettytable~=2.1.0
 alembic~=1.6.5
-pybeatsaver~=0.0.3
-pyscoresaber~=0.0.2
+pybeatsaver~=0.0.5
+pyscoresaber~=0.0.6

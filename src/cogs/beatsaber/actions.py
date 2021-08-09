@@ -46,7 +46,7 @@ class Actions:
             raise GuildNotFoundException(f"Failed to find {guild_id}")
 
         if db_player is not None and db_player in db_guild.players:
-            raise PlayerExistsException(f"Player **{db_player.playerName}** has already been added!")
+            raise PlayerExistsException(f"Player **{db_player.player_name}** has already been added!")
 
         # Add new player to db if not found
         if db_player is None:

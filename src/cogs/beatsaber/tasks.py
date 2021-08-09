@@ -36,10 +36,9 @@ class Tasks:
 
     def update_player(self, db_player: Player):
         try:
-            new_player = self.uow.scoresaber.get_player_basic(db_player.playerId)
-            player = Player(new_player)
+            new_player = self.uow.scoresaber.get_player_basic(db_player.player_id)
 
-            self.uow.player_repo.update_player(player)
+            self.uow.player_repo.update_player(Player(new_player))
         except pyscoresaber.NotFoundException:
             Logger.log(db_player, "Could not find at ScoreSaber")
 
@@ -56,7 +55,7 @@ class Tasks:
 
     def update_player_scores(self, db_player: Player):
         try:
-            recent_scores = self.uow.scoresaber.get_recent_scores(db_player.playerId)
+            recent_scores = self.uow.scoresaber.get_recent_scores(db_player.player_id)
             Logger.log(db_player, f"Got {len(recent_scores)} recent scores from ScoreSaber")
 
             # Filter out already existing scores
@@ -83,11 +82,11 @@ class Tasks:
 
     def update_score_song(self, score: Score):
         if score.beatmap_version is None:
-            beatmap = self.uow.beatmap_repo.get_beatmap_by_hash(score.songHash)
+            beatmap = self.uow.beatmap_repo.get_beatmap_by_hash(score.song_hash)
 
             if beatmap is None:
                 try:
-                    map_detail = self.uow.beatsaver.get_map_by_hash(score.songHash)
+                    map_detail = self.uow.beatsaver.get_map_by_hash(score.song_hash)
                     beatmap = Beatmap(map_detail)
                     self.uow.beatmap_repo.add_beatmap(beatmap)
 
@@ -143,7 +142,7 @@ class Tasks:
 
             # Guild snipes leaderboard
             if db_guild.guild_snipes:
-                leaderboard = GuildLeaderboard(self.uow, db_guild, db_score.leaderboardId)
+                leaderboard = GuildLeaderboard(self.uow, db_guild, db_score.leaderboard_id)
 
                 if len(leaderboard.leaderboard_scores) > 0:
                     guild_leaderboard_embed = Message.get_leaderboard_embed(leaderboard.get_top_scores(3))

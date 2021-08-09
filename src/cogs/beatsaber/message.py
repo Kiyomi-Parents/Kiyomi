@@ -18,7 +18,7 @@ class Message:
     def get_score_embed(player: Player, score: Score, country_rank=None):
         embed = Embed()
 
-        embed.set_author(name=player.playerName, url=player.profile_url, icon_url=player.avatar_url)
+        embed.set_author(name=player.player_name, url=player.profile_url, icon_url=player.avatar_url)
 
         # TODO: maybe add a thing that also shows the score's current rank?
         if country_rank is None or not isinstance(country_rank, int):
@@ -48,7 +48,7 @@ class Message:
             embed.add_field(name="Modifiers", value=f"{score.mods}")
 
         embed.set_thumbnail(url=score.song_image_url)
-        embed.colour = Colour.random(seed=player.playerId)
+        embed.colour = Colour.random(seed=player.player_id)
         embed.url = score.leaderboard_url
 
         if score.beatmap_version.beatmap is not None:
@@ -60,7 +60,7 @@ class Message:
     @staticmethod
     def get_new_score_embed(player: Player, score: Score, beatmap: Beatmap, country_rank=None):
         embed = Embed()
-        embed.set_author(name=player.playerName, url=player.profile_url, icon_url=player.avatar_url)
+        embed.set_author(name=player.player_name, url=player.profile_url, icon_url=player.avatar_url)
         if country_rank is None or not isinstance(country_rank, int):
             embed.title = f"New #{score.rank} " \
                           f"for {score.song_name_full} on {score.difficulty_name}"
@@ -79,7 +79,7 @@ class Message:
             embed.add_field(name="Modifiers", value=f"{score.mods}")
 
         embed.set_thumbnail(url=score.song_image_url)
-        embed.colour = Colour.random(seed=player.playerId)
+        embed.colour = Colour.random(seed=player.player_id)
         embed.url = score.leaderboard_url
 
         if beatmap is not None:
@@ -91,7 +91,7 @@ class Message:
     @staticmethod
     def get_improvement_score_embed(player: Player, previous_score: Score, score: Score, beatmap: Beatmap, country_rank=None):
         embed = Embed()
-        embed.set_author(name=player.playerName, url=player.profile_url, icon_url=player.avatar_url)
+        embed.set_author(name=player.player_name, url=player.profile_url, icon_url=player.avatar_url)
 
         if country_rank is None or not isinstance(country_rank, int):
             embed.title = f"Improved from #{previous_score.rank} " \
@@ -124,7 +124,7 @@ class Message:
             embed.add_field(name="Modifiers", value=f"{score.mods}")
 
         embed.set_thumbnail(url=score.song_image_url)
-        embed.colour = Colour.random(seed=player.playerId)
+        embed.colour = Colour.random(seed=player.player_id)
         embed.url = score.leaderboard_url
 
         if beatmap is not None:
@@ -170,7 +170,7 @@ class Message:
 
         for index, leaderboard_score in enumerate(leaderboard_scores):
             rank = f"#{index + 1}"
-            name = leaderboard_score.db_player.playerName
+            name = leaderboard_score.db_player.player_name
             date = timeago.format(leaderboard_score.db_score.get_date, datetime.now(tz=tz.UTC))
 
             if len(leaderboard_score.db_score.mods):

@@ -43,3 +43,17 @@ class Utils:
         pp_weight = 0.965**(pos-1)
 
         return pp_weight
+
+    @staticmethod
+    def update_class(old_class, new_class):
+        if type(new_class) is not type(old_class):
+            raise TypeError(f"Failed to update class. {type(new_class)} is not of type {type(old_class)}")
+
+        for var in old_class.__dict__.keys():
+            # Ignore private variables
+            if var.startswith("_"):
+                continue
+
+            if var in new_class.__dict__.keys():
+                if getattr(new_class, var) is not None:
+                    setattr(old_class, var, getattr(new_class, var))
