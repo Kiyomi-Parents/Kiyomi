@@ -129,7 +129,7 @@ class ScoreMessageBuilder:
         self.embed.url = score.leaderboard_url
         return self
 
-    def embed(self):
+    def get_embed(self):
         return self.embed
 
 
@@ -193,5 +193,5 @@ class BeatmapMessageBuilder:
         self.embed.url = beatmap.beatsaver_url
         return self
 
-    def embed(self):
+    def get_embed(self):
         return self.embed

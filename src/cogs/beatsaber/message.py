@@ -3,7 +3,7 @@ from typing import List
 
 import timeago
 from dateutil import tz
-from discord import Embed, Colour
+from discord import Embed
 from prettytable import PrettyTable
 
 from src.cogs.beatsaber.leaderboard.leaderboard_score import LeaderboardScore
@@ -20,7 +20,7 @@ class Message:
         msg = ScoreMessageBuilder(Embed(), score, player)
 
         embed = msg.author().title(country_rank=country_rank).mapper().pp().\
-            accuracy().score_value().mods().thumbnail().url().beatmap().embed()
+            accuracy().score_value().mods().thumbnail().url().beatmap().get_embed()
 
         return embed
 
@@ -29,7 +29,7 @@ class Message:
         msg = ScoreMessageBuilder(Embed(), score, player)
 
         embed = msg.author().title_new(country_rank=country_rank).mapper().pp().\
-            accuracy().score_value().mods().thumbnail().url().beatmap().embed()
+            accuracy().score_value().mods().thumbnail().url().beatmap().get_embed()
 
         return embed
 
@@ -39,7 +39,7 @@ class Message:
 
         embed = msg.author().title_improvement(country_rank=country_rank).mapper().pp(previous_score=previous_score).\
             accuracy(previous_score=previous_score).score_value(previous_score=previous_score).\
-            mods().thumbnail().url().beatmap().embed()
+            mods().thumbnail().url().beatmap().get_embed()
 
         return embed
 
@@ -48,7 +48,7 @@ class Message:
         msg = BeatmapMessageBuilder(Embed(), beatmap)
 
         embed = msg.author().title().rating().downloads().\
-            length().bpm().diffs().links().thumbnail().url().embed()
+            length().bpm().diffs().links().thumbnail().url().get_embed()
 
         return embed
 
