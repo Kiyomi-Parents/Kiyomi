@@ -24,6 +24,10 @@ class Security:
         return commands.is_owner()
 
     @staticmethod
+    def can_edit_roles():
+        return commands.has_permissions(manage_roles=True)
+
+    @staticmethod
     def owner_or_permissions(**perms):
         return commands.check_any(
             commands.has_permissions(**perms),

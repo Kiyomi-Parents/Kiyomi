@@ -1,6 +1,5 @@
 import time
 from functools import wraps
-import math
 
 from src.log import Logger
 
@@ -33,18 +32,6 @@ class Utils:
         return wrapper
 
     @staticmethod
-    def get_pos_from_pp_weight(weight):
-        position = int(round(math.log(weight, 0.965) + 1))
-
-        return position
-
-    @staticmethod
-    def get_pp_weight_from_pos(pos):
-        pp_weight = 0.965**(pos-1)
-
-        return pp_weight
-
-    @staticmethod
     def update_class(old_class, new_class):
         if type(new_class) is not type(old_class):
             raise TypeError(f"Failed to update class. {type(new_class)} is not of type {type(old_class)}")
@@ -57,3 +44,17 @@ class Utils:
             if var in new_class.__dict__.keys():
                 if getattr(new_class, var) is not None:
                     setattr(old_class, var, getattr(new_class, var))
+
+    @staticmethod
+    def class_inheritors(cls):
+        subclasses = set()
+        work = [cls]
+
+        while work:
+            parent = work.pop()
+            for child in parent.__subclasses__():
+                if child not in subclasses:
+                    subclasses.add(child)
+                    work.append(child)
+
+        return subclasses

@@ -7,3 +7,5 @@ config.json
 scores.json
 *log.txt
 *.db
+schema.png
+.dmypy.json
