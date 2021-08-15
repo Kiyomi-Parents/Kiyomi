@@ -23,6 +23,12 @@ class PlayerRepository(Repository[Player]):
         self._db.commit_changes()
         Logger.log(db_player, f"Added {len(scores)} new scores")
 
+    def add_score(self, player: Player, score: Score):
+        player.scores.append(score)
+
+        self._db.commit_changes()
+        Logger.log(player, f"Added new {score}")
+
     def add_role(self, db_player, db_role):
         db_player.roles.append(db_role)
 

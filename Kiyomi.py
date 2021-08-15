@@ -50,7 +50,8 @@ class Kiyomi(commands.Bot):
 
 if __name__ == "__main__":
     # Init database
-    database = Database(create_engine("sqlite:///bot.db", echo=False))
+    # database = Database(create_engine("mysql://kiyomi:6VnBh6bVJ9sM7Z59@10.0.0.17/kiyomi?charset=utf8mb4", echo=False))
+    database = Database(create_engine("mariadb+pymysql://kiyomi:6VnBh6bVJ9sM7Z59@10.0.0.17/kiyomi?charset=utf8mb4", echo=False, pool_pre_ping=True, pool_recycle=3600))
 
     bot = Kiyomi(command_prefix="!", db=database)
 

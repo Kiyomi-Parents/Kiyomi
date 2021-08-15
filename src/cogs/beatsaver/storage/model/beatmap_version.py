@@ -10,16 +10,16 @@ class BeatmapVersion(Base):
     """Map version data from BeatSaver"""
     __tablename__ = "beatmap_version"
 
-    hash = Column(String, primary_key=True)
-    map_id = Column(Integer, ForeignKey("beatmap.id", ondelete="CASCADE"))
+    hash = Column(String(128), primary_key=True, autoincrement=False)
+    map_id = Column(String(128), ForeignKey("beatmap.id", ondelete="CASCADE"))
 
-    key = Column(String)
-    state = Column(String)
+    key = Column(String(128))
+    state = Column(String(128))
     created_at = Column(DateTime)
     sage_score = Column(Integer)
-    download_url = Column(String)
-    cover_url = Column(String)
-    preview_url = Column(String)
+    download_url = Column(String(128))
+    cover_url = Column(String(128))
+    preview_url = Column(String(128))
 
     difficulties = relationship("BeatmapVersionDifficulty", cascade="all, delete-orphan")
 

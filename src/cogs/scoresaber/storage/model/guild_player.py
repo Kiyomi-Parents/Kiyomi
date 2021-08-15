@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, ForeignKey, String
+from sqlalchemy import Column, Integer, ForeignKey, String, BigInteger
 from sqlalchemy.orm import relationship, backref
 
 from src.database import Base
@@ -9,9 +9,9 @@ class GuildPlayer(Base):
 
     id = Column(Integer, primary_key=True)
 
-    guild_id = Column(Integer, ForeignKey("guild.id"))
-    member_id = Column(Integer, ForeignKey("member.id"))
-    player_id = Column(String, ForeignKey("player.id"))
+    guild_id = Column(BigInteger, ForeignKey("guild.id"))
+    member_id = Column(BigInteger, ForeignKey("member.id"))
+    player_id = Column(String(128), ForeignKey("player.id"))
 
     guild = relationship("Guild")
     member = relationship("Member")

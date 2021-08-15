@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Integer, ForeignKey
+from sqlalchemy import Column, String, Integer, ForeignKey, BigInteger
 from sqlalchemy.orm import relationship
 
 from src.database import Base
@@ -8,10 +8,10 @@ class Role(Base):
     """Discord role info"""
     __tablename__ = "role"
 
-    id = Column(Integer, primary_key=True)
-    guild_id = Column(Integer, ForeignKey("guild.id", ondelete="CASCADE"))
+    id = Column(BigInteger, primary_key=True, autoincrement=False)
+    guild_id = Column(BigInteger, ForeignKey("guild.id", ondelete="CASCADE"))
 
-    name = Column(String)
+    name = Column(String(128))
 
     members = relationship("MemberRole", back_populates="role")
 

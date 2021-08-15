@@ -1,5 +1,8 @@
 import time
-from functools import wraps
+from functools import wraps, partial
+from typing import Callable, Coroutine
+
+from asyncio import to_thread
 
 from src.log import Logger
 
@@ -58,3 +61,11 @@ class Utils:
                     work.append(child)
 
         return subclasses
+
+    @staticmethod
+    def on_thread(func: Callable):
+        @wraps(func)
+        async def wrapper(*args, **kwargs):
+            return await to_thread(func, *args, **kwargs)
+
+        return wrapper

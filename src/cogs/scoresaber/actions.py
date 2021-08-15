@@ -29,7 +29,7 @@ class Actions:
         if guild_player is not None:
             raise PlayerExistsException(f"You have already added yourself as **{guild_player.player.player_name}**!")
 
-        player = self.get_player(player_id)
+        player = await self.get_player(player_id)
 
         self.uow.guild_player_repo.add(GuildPlayer(guild_id, member_id, player_id))
 
@@ -43,12 +43,12 @@ class Actions:
 
         return player
 
-    def get_player(self, player_id: str) -> Player:
+    async def get_player(self, player_id: str) -> Player:
         player = self.uow.player_repo.get_by_id(player_id)
 
         if player is None:
             try:
-                new_player = self.uow.scoresaber.get_player_basic(player_id)
+                new_player = await self.uow.scoresaber.get_player_basic(player_id)
 
                 self.uow.player_repo.add(Player(new_player))
             except pyscoresaber.NotFoundException as error:

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Integer, ForeignKey, Enum
+from sqlalchemy import Column, String, Integer, ForeignKey, Enum, BigInteger
 
 from .enums.setting_type import SettingType
 from src.database.database import Base
@@ -9,11 +9,11 @@ class Setting(Base):
     __tablename__ = "setting"
 
     id = Column(Integer, primary_key=True)
-    guild_id = Column(Integer, ForeignKey("guild.id", ondelete="CASCADE"))
+    guild_id = Column(BigInteger, ForeignKey("guild.id", ondelete="CASCADE"))
 
     setting_type = Column(Enum(SettingType))
-    name = Column(String)
-    value = Column(String)
+    name = Column(String(128))
+    value = Column(String(1024))
 
     def __init__(self, guild_id: int, setting_type: SettingType, name: str, value: str):
         self.guild_id = guild_id

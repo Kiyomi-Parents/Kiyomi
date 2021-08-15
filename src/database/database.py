@@ -12,6 +12,7 @@ Session = sessionmaker()
 class Database:
 
     def __init__(self, engine):
+        self.engine = engine
         Base.metadata.bind = engine
         Session.configure(bind=engine)
         self.session = Session()
@@ -49,6 +50,10 @@ class Database:
     def commit_changes(self):
         try:
             self.session.commit()
-        except Exception:
+        except Exception as error:
+            if self.engine.connection_invalidated:
+                Logger.log("Database", "Reconnecting")
+                self.engine.connect()
+
             self.session.rollback()
-            raise
+            raise error

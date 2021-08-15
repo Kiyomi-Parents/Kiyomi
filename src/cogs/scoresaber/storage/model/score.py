@@ -15,28 +15,33 @@ class Score(Base):
     __tablename__ = "score"
 
     id = Column(Integer, primary_key=True)
-    player_id = Column(Integer, ForeignKey("player.id", ondelete="CASCADE"))
+    player_id = Column(String(128), ForeignKey("player.id", ondelete="CASCADE"))
 
     # ScoreSaber info
     rank = Column(Integer)
     score_id = Column(Integer)
     score = Column(Integer)
     unmodified_score = Column(Integer)
-    mods = Column(String)
+    mods = Column(String(128))
     pp = Column(Float)
     weight = Column(Float)
     time_set = Column(DateTime)
     leaderboard_id = Column(Integer)
-    song_hash = Column(String, ForeignKey("beatmap_version.hash"))
-    song_name = Column(String)
-    song_sub_name = Column(String)
-    song_author_name = Column(String)
-    level_author_name = Column(String)
+    song_hash = Column(String(128))
+    song_name = Column(String(128))
+    song_sub_name = Column(String(128))
+    song_author_name = Column(String(128))
+    level_author_name = Column(String(128))
     characteristic = Column(Enum(pyscoresaber.Characteristic))
     difficulty = Column(Enum(pyscoresaber.Difficulty))
     max_score = Column(Integer)
 
-    beatmap_version = relationship("BeatmapVersion", uselist=False)
+    beatmap_version = relationship(
+        "BeatmapVersion",
+        primaryjoin='BeatmapVersion.hash == Score.song_hash',
+        foreign_keys=[song_hash],
+        uselist=False
+    )
 
     def __init__(self, score_data: pyscoresaber.Score):
         self.rank = score_data.rank
@@ -93,7 +98,7 @@ class Score(Base):
             if not max_score and self.beatmap_version.beatmap is not None:
                 for diff in self.beatmap_version.difficulties:
                     if diff.scoresaber_difficulty == self.difficulty and diff.scoresaber_characteristic == self.characteristic:
-                        max_score = ScoreSaberUtils.get_max_score(diff.notes)
+                        max_score = diff.max_score
 
         if max_score:
             return round(self.score / max_score * 100, 2)

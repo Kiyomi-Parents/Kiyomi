@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, ForeignKey
+from sqlalchemy import Column, Integer, ForeignKey, BigInteger
 from sqlalchemy.orm import relationship
 
 from src.database import Base
@@ -10,7 +10,7 @@ class SentScore(Base):
     id = Column(Integer, primary_key=True)
 
     score_id = Column(Integer, ForeignKey("score.id"))
-    guild_id = Column(Integer, ForeignKey("guild.id"))
+    guild_id = Column(BigInteger, ForeignKey("guild.id"))
 
     score = relationship("Score")
     guild = relationship("Guild")

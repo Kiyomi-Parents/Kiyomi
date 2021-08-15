@@ -3,6 +3,7 @@ import pyscoresaber.models.enum
 from pybeatsaver import MapDifficulty
 from sqlalchemy import Column, String, ForeignKey, Integer, Float, Boolean, Enum
 
+from ...beatsaver_utils import BeatSaverUtils
 from src.database import Base
 
 
@@ -11,7 +12,7 @@ class BeatmapVersionDifficulty(Base):
     __tablename__ = "beatmap_version_difficulty"
 
     id = Column(Integer, primary_key=True)
-    version_hash = Column(String, ForeignKey("beatmap_version.hash", ondelete="CASCADE"))
+    version_hash = Column(String(128), ForeignKey("beatmap_version.hash", ondelete="CASCADE"))
 
     njs = Column(Float)
     offset = Column(Float)
@@ -53,6 +54,10 @@ class BeatmapVersionDifficulty(Base):
         self.parity_errors = version_difficulty.parity_summary.errors
         self.parity_warns = version_difficulty.parity_summary.warns
         self.parity_resets = version_difficulty.parity_summary.resets
+
+    @property
+    def max_score(self) -> Integer:
+        return BeatSaverUtils.get_max_score(self.notes)
 
     @property
     def scoresaber_characteristic(self) -> pyscoresaber.Characteristic:

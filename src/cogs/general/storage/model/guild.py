@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Integer
+from sqlalchemy import Column, String, Integer, BigInteger
 from sqlalchemy.orm import relationship
 
 from src.database import Base
@@ -8,8 +8,8 @@ class Guild(Base):
     """Discord guild info and settings"""
     __tablename__ = "guild"
 
-    id = Column(Integer, primary_key=True)
-    name = Column(String)
+    id = Column(BigInteger, primary_key=True, autoincrement=False)
+    name = Column(String(128))
 
     members = relationship("GuildMember", back_populates="guild", cascade="all, delete-orphan")
     channels = relationship("Channel", cascade="all, delete-orphan")

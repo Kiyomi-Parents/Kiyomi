@@ -15,9 +15,9 @@ class Beatmap(Base):
     __tablename__ = "beatmap"
 
     # BeatSaver info
-    id = Column(String, primary_key=True)
-    name = Column(String)
-    description = Column(String)
+    id = Column(String(128), primary_key=True, autoincrement=False)
+    name = Column(String(128))
+    description = Column(String(4096))
     uploaded = Column(DateTime)
     automapper = Column(Boolean)
     ranked = Column(Boolean)
@@ -25,17 +25,17 @@ class Beatmap(Base):
 
     # Uploader
     uploader_id = Column(Integer)
-    uploader_name = Column(String)
-    uploader_hash = Column(String)
-    uploader_avatar = Column(String)
+    uploader_name = Column(String(128))
+    uploader_hash = Column(String(128))
+    uploader_avatar = Column(String(128))
 
     # Map metadata
     metadata_bpm = Column(Float)
     metadata_duration = Column(Integer)
-    metadata_song_name = Column(String)
-    metadata_song_sub_name = Column(String)
-    metadata_song_author_name = Column(String)
-    metadata_level_author_name = Column(String)
+    metadata_song_name = Column(String(128))
+    metadata_song_sub_name = Column(String(128))
+    metadata_song_author_name = Column(String(128))
+    metadata_level_author_name = Column(String(128))
 
     # Stats
     stats_plays = Column(Integer)

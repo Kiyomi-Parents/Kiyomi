@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, ForeignKey, String
+from sqlalchemy import Column, Integer, ForeignKey, String, BigInteger
 from sqlalchemy.orm import relationship
 
 from src.database import Base
@@ -9,11 +9,11 @@ class AchievementRole(Base):
     __tablename__ = "achievement_role"
 
     id = Column(Integer, primary_key=True)
-    guild_id = Column(Integer, ForeignKey("guild.id", ondelete="CASCADE"))
-    role_id = Column(Integer, ForeignKey("role.id", ondelete="CASCADE"))
+    guild_id = Column(BigInteger, ForeignKey("guild.id", ondelete="CASCADE"))
+    role_id = Column(BigInteger, ForeignKey("role.id", ondelete="CASCADE"))
 
-    group = Column(String)
-    identifier = Column(String)
+    group = Column(String(128))
+    identifier = Column(String(128))
 
     members = relationship("AchievementRoleMember", back_populates="achievement_role")
 

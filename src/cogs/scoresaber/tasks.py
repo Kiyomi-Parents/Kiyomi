@@ -1,4 +1,5 @@
 import asyncio
+from typing import List
 
 import pyscoresaber
 from discord.ext import tasks
@@ -26,11 +27,11 @@ class Tasks:
             Logger.log("task", f"Updating {len(players)} players")
 
             for player in players:
-                self.update_player(player)
+                await self.update_player(player)
 
-    def update_player(self, player: Player):
+    async def update_player(self, player: Player):
         try:
-            new_player = self.uow.scoresaber.get_player_basic(player.id)
+            new_player = await self.uow.scoresaber.get_player_basic(player.id)
 
             self.uow.player_repo.update(Player(new_player))
         except pyscoresaber.NotFoundException:
@@ -45,24 +46,12 @@ class Tasks:
             Logger.log("task", f"Updating scores for {len(players)} players")
 
             for player in players:
-                self.update_player_scores(player)
+                await self.update_player_scores(player)
 
-    def update_player_scores(self, player: Player):
+    async def update_player_scores(self, player: Player):
         try:
-            recent_scores = self.uow.scoresaber.get_recent_scores(player.id)
-            Logger.log(player, f"Got {len(recent_scores)} recent scores from ScoreSaber")
-
-            # Filter out already existing scores
-            new_scores = []
-
-            for recent_score in recent_scores:
-                new_score = Score(recent_score)
-
-                if self.uow.score_repo.is_score_new(new_score):
-                    new_scores.append(new_score)
-
-            # Add new scores to player
-            self.uow.player_repo.add_scores(player, new_scores)
+            new_scores = await self.get_all_recent_scores(player)
+            Logger.log(player, f"Got {len(new_scores)} new recent scores from ScoreSaber")
 
             # Get db scores from recent scores
             scores = self.uow.score_repo.get_scores(new_scores)
@@ -73,3 +62,30 @@ class Tasks:
 
         except pyscoresaber.NotFoundException:
             Logger.log(player, "Could not find scores on ScoreSaber")
+
+    async def get_all_recent_scores(self, player: Player) -> List[Score]:
+        new_scores = []
+        last_new_scores_len = -1
+        page = 1
+
+        while len(new_scores) != last_new_scores_len:
+            last_new_scores_len = len(new_scores)
+
+            try:
+                recent_scores = await self.uow.scoresaber.get_recent_scores(player.id, page)
+                Logger.log(player, f"Got {len(recent_scores)} recent scores from ScoreSaber page {page}")
+
+                for recent_score in recent_scores:
+                    new_score = Score(recent_score)
+
+                    if self.uow.score_repo.is_score_new(new_score):
+                        new_scores.append(new_score)
+                        self.uow.player_repo.add_score(player, new_score)
+
+            except pyscoresaber.NotFoundException:
+                Logger.log(player, "Could not find scores on ScoreSaber")
+                break
+
+            page += 1
+
+        return new_scores

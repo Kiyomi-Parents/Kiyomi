@@ -10,16 +10,16 @@ class Player(Base):
     """Player data from ScoreSaber"""
     __tablename__ = "player"
 
-    id = Column(String, primary_key=True)
-    player_name = Column(String)
-    avatar = Column(String)
+    id = Column(String(128), primary_key=True, autoincrement=False)
+    player_name = Column(String(128))
+    avatar = Column(String(128))
     rank = Column(Integer)
     country_rank = Column(Integer)
     pp = Column(Float)
-    country = Column(String)
-    role = Column(String)
+    country = Column(String(128))
+    role = Column(String(128))
     badges = Column(JSON)
-    history = Column(String)
+    history = Column(String(512))
     permissions = Column(Integer)
     inactive = Column(Integer)
     banned = Column(Integer)

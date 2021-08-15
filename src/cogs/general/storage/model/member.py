@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, ForeignKey, String
+from sqlalchemy import Column, Integer, ForeignKey, String, BigInteger
 from sqlalchemy.orm import relationship
 
 from src.database import Base
@@ -7,9 +7,9 @@ from src.database import Base
 class Member(Base):
     __tablename__ = "member"
 
-    id = Column(Integer, primary_key=True)
+    id = Column(BigInteger, primary_key=True, autoincrement=False)
 
-    name = Column(String)
+    name = Column(String(128))
 
     guilds = relationship("GuildMember", back_populates="member")
     roles = relationship("MemberRole", back_populates="member")
