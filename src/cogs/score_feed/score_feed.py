@@ -20,7 +20,7 @@ class ScoreFeed(BaseCog):
     def events(self):
 
         @self.uow.bot.events.on("on_new_player")
-        def mark_scores_sent(player: Player, _discord_member: discord.Member):
+        def mark_scores_sent(player: Player):
             self.actions.mark_all_player_scores_sent(player)
 
     @commands.group(invoke_without_command=True)

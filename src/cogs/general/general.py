@@ -19,15 +19,15 @@ class General(BaseCog):
 
     def events(self):
 
-        @self.uow.bot.events.on("on_new_player")
-        def register_member(_player: Player, discord_member: discord.Member):
+        @self.uow.bot.events.on("register_member")
+        def register_member(discord_member: discord.Member):
             self.actions.register_member(discord_member)
             self.actions.register_guild_member(discord_member)
 
     @commands.Cog.listener()
     async def on_ready(self):
-        for guild in self.uow.bot.guilds:
-            self.actions.register_guild(guild)
+        for discord_guild in self.uow.bot.guilds:
+            self.actions.register_guild(discord_guild)
 
     @commands.command()
     async def hello(self, ctx):

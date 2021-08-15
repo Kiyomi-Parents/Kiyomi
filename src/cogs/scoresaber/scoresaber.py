@@ -25,11 +25,12 @@ class ScoreSaber(BaseCog):
     async def player_add(self, ctx, profile: str):
         """Link yourself to your ScoreSaber profile."""
         player_id = ScoreSaberUtils.scoresaber_id_from_url(profile)
+        self.uow.bot.events.emit("register_member", ctx.author)
 
         try:
             player = self.actions.add_player(ctx.guild.id, ctx.author.id, player_id)
-            self.uow.bot.events.emit("on_new_player", player, ctx.author)
-            
+            self.uow.bot.events.emit("on_new_player", player)
+
             await ctx.send(f"Successfully linked **{player.player_name}** ScoreSaber profile!")
         except (PlayerExistsException, PlayerNotFoundException) as error:
             await ctx.send(error)

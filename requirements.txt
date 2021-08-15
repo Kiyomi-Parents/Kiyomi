@@ -14,5 +14,6 @@ pylint~=2.8.3
 prettytable~=2.1.0
 alembic~=1.6.5
 pybeatsaver~=0.0.6
-pyscoresaber~=0.0.7
+pyscoresaber~=0.0.8
 pymitter~=0.3.1
+sqlalchemy_schemadisplay~=1.3
