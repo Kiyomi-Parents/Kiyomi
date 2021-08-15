@@ -29,8 +29,6 @@ class ScoreSaber(BaseCog):
 
         try:
             player = self.actions.add_player(ctx.guild.id, ctx.author.id, player_id)
-            self.uow.bot.events.emit("on_new_player", player)
-
             await ctx.send(f"Successfully linked **{player.player_name}** ScoreSaber profile!")
         except (PlayerExistsException, PlayerNotFoundException) as error:
             await ctx.send(error)
@@ -100,3 +98,14 @@ class ScoreSaber(BaseCog):
                 await ctx.send(f"{score.score} on {score.song_name} at {score.time_set}")
             else:
                 await ctx.send("Score was None")
+
+    @commands.command(name="manualaddplayer")
+    @Security.is_owner()
+    async def manual_add_player(self, ctx, discord_member_id: int, scoresaber_player_id: str):
+        try:
+            player = self.actions.add_player(ctx.guild.id, discord_member_id, scoresaber_player_id)
+            await ctx.send(f"Successfully linked **{player.player_name}** ScoreSaber profile to {discord_member_id}!")
+        except (PlayerExistsException, PlayerNotFoundException) as error:
+            await ctx.send(error)
+
+

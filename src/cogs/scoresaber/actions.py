@@ -27,8 +27,10 @@ class Actions:
 
         self.uow.guild_player_repo.add(GuildPlayer(guild_id, member_id, player_id))
 
-        # Get player scores and marked them sent to decrease spam
+        # Get player scores
         self.tasks.update_player_scores(player)
+
+        self.uow.bot.events.emit("on_new_player", player)
 
         # Add role to player
         # await self.update_player_roles(db_community, player) # TODO: Add to event bus
