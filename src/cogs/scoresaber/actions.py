@@ -2,7 +2,7 @@ import pyscoresaber
 
 from .storage.uow import UnitOfWork
 from .tasks import Tasks
-from .errors import PlayerExistsException, PlayerNotFoundException
+from .errors import PlayerExistsException, PlayerNotFoundException, InvalidPlayerException
 from .storage.model.guild_player import GuildPlayer
 from .storage.model.player import Player
 
@@ -13,6 +13,12 @@ class Actions:
         self.tasks = tasks
 
     def add_player(self, guild_id: int, member_id: int, player_id: str) -> Player:
+        guild_players = self.uow.guild_player_repo.get_all_by_member_id(member_id)
+        if guild_players is not None:
+            for guild_player in guild_players:
+                if guild_player.player_id != player_id:
+                    raise InvalidPlayerException(f"You already have a different ScoreSaber user assigned!")
+
         guild_player = self.uow.guild_player_repo.get_by_guild_id_and_player_id(guild_id, player_id)
 
         if guild_player is not None:
@@ -27,8 +33,10 @@ class Actions:
 
         self.uow.guild_player_repo.add(GuildPlayer(guild_id, member_id, player_id))
 
-        # Get player scores and marked them sent to decrease spam
+        # Get player scores
         self.tasks.update_player_scores(player)
+
+        self.uow.bot.events.emit("on_new_player", player)
 
         # Add role to player
         # await self.update_player_roles(db_community, player) # TODO: Add to event bus
