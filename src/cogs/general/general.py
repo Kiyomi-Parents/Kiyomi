@@ -4,10 +4,11 @@ from discord.ext import commands
 from src.cogs.security import Security
 from .actions import Actions
 from .storage.uow import UnitOfWork
-from ..scoresaber.storage.model.player import Player
+from src.cogs.scoresaber.storage.model.player import Player
+from src.base.base_cog import BaseCog
 
 
-class General(commands.Cog):
+class General(BaseCog):
 
     def __init__(self, uow: UnitOfWork, actions: Actions):
         self.uow = uow
@@ -27,9 +28,6 @@ class General(commands.Cog):
     async def on_ready(self):
         for guild in self.uow.bot.guilds:
             self.actions.register_guild(guild)
-
-    async def cog_before_invoke(self, ctx):
-        await ctx.trigger_typing()
 
     @commands.command()
     async def hello(self, ctx):

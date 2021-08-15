@@ -2,9 +2,10 @@ from discord.ext import commands
 
 from .tasks import Tasks
 from .storage.uow import UnitOfWork
+from src.base.base_cog import BaseCog
 
 
-class AchievementRoles(commands.Cog):
+class AchievementRoles(BaseCog):
     def __init__(self, uow: UnitOfWork, tasks: Tasks):
         self.uow = uow
         self.tasks = tasks

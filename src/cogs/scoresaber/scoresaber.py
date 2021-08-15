@@ -6,10 +6,11 @@ from .actions import Actions
 from .errors import PlayerExistsException, PlayerNotFoundException, GuildNotFoundException
 from .message import Message
 from .scoresaber_utils import ScoreSaberUtils
-from ..security import Security
+from src.cogs.security import Security
+from src.base.base_cog import BaseCog
 
 
-class ScoreSaber(commands.Cog):
+class ScoreSaber(BaseCog):
     def __init__(self, uow: UnitOfWork, tasks: Tasks, actions: Actions):
         self.uow = uow
         self.tasks = tasks

@@ -3,9 +3,10 @@ from discord.ext import commands
 from .actions import Actions
 from .message import Message
 from .storage.uow import UnitOfWork
+from src.base.base_cog import BaseCog
 
 
-class Achievements(commands.Cog):
+class Achievements(BaseCog):
     def __init__(self, uow: UnitOfWork, actions: Actions):
         self.uow = uow
         self.actions = actions

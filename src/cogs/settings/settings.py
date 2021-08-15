@@ -4,10 +4,11 @@ from discord.ext import commands
 
 from .actions import Actions
 from .storage.uow import UnitOfWork
-from ..security import Security
+from src.cogs.security import Security
+from src.base.base_cog import BaseCog
 
 
-class Settings(commands.Cog):
+class Settings(BaseCog):
 
     def __init__(self, uow: UnitOfWork, actions: Actions):
         self.uow = uow

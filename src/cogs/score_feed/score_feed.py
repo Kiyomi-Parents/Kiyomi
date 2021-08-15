@@ -4,11 +4,12 @@ from discord.ext import commands
 from .actions import Actions
 from .errors import GuildRecentChannelExistsException, GuildRecentChannelNotFoundException
 from .storage.uow import UnitOfWork
-from ..scoresaber.storage.model.player import Player
-from ..security import Security
+from src.cogs.scoresaber.storage.model.player import Player
+from src.cogs.security import Security
+from src.base.base_cog import BaseCog
 
 
-class ScoreFeed(commands.Cog):
+class ScoreFeed(BaseCog):
     def __init__(self, uow: UnitOfWork, actions: Actions):
         self.uow = uow
         self.actions = actions
