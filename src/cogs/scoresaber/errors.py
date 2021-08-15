@@ -8,3 +8,7 @@ class PlayerNotFoundException(Exception):
 
 class GuildNotFoundException(Exception):
     pass
+
+
+class InvalidPlayerException(Exception):
+    pass
