@@ -1,4 +1,4 @@
-import pybeatsaver.models.enums
+import pybeatsaver.models.enum
 import pyscoresaber.models.enum
 from pybeatsaver import MapDifficulty
 from sqlalchemy import Column, String, ForeignKey, Integer, Float, Boolean, Enum
