@@ -74,7 +74,7 @@ if __name__ == "__main__":
     bot.load_extension(name="src.cogs.achievements")
     bot.load_extension(name="src.cogs.achievement_roles")
 
-    database.create_tables()
+    # database.create_tables()
     # database.create_schema_image()
 
     bot.run(TOKEN)
