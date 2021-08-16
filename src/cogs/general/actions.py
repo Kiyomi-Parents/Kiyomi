@@ -13,8 +13,11 @@ class Actions:
     def __init__(self, uow: UnitOfWork):
         self.uow = uow
 
-    def get_discord_guild(self, guild_id: int) -> discord.Guild:
+    async def get_discord_guild(self, guild_id: int) -> discord.Guild:
         discord_guild = self.uow.bot.get_guild(guild_id)
+
+        if discord_guild is None:
+            discord_guild = await self.uow.bot.fetch_guild(guild_id)
 
         if discord_guild is None:
             raise GuildNotFoundException(f"Could not find guild with id {guild_id}")
@@ -22,8 +25,11 @@ class Actions:
         return discord_guild
 
     async def get_discord_member(self, guild_id: int, member_id: int) -> discord.Member:
-        discord_guild = self.get_discord_guild(guild_id)
-        discord_member = await discord_guild.fetch_member(member_id)
+        discord_guild = await self.get_discord_guild(guild_id)
+        discord_member = discord_guild.get_member(member_id)
+
+        if discord_member is None:
+            discord_member = await discord_guild.fetch_member(member_id)
 
         if discord_member is None:
             raise MemberNotFound(f"Could not find member with id {member_id} in guild {discord_guild.name}")
@@ -31,8 +37,15 @@ class Actions:
         return discord_member
 
     def get_discord_role(self, guild_id: int, role_id: int) -> discord.Role:
-        discord_guild = self.get_discord_guild(guild_id)
+        discord_guild = await self.get_discord_guild(guild_id)
         discord_role = discord_guild.get_role(role_id)
+
+        if discord_role is None:
+            tmp_discord_roles = await discord_guild.fetch_roles()
+            for tmp_discord_role in tmp_discord_roles:
+                if tmp_discord_role.id == role_id:
+                    discord_role = tmp_discord_role
+                    break
 
         if discord_role is None:
             raise RoleNotFoundException(f"Could not find role with id {role_id} in guild {discord_guild.name}")
@@ -62,7 +75,7 @@ class Actions:
 
     @Security.can_edit_roles()
     async def create_role(self, guild_id: int, name: str, colour: Colour, hoist: bool, reason: str) -> Role:
-        discord_guild = self.get_discord_guild(guild_id)
+        discord_guild = await self.get_discord_guild(guild_id)
 
         try:
             role = await discord_guild.create_role(name=name, colour=colour, hoist=hoist, reason=reason)
