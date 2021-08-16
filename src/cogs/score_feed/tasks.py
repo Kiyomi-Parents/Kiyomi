@@ -19,7 +19,7 @@ class Tasks:
         self.uow = uow
         self.send_notifications_lock = asyncio.Lock()
 
-    @tasks.loop(minutes=1)
+    @tasks.loop(minutes=2)
     @Utils.time_task
     @Utils.discord_ready
     @Utils.update_tasks_list

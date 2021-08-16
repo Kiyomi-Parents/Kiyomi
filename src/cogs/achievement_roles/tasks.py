@@ -18,7 +18,7 @@ class Tasks:
         self.uow = uow
         self.update_member_roles_lock = asyncio.Lock()
 
-    @tasks.loop(minutes=1)
+    @tasks.loop(minutes=5)
     @Utils.time_task
     @Utils.discord_ready
     @Utils.update_tasks_list
