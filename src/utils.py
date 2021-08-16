@@ -1,6 +1,7 @@
 import random
 import time
 from functools import wraps
+from discord.ext import tasks
 
 from Kiyomi import Kiyomi
 import discord
@@ -84,3 +85,29 @@ class Utils:
             return result
 
         return wrapper
+
+    @staticmethod
+    def combine_decorators(*decs):
+        def deco(f):
+            for dec in reversed(decs):
+                f = dec(f)
+            return f
+        return deco
+
+    @staticmethod
+    def sub_tasks_decorator(func):
+        @Utils.combine_decorators(Utils.time_task, Utils.discord_ready)
+        @wraps(func)
+        def wrapper():
+            return func()
+        return wrapper
+
+    @staticmethod
+    def tasks_decorator(seconds=0, minutes=0, hours=0, count=None, reconnect=True, loop=None):
+        def decorator(func):
+            @tasks.loop(seconds=seconds, minutes=minutes, hours=hours, count=count, reconnect=reconnect, loop=loop)
+            @wraps(func)
+            async def wrapper(self, *args, **kwargs):
+                return await func(self, *args, **kwargs)
+            return wrapper
+        return decorator
