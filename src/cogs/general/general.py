@@ -1,3 +1,5 @@
+import random
+
 import discord.member
 from discord.ext import commands
 
@@ -40,8 +42,16 @@ class General(BaseCog):
         await ctx.send("Hello there!")
 
     @commands.command(name="emoji", hidden=True)
+    async def random_emoji(self, ctx: Context):
+        try:
+            await ctx.message.delete()
+        except Exception:
+            pass
+        await ctx.send(self.uow.bot.get_emoji(self.uow.bot.emojis[random.randint(0, len(self.uow.bot.emojis)-1)].id))
+
+    @commands.command(name="many emoji", hidden=True)
     @Security.is_owner()
-    async def emoji(self, ctx):
+    async def many_emoji(self, ctx):
         emoji_list = []
         for emoji in self.uow.bot.emojis:
             emoji_list.append(str(self.uow.bot.get_emoji(emoji.id)))
