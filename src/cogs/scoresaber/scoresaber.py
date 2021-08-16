@@ -34,6 +34,7 @@ class ScoreSaber(BaseCog, name="Score Saber"):
         self.uow.bot.events.emit("register_member", ctx.author)
 
         try:
+            await ctx.send(f"Getting scores.... This may take a while")
             player = await self.actions.add_player(ctx.guild.id, ctx.author.id, player_id)
             await ctx.send(f"Successfully linked **{player.player_name}** ScoreSaber profile!")
         except (PlayerExistsException, PlayerNotFoundException) as error:
