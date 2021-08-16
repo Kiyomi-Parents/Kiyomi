@@ -14,16 +14,16 @@ class Actions:
     def __init__(self, uow: UnitOfWork):
         self.uow = uow
 
-    def get_player_score_leaderboard_by_guild_id_and_beatmap_key(self, guild_id: int, beatmap_key: str) -> PlayerScoreLeaderboard:
+    async def get_player_score_leaderboard_by_guild_id_and_beatmap_key(self, guild_id: int, beatmap_key: str) -> PlayerScoreLeaderboard:
         beatsaver = self.uow.bot.get_cog("BeatSaverAPI")
         scoresaber = self.uow.bot.get_cog("ScoreSaberAPI")
 
-        beatmap = beatsaver.get_beatmap_by_key(beatmap_key)
+        beatmap = await beatsaver.get_beatmap_by_key(beatmap_key)
 
         if beatmap is None:
             return None
 
-        score = scoresaber.get_score_by_song_hash(beatmap.latest_version.hash)
+        score = await scoresaber.get_score_by_song_hash(beatmap.latest_version.hash)
 
         if score is None:
             return None

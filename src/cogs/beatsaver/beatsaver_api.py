@@ -14,9 +14,9 @@ class BeatSaverAPI(commands.Cog):
         self.uow = uow
         self.actions = actions
 
-    def get_beatmap_by_key(self, key: str) -> Optional[Beatmap]:
+    async def get_beatmap_by_key(self, key: str) -> Optional[Beatmap]:
         try:
-            return self.actions.get_beatmap_by_key(key)
+            return await self.actions.get_beatmap_by_key(key)
         except SongNotFound as error:
             Logger.log(self.__class__.__name__, error)
             return None

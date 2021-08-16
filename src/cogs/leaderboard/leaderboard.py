@@ -20,7 +20,7 @@ class Leaderboard(BaseCog):
     @commands.command()
     async def song_leaderboard(self, ctx, key: str):
         """Displays song leaderboard."""
-        leaderboard = self.actions.get_player_score_leaderboard_by_guild_id_and_beatmap_key(ctx.guild.id, key)
+        leaderboard = await self.actions.get_player_score_leaderboard_by_guild_id_and_beatmap_key(ctx.guild.id, key)
 
         guild_leaderboard_embed = Message.get_player_score_leaderboard_embed(leaderboard)
         await ctx.send(embed=guild_leaderboard_embed)
