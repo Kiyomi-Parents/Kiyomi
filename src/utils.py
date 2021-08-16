@@ -1,5 +1,9 @@
+import random
 import time
 from functools import wraps
+
+from Kiyomi import Kiyomi
+import discord
 
 from src.log import Logger
 
@@ -58,3 +62,25 @@ class Utils:
                     work.append(child)
 
         return subclasses
+
+    @staticmethod
+    def update_tasks_list(func):
+        async def update_status(bot: Kiyomi):
+            if bot.running_tasks:
+                await bot.change_presence(activity=discord.Game(" | ".join(bot.running_tasks)))
+            else:
+                activity_index = random.randint(0, len(bot.activity_list)-1)
+                await bot.change_presence(activity=discord.Game(bot.activity_list[activity_index]))
+
+        @wraps(func)
+        async def wrapper(self, *args, **kwargs):
+            if func.__doc__ not in self.uow.bot.running_tasks:
+                self.uow.bot.running_tasks.append(func.__doc__)
+            await update_status(self.uow.bot)
+            result = await func(self, *args, **kwargs)
+            if func.__doc__ in self.uow.bot.running_tasks:
+                self.uow.bot.running_tasks.pop(self.uow.bot.running_tasks.index(func.__doc__))
+                await update_status(self.uow.bot)
+            return result
+
+        return wrapper

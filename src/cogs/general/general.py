@@ -6,6 +6,7 @@ from .actions import Actions
 from .storage.uow import UnitOfWork
 from src.cogs.scoresaber.storage.model.player import Player
 from src.base.base_cog import BaseCog
+from ...utils import Utils
 
 
 class General(BaseCog):
@@ -30,6 +31,7 @@ class General(BaseCog):
             self.actions.register_guild(discord_guild)
 
     @commands.command()
+    @Utils.update_tasks_list
     async def hello(self, ctx):
         """Greet the bot."""
         await ctx.send("Hello there!")

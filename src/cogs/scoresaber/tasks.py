@@ -39,7 +39,9 @@ class Tasks:
     @tasks.loop(minutes=2)
     @Utils.time_task
     @Utils.discord_ready
+    @Utils.update_tasks_list
     async def update_players_scores(self):
+        """updating player scores"""
         async with self.update_players_scores_lock:
             players = self.uow.player_repo.get_all()
             Logger.log("task", f"Updating scores for {len(players)} players")
