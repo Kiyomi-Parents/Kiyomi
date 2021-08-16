@@ -62,7 +62,8 @@ class Actions:
         for score in scores:
             sent_scores.append(SentScore(score.id, guild.id))
 
-        self.uow.sent_score_repo.add_all(sent_scores)
+        if len(sent_scores) != 0:
+            self.uow.sent_score_repo.add_all(sent_scores)
 
     async def send_notifications(self, guild_id: int):
         scoresaber = self.uow.bot.get_cog("ScoreSaberAPI")
