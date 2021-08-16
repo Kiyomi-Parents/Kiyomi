@@ -21,7 +21,9 @@ class Tasks:
     @tasks.loop(minutes=1)
     @Utils.time_task
     @Utils.discord_ready
+    @Utils.update_tasks_list
     async def update_member_roles(self):
+        """updating member roles"""
         async with self.update_member_roles_lock:
             general = self.uow.bot.get_cog("GeneralAPI")
             settings = self.uow.bot.get_cog("SettingsAPI")

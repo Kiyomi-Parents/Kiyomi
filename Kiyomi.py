@@ -15,6 +15,8 @@ from src.log import Logger
 class Kiyomi(commands.Bot):
     running_tests = False
     events = AsyncIOEventEmitter()
+    running_tasks = []
+    activity_list = ["sleeping", "sitting in a tiny box", "chilling @ Smugle Stick"]
 
     def __init__(self, *args, db: Database, **kwargs):
         super().__init__(*args, **kwargs)

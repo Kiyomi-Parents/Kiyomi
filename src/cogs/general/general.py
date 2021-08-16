@@ -6,6 +6,7 @@ from .actions import Actions
 from .storage.uow import UnitOfWork
 from src.cogs.scoresaber.storage.model.player import Player
 from src.base.base_cog import BaseCog
+from ...utils import Utils
 
 
 class General(BaseCog):
@@ -33,6 +34,13 @@ class General(BaseCog):
     async def hello(self, ctx):
         """Greet the bot."""
         await ctx.send("Hello there!")
+
+    @commands.command(name="su")
+    @Security.is_owner()
+    @Utils.update_tasks_list
+    async def status_update(self, ctx):
+        """owo"""
+        await ctx.send("status should've updated")
 
     @commands.command(name="admintest")
     @Security.owner_or_permissions(administrator=True)
