@@ -37,7 +37,9 @@ class Actions:
         # Get player scores
         await self.tasks.update_player_scores(player)
 
-        self.uow.bot.events.emit("on_new_player", player)
+        guild_player = self.uow.guild_player_repo.get_by_guild_id_and_member_id_and_player_id(guild_id, member_id, player_id)
+
+        self.uow.bot.events.emit("on_new_player", guild_player)
 
         # Add role to player
         # await self.update_player_roles(db_community, player) # TODO: Add to event bus

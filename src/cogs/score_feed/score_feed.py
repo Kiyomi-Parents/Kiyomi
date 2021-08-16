@@ -7,6 +7,7 @@ from .storage.uow import UnitOfWork
 from src.cogs.scoresaber.storage.model.player import Player
 from src.cogs.security import Security
 from src.base.base_cog import BaseCog
+from ..scoresaber.storage.model.guild_player import GuildPlayer
 
 
 class ScoreFeed(BaseCog):
@@ -20,8 +21,8 @@ class ScoreFeed(BaseCog):
     def events(self):
 
         @self.uow.bot.events.on("on_new_player")
-        async def mark_scores_sent(player: Player):
-            self.actions.mark_all_player_scores_sent(player)
+        async def mark_scores_sent(guild_player: GuildPlayer):
+            self.actions.mark_player_scores_sent(guild_player.guild, guild_player.player)
 
     @commands.group(invoke_without_command=True)
     @Security.owner_or_permissions(administrator=True)
