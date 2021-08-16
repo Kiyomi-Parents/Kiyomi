@@ -42,8 +42,13 @@ class General(BaseCog):
     @commands.command(name="emoji", hidden=True)
     @Security.is_owner()
     async def emoji(self, ctx):
+        emoji_list = []
         for emoji in self.uow.bot.emojis:
-            await ctx.send(self.uow.bot.get_emoji(emoji.id))
+            emoji_list.append(str(self.uow.bot.get_emoji(emoji.id)))
+            if len(emoji_list) >= 20:
+                await ctx.send("".join(emoji_list))
+                emoji_list.clear()
+        await ctx.send("".join(emoji_list))
 
     @commands.command(name="su", hidden=True)
     @Security.is_owner()
