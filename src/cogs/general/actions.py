@@ -13,7 +13,7 @@ class Actions:
     def __init__(self, uow: UnitOfWork):
         self.uow = uow
 
-    def _get_discord_guild(self, guild_id: int) -> discord.Guild:
+    def get_discord_guild(self, guild_id: int) -> discord.Guild:
         discord_guild = self.uow.bot.get_guild(guild_id)
 
         if discord_guild is None:
@@ -21,8 +21,8 @@ class Actions:
 
         return discord_guild
 
-    async def _get_discord_member(self, guild_id: int, member_id: int) -> discord.Member:
-        discord_guild = self._get_discord_guild(guild_id)
+    async def get_discord_member(self, guild_id: int, member_id: int) -> discord.Member:
+        discord_guild = self.get_discord_guild(guild_id)
         discord_member = await discord_guild.fetch_member(member_id)
 
         if discord_member is None:
@@ -30,8 +30,8 @@ class Actions:
 
         return discord_member
 
-    def _get_discord_role(self, guild_id: int, role_id: int) -> discord.Role:
-        discord_guild = self._get_discord_guild(guild_id)
+    def get_discord_role(self, guild_id: int, role_id: int) -> discord.Role:
+        discord_guild = self.get_discord_guild(guild_id)
         discord_role = discord_guild.get_role(role_id)
 
         if discord_role is None:
@@ -62,7 +62,7 @@ class Actions:
 
     @Security.can_edit_roles()
     async def create_role(self, guild_id: int, name: str, colour: Colour, hoist: bool, reason: str) -> Role:
-        discord_guild = self._get_discord_guild(guild_id)
+        discord_guild = self.get_discord_guild(guild_id)
 
         try:
             role = await discord_guild.create_role(name=name, colour=colour, hoist=hoist, reason=reason)
@@ -74,7 +74,7 @@ class Actions:
     @Security.can_edit_roles()
     async def delete_role(self, guild_id: int, role_id: int, reason: str) -> None:
         try:
-            discord_role = self._get_discord_role(guild_id, role_id)
+            discord_role = self.get_discord_role(guild_id, role_id)
         except RoleNotFoundException as error:
             role = self.uow.role_repo.get_by_id(role_id)
 
@@ -96,8 +96,8 @@ class Actions:
 
     @Security.can_edit_roles()
     async def add_role_to_member(self, guild_id: int, member_id: int, role_id: int, reason: str) -> None:
-        discord_member = await self._get_discord_member(guild_id, member_id)
-        discord_role = self._get_discord_role(guild_id, role_id)
+        discord_member = await self.get_discord_member(guild_id, member_id)
+        discord_role = self.get_discord_role(guild_id, role_id)
 
         try:
             await discord_member.add_roles(discord_role, reason=reason)
@@ -108,8 +108,8 @@ class Actions:
 
     @Security.can_edit_roles()
     async def remove_role_from_member(self, guild_id: int, member_id: int, role_id: int, reason: str) -> None:
-        discord_member = await self._get_discord_member(guild_id, member_id)
-        discord_role = self._get_discord_role(guild_id, role_id)
+        discord_member = await self.get_discord_member(guild_id, member_id)
+        discord_role = self.get_discord_role(guild_id, role_id)
 
         try:
             await discord_member.remove_roles(discord_role, reason=reason)

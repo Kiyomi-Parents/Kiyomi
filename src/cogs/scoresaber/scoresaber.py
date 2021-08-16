@@ -1,3 +1,5 @@
+from typing import Optional
+
 from discord.ext import commands
 
 from .storage.uow import UnitOfWork
@@ -104,13 +106,20 @@ class ScoreSaber(BaseCog):
                 await ctx.send("Score was None")
 
     @commands.command(name="manualaddplayer")
-    @Security.is_owner()
-    async def manual_add_player(self, ctx, discord_member_id: int, scoresaber_player_id: str):
-        self.uow.bot.events.emit("register_member", ctx.author)
+    @Security.owner_or_permissions()
+    async def manual_add_player(self, ctx, guild_id: Optional[int], member_id: Optional[int], player_id: str):
+        if guild_id is not None and member_id is not None:
+            general = self.uow.bot.get_cog("GeneralAPI")
+            discord_member = await general.get_discord_member(guild_id, member_id)
+
+            self.uow.bot.events.emit("register_member", discord_member)
+
+        if guild_id is None:
+            guild_id = ctx.guild.id
 
         try:
-            player = self.actions.add_player(ctx.guild.id, discord_member_id, scoresaber_player_id)
-            await ctx.send(f"Successfully linked **{player.player_name}** ScoreSaber profile to {discord_member_id}!")
+            player = await self.actions.add_player(guild_id, member_id, player_id)
+            await ctx.send(f"Successfully linked **{player.player_name}** ScoreSaber profile to {member_id}!")
         except (PlayerExistsException, PlayerNotFoundException) as error:
             await ctx.send(error)
 

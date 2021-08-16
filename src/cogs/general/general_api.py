@@ -1,5 +1,6 @@
 from typing import Optional, List
 
+import discord
 from discord import Colour
 from discord.ext import commands
 
@@ -22,6 +23,9 @@ class GeneralAPI(commands.Cog):
 
     def get_member(self, member_id: int) -> Optional[Member]:
         return self.uow.member_repo.get_by_id(member_id)
+
+    async def get_discord_member(self, guild_id: int, member_id: int) -> Optional[discord.Member]:
+        return await self.actions.get_discord_member(guild_id, member_id)
 
     def get_all_guild_members(self) -> Optional[List[Member]]:
         return self.uow.guild_member_repo.get_all()
