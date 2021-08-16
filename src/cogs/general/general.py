@@ -30,6 +30,10 @@ class General(BaseCog):
         for discord_guild in self.uow.bot.guilds:
             self.actions.register_guild(discord_guild)
 
+    @commands.Cog.listener()
+    async def on_guild_join(self, guild: discord.Guild):
+        self.actions.register_guild(guild)
+
     @commands.command()
     async def hello(self, ctx):
         """Greet the bot."""
