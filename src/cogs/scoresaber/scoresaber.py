@@ -60,7 +60,7 @@ class ScoreSaber(BaseCog, name="Score Saber"):
         pp_size = round(guild_player.player.pp / 100)
         await ctx.send(f"**{ctx.author.name}**'s PP is this big:\n8{'=' * pp_size}D")
 
-    @commands.command(aliases=["recentmap", "recentscore"], invoke_without_command=True)
+    @commands.command(name="recent", invoke_without_command=True)
     async def recent_song(self, ctx, index: int = 1, discord_user_id: int = None):
         """Displays your most recent score"""
         if discord_user_id is None:
@@ -90,7 +90,7 @@ class ScoreSaber(BaseCog, name="Score Saber"):
             await ctx.send("Song argument too large")
 
     # DEBUGGING COMMANDS
-    @commands.command(name="getscoresbyid")
+    @commands.command(name="getscoresbyid", hidden=True)
     @Security.is_owner()
     async def get_scores_by_id(self, ctx, score_id: int):
         db_scores = self.uow.score_repo.get_all_by_score_id(score_id)
@@ -105,7 +105,7 @@ class ScoreSaber(BaseCog, name="Score Saber"):
             else:
                 await ctx.send("Score was None")
 
-    @commands.command(name="manualaddplayer")
+    @commands.command(name="manualaddplayer", hidden=True)
     @Security.owner_or_permissions()
     async def manual_add_player(self, ctx, guild_id: Optional[int], member_id: Optional[int], player_id: str):
         if guild_id is not None and member_id is not None:
