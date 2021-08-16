@@ -49,19 +49,17 @@ class Tasks:
                 await self.update_player_scores(player)
 
     async def update_player_scores(self, player: Player):
-        try:
-            new_scores = await self.get_all_recent_scores(player)
-            Logger.log(player, f"Got {len(new_scores)} new recent scores from ScoreSaber")
+        new_scores = await self.get_all_recent_scores(player)
+        Logger.log(player, f"Got {len(new_scores)} new recent scores from ScoreSaber")
 
-            # Get db scores from recent scores
-            scores = self.uow.score_repo.get_scores(new_scores)
+        # Add new scores to database
+        self.uow.player_repo.add_scores(player, new_scores)
 
-            # Emit event for new scores
-            for score in scores:
-                self.uow.bot.events.emit("on_new_score", score)
+        # Get db scores from recent scores
+        scores = self.uow.score_repo.get_scores(new_scores)
 
-        except pyscoresaber.NotFoundException:
-            Logger.log(player, "Could not find scores on ScoreSaber")
+        # Emit event for new scores
+        self.uow.bot.events.emit("on_new_scores", scores)
 
     async def get_all_recent_scores(self, player: Player) -> List[Score]:
         new_scores = []
@@ -80,7 +78,6 @@ class Tasks:
 
                     if self.uow.score_repo.is_score_new(new_score):
                         new_scores.append(new_score)
-                        self.uow.player_repo.add_score(player, new_score)
 
             except pyscoresaber.NotFoundException:
                 Logger.log(player, "Could not find scores on ScoreSaber")

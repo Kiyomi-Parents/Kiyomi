@@ -1,3 +1,5 @@
+from typing import List
+
 from discord.ext import commands
 
 from .actions import Actions
@@ -6,6 +8,7 @@ from .message import Message
 from .storage.uow import UnitOfWork
 from src.log import Logger
 from src.base.base_cog import BaseCog
+from ..scoresaber.storage.model.score import Score
 
 
 class BeatSaver(BaseCog):
@@ -18,12 +21,17 @@ class BeatSaver(BaseCog):
 
     def events(self):
 
-        @self.uow.bot.events.on("on_new_score")
-        def attach_song_to_score(score):
-            try:
-                self.actions.get_beatmap_by_hash(score.song_hash)
-            except SongNotFound as error:
-                Logger.log(score, error)
+        @self.uow.bot.events.on("on_new_scores")
+        async def attach_song_to_score(scores: List[Score]):
+            for score in scores:
+                try:
+                    await self.actions.get_beatmap_version_by_hash(score.song_hash)
+                except SongNotFound as error:
+                    Logger.log(score, error)
+
+    @commands.Cog.listener()
+    async def on_ready(self):
+        await self.uow.beatsaver.start()
 
     @commands.command(aliases=["bsr", "song"])
     async def map(self, ctx, key: str):
@@ -32,7 +40,7 @@ class BeatSaver(BaseCog):
         settings = self.uow.bot.get_cog("SettingsAPI")
 
         try:
-            db_beatmap = self.actions.get_beatmap_by_key(key)
+            db_beatmap = await self.actions.get_beatmap_by_key(key)
             song_embed = Message.get_song_embed(db_beatmap)
 
             await ctx.send(embed=song_embed)

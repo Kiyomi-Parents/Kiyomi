@@ -16,6 +16,10 @@ class ScoreSaber(BaseCog):
         self.tasks = tasks
         self.actions = actions
 
+    @commands.Cog.listener()
+    async def on_ready(self):
+        await self.uow.scoresaber.start()
+
     @commands.group(invoke_without_command=True)
     async def player(self, ctx):
         """Link ScoreSaber profile to Discord member."""
@@ -28,7 +32,7 @@ class ScoreSaber(BaseCog):
         self.uow.bot.events.emit("register_member", ctx.author)
 
         try:
-            player = self.actions.add_player(ctx.guild.id, ctx.author.id, player_id)
+            player = await self.actions.add_player(ctx.guild.id, ctx.author.id, player_id)
             await ctx.send(f"Successfully linked **{player.player_name}** ScoreSaber profile!")
         except (PlayerExistsException, PlayerNotFoundException) as error:
             await ctx.send(error)

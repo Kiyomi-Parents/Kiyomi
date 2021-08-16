@@ -16,7 +16,7 @@ class Beatmap(Base):
 
     # BeatSaver info
     id = Column(String(128), primary_key=True, autoincrement=False)
-    name = Column(String(128))
+    name = Column(String(256))
     description = Column(String(4096))
     uploaded = Column(DateTime)
     automapper = Column(Boolean)

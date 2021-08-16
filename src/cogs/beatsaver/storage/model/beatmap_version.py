@@ -17,9 +17,9 @@ class BeatmapVersion(Base):
     state = Column(String(128))
     created_at = Column(DateTime)
     sage_score = Column(Integer)
-    download_url = Column(String(128))
-    cover_url = Column(String(128))
-    preview_url = Column(String(128))
+    download_url = Column(String(256))
+    cover_url = Column(String(256))
+    preview_url = Column(String(256))
 
     difficulties = relationship("BeatmapVersionDifficulty", cascade="all, delete-orphan")
 

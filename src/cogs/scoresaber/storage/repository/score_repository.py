@@ -40,16 +40,10 @@ class ScoreRepository(Repository[Score]):
             .filter(Score.score_id == score_id) \
             .all()
 
-    def get_scores(self, scores: List[Score] = None):
-        if scores is None:
-            return self._db.session.query(Score).all()
-
-        db_scores = []
-
-        for score in scores:
-            db_scores.append(self.get_by_score_id(score.score_id))
-
-        return db_scores
+    def get_scores(self, scores: List[Score]):
+        return self._db.session.query(Score) \
+            .filter(Score.id.in_([score.id for score in scores])) \
+            .all()
 
     # def get_leaderboard_id_by_hash(self, song_hash: str) -> Optional[int]:
     #     db_score = self._db.session.query(Score).filter(Score.song_hash == song_hash).first()

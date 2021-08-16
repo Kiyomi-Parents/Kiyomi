@@ -20,7 +20,7 @@ class General(BaseCog):
     def events(self):
 
         @self.uow.bot.events.on("register_member")
-        def register_member(discord_member: discord.Member):
+        async def register_member(discord_member: discord.Member):
             self.actions.register_member(discord_member)
             self.actions.register_guild_member(discord_member)
 

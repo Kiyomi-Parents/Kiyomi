@@ -68,7 +68,8 @@ class BeatmapVersionDifficulty(Base):
             pybeatsaver.Characteristic.DEGREE_90: pyscoresaber.Characteristic.DEGREE_90,
             pybeatsaver.Characteristic.DEGREE_360: pyscoresaber.Characteristic.DEGREE_360,
             pybeatsaver.Characteristic.LIGHTSHOW: pyscoresaber.Characteristic.LIGHTSHOW,
-            pybeatsaver.Characteristic.LAWLESS: pyscoresaber.Characteristic.LAWLESS
+            pybeatsaver.Characteristic.LAWLESS: pyscoresaber.Characteristic.LAWLESS,
+            pybeatsaver.Characteristic.UNKNOWN: pyscoresaber.Characteristic.UNKNOWN
         }
 
         return characteristics[self.characteristic]
@@ -80,7 +81,8 @@ class BeatmapVersionDifficulty(Base):
             pybeatsaver.Difficulty.NORMAL: pyscoresaber.Difficulty.NORMAL,
             pybeatsaver.Difficulty.HARD: pyscoresaber.Difficulty.HARD,
             pybeatsaver.Difficulty.EXPERT: pyscoresaber.Difficulty.EXPERT,
-            pybeatsaver.Difficulty.EXPERT_PLUS: pyscoresaber.Difficulty.EXPERT_PLUS
+            pybeatsaver.Difficulty.EXPERT_PLUS: pyscoresaber.Difficulty.EXPERT_PLUS,
+            pybeatsaver.Difficulty.UNKNOWN: pyscoresaber.Difficulty.UNKNOWN
         }
 
         return difficulties[self.difficulty]

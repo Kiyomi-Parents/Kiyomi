@@ -12,8 +12,9 @@ class Actions:
         self.uow = uow
         self.tasks = tasks
 
-    def add_player(self, guild_id: int, member_id: int, player_id: str) -> Player:
+    async def add_player(self, guild_id: int, member_id: int, player_id: str) -> Player:
         guild_players = self.uow.guild_player_repo.get_all_by_member_id(member_id)
+
         if guild_players is not None:
             for guild_player in guild_players:
                 if guild_player.player_id != player_id:
@@ -34,7 +35,7 @@ class Actions:
         self.uow.guild_player_repo.add(GuildPlayer(guild_id, member_id, player_id))
 
         # Get player scores
-        self.tasks.update_player_scores(player)
+        await self.tasks.update_player_scores(player)
 
         self.uow.bot.events.emit("on_new_player", player)
 

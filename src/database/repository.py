@@ -25,6 +25,9 @@ class Repository(ABC, Generic[T]):
 
         return self.get_by_id(entry.id)
 
+    def add_all(self, entries: List[T]):
+        self._db.add_entries(entries)
+
     def remove(self, entry: T):
         self._db.remove_entry(entry)
 

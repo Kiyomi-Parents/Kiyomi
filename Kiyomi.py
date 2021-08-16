@@ -4,7 +4,7 @@ from discord.ext import commands
 from discord.ext.commands import MissingRequiredArgument
 from discord.ext.commands.errors import BadArgument
 from dotenv import load_dotenv
-from pymitter import EventEmitter
+from pyee import AsyncIOEventEmitter
 from sqlalchemy import create_engine
 
 from src.cogs.errors import NoPrivateMessagesException
@@ -14,7 +14,7 @@ from src.log import Logger
 
 class Kiyomi(commands.Bot):
     running_tests = False
-    events = EventEmitter()
+    events = AsyncIOEventEmitter()
 
     def __init__(self, *args, db: Database, **kwargs):
         super().__init__(*args, **kwargs)
@@ -49,9 +49,15 @@ class Kiyomi(commands.Bot):
 
 
 if __name__ == "__main__":
+    load_dotenv()
+    TOKEN = os.getenv("DISCORD_TOKEN")
+    DATABASE_IP = os.getenv("DATABASE_IP")
+    DATABASE_USER = os.getenv("DATABASE_USER")
+    DATABASE_PW = os.getenv("DATABASE_PW")
+    DATABASE_NAME = os.getenv("DATABASE_NAME")
+
     # Init database
-    # database = Database(create_engine("mysql://kiyomi:6VnBh6bVJ9sM7Z59@10.0.0.17/kiyomi?charset=utf8mb4", echo=False))
-    database = Database(create_engine("mariadb+pymysql://kiyomi:6VnBh6bVJ9sM7Z59@10.0.0.17/kiyomi?charset=utf8mb4", echo=False, pool_pre_ping=True, pool_recycle=3600))
+    database = Database(create_engine(f"mariadb+pymysql://{DATABASE_USER}:{DATABASE_PW}@{DATABASE_IP}/{DATABASE_NAME}?charset=utf8mb4", echo=False, pool_pre_ping=True, pool_recycle=3600))
 
     bot = Kiyomi(command_prefix="!", db=database)
 
@@ -69,6 +75,4 @@ if __name__ == "__main__":
     database.create_tables()
     # database.create_schema_image()
 
-    load_dotenv()
-    TOKEN = os.getenv("DISCORD_TOKEN")
     bot.run(TOKEN)
