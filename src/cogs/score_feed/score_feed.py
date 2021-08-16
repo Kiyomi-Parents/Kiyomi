@@ -1,12 +1,10 @@
-import discord.member
 from discord.ext import commands
 
+from src.base.base_cog import BaseCog
+from src.cogs.security import Security
 from .actions import Actions
 from .errors import GuildRecentChannelExistsException, GuildRecentChannelNotFoundException
 from .storage.uow import UnitOfWork
-from src.cogs.scoresaber.storage.model.player import Player
-from src.cogs.security import Security
-from src.base.base_cog import BaseCog
 from ..scoresaber.storage.model.guild_player import GuildPlayer
 
 
@@ -22,7 +20,7 @@ class ScoreFeed(BaseCog, name="Score Feed"):
 
         @self.uow.bot.events.on("on_new_player")
         async def mark_scores_sent(guild_player: GuildPlayer):
-            self.actions.mark_player_scores_sent(guild_player.guild, guild_player.player)
+            self.actions.mark_player_scores_sent(guild_player.player, guild_player.guild)
 
     @commands.group(invoke_without_command=True)
     @Security.owner_or_permissions(administrator=True)
