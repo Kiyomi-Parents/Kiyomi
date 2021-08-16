@@ -2,7 +2,7 @@ import time
 from typing import List, Optional
 
 from pybeatsaver import MapDetail
-from sqlalchemy import Column, String, Integer, DateTime, Boolean, Float
+from sqlalchemy import Column, String, Integer, DateTime, Boolean, Float, Text
 from sqlalchemy.orm import relationship
 
 from src.database import Base
@@ -17,7 +17,7 @@ class Beatmap(Base):
     # BeatSaver info
     id = Column(String(128), primary_key=True, autoincrement=False)
     name = Column(String(256))
-    description = Column(String(4096))
+    description = Column(Text)
     uploaded = Column(DateTime)
     automapper = Column(Boolean)
     ranked = Column(Boolean)
