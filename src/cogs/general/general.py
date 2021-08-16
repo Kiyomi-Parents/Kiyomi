@@ -39,6 +39,12 @@ class General(BaseCog):
         """Greet the bot."""
         await ctx.send("Hello there!")
 
+    @commands.command(name="emoji", hidden=True)
+    @Security.is_owner()
+    async def emoji(self, ctx):
+        for emoji in self.uow.bot.emojis:
+            await ctx.send(self.uow.bot.get_emoji(emoji.id))
+
     @commands.command(name="su", hidden=True)
     @Security.is_owner()
     @Utils.update_tasks_list
