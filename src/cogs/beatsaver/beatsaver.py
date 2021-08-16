@@ -46,7 +46,7 @@ class BeatSaver(BaseCog, name="Beat Saver"):
             await ctx.send(embed=song_embed)
 
             if settings.get(ctx.guild.id, "map_leaderboard"):
-                leaderboard_embed = leaderboard.get_player_score_leaderboard_embed(ctx.guild.id, key)
+                leaderboard_embed = await leaderboard.get_player_score_leaderboard_embed(ctx.guild.id, key)
 
                 await ctx.send(embed=leaderboard_embed)
         except SongNotFound as error:

@@ -23,7 +23,7 @@ class Actions:
         if beatmap is None:
             return None
 
-        score = await scoresaber.get_score_by_song_hash(beatmap.latest_version.hash)
+        score = scoresaber.get_score_by_song_hash(beatmap.latest_version.hash)
 
         if score is None:
             return None
