@@ -39,14 +39,14 @@ class General(BaseCog):
         """Greet the bot."""
         await ctx.send("Hello there!")
 
-    @commands.command(name="su")
+    @commands.command(name="su", hidden=True)
     @Security.is_owner()
     @Utils.update_tasks_list
     async def status_update(self, ctx):
         """owo"""
         await ctx.send("status should've updated")
 
-    @commands.command(name="admintest")
+    @commands.command(name="admintest", hidden=True)
     @Security.owner_or_permissions(administrator=True)
     async def admin_test(self, ctx):
         """Command to test if security is working"""
