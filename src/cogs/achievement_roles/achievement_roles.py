@@ -11,16 +11,24 @@ class AchievementRoles(BaseCog):
         self.uow = uow
         self.tasks = tasks
 
-    @commands.command()
+    @commands.group(invoke_without_command=True, name="pproles")
+    @Security.owner_or_permissions(administrator=True)
+    async def pp_roles(self, ctx):
+        """PP role commands"""
+        await ctx.send_help(ctx.command)
+
+    @pp_roles.command(name="enable")
     @Security.owner_or_permissions()
-    async def enable_pp_roles(self, ctx):
+    async def pp_roles_enable(self, ctx):
+        """Enable pp roles"""
         settings = self.uow.bot.get_cog("SettingsAPI")
 
         settings.set(ctx.guild.id, "achievement_roles_pp", True)
 
-    @commands.command()
+    @pp_roles.command(name="disable")
     @Security.owner_or_permissions()
-    async def disable_pp_roles(self, ctx):
+    async def pp_roles_disable(self, ctx):
+        """Disable pp roles"""
         settings = self.uow.bot.get_cog("SettingsAPI")
 
         settings.set(ctx.guild.id, "achievement_roles_pp", False)
