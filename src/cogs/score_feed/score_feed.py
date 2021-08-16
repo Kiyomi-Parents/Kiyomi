@@ -10,7 +10,7 @@ from src.base.base_cog import BaseCog
 from ..scoresaber.storage.model.guild_player import GuildPlayer
 
 
-class ScoreFeed(BaseCog):
+class ScoreFeed(BaseCog, name="Score Feed"):
     def __init__(self, uow: UnitOfWork, actions: Actions):
         self.uow = uow
         self.actions = actions

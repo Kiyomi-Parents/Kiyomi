@@ -12,7 +12,7 @@ from src.cogs.security import Security
 from src.base.base_cog import BaseCog
 
 
-class ScoreSaber(BaseCog):
+class ScoreSaber(BaseCog, name="Score Saber"):
     def __init__(self, uow: UnitOfWork, tasks: Tasks, actions: Actions):
         self.uow = uow
         self.tasks = tasks

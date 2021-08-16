@@ -11,7 +11,7 @@ from src.base.base_cog import BaseCog
 from ..scoresaber.storage.model.score import Score
 
 
-class BeatSaver(BaseCog):
+class BeatSaver(BaseCog, name="Beat Saver"):
     def __init__(self, uow: UnitOfWork, actions: Actions):
         self.uow = uow
         self.actions = actions

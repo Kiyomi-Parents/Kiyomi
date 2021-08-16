@@ -6,7 +6,7 @@ from src.base.base_cog import BaseCog
 from src.cogs.security import Security
 
 
-class AchievementRoles(BaseCog):
+class AchievementRoles(BaseCog, name="Achievement Roles"):
     def __init__(self, uow: UnitOfWork, tasks: Tasks):
         self.uow = uow
         self.tasks = tasks
