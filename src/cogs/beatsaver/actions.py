@@ -1,3 +1,4 @@
+import asyncio
 import pybeatsaver.errors
 
 from .storage.uow import UnitOfWork
@@ -14,6 +15,9 @@ class Actions:
 
         if beatmap is None:
             try:
+                # Beat Saver api likes when you wait 0.2 seconds
+                await asyncio.sleep(0.2)
+
                 map_detail = await self.uow.beatsaver.get_map_by_key(beatmap_key)
                 beatmap = self.uow.beatmap_repo.add(Beatmap(map_detail))
             except pybeatsaver.NotFoundException as error:
@@ -26,6 +30,9 @@ class Actions:
 
         if beatmap is None:
             try:
+                # Beat Saver api likes when you wait 0.2 seconds
+                await asyncio.sleep(0.2)
+
                 map_detail = await self.uow.beatsaver.get_map_by_hash(beatmap_hash)
                 beatmap = Beatmap(map_detail)
 
