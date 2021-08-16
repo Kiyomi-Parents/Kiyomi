@@ -19,8 +19,8 @@ class Tasks:
         self.update_players_scores_lock = asyncio.Lock()
 
     @tasks.loop(minutes=30)
-    @Utils.sub_tasks_decorator
-    # @Utils.tasks_decorator(minutes=30)
+    @Utils.time_task
+    @Utils.discord_ready
     async def update_players(self):
         async with self.update_players_lock:
             players = self.uow.player_repo.get_all()
@@ -38,8 +38,8 @@ class Tasks:
             Logger.log(player, "Could not find at ScoreSaber")
 
     @tasks.loop(minutes=2)
-    @Utils.sub_tasks_decorator
-    # @Utils.tasks_decorator(minutes=2)
+    @Utils.time_task
+    @Utils.discord_ready
     @Utils.update_tasks_list
     async def update_players_scores(self):
         """updating player scores"""
