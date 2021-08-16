@@ -31,10 +31,16 @@ class General(BaseCog):
             self.actions.register_guild(discord_guild)
 
     @commands.command()
-    @Utils.update_tasks_list
     async def hello(self, ctx):
         """Greet the bot."""
         await ctx.send("Hello there!")
+
+    @commands.command(name="su")
+    @Security.is_owner()
+    @Utils.update_tasks_list
+    async def status_update(self, ctx):
+        """owo"""
+        await ctx.send("status should've updated")
 
     @commands.command(name="admintest")
     @Security.owner_or_permissions(administrator=True)
