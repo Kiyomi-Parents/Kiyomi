@@ -2,6 +2,7 @@ import random
 
 import discord.member
 from discord.ext import commands
+from discord.ext.commands import Context
 
 from src.cogs.security import Security
 from .actions import Actions
