@@ -40,7 +40,7 @@ class BeatmapMessageBuilder:
 
     def diffs(self):
         beatmap = self.beatmap
-        self.embed.add_field(name="difficulties", value=" ".join(f"**{diff}**" for diff in beatmap.difficulties_short))
+        self.embed.add_field(name="Difficulties", value=" ".join(f"**{diff.difficulty_text}**" for diff in beatmap.difficulties))
         return self
 
     def links(self):

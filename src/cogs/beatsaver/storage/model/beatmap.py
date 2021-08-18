@@ -118,16 +118,7 @@ class Beatmap(Base):
         return time.strftime("%H:%M:%S", time.gmtime(self.metadata_duration))
 
     @property
-    def difficulties_short(self) -> List[str]:
-        diffs = []
-
-        for diff in self.latest_version.difficulties:
-            diffs.append(diff.difficulty)
-
-        return diffs
-
-    @property
-    def difficulties_long(self) -> BeatmapVersionDifficulty:
+    def difficulties(self) -> BeatmapVersionDifficulty:
         return self.latest_version.difficulties
 
     def __str__(self):
