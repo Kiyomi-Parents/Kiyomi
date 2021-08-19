@@ -24,7 +24,7 @@ class Tasks:
     @Utils.discord_ready
     @Utils.update_tasks_list
     async def send_notifications(self) -> None:
-        """sending score notifications"""
+        """Sending notifications"""
         async with self.send_notifications_lock:
             scoresaber = self.uow.bot.get_cog('ScoreSaberAPI')
             players = scoresaber.get_players()

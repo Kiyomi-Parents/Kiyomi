@@ -23,7 +23,7 @@ class Tasks:
     @Utils.discord_ready
     @Utils.update_tasks_list
     async def update_member_roles(self):
-        """updating member roles"""
+        """Updating roles"""
         async with self.update_member_roles_lock:
             general = self.uow.bot.get_cog("GeneralAPI")
             settings = self.uow.bot.get_cog("SettingsAPI")
