@@ -104,10 +104,12 @@ class ScoreRepository(Repository[Score]):
 
     def is_score_new(self, db_score: Score) -> bool:
         """Checks if the score already exists in the database by comparing scoreId and timeSet"""
-        db_scores = self._db.session.query(Score).filter(
-            Score.score_id == db_score.score_id and Score.time_set == db_score.time_set).all()
+        scores = self._db.session.query(Score) \
+            .filter(Score.score_id == db_score.score_id) \
+            .filter(Score.time_set == db_score.time_set) \
+            .all()
 
-        return 1 > len(db_scores)
+        return 1 > len(scores)
 
     def mark_score_sent(self, db_score, db_guild):
         db_score.msg_guilds.append(db_guild)
