@@ -1,8 +1,8 @@
-from discord import Embed, Colour
+from discord import Embed
 
 from .storage.model.player import Player
 from .storage.model.score import Score
-from src.base.message_builder.score_message_builder import ScoreMessageBuilder
+from src.kiyomi.message_builder.score_message_builder import ScoreMessageBuilder
 
 
 class Message:

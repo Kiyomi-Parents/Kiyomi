@@ -1,6 +1,7 @@
 from discord.ext import commands
+from discord.ext.commands import Context
 
-from src.base.base_cog import BaseCog
+from src.kiyomi.base_cog import BaseCog
 from src.cogs.security import Security
 from .actions import Actions
 from .errors import GuildRecentChannelExistsException, GuildRecentChannelNotFoundException
@@ -51,3 +52,15 @@ class ScoreFeed(BaseCog, name="Score Feed"):
     async def send_notifications(self, ctx):
         """Send recent score notifications."""
         await self.actions.send_notifications(ctx.guild.id)
+
+    @commands.command()
+    @Security.owner_or_permissions(administrator=True)
+    async def mark_sent(self, ctx: Context, player_id: str):
+        scoresaber = self.uow.bot.get_cog("ScoreSaberAPI")
+        player = scoresaber.get_player(player_id)
+
+        if player is None:
+            await ctx.send(f"Could not find player with id {player_id}")
+            return
+
+        self.actions.mark_all_player_scores_sent(player)

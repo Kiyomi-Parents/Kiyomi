@@ -5,7 +5,7 @@ from discord.ext import commands
 from .actions import Actions
 from .storage.uow import UnitOfWork
 from src.cogs.security import Security
-from src.base.base_cog import BaseCog
+from src.kiyomi.base_cog import BaseCog
 
 
 class Settings(BaseCog):

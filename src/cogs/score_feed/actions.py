@@ -54,9 +54,9 @@ class Actions:
             self.mark_player_scores_sent(player, guild)
 
     def mark_player_scores_sent(self, player: Player, guild: Guild):
-        Logger.log(player, f"Marking all scores as sent in {guild}")
-
         scores = self.tasks.get_unsent_scores(player, guild)
+
+        Logger.log(player, f"Marking {len(scores)} scores as sent in {guild}")
 
         sent_scores = []
         for score in scores:

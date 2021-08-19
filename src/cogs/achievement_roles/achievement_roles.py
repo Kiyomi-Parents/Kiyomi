@@ -2,7 +2,7 @@ from discord.ext import commands
 
 from .tasks import Tasks
 from .storage.uow import UnitOfWork
-from src.base.base_cog import BaseCog
+from src.kiyomi.base_cog import BaseCog
 from src.cogs.security import Security
 
 

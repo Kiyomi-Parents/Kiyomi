@@ -7,8 +7,8 @@ from .errors import SongNotFound
 from .message import Message
 from .storage.uow import UnitOfWork
 from src.log import Logger
-from src.base.base_cog import BaseCog
-from ..scoresaber.storage.model.score import Score
+from src.kiyomi.base_cog import BaseCog
+from src.cogs.scoresaber.storage.model.score import Score
 
 
 class BeatSaver(BaseCog, name="Beat Saver"):

@@ -51,7 +51,7 @@ class ScoreMessageBuilder:
 
     def mapper(self):
         score = self.score
-        if score.beatmap_version.beatmap is not None:
+        if score.beatmap_version is not None:
             self.embed.description = F"Mapped by {score.beatmap_version.beatmap.metadata_level_author_name}"
         return self
 
@@ -122,7 +122,7 @@ class ScoreMessageBuilder:
 
     def beatmap(self):
         score = self.score
-        if score.beatmap_version.beatmap is not None:
+        if score.beatmap_version is not None:
             self.embed.add_field(name="\u200b", value=f"[Beat Saver]({score.beatmap_version.beatmap.beatsaver_url})")
             self.embed.add_field(name="\u200b", value=f"[Preview Map]({score.beatmap_version.beatmap.preview_url})")
         return self

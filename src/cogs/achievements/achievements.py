@@ -3,7 +3,7 @@ from discord.ext import commands
 from .actions import Actions
 from .message import Message
 from .storage.uow import UnitOfWork
-from src.base.base_cog import BaseCog
+from src.kiyomi.base_cog import BaseCog
 
 
 class Achievements(BaseCog):

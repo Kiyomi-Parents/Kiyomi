@@ -1,6 +1,6 @@
 from discord import Embed
 
-from src.base.message_builder.beatmap_message_builder import BeatmapMessageBuilder
+from src.kiyomi.message_builder.beatmap_message_builder import BeatmapMessageBuilder
 from src.cogs.beatsaver.storage.model import Beatmap
 
 

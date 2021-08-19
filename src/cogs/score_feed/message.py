@@ -1,7 +1,6 @@
-from discord import Embed, Colour
+from discord import Embed
 
-from src.base.message_builder.score_message_builder import ScoreMessageBuilder
-from src.cogs.beatsaver.storage.model import BeatmapVersion
+from src.kiyomi.message_builder.score_message_builder import ScoreMessageBuilder
 from src.cogs.scoresaber.storage.model.player import Player
 from src.cogs.scoresaber.storage.model.score import Score
 

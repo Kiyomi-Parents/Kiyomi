@@ -11,7 +11,7 @@ from .errors import PlayerExistsException, PlayerNotFoundException, GuildNotFoun
 from .message import Message
 from .scoresaber_utils import ScoreSaberUtils
 from src.cogs.security import Security
-from src.base.base_cog import BaseCog
+from src.kiyomi.base_cog import BaseCog
 
 
 class ScoreSaber(BaseCog, name="Score Saber"):

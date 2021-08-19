@@ -35,6 +35,7 @@ class Database:
     @staticmethod
     def create_tables():
         Base.metadata.create_all()
+        Logger.log("Database", f"Created {len(Base.metadata.tables)} tables")
 
     @staticmethod
     def create_schema_image():

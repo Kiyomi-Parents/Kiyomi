@@ -7,9 +7,8 @@ from discord.ext.commands import Context
 from src.cogs.security import Security
 from .actions import Actions
 from .storage.uow import UnitOfWork
-from src.cogs.scoresaber.storage.model.player import Player
-from src.base.base_cog import BaseCog
-from ...utils import Utils
+from src.kiyomi.base_cog import BaseCog
+from src.utils import Utils
 
 
 class General(BaseCog):
