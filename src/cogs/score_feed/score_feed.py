@@ -64,6 +64,7 @@ class ScoreFeed(BaseCog, name="Score Feed"):
             for player in players:
                 self.actions.mark_all_player_scores_sent(player)
 
+            await ctx.send(f"Marked scores as sent for {len(players)} players")
             return
 
         player = scoresaber.get_player(player_id)
