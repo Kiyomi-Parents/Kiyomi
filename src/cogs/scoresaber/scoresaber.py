@@ -1,6 +1,8 @@
 from typing import Optional
 
+import discord
 from discord.ext import commands
+from discord.ext.commands import Context
 
 from .storage.uow import UnitOfWork
 from .tasks import Tasks
@@ -61,31 +63,62 @@ class ScoreSaber(BaseCog, name="Score Saber"):
         pp_size = round(guild_player.player.pp / 100)
         await ctx.send(f"**{ctx.author.name}**'s PP is this big:\n8{'=' * pp_size}D")
 
-    @commands.command(name="recent", invoke_without_command=True)
-    async def recent_song(self, ctx, index: int = 1, discord_user_id: int = None):
-        """Displays your most recent score"""
-        if discord_user_id is None:
-            discord_user_id = ctx.author.id
+    @commands.command(name="recent")
+    async def recent_score(self, ctx: Context, index: int = 0, discord_member: discord.Member = None):
+        """Displays your most recent scores"""
+        if discord_member is None:
+            discord_member = ctx.author
 
-        guild_player = self.uow.guild_player_repo.get_by_guild_id_and_member_id(ctx.guild.id, ctx.author.id)
+        guild_player = self.uow.guild_player_repo.get_by_guild_id_and_member_id(ctx.guild.id, discord_member.id)
 
         if guild_player is None:
             await ctx.send("Player not found!")
             return
 
-        if index <= 0:
-            index += 1
+        if index < 0:
+            await ctx.send("Score index needs to be positive!")
+            return
 
         try:
-            scores = self.uow.score_repo.get_player_recent_scores(guild_player.player.id)
+            score = self.uow.score_repo.get_player_recent_score(guild_player.player.id, index)
+
+            if score is None:
+                await ctx.send("No scores found!")
+                return
+
+            score_embed = Message.get_score_embed(guild_player.player, score)
+            await ctx.send(embed=score_embed)
+
+        except IndexError as e:
+            await ctx.send("Song argument too large")
+
+    @commands.command(name="recentscores")
+    @Security.owner_or_permissions()
+    async def recent_scores(self, ctx: Context, count: int = 1, discord_member: discord.Member = None):
+        """Displays your most recent scores"""
+        if discord_member is None:
+            discord_member = ctx.author
+
+        guild_player = self.uow.guild_player_repo.get_by_guild_id_and_member_id(ctx.guild.id, discord_member.id)
+
+        if guild_player is None:
+            await ctx.send("Player not found!")
+            return
+
+        if count <= 0:
+            await ctx.send("Score count needs to be positive!")
+            return
+
+        try:
+            scores = self.uow.score_repo.get_player_recent_scores(guild_player.player.id, count)
 
             if scores is None:
                 await ctx.send("No scores found!")
                 return
 
-            score = scores[index-1]
-            score_embed = Message.get_score_embed(guild_player.player, score)
-            await ctx.send(embed=score_embed)
+            for score in scores:
+                score_embed = Message.get_score_embed(guild_player.player, score)
+                await ctx.send(embed=score_embed)
 
         except IndexError as e:
             await ctx.send("Song argument too large")

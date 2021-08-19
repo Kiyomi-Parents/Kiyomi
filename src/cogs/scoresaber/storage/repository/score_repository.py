@@ -79,10 +79,24 @@ class ScoreRepository(Repository[Score]):
             .filter(~Score.song.has()) \
             .all()
 
-    def get_player_recent_scores(self, player_id: int):
+    def get_all_player_recent_scores(self, player_id: int) -> List[Score]:
         return self._db.session.query(Score) \
             .filter(Score.player_id == player_id) \
             .order_by(Score.time_set.desc()) \
+            .all()
+
+    def get_player_recent_score(self, player_id: int, index: int) -> Score:
+        return self._db.session.query(Score) \
+            .filter(Score.player_id == player_id) \
+            .order_by(Score.time_set.desc()) \
+            .offset(index) \
+            .first()
+
+    def get_player_recent_scores(self, player_id: int, count: int) -> List[Score]:
+        return self._db.session.query(Score) \
+            .filter(Score.player_id == player_id) \
+            .order_by(Score.time_set.desc()) \
+            .limit(count) \
             .all()
 
     def get_scores_without_song(self):
