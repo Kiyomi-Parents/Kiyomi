@@ -55,8 +55,17 @@ class ScoreFeed(BaseCog, name="Score Feed"):
 
     @commands.command()
     @Security.owner_or_permissions(administrator=True)
-    async def mark_sent(self, ctx: Context, player_id: str):
+    async def mark_sent(self, ctx: Context, player_id: str = None):
         scoresaber = self.uow.bot.get_cog("ScoreSaberAPI")
+
+        if player_id is None:
+            players = scoresaber.get_players()
+
+            for player in players:
+                self.actions.mark_all_player_scores_sent(player)
+
+            return
+
         player = scoresaber.get_player(player_id)
 
         if player is None:
