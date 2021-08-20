@@ -34,17 +34,18 @@ class Tasks:
 
             for player in players:
                 for guild in player.guilds:
-                    score_feed_channel_id = settings.get(guild.id, "score_feed_channel_id")
+                    await self.send_notification(guild, player)
 
-                    if score_feed_channel_id is None:
-                        continue
-
-                    await self.send_notification(guild, player, score_feed_channel_id)
-
-    async def send_notification(self, guild: Guild, player: Player, channel_id: int) -> None:
+    async def send_notification(self, guild: Guild, player: Player) -> None:
         scoresaber = self.uow.bot.get_cog('ScoreSaberAPI')
+        settings = self.uow.bot.get_cog("SettingsAPI")
 
-        channel = self.uow.bot.get_channel(channel_id)
+        score_feed_channel_id = settings.get(guild.id, "score_feed_channel_id")
+
+        if score_feed_channel_id is None:
+            return
+
+        channel = self.uow.bot.get_channel(score_feed_channel_id)
 
         if channel is None:
             Logger.log(guild, "Recent scores channel not found, skipping!")
