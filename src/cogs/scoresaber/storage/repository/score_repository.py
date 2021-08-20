@@ -1,9 +1,8 @@
 from typing import Optional, List
 
-from pyscoresaber import ScoreSaber
-
 from src.database import Repository
 from src.log import Logger
+from .player_repository import PlayerRepository
 from ..model.score import Score
 from ...scoresaber_utils import ScoreSaberUtils
 
@@ -108,24 +107,18 @@ class ScoreRepository(Repository[Score]):
 
         return 1 > len(scores)
 
-    def update_score_pp_weight(self, db_score, player_repo):
-        pos = ScoreSaberUtils.get_pos_from_pp_weight(db_score.weight)
-        player = player_repo.get_player_by_internal_player_id(db_score.player_id)
-        page = (pos - 1) // 8
-        if type(page) != int or page < 0:
-            starting_page = 0
+    def update_score_pp_weight(self, db_score: Score, player_repo: PlayerRepository):
+        player = player_repo.get_by_id(db_score.player_id)
 
-        new_pp_weight = None
-        not_found = True
-        while not_found:
-            page += 1
-            scores_list = ScoreSaber.get_top_scores(player.player_id, page)
-            for comparing_score in scores_list:
-                if comparing_score.pp < db_score.pp:
-                    new_pp_weight = ScoreSaberUtils.get_pp_weight_from_pos(
-                        ScoreSaberUtils.get_pos_from_pp_weight(comparing_score.weight) - 1)
-                    not_found = False
-                    break
+        scores_with_more_pp = self._db.session.query(Score) \
+            .filter(Score.player_id == player.id) \
+            .filter(Score.score_id != db_score.score_id) \
+            .order_by(Score.pp.desc()) \
+            .filter(Score.pp >= db_score.pp) \
+            .all()
+
+        score_position = len(scores_with_more_pp) + 1
+        new_pp_weight = ScoreSaberUtils.get_pp_weight_from_pos(score_position)
 
         db_score.weight = new_pp_weight
         self._db.commit_changes()
