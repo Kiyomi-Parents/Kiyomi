@@ -50,7 +50,7 @@ class Tasks:
             Logger.log(guild, "Recent scores channel not found, skipping!")
             return
 
-        scores = self.get_unsent_scores(guild, player)
+        scores = self.uow.sent_score_repo.get_unsent_scores(guild.id, player.id)
 
         Logger.log(guild, f"{player} has {len(scores)} scores to notify")
 
@@ -76,14 +76,3 @@ class Tasks:
             #     if len(leaderboard.leaderboard_scores) > 0:
             #         guild_leaderboard_embed = Message.get_leaderboard_embed(leaderboard.get_top_scores(3))
             #         await channel.send(embed=guild_leaderboard_embed)
-
-    def get_unsent_scores(self, guild: Guild, player: Player) -> List[Score]:
-        unsent_scores = []
-
-        for score in player.scores:
-            sent_score = self.uow.sent_score_repo.get_by_score_id_and_guild_id(score.id, guild.id)
-
-            if sent_score is None:
-                unsent_scores.append(score)
-
-        return unsent_scores
