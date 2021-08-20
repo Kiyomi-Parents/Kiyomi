@@ -30,6 +30,6 @@ class SentScoreRepository(Repository):
         """
         return self._db.session.query(Score) \
             .filter(Score.player_id == player_id) \
-            .outerjoin(SentScore, SentScore.score_id == Score.id) \
+            .join(SentScore, SentScore.score_id == Score.id) \
             .filter(or_(SentScore.score_id.is_(None), SentScore.guild_id != guild_id)) \
             .all()
