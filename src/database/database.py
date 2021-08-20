@@ -25,7 +25,7 @@ class Database:
     def add_entries(self, entries):
         self.session.add_all(entries)
         self.commit_changes()
-        Logger.log(type(entries[0]), f"Added {len(entries)} new entries")
+        Logger.log(type(entries[0]).__name__, f"Added {len(entries)} new entries")
 
     def remove_entry(self, entry):
         self.session.delete(entry)

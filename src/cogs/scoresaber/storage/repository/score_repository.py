@@ -99,9 +99,6 @@ class ScoreRepository(Repository[Score]):
             .limit(count) \
             .all()
 
-    def get_scores_without_song(self):
-        return self._db.session.query(Score).filter(~Score.song.has()).all()
-
     def is_score_new(self, db_score: Score) -> bool:
         """Checks if the score already exists in the database by comparing scoreId and timeSet"""
         scores = self._db.session.query(Score) \
@@ -110,25 +107,6 @@ class ScoreRepository(Repository[Score]):
             .all()
 
         return 1 > len(scores)
-
-    def mark_score_sent(self, db_score, db_guild):
-        db_score.msg_guilds.append(db_guild)
-
-        self._db.commit_changes()
-        Logger.log(db_score, f"Marked as sent in {db_guild}")
-
-    def mark_score_unsent(self, db_score):
-        db_score.msg_guilds = []
-
-        self._db.commit_changes()
-        Logger.log(db_score, "Marked as unsent")
-
-    def add_beatmap(self, score: Score, beatmap):
-        if score.beatmap_version is None:
-            score.beatmap_version = beatmap.latest_version
-
-            self._db.commit_changes()
-            Logger.log(score, f"Added {beatmap}")
 
     def update_score_pp_weight(self, db_score, player_repo):
         pos = ScoreSaberUtils.get_pos_from_pp_weight(db_score.weight)

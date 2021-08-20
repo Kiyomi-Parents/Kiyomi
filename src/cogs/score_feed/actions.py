@@ -2,9 +2,9 @@ from .errors import GuildRecentChannelExistsException, GuildRecentChannelNotFoun
 from .storage.model import SentScore
 from .storage.uow import UnitOfWork
 from .tasks import Tasks
-from ..general.storage.model import Guild
-from ..scoresaber.storage.model.player import Player
-from ...log import Logger
+from src.cogs.general.storage.model import Guild
+from src.cogs.scoresaber.storage.model.player import Player
+from src.log import Logger
 
 
 class Actions:
@@ -54,7 +54,7 @@ class Actions:
             self.mark_player_scores_sent(player, guild)
 
     def mark_player_scores_sent(self, player: Player, guild: Guild):
-        scores = self.tasks.get_unsent_scores(player, guild)
+        scores = self.uow.sent_score_repo.get_unsent_scores(guild.id, player.id)
 
         Logger.log(player, f"Marking {len(scores)} scores as sent in {guild}")
 

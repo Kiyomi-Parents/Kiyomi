@@ -7,7 +7,7 @@ from discord.ext.commands import Context
 from .storage.uow import UnitOfWork
 from .tasks import Tasks
 from .actions import Actions
-from .errors import PlayerExistsException, PlayerNotFoundException, GuildNotFoundException
+from .errors import PlayerExistsException, PlayerNotFoundException, GuildNotFoundException, InvalidPlayerException
 from .message import Message
 from .scoresaber_utils import ScoreSaberUtils
 from src.cogs.security import Security
@@ -154,7 +154,7 @@ class ScoreSaber(BaseCog, name="Score Saber"):
         try:
             player = await self.actions.add_player(guild_id, member_id, player_id)
             await ctx.send(f"Successfully linked **{player.player_name}** ScoreSaber profile to {member_id}!")
-        except (PlayerExistsException, PlayerNotFoundException) as error:
+        except (PlayerExistsException, PlayerNotFoundException, InvalidPlayerException) as error:
             await ctx.send(error)
 
 
