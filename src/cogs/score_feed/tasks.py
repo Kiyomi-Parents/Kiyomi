@@ -63,7 +63,7 @@ class Tasks:
                 embed = Message.get_new_score_embed(player, score, score.beatmap_version)
             else:
                 # Post as improvement
-                # previous_db_score = self.uow.score_repo.update_score_pp_weight(previous_db_score, self.uow.player_repo)
+                previous_db_score = self.uow.score_repo.update_score_pp_weight(previous_db_score, self.uow.player_repo)
                 embed = Message.get_improvement_score_embed(player, previous_db_score, score, score.beatmap_version)
 
             await channel.send(embed=embed)

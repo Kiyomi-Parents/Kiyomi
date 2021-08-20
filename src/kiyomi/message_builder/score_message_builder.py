@@ -63,9 +63,8 @@ class ScoreMessageBuilder:
             pp_improvement = round(score.pp - previous_score.pp, 2)
             embed_string = f"**{round(score.pp, 2)}pp** +{pp_improvement}pp"
             embed_string += f"_({score.weighted_pp}pp"
-            # TODO: enable weighted pp improvement once it's fixed (https://github.com/Kiyomi-Parents/Kiyomi/issues/12)
-            # weighted_pp_improvement = round(score.weighted_pp - previous_score.weighted_pp, 2)
-            # embed_string += f" +{weighted_pp_improvement}pp"
+            weighted_pp_improvement = round(score.weighted_pp - previous_score.weighted_pp, 2)
+            embed_string += f" +{weighted_pp_improvement}pp"
             embed_string += ")_"
             self.embed.add_field(name="PP", value=embed_string)
             sent_improvement = True
