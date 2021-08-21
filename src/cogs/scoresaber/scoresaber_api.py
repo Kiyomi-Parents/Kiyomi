@@ -2,6 +2,7 @@ from typing import Optional, List
 
 from discord.ext import commands
 
+from .scoresaber_utils import ScoreSaberUtils
 from .storage.model.score import Score
 from .storage.uow import UnitOfWork
 from .tasks import Tasks
@@ -36,3 +37,23 @@ class ScoreSaberAPI(commands.Cog):
 
     def get_score_by_player_id_and_leaderboard_id(self, player_id: int, leaderboard_id: int) -> Optional[List[Score]]:
         return self.uow.score_repo.get_by_player_id_and_leaderboard_id(player_id, leaderboard_id)
+
+    def get_player_scores_sorted_by_pp(self, player_id: int) -> List[Score]:
+        return self.uow.score_repo.get_player_scores_sorted_by_pp(player_id)
+
+    def update_score_pp_weight(self, score: Score) -> Score:
+        leaderboard = self.uow.bot.get_cog("LeaderboardAPI")
+        top_scores_leaderboard = leaderboard.get_player_top_scores_leaderboard(score.player_id)
+
+        position = 0
+
+        for top_score in top_scores_leaderboard:
+            if top_score.score_id == score.score_id:
+                continue
+            position += 1
+            if top_score.pp < score.pp and position:
+                break
+
+        score.weight = ScoreSaberUtils.get_pp_weight_from_pos(position)
+
+        return score

@@ -1,7 +1,7 @@
 from discord import Embed
 from discord.ext import commands
 
-from .actions import Actions, PlayerScoreLeaderboard
+from .actions import Actions, PlayerScoreLeaderboard, PlayerTopScoresLeaderboard
 from .message import Message
 from .storage.uow import UnitOfWork
 
@@ -18,3 +18,6 @@ class LeaderboardAPI(commands.Cog):
         leaderboard = await self.get_player_score_leaderboard(guild_id, beatmap_key)
 
         return Message.get_player_score_leaderboard_embed(leaderboard)
+
+    def get_player_top_scores_leaderboard(self, player_id: int) -> PlayerTopScoresLeaderboard:
+        return self.actions.get_player_top_scores_leaderboard(player_id)

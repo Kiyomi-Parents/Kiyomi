@@ -1,5 +1,4 @@
 import asyncio
-from typing import List
 
 from discord.ext import tasks
 
@@ -10,7 +9,6 @@ from .storage.model import SentScore
 from .storage.uow import UnitOfWork
 from src.cogs.general.storage.model import Guild
 from src.cogs.scoresaber.storage.model.player import Player
-from src.cogs.scoresaber.storage.model.score import Score
 
 
 class Tasks:
@@ -27,7 +25,6 @@ class Tasks:
         """Sending notifications"""
         async with self.send_notifications_lock:
             scoresaber = self.uow.bot.get_cog('ScoreSaberAPI')
-            settings = self.uow.bot.get_cog("SettingsAPI")
 
             players = scoresaber.get_players()
             Logger.log("task", f"Sending notifications for {len(players)} players")
@@ -56,15 +53,15 @@ class Tasks:
         Logger.log(guild, f"{player} has {len(scores)} scores to notify")
 
         for score in scores:
-            previous_db_score = scoresaber.get_previous_score(score)
+            previous_score = scoresaber.get_previous_score(score)
 
-            if previous_db_score is None:
+            if previous_score is None:
                 # Post as new score
                 embed = Message.get_new_score_embed(player, score, score.beatmap_version)
             else:
                 # Post as improvement
-                previous_db_score = self.uow.score_repo.update_score_pp_weight(previous_db_score, self.uow.player_repo)
-                embed = Message.get_improvement_score_embed(player, previous_db_score, score, score.beatmap_version)
+                previous_score = scoresaber.update_score_pp_weight(previous_score)
+                embed = Message.get_improvement_score_embed(player, previous_score, score, score.beatmap_version)
 
             await channel.send(embed=embed)
             self.uow.sent_score_repo.add(SentScore(score.id, guild.id))

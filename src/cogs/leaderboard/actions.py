@@ -1,5 +1,5 @@
 from collections import OrderedDict
-from typing import Dict, Optional, List
+from typing import Optional, List
 
 import typing
 
@@ -8,6 +8,7 @@ from ..scoresaber.storage.model.player import Player
 from ..scoresaber.storage.model.score import Score
 
 PlayerScoreLeaderboard = Optional[typing.OrderedDict[Player, Score]]
+PlayerTopScoresLeaderboard = Optional[List[Score]]
 
 
 class Actions:
@@ -62,3 +63,13 @@ class Actions:
                 best_score = score
 
         return best_score
+
+    def get_player_top_scores_leaderboard(self, player_id: int) -> PlayerTopScoresLeaderboard:
+        scoresaber = self.uow.bot.get_cog("ScoreSaberAPI")
+        scores = scoresaber.get_player_scores_sorted_by_pp(player_id)
+        unique_scores = []
+        for score in scores:
+            if score.score_id not in [unique_score.score_id for unique_score in unique_scores]:
+                unique_scores.append(score)
+
+        return unique_scores
