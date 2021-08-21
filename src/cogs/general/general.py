@@ -1,6 +1,6 @@
 import discord.member
 from discord.ext import commands
-from discord.ext.commands import Context
+from discord.ext.commands import Context, NotOwner, EmojiNotFound
 
 from src.cogs.security import Security
 from .actions import Actions
@@ -67,6 +67,7 @@ class General(BaseCog):
     @commands.group(invoke_without_command=True)
     async def emoji(self, ctx: Context):
         if ctx.subcommand_passed is None:
+            await ctx.message.delete()
             emoji = await self.actions.get_random_enabled_emoji()
             await ctx.send(str(emoji))
 
@@ -89,3 +90,10 @@ class General(BaseCog):
             await ctx.send(f"Disabled {str(emoji)}")
         except EmojiNotFoundException as error:
             await ctx.send(str(error))
+
+    @emoji_enable.error
+    @emoji_disable.error
+    async def emoji_error(self, ctx, error):
+        if isinstance(error, EmojiNotFound):
+            await ctx.send("You can't use unicode emojis and emojis from servers the bot isn't in!")
+        return
