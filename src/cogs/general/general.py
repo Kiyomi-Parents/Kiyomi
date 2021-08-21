@@ -40,6 +40,11 @@ class General(BaseCog):
         """Greet the bot."""
         await ctx.send("Hello there!")
 
+    @commands.command(hidden=True)
+    @Security.is_owner()
+    async def say(self, ctx: Context, text: str):
+        await ctx.send(text)
+
     @commands.command(name="many emoji", hidden=True)
     @Security.is_owner()
     async def many_emoji(self, ctx):
