@@ -19,7 +19,10 @@ class Actions:
                 await asyncio.sleep(0.2)
 
                 map_detail = await self.uow.beatsaver.get_map_by_key(beatmap_key)
-                beatmap = self.uow.beatmap_repo.add(Beatmap(map_detail))
+                beatmap = Beatmap(map_detail)
+
+                if self.uow.beatmap_repo.get_by_id(beatmap.id) is None:
+                    beatmap = self.uow.beatmap_repo.add(Beatmap(map_detail))
             except pybeatsaver.NotFoundException as error:
                 raise SongNotFound(f"Could not find song with key {beatmap_key}") from error
 

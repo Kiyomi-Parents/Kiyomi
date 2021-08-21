@@ -52,9 +52,5 @@ class Database:
         try:
             self.session.commit()
         except Exception as error:
-            if self.engine.connection_invalidated:
-                Logger.log("Database", "Reconnecting")
-                self.engine.connect()
-
             self.session.rollback()
             raise error
