@@ -1,6 +1,6 @@
 from Kiyomi import Kiyomi
 from .repository import GuildRepository, ChannelRepository, RoleRepository, MemberRepository, GuildMemberRepository, \
-    MemberRoleRepository
+    MemberRoleRepository, EmojiRepository
 
 
 class UnitOfWork:
@@ -12,5 +12,6 @@ class UnitOfWork:
         self.member_repo = MemberRepository(bot.database)
         self.guild_member_repo = GuildMemberRepository(bot.database)
         self.member_role_repo = MemberRoleRepository(bot.database)
+        self.emoji_repo = EmojiRepository(bot.database)
 
         self.bot = bot

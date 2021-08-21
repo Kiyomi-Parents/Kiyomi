@@ -1,9 +1,11 @@
+import random
+
 import discord
 from discord import Colour, DiscordException
 from discord.ext.commands import MemberNotFound
 
-from .errors import GuildNotFoundException, RoleNotFoundException
-from .storage.model import Member, GuildMember, Guild, Role, MemberRole
+from .errors import GuildNotFoundException, RoleNotFoundException, EmojiAlreadyExistsException, EmojiNotFoundException
+from .storage.model import Member, GuildMember, Guild, Role, MemberRole, Emoji
 from .storage.uow import UnitOfWork
 from ..security import Security
 from ...log import Logger
@@ -135,3 +137,24 @@ class Actions:
         except DiscordException as error:
             Logger.log(guild_id, f"Failed to add role {discord_role.name} ({discord_role.id}) to member {discord_member.name} ({discord_member.id})")
             raise error
+
+    async def enable_emoji(self, emoji_id: int, guild_id: int, emoji_name: str):
+        if self.uow.emoji_repo.get_by_id(emoji_id) is not None:
+            raise EmojiAlreadyExistsException("Emoji is already enabled!")
+        self.uow.emoji_repo.add(Emoji(emoji_id, guild_id, emoji_name))
+
+    async def disable_emoji(self, emoji_id: int):
+        emoji = self.uow.emoji_repo.get_by_id(emoji_id)
+        if emoji is None:
+            raise EmojiNotFoundException("Emoji is already disabled!")
+        self.uow.emoji_repo.remove(emoji)
+
+    async def get_random_enabled_emoji(self):
+        emoji_list = self.uow.emoji_repo.get_all()
+        emoji = None
+        for i in range(10):
+            test_emoji = emoji_list[random.randint(0, len(emoji_list) - 1)]
+            emoji = self.uow.bot.get_emoji(test_emoji.id)
+            if emoji is not None:
+                break
+        return emoji

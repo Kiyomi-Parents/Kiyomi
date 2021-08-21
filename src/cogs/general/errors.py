@@ -8,3 +8,11 @@ class MemberNotFoundException(Exception):
 
 class RoleNotFoundException(Exception):
     pass
+
+
+class EmojiAlreadyExistsException(Exception):
+    pass
+
+
+class EmojiNotFoundException(Exception):
+    pass
