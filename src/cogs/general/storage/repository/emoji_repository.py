@@ -13,3 +13,8 @@ class EmojiRepository(Repository[Emoji]):
     def get_all(self) -> Optional[List[Emoji]]:
         return self._db.session.query(Emoji) \
             .all()
+
+    def get_by_name(self, emoji_name: str) -> Optional[Emoji]:
+        return self._db.session.query(Emoji) \
+            .filter(Emoji.name == emoji_name) \
+            .first()
