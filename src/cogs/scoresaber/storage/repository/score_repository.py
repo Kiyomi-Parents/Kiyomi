@@ -121,7 +121,5 @@ class ScoreRepository(Repository[Score]):
         new_pp_weight = ScoreSaberUtils.get_pp_weight_from_pos(score_position)
 
         db_score.weight = new_pp_weight
-        self._db.commit_changes()
-        Logger.log(db_score, f"Updated weight to {new_pp_weight}")
 
         return db_score
