@@ -1,4 +1,5 @@
 import discord.member
+from discord import Forbidden
 from discord.ext import commands
 from discord.ext.commands import Context, NotOwner, EmojiNotFound
 
@@ -72,7 +73,10 @@ class General(BaseCog):
     @commands.group(invoke_without_command=True)
     async def emoji(self, ctx: Context):
         if ctx.subcommand_passed is None:
-            await ctx.message.delete()
+            try:
+                await ctx.message.delete()
+            except Forbidden:
+                pass
             emoji = await self.actions.get_random_enabled_emoji()
             await ctx.send(str(emoji))
 
