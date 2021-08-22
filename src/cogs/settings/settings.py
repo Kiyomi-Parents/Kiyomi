@@ -46,3 +46,16 @@ class Settings(BaseCog):
 
         await ctx.send(f"Map leaderboards are now: {status}")
 
+    # TODO: Find a better way for this. This should belong in General cog!
+    @settings.command(name="repost_emoji")
+    async def settings_repost_emoji(self, ctx, status: str):
+        """Enable/Disable emoji reposting on single emoji messages."""
+        if status.lower() == "enable":
+            self.actions.set(ctx.guild.id, "repost_emoji", True)
+        elif status.lower() == "disable":
+            self.actions.set(ctx.guild.id, "repost_emoji", False)
+        else:
+            await ctx.send(f"Only valid options are: enable, disable")
+
+        await ctx.send(f"Reposting emojis are now: {status}")
+

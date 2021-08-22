@@ -45,7 +45,7 @@ class GeneralAPI(commands.Cog):
     async def remove_role_from_member(self, guild_id: int, member_id: int, role_id: int, reason: str) -> None:
         await self.actions.remove_role_from_member(guild_id, member_id, role_id, reason)
 
-    async def get_emoji(self, emoji_name: str) -> Optional[Emoji]:
+    def get_emoji(self, emoji_name: str) -> Optional[Emoji]:
         emoji_name = emoji_name.replace(":", "")
         emoji = self.uow.bot.get_emoji(self.uow.emoji_repo.get_by_name(emoji_name).id)
         return emoji

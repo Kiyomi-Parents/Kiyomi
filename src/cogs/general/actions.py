@@ -1,4 +1,6 @@
 import random
+import re
+from typing import Optional
 
 import discord
 from discord import Colour, DiscordException
@@ -148,6 +150,22 @@ class Actions:
         if emoji is None:
             raise EmojiNotFoundException("Emoji is already disabled!")
         self.uow.emoji_repo.remove(emoji)
+
+    def get_emoji_by_id(self, emoji_id: int) -> Optional[Emoji]:
+        emoji = self.uow.emoji_repo.get_by_id(emoji_id)
+
+        if emoji is None:
+            return None
+
+        return self.uow.bot.get_emoji(emoji.id)
+
+    def get_emoji_from_message(self, msg: str):
+        emoji_text = re.search(r'^<\w*:\w*:(\d*)>$', msg)
+
+        if emoji_text is None:
+            return None
+
+        return self.get_emoji_by_id(int(emoji_text.group(1)))
 
     async def get_random_enabled_emoji(self):
         emoji_list = self.uow.emoji_repo.get_all()

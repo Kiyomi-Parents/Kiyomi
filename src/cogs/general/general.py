@@ -1,3 +1,5 @@
+import re
+
 import discord.member
 from discord import Forbidden
 from discord.ext import commands
@@ -31,6 +33,19 @@ class General(BaseCog):
     async def on_ready(self):
         for discord_guild in self.uow.bot.guilds:
             self.actions.register_guild(discord_guild)
+
+    @commands.Cog.listener()
+    async def on_message(self, msg: discord.Message):
+        """Repost emoji if enabled"""
+        if msg.author.id == self.uow.bot.user.id:
+            return
+
+        settings = self.uow.bot.get_cog("SettingsAPI")
+
+        if settings.get(msg.guild.id, "repost_emoji"):
+            emoji = self.actions.get_emoji_from_message(msg.content)
+            if emoji is not None:
+                await msg.channel.send(emoji)
 
     @commands.Cog.listener()
     async def on_guild_join(self, guild: discord.Guild):

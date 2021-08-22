@@ -1,3 +1,4 @@
+import distutils.util
 from typing import Optional
 
 from src.cogs.settings.storage.model import Setting
@@ -14,6 +15,9 @@ class Actions:
 
     @staticmethod
     def convert_setting_type_to_value(setting_type: SettingType, value: str) -> any:
+        if setting_type.value == bool:
+            return distutils.util.strtobool(value)
+
         return setting_type.value(value)
 
     def get(self, guild_id: int, name: str) -> Optional[Setting]:
