@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 
 from src.cogs.errors import NoPrivateMessagesException
 from src.log import Logger
-
+import json
 
 class BSBot(commands.Bot):
     running_tests = False
@@ -50,6 +50,8 @@ if __name__ == "__main__":
     bot.load_extension(name="src.cogs.general")
     bot.load_extension(name="src.cogs.beatsaber")
 
-    load_dotenv()
-    TOKEN = os.getenv("DISCORD_TOKEN")
+    with open('config.json', 'r') as myfile:
+    	data=myfile.read()
+    data = json.loads(data)	
+    TOKEN = str(data["token"])
     bot.run(TOKEN)
