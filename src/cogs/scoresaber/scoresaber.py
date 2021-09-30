@@ -126,7 +126,7 @@ class ScoreSaber(BaseCog, name="Score Saber"):
     # DEBUGGING COMMANDS
     @commands.command(name="getscoresbyid", hidden=True)
     @Security.is_owner()
-    async def get_scores_by_id(self, ctx, score_id: int):
+    async def get_scores_by_id(self, ctx: Context, score_id: int):
         db_scores = self.uow.score_repo.get_all_by_score_id(score_id)
 
         if len(db_scores) == 0:
@@ -139,38 +139,49 @@ class ScoreSaber(BaseCog, name="Score Saber"):
             else:
                 await ctx.send("Score was None")
 
-    @commands.command(name="manualaddplayer", hidden=True)
+    @player.command(name="manualadd", hidden=True)
     @Security.is_owner()
-    async def manual_add_player(self, ctx, guild_id: Optional[int], member_id: Optional[int], player_id: str):
-        if guild_id is not None and member_id is not None:
+    async def manual_add_player(self, ctx: Context, player_id: str, member_id: Optional[int], guild_id: Optional[int]):
+        if guild_id is None:
+            guild_id = ctx.guild.id
+        await self._manual_add_player(ctx, player_id, member_id, guild_id)
+
+    @player.command(name="adminadd", hidden=True)
+    @Security.owner_or_permissions(administrator=True)
+    async def manual_add_player(self, ctx: Context, player_id: str, member_id: Optional[int]):
+        guild_id = ctx.guild.id
+        await self._manual_add_player(ctx, player_id, member_id, guild_id)
+
+    @player.command(name="manualremove", hidden=True)
+    @Security.is_owner()
+    async def manual_remove_player(self, ctx: Context, member_id: Optional[int], guild_id: Optional[int]):
+        if guild_id is None:
+            guild_id = ctx.guild.id
+        await self._manual_remove_player(ctx, member_id, guild_id)
+
+    @player.command(name="adminremove", hidden=True)
+    @Security.owner_or_permissions(administrator=True)
+    async def admin_remove_player(self, ctx: Context, member_id: Optional[int]):
+        await self._manual_remove_player(ctx, member_id, ctx.guild.id)
+
+    async def _manual_remove_player(self, ctx: Context, member_id: Optional[int], guild_id: Optional[int]):
+        if member_id is None:
+            member_id = ctx.author.id
+        try:
+            await self.actions.remove_player(guild_id, member_id)
+            await ctx.send("Successfully removed!")
+        except (PlayerNotFoundException) as error:
+            await ctx.send(error)
+
+    async def _manual_add_player(self, ctx: Context, player_id: str, member_id: Optional[int], guild_id: Optional[int]):
+        if member_id is not None:
             general = self.uow.bot.get_cog("GeneralAPI")
             discord_member = await general.get_discord_member(guild_id, member_id)
 
             self.uow.bot.events.emit("register_member", discord_member)
 
-        if guild_id is None:
-            guild_id = ctx.guild.id
-
         try:
             player = await self.actions.add_player(guild_id, member_id, player_id)
             await ctx.send(f"Successfully linked **{player.player_name}** ScoreSaber profile to {member_id}!")
         except (PlayerExistsException, PlayerNotFoundException, InvalidPlayerException) as error:
-            await ctx.send(error)
-
-    @commands.command(name="manualremoveplayer", hidden=True)
-    @Security.is_owner()
-    async def manual_remove_player(self, ctx, guild_id: Optional[int], member_id: Optional[int]):
-        try:
-            await self.actions.remove_player(guild_id, member_id)
-            await ctx.send("Successfully removed!")
-        except PlayerNotFoundException as error:
-            await ctx.send(error)
-
-    @commands.command(name="adminremoveplayer", hidden=True)
-    @Security.owner_or_permissions(administrator=True)
-    async def admin_remove_player(self, ctx, member_id: Optional[int]):
-        try:
-            await self.actions.remove_player(ctx.guild.id, member_id)
-            await ctx.send("Successfully removed!")
-        except PlayerNotFoundException as error:
             await ctx.send(error)
