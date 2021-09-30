@@ -157,4 +157,20 @@ class ScoreSaber(BaseCog, name="Score Saber"):
         except (PlayerExistsException, PlayerNotFoundException, InvalidPlayerException) as error:
             await ctx.send(error)
 
+    @commands.command(name="manualremoveplayer", hidden=True)
+    @Security.is_owner()
+    async def manual_remove_player(self, ctx, guild_id: Optional[int], member_id: Optional[int]):
+        try:
+            await self.actions.remove_player(guild_id, member_id)
+            await ctx.send("Successfully removed!")
+        except PlayerNotFoundException as error:
+            await ctx.send(error)
 
+    @commands.command(name="adminremoveplayer", hidden=True)
+    @Security.owner_or_permissions(administrator=True)
+    async def admin_remove_player(self, ctx, member_id: Optional[int]):
+        try:
+            await self.actions.remove_player(ctx.guild.id, member_id)
+            await ctx.send("Successfully removed!")
+        except PlayerNotFoundException as error:
+            await ctx.send(error)
