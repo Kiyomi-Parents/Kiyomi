@@ -140,7 +140,7 @@ class ScoreSaber(BaseCog, name="Score Saber"):
                 await ctx.send("Score was None")
 
     @commands.command(name="manualaddplayer", hidden=True)
-    @Security.owner_or_permissions()
+    @Security.is_owner()
     async def manual_add_player(self, ctx, guild_id: Optional[int], member_id: Optional[int], player_id: str):
         if guild_id is not None and member_id is not None:
             general = self.uow.bot.get_cog("GeneralAPI")
