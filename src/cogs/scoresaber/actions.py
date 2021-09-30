@@ -1,4 +1,7 @@
+from typing import Optional
+
 import pyscoresaber
+from discord.ext.commands import Context
 
 from .storage.uow import UnitOfWork
 from .tasks import Tasks
@@ -70,3 +73,24 @@ class Actions:
         # Remove player roles
         # await self.remove_player_roles(db_community, db_player) # TODO: Add to event bus
 
+    async def manual_remove_player(self, ctx: Context, member_id: Optional[int], guild_id: Optional[int]):
+        if member_id is None:
+            member_id = ctx.author.id
+        try:
+            await self.remove_player(guild_id, member_id)
+            await ctx.send("Successfully removed!")
+        except (PlayerNotFoundException) as error:
+            await ctx.send(error)
+
+    async def manual_add_player(self, ctx: Context, player_id: str, member_id: Optional[int], guild_id: Optional[int]):
+        if member_id is not None:
+            general = self.uow.bot.get_cog("GeneralAPI")
+            discord_member = await general.get_discord_member(guild_id, member_id)
+
+            self.uow.bot.events.emit("register_member", discord_member)
+
+        try:
+            player = await self.add_player(guild_id, member_id, player_id)
+            await ctx.send(f"Successfully linked **{player.player_name}** ScoreSaber profile to {member_id}!")
+        except (PlayerExistsException, PlayerNotFoundException, InvalidPlayerException) as error:
+            await ctx.send(error)
