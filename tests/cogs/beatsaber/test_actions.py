@@ -72,7 +72,6 @@ async def test_remove_player(actions, uow, db_guild, member):
     assert uow.player_repo.get_player_by_member_id(member.id) is None
     assert len(uow.player_repo.get_players()) == 0
     assert len(uow.score_repo.get_scores()) == 0
-    assert len(uow.song_repo.get_songs()) == 0
 
 
 @pytest.mark.asyncio
@@ -158,17 +157,17 @@ async def test_get_song(actions):
     valid_song_key = "19487"
     invalid_song_key = "153423234235"
 
-    db_song = await actions.get_song(valid_song_key)
-    assert db_song.key == valid_song_key
+    beatmap = await actions.get_beatmap(valid_song_key)
+    assert beatmap.id == valid_song_key
 
     with pytest.raises(SongNotFound):
-        await actions.get_song(invalid_song_key)
+        await actions.get_beatmap(invalid_song_key)
 
 
 @pytest.mark.asyncio
 async def test_get_guild_leaderboard(actions, member, db_guild):
     db_player = await actions.add_player(db_guild.discord_guild_id, member.id, "76561198029447509")
 
-    leaderboard = await actions.get_guild_leaderboard(db_guild.discord_guild_id, db_player.scores[0].song.key)
+    leaderboard = await actions.get_guild_leaderboard(db_guild.discord_guild_id, db_player.scores[0].beatmap_version.beatmap.id)
 
     assert len(leaderboard) != 0

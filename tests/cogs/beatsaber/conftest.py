@@ -1,8 +1,8 @@
 import pytest
+from pybeatsaver import BeatSaver
+from pyscoresaber import ScoreSaber
 from sqlalchemy import create_engine
 
-from src.cogs.beatsaber.api.beatsaver import BeatSaver
-from src.cogs.beatsaber.api.scoresaber import ScoreSaber
 from src.cogs.beatsaber.actions import Actions
 from src.cogs.beatsaber.beatsaber import BeatSaber
 from src.cogs.beatsaber.tasks import Tasks
