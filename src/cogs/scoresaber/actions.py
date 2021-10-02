@@ -77,7 +77,7 @@ class Actions:
         if member_id is None:
             member_id = ctx.author.id
         try:
-            await self.remove_player(guild_id, member_id)
+            self.remove_player(guild_id, member_id)
             await ctx.send("Successfully removed!")
         except (PlayerNotFoundException) as error:
             await ctx.send(error)

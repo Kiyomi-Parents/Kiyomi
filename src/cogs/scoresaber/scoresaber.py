@@ -146,9 +146,9 @@ class ScoreSaber(BaseCog, name="Score Saber"):
             guild_id = ctx.guild.id
         await self.actions.manual_add_player(ctx, player_id, member_id, guild_id)
 
-    @player.command(name="adminadd", hidden=True)
+    @player.command(name="adminadd")
     @Security.owner_or_permissions(administrator=True)
-    async def manual_add_player(self, ctx: Context, player_id: str, member_id: Optional[int]):
+    async def admin_add_player(self, ctx: Context, player_id: str, member_id: Optional[int]):
         guild_id = ctx.guild.id
         await self.actions.manual_add_player(ctx, player_id, member_id, guild_id)
 
@@ -159,7 +159,7 @@ class ScoreSaber(BaseCog, name="Score Saber"):
             guild_id = ctx.guild.id
         await self.actions.manual_remove_player(ctx, member_id, guild_id)
 
-    @player.command(name="adminremove", hidden=True)
+    @player.command(name="adminremove")
     @Security.owner_or_permissions(administrator=True)
     async def admin_remove_player(self, ctx: Context, member_id: Optional[int]):
         await self.actions.manual_remove_player(ctx, member_id, ctx.guild.id)
