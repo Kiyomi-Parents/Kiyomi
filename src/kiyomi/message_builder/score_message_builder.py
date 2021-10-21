@@ -57,23 +57,23 @@ class ScoreMessageBuilder:
 
     def pp(self, previous_score=None):
         score = self.score
+        if score.is_ranked:
+            sent_improvement = False
+            if previous_score is not None:
+                pp_improvement = round(score.pp - previous_score.pp, 2)
+                embed_string = f"**{round(score.pp, 2)}pp** +{pp_improvement}pp"
+                embed_string += f"_({score.weighted_pp}pp"
+                weighted_pp_improvement = round(score.weighted_pp - previous_score.weighted_pp, 2)
+                embed_string += f" +{weighted_pp_improvement}pp"
+                embed_string += ")_"
+                self.embed.add_field(name="PP", value=embed_string)
+                sent_improvement = True
 
-        sent_improvement = False
-        if previous_score is not None:
-            pp_improvement = round(score.pp - previous_score.pp, 2)
-            embed_string = f"**{round(score.pp, 2)}pp** +{pp_improvement}pp"
-            embed_string += f"_({score.weighted_pp}pp"
-            weighted_pp_improvement = round(score.weighted_pp - previous_score.weighted_pp, 2)
-            embed_string += f" +{weighted_pp_improvement}pp"
-            embed_string += ")_"
-            self.embed.add_field(name="PP", value=embed_string)
-            sent_improvement = True
-
-        if not sent_improvement:
-            self.embed.add_field(
-                name="PP",
-                value=f"**{round(score.pp, 2)}pp** _({score.weighted_pp}pp)_"
-            )
+            if not sent_improvement:
+                self.embed.add_field(
+                    name="PP",
+                    value=f"**{round(score.pp, 2)}pp** _({score.weighted_pp}pp)_"
+                )
 
         return self
 
