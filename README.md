@@ -1,6 +1,14 @@
-# BSBot
+<h1 align="center">
+  <br>
+  <a href="https://github.com/Kiyomi-Parents/Kiyomi"><img src="https://share.lucker.xyz/qahu5/loJOwOga01.png/raw.png" alt="Kiyomi"></a>
+  <br>
+  Kiyomi
+  <br>
+</h1>
 
-cool bot
+# Overview
+
+Discord bot that has various functionality related to Beat Saber.
 
 ### Install
 
@@ -15,14 +23,7 @@ cool bot
 	export DISCORD_TOKEN=<My very secret token>  
   
 	# Start bot  
-	python3 BSBot.py  
-
-
-### Tests
-    # Run tests
-    pytest
-    # or
-    pytest -v --numprocesses=auto
+	python3 BSBot.py
 
 ### Lint
     # Run pylint
