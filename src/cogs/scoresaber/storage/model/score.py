@@ -113,5 +113,9 @@ class Score(Base):
     def get_date(self):
         return self.time_set.astimezone(tz.tzlocal())
 
+    @property
+    def is_ranked(self):
+        return True if self.pp else False
+
     def __str__(self):
         return f"Score {self.song_name} ({self.score_id})"
