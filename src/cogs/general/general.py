@@ -71,8 +71,7 @@ class General(BaseCog):
 
     emoji = SlashCommandGroup(
         "emoji",
-        "Emojis that Kiyomi is allowed to play with",
-        guild_ids=[198040147189694464]
+        "Emojis that Kiyomi is allowed to play with"
     )
 
     @emoji.command(name="random")
@@ -100,7 +99,7 @@ class General(BaseCog):
     async def get_available_emojis(self, ctx: discord.AutocompleteContext):
         return await self.actions.get_available_emojis(ctx)
 
-    @emoji.command(name="enable", guild_ids=[198040147189694464])
+    @emoji.command(name="enable")
     @Security.is_owner()
     async def emoji_enable(
         self,
@@ -124,7 +123,7 @@ class General(BaseCog):
     async def get_enabled_emojis(self, ctx: discord.AutocompleteContext):
         return await self.actions.get_enabled_emojis(ctx)
 
-    @emoji.command(name="disable", guild_ids=[198040147189694464])
+    @emoji.command(name="disable")
     @Security.is_owner()
     async def emoji_disable(self,
         ctx: discord.ApplicationContext,
