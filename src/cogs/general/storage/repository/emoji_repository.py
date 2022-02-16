@@ -18,3 +18,8 @@ class EmojiRepository(Repository[Emoji]):
         return self._db.session.query(Emoji) \
             .filter(Emoji.name == emoji_name) \
             .first()
+
+    def get_by_guild_id(self, guild_id: int) -> List[Emoji]:
+        return self._db.session.query(Emoji) \
+            .filter(Emoji.guild_id == guild_id) \
+            .all()
