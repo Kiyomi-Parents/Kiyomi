@@ -1,6 +1,5 @@
 from discord import slash_command
 from discord.ext import commands
-from discord.ext.commands import Context
 
 from src.cogs.scoresaber.storage.model.guild_player import GuildPlayer
 from src.cogs.security import Security
