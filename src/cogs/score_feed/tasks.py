@@ -37,12 +37,7 @@ class Tasks:
         scoresaber = self.uow.bot.get_cog('ScoreSaberAPI')
         settings = self.uow.bot.get_cog("SettingsAPI")
 
-        score_feed_channel_id = settings.get(guild.id, "score_feed_channel_id")
-
-        if score_feed_channel_id is None:
-            return
-
-        channel = self.uow.bot.get_channel(score_feed_channel_id)
+        channel = settings.get(guild.id, "score_feed_channel_id")
 
         if channel is None:
             Logger.log(guild, "Recent scores channel not found, skipping!")

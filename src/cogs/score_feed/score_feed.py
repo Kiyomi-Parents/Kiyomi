@@ -1,12 +1,13 @@
 from discord.ext import commands
 from discord.ext.commands import Context
 
-from src.kiyomi.base_cog import BaseCog
+from src.cogs.scoresaber.storage.model.guild_player import GuildPlayer
 from src.cogs.security import Security
+from src.kiyomi.base_cog import BaseCog
 from .actions import Actions
 from .errors import GuildRecentChannelExistsException, GuildRecentChannelNotFoundException
 from .storage.uow import UnitOfWork
-from ..scoresaber.storage.model.guild_player import GuildPlayer
+from src.cogs.settings.storage.model.ChannelSetting import ChannelSetting
 
 
 class ScoreFeed(BaseCog, name="Score Feed"):
@@ -22,6 +23,14 @@ class ScoreFeed(BaseCog, name="Score Feed"):
         @self.uow.bot.events.on("on_new_player")
         async def mark_scores_sent(guild_player: GuildPlayer):
             self.actions.mark_player_scores_sent(guild_player.player, guild_player.guild)
+
+    @commands.Cog.listener()
+    async def on_ready(self):
+        settings = [
+            ChannelSetting.create(self.uow.bot, "score_feed_channel_id", None)
+        ]
+
+        self.uow.bot.events.emit("setting_register", settings)
 
     @commands.group(invoke_without_command=True)
     @Security.owner_or_permissions(administrator=True)

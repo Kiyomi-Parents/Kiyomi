@@ -9,6 +9,7 @@ from src.utils import Utils
 from .actions import Actions
 from .errors import EmojiAlreadyExistsException, EmojiNotFoundException
 from .storage.uow import UnitOfWork
+from src.cogs.settings.storage.model.ToggleSetting import ToggleSetting
 
 
 class General(BaseCog):
@@ -27,6 +28,12 @@ class General(BaseCog):
 
     @commands.Cog.listener()
     async def on_ready(self):
+        settings = [
+            ToggleSetting.create("repost_emoji", False)
+        ]
+
+        self.uow.bot.events.emit("setting_register", settings)
+
         for discord_guild in self.uow.bot.guilds:
             self.actions.register_guild(discord_guild)
 

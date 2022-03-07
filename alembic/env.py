@@ -36,10 +36,10 @@ target_metadata = Base.metadata
 # ... etc.
 section = config.config_ini_section
 
-config.set_section_option(section, "DB_USER", os.environ.get("DATABASE_USER"))
-config.set_section_option(section, "DB_PW", os.environ.get("DATABASE_PW"))
-config.set_section_option(section, "DB_IP", os.environ.get("DATABASE_IP"))
-config.set_section_option(section, "DB_NAME", os.environ.get("DATABASE_NAME"))
+config.set_section_option(section, "DB_USER", os.getenv("DATABASE_USER"))
+config.set_section_option(section, "DB_PW", os.getenv("DATABASE_PW"))
+config.set_section_option(section, "DB_IP", os.getenv("DATABASE_IP"))
+config.set_section_option(section, "DB_NAME", os.getenv("DATABASE_NAME"))
 
 
 def run_migrations_offline():
