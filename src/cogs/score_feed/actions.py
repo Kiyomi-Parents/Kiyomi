@@ -12,29 +12,6 @@ class Actions:
         self.uow = uow
         self.tasks = tasks
 
-    def add_score_feed_channel(self, guild_id: int, channel_id: int):
-        settings = self.uow.bot.get_cog("SettingsAPI")
-        score_feed_channel_id = settings.get(guild_id, "score_feed_channel_id")
-
-        if score_feed_channel_id is not None:
-            guild = self.uow.bot.get_guild(guild_id)
-            recent_scores_channel = guild.get_channel(score_feed_channel_id)
-
-            raise GuildRecentChannelExistsException(f"Channel **{recent_scores_channel.name}** has already been set as the notification channel!")
-
-        settings.set(guild_id, "score_feed_channel_id", channel_id)
-
-        self.mark_all_guild_scores_sent(guild_id)
-
-    def remove_score_feed_channel(self, guild_id):
-        settings = self.uow.bot.get_cog("SettingsAPI")
-        score_feed_channel_id = settings.get(guild_id, "score_feed_channel_id")
-
-        if score_feed_channel_id is None:
-            raise GuildRecentChannelNotFoundException("There isn't a notification channel set for this Discord server.")
-
-        settings.delete(guild_id, "score_feed_channel_id")
-
     def mark_all_guild_scores_sent(self, guild_id: int):
         scoresaber = self.uow.bot.get_cog("ScoreSaberAPI")
         guild_players = scoresaber.get_guild_players_by_guild(guild_id)
