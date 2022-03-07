@@ -1,5 +1,6 @@
 from typing import List
 
+from discord import slash_command
 from discord.ext import commands
 
 from .actions import Actions
@@ -33,7 +34,7 @@ class BeatSaver(BaseCog, name="Beat Saver"):
     async def on_ready(self):
         await self.uow.beatsaver.start()
 
-    @commands.command(aliases=["bsr", "song"])
+    @slash_command(aliases=["bsr", "song"], guild_ids=[198040147189694464])
     async def map(self, ctx, key: str):
         """Displays song info."""
         leaderboard = self.uow.bot.get_cog("LeaderboardAPI")
@@ -43,11 +44,11 @@ class BeatSaver(BaseCog, name="Beat Saver"):
             db_beatmap = await self.actions.get_beatmap_by_key(key)
             song_embed = Message.get_song_embed(db_beatmap)
 
-            await ctx.send(embed=song_embed)
+            await ctx.respond(embed=song_embed)
 
             if settings.get(ctx.guild.id, "map_leaderboard"):
                 leaderboard_embed = await leaderboard.get_player_score_leaderboard_embed(ctx.guild.id, key)
 
-                await ctx.send(embed=leaderboard_embed)
+                await ctx.respond(embed=leaderboard_embed)
         except SongNotFound as error:
-            await ctx.send(error)
+            await ctx.respond(error)
