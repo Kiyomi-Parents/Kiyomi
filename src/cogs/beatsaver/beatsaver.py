@@ -34,7 +34,7 @@ class BeatSaver(BaseCog, name="Beat Saver"):
     async def on_ready(self):
         await self.uow.beatsaver.start()
 
-    @slash_command(aliases=["bsr", "song"], guild_ids=[198040147189694464])
+    @slash_command(aliases=["bsr", "song"])
     async def map(self, ctx, key: str):
         """Displays song info."""
         leaderboard = self.uow.bot.get_cog("LeaderboardAPI")
