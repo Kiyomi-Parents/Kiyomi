@@ -1,3 +1,8 @@
+from typing import List
+
+import discord
+from discord import OptionChoice
+
 from .registry import Registry, AchievementGroups, Achievement
 from .storage.uow import UnitOfWork
 
@@ -52,3 +57,10 @@ class Actions:
 
         return best_achievement
 
+    async def get_all_groups(self, ctx: discord.AutocompleteContext) -> List[OptionChoice]:
+        choices = []
+
+        for group in self.registry.get_generators():
+            choices.append(OptionChoice(group, group))
+
+        return choices

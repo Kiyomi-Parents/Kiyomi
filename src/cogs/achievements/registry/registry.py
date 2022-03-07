@@ -24,6 +24,9 @@ class Registry:
 
         raise AchievementGeneratorNotFound(f"Generator with name \"{generator_name}\" doesn't exist.")
 
+    def get_generators(self) -> List[str]:
+        return [generator.name for generator in self._generators]
+
     def get_achievements(self, generator_name: str, member: Member) -> AchievementGroups:
         generator = self._find_generator(generator_name)
         achievement_groups = {generator.name: generator.get_achievements(member)}
