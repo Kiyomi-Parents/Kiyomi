@@ -1,20 +1,18 @@
-import re
-
 import discord.member
-from discord import Forbidden
+from discord import SlashCommandGroup, Option
 from discord.ext import commands
-from discord.ext.commands import Context, NotOwner, EmojiNotFound
+from discord.ext.commands import EmojiNotFound
 
 from src.cogs.security import Security
+from src.kiyomi.base_cog import BaseCog
+from src.utils import Utils
 from .actions import Actions
 from .errors import EmojiAlreadyExistsException, EmojiNotFoundException
 from .storage.uow import UnitOfWork
-from src.kiyomi.base_cog import BaseCog
-from src.utils import Utils
+from src.cogs.settings.storage.model.ToggleSetting import ToggleSetting
 
 
 class General(BaseCog):
-
     def __init__(self, uow: UnitOfWork, actions: Actions):
         self.uow = uow
         self.actions = actions
@@ -23,7 +21,6 @@ class General(BaseCog):
         self.events()
 
     def events(self):
-
         @self.uow.bot.events.on("register_member")
         async def register_member(discord_member: discord.Member):
             self.actions.register_member(discord_member)
@@ -31,6 +28,12 @@ class General(BaseCog):
 
     @commands.Cog.listener()
     async def on_ready(self):
+        settings = [
+            ToggleSetting.create("repost_emoji", False)
+        ]
+
+        self.uow.bot.events.emit("setting_register", settings)
+
         for discord_guild in self.uow.bot.guilds:
             self.actions.register_guild(discord_guild)
 
@@ -51,73 +54,104 @@ class General(BaseCog):
     async def on_guild_join(self, guild: discord.Guild):
         self.actions.register_guild(guild)
 
-    @commands.command()
+    @commands.slash_command()
     async def hello(self, ctx):
-        """Greet the bot."""
-        await ctx.send("Hello there!")
+        """Greet the bot"""
+        await ctx.respond("Hello there!")
 
-    @commands.command(hidden=True)
+    @commands.slash_command()
     @Security.is_owner()
-    async def say(self, ctx: Context, text: str):
-        await ctx.send(text)
+    async def say(self, ctx, text: str):
+        """I repeat what you say"""
+        await ctx.respond(text)
 
-    @commands.command(name="many emoji", hidden=True)
-    @Security.is_owner()
-    async def many_emoji(self, ctx):
-        emoji_list = []
-        for emoji in self.uow.bot.emojis:
-            emoji_list.append(str(self.uow.bot.get_emoji(emoji.id)))
-            if len(emoji_list) >= 20:
-                await ctx.send("".join(emoji_list))
-                emoji_list.clear()
-        await ctx.send("".join(emoji_list))
+    status = SlashCommandGroup(
+        "status", "Commands related to Kiyomi's status"
+    )
 
-    @commands.command(name="su", hidden=True)
+    @status.command(name="update")
     @Security.is_owner()
     @Utils.update_tasks_list
     async def status_update(self, ctx):
         """owo"""
-        await ctx.send("status should've updated")
+        await ctx.respond("status should've updated")
 
-    @commands.command(name="admintest", hidden=True)
-    @Security.owner_or_permissions(administrator=True)
-    async def admin_test(self, ctx):
-        """Command to test if security is working"""
-        await ctx.send("This message should only be seen if !admintest was called by a server admin.")
+    emoji = SlashCommandGroup(
+        "emoji",
+        "Emojis that Kiyomi is allowed to play with"
+    )
 
-    @commands.group(invoke_without_command=True)
-    async def emoji(self, ctx: Context):
-        if ctx.subcommand_passed is None:
-            try:
-                await ctx.message.delete()
-            except Forbidden:
-                pass
-            emoji = await self.actions.get_random_enabled_emoji()
-            await ctx.send(str(emoji))
+    @emoji.command(name="random")
+    async def emoji_random(self, ctx):
+        """Posts a random enabled emoji"""
+        emoji = await self.actions.get_random_enabled_emoji()
+        await ctx.respond(str(emoji))
 
-    @emoji.command(name="enable", hidden=True)
+    @emoji.command(name="all")
     @Security.is_owner()
-    async def emoji_enable(self, ctx: Context, emoji: discord.Emoji):
+    async def emoji_all(self, ctx):
+        """Posts all the emojis, not a good idea to use :)"""
+        emoji_list = []
+
+        for emoji in self.uow.bot.emojis:
+            emoji_list.append(str(self.uow.bot.get_emoji(emoji.id)))
+
+            if len(emoji_list) >= 20:
+                await ctx.respond("".join(emoji_list))
+                emoji_list.clear()
+
+        await ctx.respond("".join(emoji_list))
+
+    # Workaround
+    async def get_available_emojis(self, ctx: discord.AutocompleteContext):
+        return await self.actions.get_available_emojis(ctx)
+
+    @emoji.command(name="enable")
+    @Security.is_owner()
+    async def emoji_enable(
+        self,
+        ctx: discord.ApplicationContext,
+        emoji: Option(
+            str,
+            "Choose an emoji",
+            autocomplete=get_available_emojis
+        )
+    ):
         """Allow the given emoji to be used by the bot"""
         try:
-            await self.actions.enable_emoji(emoji.id, emoji.guild_id, emoji.name)
-            await ctx.send(f"Enabled {str(emoji)}")
-        except EmojiAlreadyExistsException as error:
-            await ctx.send(str(error))
+            obj_emoji = self.uow.bot.get_emoji(int(emoji))
 
-    @emoji.command(name="disable", hidden=True)
+            await self.actions.enable_emoji(obj_emoji.id, obj_emoji.guild_id, obj_emoji.name)
+            await ctx.respond(f"Enabled {str(obj_emoji)}")
+        except EmojiAlreadyExistsException as error:
+            await ctx.respond(str(error))
+
+    # Workaround
+    async def get_enabled_emojis(self, ctx: discord.AutocompleteContext):
+        return await self.actions.get_enabled_emojis(ctx)
+
+    @emoji.command(name="disable")
     @Security.is_owner()
-    async def emoji_disable(self, ctx: Context, emoji: discord.Emoji):
+    async def emoji_disable(self,
+        ctx: discord.ApplicationContext,
+        emoji: Option(
+            str,
+            "Choose an emoji",
+            autocomplete=get_enabled_emojis
+        )
+    ):
         """Disallow the given emoji from being used by the bot"""
         try:
-            await self.actions.disable_emoji(emoji.id)
-            await ctx.send(f"Disabled {str(emoji)}")
+            obj_emoji = self.uow.bot.get_emoji(int(emoji))
+
+            await self.actions.disable_emoji(obj_emoji.id)
+            await ctx.respond(f"Disabled {str(obj_emoji)}")
         except EmojiNotFoundException as error:
-            await ctx.send(str(error))
+            await ctx.respond(str(error))
 
     @emoji_enable.error
     @emoji_disable.error
     async def emoji_error(self, ctx, error):
         if isinstance(error, EmojiNotFound):
-            await ctx.send("You can't use unicode emojis and emojis from servers the bot isn't in!")
+            await ctx.respond("You can't use unicode emojis and emojis from servers the bot isn't in!")
         return

@@ -1,12 +1,12 @@
+from discord import slash_command
 from discord.ext import commands
-from discord.ext.commands import Context
 
-from src.kiyomi.base_cog import BaseCog
+from src.cogs.scoresaber.storage.model.guild_player import GuildPlayer
 from src.cogs.security import Security
+from src.cogs.settings.storage.model.ChannelSetting import ChannelSetting
+from src.kiyomi.base_cog import BaseCog
 from .actions import Actions
-from .errors import GuildRecentChannelExistsException, GuildRecentChannelNotFoundException
 from .storage.uow import UnitOfWork
-from ..scoresaber.storage.model.guild_player import GuildPlayer
 
 
 class ScoreFeed(BaseCog, name="Score Feed"):
@@ -23,39 +23,24 @@ class ScoreFeed(BaseCog, name="Score Feed"):
         async def mark_scores_sent(guild_player: GuildPlayer):
             self.actions.mark_player_scores_sent(guild_player.player, guild_player.guild)
 
-    @commands.group(invoke_without_command=True)
-    @Security.owner_or_permissions(administrator=True)
-    async def channel(self, ctx):
-        """Set the recent score notification channel for ScoreSaber scores."""
-        await ctx.send_help(ctx.command)
+    @commands.Cog.listener()
+    async def on_ready(self):
+        settings = [
+            ChannelSetting.create(self.uow.bot, "score_feed_channel_id", None)
+        ]
 
-    @channel.command(name="add")
-    async def channel_add(self, ctx):
-        """Set current channel as the notification channel."""
-        try:
-            self.actions.add_score_feed_channel(ctx.guild.id, ctx.channel.id)
-            await ctx.send(f"Channel **{ctx.channel.name}** has successfully set as the notification channel!")
-        except GuildRecentChannelExistsException as error:
-            await ctx.send(error)
+        self.uow.bot.events.emit("setting_register", settings)
 
-    @channel.command(name="remove")
-    async def channel_remove(self, ctx):
-        """Remove the currently set notification channel."""
-        try:
-            self.actions.remove_score_feed_channel(ctx.guild.id)
-            await ctx.send("Notifications channel successfully removed!")
-        except GuildRecentChannelNotFoundException as error:
-            await ctx.send(error)
-
-    @commands.command()
+    @slash_command()
     @Security.owner_or_permissions(administrator=True)
     async def send_notifications(self, ctx):
         """Send recent score notifications."""
         await self.actions.send_notifications(ctx.guild.id)
 
-    @commands.command()
+    @slash_command()
     @Security.owner_or_permissions(administrator=True)
-    async def mark_sent(self, ctx: Context, player_id: str = None):
+    async def mark_sent(self, ctx, player_id: str = None):
+        """Mark all scores send for player."""
         scoresaber = self.uow.bot.get_cog("ScoreSaberAPI")
 
         if player_id is None:
@@ -64,13 +49,13 @@ class ScoreFeed(BaseCog, name="Score Feed"):
             for player in players:
                 self.actions.mark_all_player_scores_sent(player)
 
-            await ctx.send(f"Marked scores as sent for {len(players)} players")
+            await ctx.respond(f"Marked scores as sent for {len(players)} players")
             return
 
         player = scoresaber.get_player(player_id)
 
         if player is None:
-            await ctx.send(f"Could not find player with id {player_id}")
+            await ctx.respond(f"Could not find player with id {player_id}")
             return
 
         self.actions.mark_all_player_scores_sent(player)

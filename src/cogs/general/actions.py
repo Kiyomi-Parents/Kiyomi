@@ -1,9 +1,9 @@
 import random
 import re
-from typing import Optional
+from typing import Optional, List
 
 import discord
-from discord import Colour, DiscordException
+from discord import Colour, DiscordException, OptionChoice
 from discord.ext.commands import MemberNotFound
 
 from .errors import GuildNotFoundException, RoleNotFoundException, EmojiAlreadyExistsException, EmojiNotFoundException
@@ -139,6 +139,35 @@ class Actions:
         except DiscordException as error:
             Logger.log(guild_id, f"Failed to add role {discord_role.name} ({discord_role.id}) to member {discord_member.name} ({discord_member.id})")
             raise error
+
+    @staticmethod
+    def find_all_emoji_by_name(name: str, emojis: List[OptionChoice]) -> List[OptionChoice]:
+        return [
+            emoji
+            for emoji in emojis
+            if emoji.name.startswith(name.lower())
+        ]
+
+    async def get_available_emojis(self, ctx: discord.AutocompleteContext) -> List[OptionChoice]:
+        enabled_emojis = self.uow.emoji_repo.get_by_guild_id(ctx.interaction.guild_id)
+        emojis = []
+
+        for emoji in ctx.bot.emojis:
+            if emoji.id in [enabled_emoji.id for enabled_emoji in enabled_emojis]:
+                continue
+
+            emojis.append(discord.OptionChoice(emoji.name, str(emoji.id)))
+
+        return self.find_all_emoji_by_name(ctx.value.lower(), emojis)
+
+    async def get_enabled_emojis(self, ctx: discord.AutocompleteContext) -> List[OptionChoice]:
+        enabled_emojis = self.uow.emoji_repo.get_by_guild_id(ctx.interaction.guild_id)
+        emojis = []
+
+        for emoji in enabled_emojis:
+            emojis.append(discord.OptionChoice(emoji.name, str(emoji.id)))
+
+        return self.find_all_emoji_by_name(ctx.value.lower(), emojis)
 
     async def enable_emoji(self, emoji_id: int, guild_id: int, emoji_name: str):
         if self.uow.emoji_repo.get_by_id(emoji_id) is not None:

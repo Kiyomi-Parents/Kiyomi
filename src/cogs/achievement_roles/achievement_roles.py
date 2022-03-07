@@ -1,9 +1,9 @@
 from discord.ext import commands
 
-from .tasks import Tasks
-from .storage.uow import UnitOfWork
 from src.kiyomi.base_cog import BaseCog
-from src.cogs.security import Security
+from .storage.uow import UnitOfWork
+from .tasks import Tasks
+from src.cogs.settings.storage.model.ToggleSetting import ToggleSetting
 
 
 class AchievementRoles(BaseCog, name="Achievement Roles"):
@@ -11,24 +11,10 @@ class AchievementRoles(BaseCog, name="Achievement Roles"):
         self.uow = uow
         self.tasks = tasks
 
-    @commands.group(invoke_without_command=True, name="pproles")
-    @Security.owner_or_permissions(administrator=True)
-    async def pp_roles(self, ctx):
-        """PP role commands"""
-        await ctx.send_help(ctx.command)
+    @commands.Cog.listener()
+    async def on_ready(self):
+        settings = [
+            ToggleSetting.create("achievement_roles_pp", False)
+        ]
 
-    @pp_roles.command(name="enable")
-    @Security.owner_or_permissions()
-    async def pp_roles_enable(self, ctx):
-        """Enable pp roles"""
-        settings = self.uow.bot.get_cog("SettingsAPI")
-
-        settings.set(ctx.guild.id, "achievement_roles_pp", True)
-
-    @pp_roles.command(name="disable")
-    @Security.owner_or_permissions()
-    async def pp_roles_disable(self, ctx):
-        """Disable pp roles"""
-        settings = self.uow.bot.get_cog("SettingsAPI")
-
-        settings.set(ctx.guild.id, "achievement_roles_pp", False)
+        self.uow.bot.events.emit("setting_register", settings)

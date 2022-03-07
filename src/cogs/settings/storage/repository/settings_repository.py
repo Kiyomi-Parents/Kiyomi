@@ -5,7 +5,7 @@ from src.log import Logger
 from ..model import Setting
 
 
-class SettingsRepository(Repository):
+class SettingsRepository(Repository[Setting]):
 
     def get_all(self) -> Optional[List[Setting]]:
         return self._db.session.query(Setting) \
@@ -27,3 +27,8 @@ class SettingsRepository(Repository):
 
         self._db.commit_changes()
         Logger.log(setting, f"Set {setting.name} to {value}")
+
+    def get_by_guild_id(self, guild_id: int) -> Optional[List[Setting]]:
+        return self._db.session.query(Setting) \
+            .filter(Setting.guild_id == guild_id) \
+            .all()

@@ -1,11 +1,12 @@
-from pydoc import locate
+from typing import List
 
-from discord.ext import commands
+import discord
+from discord import SlashCommandGroup, Option, OptionChoice
 
-from .actions import Actions
-from .storage.uow import UnitOfWork
-from src.cogs.security import Security
 from src.kiyomi.base_cog import BaseCog
+from .actions import Actions
+from .storage.model import Setting
+from .storage.uow import UnitOfWork
 
 
 class Settings(BaseCog):
@@ -14,48 +15,48 @@ class Settings(BaseCog):
         self.uow = uow
         self.actions = actions
 
-    @commands.group(invoke_without_command=True)
-    @Security.owner_or_permissions(administrator=True)
-    async def settings(self, ctx):
-        """Link ScoreSaber profile to Discord member."""
-        await ctx.send_help(ctx.command)
+        # Register events
+        self.events()
+
+    def events(self):
+        @self.uow.bot.events.on("setting_register")
+        async def register_setting(settings: List[Setting]):
+            self.actions.register_settings(settings)
+
+    settings = SlashCommandGroup(
+        "setting",
+        "Various settings"
+    )
+
+    # Workaround
+    async def get_settings(self, ctx: discord.AutocompleteContext) -> List[OptionChoice]:
+        return self.actions.get_settings()
+
+    async def get_setting_values(self, ctx: discord.AutocompleteContext):
+        return await self.actions.get_setting_values(ctx)
 
     @settings.command(name="set")
-    async def settings_set(self, ctx, setting_name: str, value_type: str, setting_value: str):
+    async def settings_set(
+        self,
+        ctx: discord.ApplicationContext,
+        setting: Option(
+            str,
+            "Setting name",
+            autocomplete=get_settings
+        ),
+        value: Option(
+            str,
+            "Setting value",
+            autocomplete=get_setting_values
+        )
+    ):
         """Set setting value"""
-        t = locate(value_type)
-        value = t(setting_value)
-        self.actions.set(ctx.guild.id, setting_name, value)
+        registered_settings = [choice.value for choice in self.actions.get_settings()]
 
-    @settings.command(name="get")
-    async def settings_get(self, ctx, setting_name: str):
-        """Get setting value"""
-        setting_value = self.actions.get_value(ctx.guild.id, setting_name)
-        await ctx.send(f"{setting_name} = {setting_value}")
+        if setting not in registered_settings:
+            await ctx.respond(f"\"{setting}\" is not a valid setting name")
 
-    # TODO: Find a better way for this. This should belong in BeatSaver cog!
-    @settings.command(name="leaderboard")
-    async def settings_leaderboard(self, ctx, status: str):
-        """Enable/Disable leaderboards on map command."""
-        if status.lower() == "enable":
-            self.actions.set(ctx.guild.id, "map_leaderboard", True)
-        elif status.lower() == "disable":
-            self.actions.set(ctx.guild.id, "map_leaderboard", False)
-        else:
-            await ctx.send(f"Only valid options are: enable, disable")
+        self.actions.set(ctx.guild.id, setting, value)
 
-        await ctx.send(f"Map leaderboards are now: {status}")
-
-    # TODO: Find a better way for this. This should belong in General cog!
-    @settings.command(name="repost_emoji")
-    async def settings_repost_emoji(self, ctx, status: str):
-        """Enable/Disable emoji reposting on single emoji messages."""
-        if status.lower() == "enable":
-            self.actions.set(ctx.guild.id, "repost_emoji", True)
-        elif status.lower() == "disable":
-            self.actions.set(ctx.guild.id, "repost_emoji", False)
-        else:
-            await ctx.send(f"Only valid options are: enable, disable")
-
-        await ctx.send(f"Reposting emojis are now: {status}")
+        await ctx.respond(f"{setting} is now {value}")
 
