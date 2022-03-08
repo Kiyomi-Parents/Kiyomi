@@ -24,11 +24,12 @@ class BeatSaver(BaseCog, name="Beat Saver"):
 
         @self.uow.bot.events.on("on_new_scores")
         async def attach_song_to_score(scores: List[Score]):
-            for score in scores:
-                try:
-                    await self.actions.get_beatmap_version_by_hash(score.song_hash)
-                except SongNotFound as error:
-                    Logger.log(score, error)
+            song_hashes = [score.song_hash for score in scores]
+
+            try:
+                await self.actions.get_beatmaps_by_hashes(list(set(song_hashes)))
+            except SongNotFound as error:
+                Logger.log("on_new_score", error)
 
     @commands.Cog.listener()
     async def on_ready(self):

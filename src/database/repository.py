@@ -20,13 +20,16 @@ class Repository(ABC, Generic[T]):
     def get_all(self) -> Optional[List[T]]:
         pass
 
-    def add(self, entry: T) -> T:
+    def add(self, entry: T):
         self._db.add_entry(entry)
 
-        return self.get_by_id(entry.id)
+        self._db.session.refresh(entry)
 
     def add_all(self, entries: List[T]):
         self._db.add_entries(entries)
+
+        for entry in entries:
+            self._db.session.refresh(entry)
 
     def remove(self, entry: T):
         self._db.remove_entry(entry)
