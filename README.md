@@ -10,21 +10,28 @@
 
 Discord bot that has various functionality related to Beat Saber.
 
-### Install
-
+### Install dependencies
     # Install requirements  
 	python3 -m pip install -r requirements.txt  
 
-### Usage
+### Starting Kiyomi
+    # Set environment variables manually
+    # Alternatively rename .env.example to .env and fill out the configuration there instead
+	export DISCORD_TOKEN=<Discord bot token>
+    export DATABASE_IP=<MySql/MariaDB host ip>
+    export DATABASE_USER=<Database username>
+    export DATABASE_PW=<Database password>
+    export DATABASE_NAME=<Database name>
+
     # Run database migrations
     alembic upgrade head
-
-    # Set discord token  
-	export DISCORD_TOKEN=<My very secret token>  
   
 	# Start bot  
-	python3 BSBot.py
+	python3 Kiyomi.py
 
 ### Lint
     # Run pylint
-    pylint BSBot.py src tests
+    pylint Kiyomi.py src
+
+### Generate alembic migration
+    alembic revision --autogenerate -m "Change message"
