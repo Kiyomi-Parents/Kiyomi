@@ -2,13 +2,16 @@
   <br>
   <a href="https://github.com/Kiyomi-Parents/Kiyomi"><img src="https://share.lucker.xyz/qahu5/rakOHeSi09.png/raw.png" alt="Kiyomi"></a>
   <br>
-  Kiyomi
+  Kiyomi 🦊
   <br>
 </h1>
 
 # Overview
 
-Discord bot that has various functionality related to Beat Saber.
+Discord bot that has various functionality related to Beat Saber 💜</br>
+<sub>Watching your Beat Saber activity very closely 👀</sub></br>
+<sub>Measures your Score Saber PP everyday 📏</sub>
+
 
 ### Install dependencies
     # Install requirements  
