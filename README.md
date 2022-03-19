@@ -1,6 +1,6 @@
 <h1 align="center">
   <br>
-  <a href="https://github.com/Kiyomi-Parents/Kiyomi"><img src="https://share.lucker.xyz/qahu5/rakOHeSi09.png/raw.png" alt="Kiyomi"></a>
+  <a href="https://github.com/Kiyomi-Parents/Kiyomi"><img src="https://share.lucker.xyz/qahu5/WelisUWo93.png/raw.png" alt="Kiyomi"></a>
   <br>
   Kiyomi 🦊
   <br>
