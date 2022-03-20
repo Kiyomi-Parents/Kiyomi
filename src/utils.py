@@ -1,11 +1,11 @@
 import random
 import time
 from functools import wraps
+
+import discord
 from discord.ext import tasks
 
 from Kiyomi import Kiyomi
-import discord
-
 from src.log import Logger
 
 
@@ -28,6 +28,8 @@ class Utils:
     def discord_ready(func):
         @wraps(func)
         async def wrapper(self, *args, **kwargs):
+            await self.uow.bot.wait_until_ready()
+
             if not self.uow.bot.is_ready() and not self.uow.bot.running_tests:
                 Logger.log("Discord", f"Discord client not ready, skipping task {func.__name__}")
                 return
