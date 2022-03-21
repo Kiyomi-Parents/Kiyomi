@@ -14,11 +14,11 @@ class BeatmapService(BeatSaverService):
 
         try:
             async for map_detail in self.beatsaver.beatmaps_by_keys(beatmap_keys):
-                beatmap = Beatmap(map_detail)
-                self.uow.beatmap_repo.add_all(beatmap)
-                beatmaps.append(beatmap)
+                beatmaps.append(Beatmap(map_detail))
         except pybeatsaver.NotFoundException as error:
             raise SongNotFound(f"Could not find song at {error.url}") from error
+
+        self.uow.beatmap_repo.add_all(beatmaps)
 
         return beatmaps
 
