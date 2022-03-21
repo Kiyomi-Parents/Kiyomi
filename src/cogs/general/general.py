@@ -4,27 +4,33 @@ from discord.ext import commands
 from discord.ext.commands import EmojiNotFound
 
 from src.cogs.security import Security
-from src.kiyomi.base_cog import BaseCog
+from src.cogs.settings.storage.model.toggle_setting import ToggleSetting
 from src.utils import Utils
-from .actions import Actions
 from .errors import EmojiAlreadyExistsException, EmojiNotFoundException
-from .storage.uow import UnitOfWork
-from src.cogs.settings.storage.model.ToggleSetting import ToggleSetting
+from .general_cog import GeneralCog
+from .services import EmojiService, GuildService, MemberService, RoleService
+from ..settings import SettingsAPI
+from ...kiyomi import Kiyomi
 
 
-class General(BaseCog):
-    def __init__(self, uow: UnitOfWork, actions: Actions):
-        self.uow = uow
-        self.actions = actions
+class General(GeneralCog):
+    def __init__(self,
+        bot: Kiyomi,
+        emoji_service: EmojiService,
+        guild_service: GuildService,
+        member_service: MemberService,
+        role_service: RoleService
+    ):
+        super().__init__(bot, emoji_service, guild_service, member_service, role_service)
 
         # Register events
         self.events()
 
     def events(self):
-        @self.uow.bot.events.on("register_member")
+        @self.bot.events.on("register_member")
         async def register_member(discord_member: discord.Member):
-            self.actions.register_member(discord_member)
-            self.actions.register_guild_member(discord_member)
+            self.member_service.register_member(discord_member)
+            self.member_service.register_guild_member(discord_member)
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -32,27 +38,28 @@ class General(BaseCog):
             ToggleSetting.create("repost_emoji", False)
         ]
 
-        self.uow.bot.events.emit("setting_register", settings)
+        self.bot.events.emit("setting_register", settings)
 
-        for discord_guild in self.uow.bot.guilds:
-            self.actions.register_guild(discord_guild)
+        for discord_guild in self.bot.guilds:
+            self.guild_service.register_guild(discord_guild)
 
     @commands.Cog.listener()
     async def on_message(self, msg: discord.Message):
         """Repost emoji if enabled"""
-        if msg.author.id == self.uow.bot.user.id:
+        if msg.author.id == self.bot.user.id:
             return
 
-        settings = self.uow.bot.get_cog("SettingsAPI")
+        settings = self.bot.get_cog_api(SettingsAPI)
 
         if settings.get(msg.guild.id, "repost_emoji"):
-            emoji = self.actions.get_emoji_from_message(msg.content)
+            emoji = self.emoji_service.get_emoji_from_message(msg.content)
+
             if emoji is not None:
                 await msg.channel.send(emoji)
 
     @commands.Cog.listener()
     async def on_guild_join(self, guild: discord.Guild):
-        self.actions.register_guild(guild)
+        self.guild_service.register_guild(guild)
 
     @commands.slash_command()
     async def hello(self, ctx):
@@ -84,7 +91,8 @@ class General(BaseCog):
     @emoji.command(name="random")
     async def emoji_random(self, ctx):
         """Posts a random enabled emoji"""
-        emoji = await self.actions.get_random_enabled_emoji()
+        emoji = await self.emoji_service.get_random_enabled_emoji()
+
         await ctx.respond(str(emoji))
 
     @emoji.command(name="all")
@@ -93,8 +101,8 @@ class General(BaseCog):
         """Posts all the emojis, not a good idea to use :)"""
         emoji_list = []
 
-        for emoji in self.uow.bot.emojis:
-            emoji_list.append(str(self.uow.bot.get_emoji(emoji.id)))
+        for emoji in self.bot.emojis:
+            emoji_list.append(str(self.bot.get_emoji(emoji.id)))
 
             if len(emoji_list) >= 20:
                 await ctx.respond("".join(emoji_list))
@@ -104,7 +112,7 @@ class General(BaseCog):
 
     # Workaround
     async def get_available_emojis(self, ctx: discord.AutocompleteContext):
-        return await self.actions.get_available_emojis(ctx)
+        return await self.emoji_service.get_available_emojis(ctx)
 
     @emoji.command(name="enable")
     @Security.is_owner()
@@ -119,16 +127,16 @@ class General(BaseCog):
     ):
         """Allow the given emoji to be used by the bot"""
         try:
-            obj_emoji = self.uow.bot.get_emoji(int(emoji))
+            obj_emoji = self.bot.get_emoji(int(emoji))
 
-            await self.actions.enable_emoji(obj_emoji.id, obj_emoji.guild_id, obj_emoji.name)
+            await self.emoji_service.enable_emoji(obj_emoji.id, obj_emoji.guild_id, obj_emoji.name)
             await ctx.respond(f"Enabled {str(obj_emoji)}")
         except EmojiAlreadyExistsException as error:
             await ctx.respond(str(error))
 
     # Workaround
     async def get_enabled_emojis(self, ctx: discord.AutocompleteContext):
-        return await self.actions.get_enabled_emojis(ctx)
+        return await self.emoji_service.get_enabled_emojis(ctx)
 
     @emoji.command(name="disable")
     @Security.is_owner()
@@ -142,9 +150,9 @@ class General(BaseCog):
     ):
         """Disallow the given emoji from being used by the bot"""
         try:
-            obj_emoji = self.uow.bot.get_emoji(int(emoji))
+            obj_emoji = self.bot.get_emoji(int(emoji))
 
-            await self.actions.disable_emoji(obj_emoji.id)
+            await self.emoji_service.disable_emoji(obj_emoji.id)
             await ctx.respond(f"Disabled {str(obj_emoji)}")
         except EmojiNotFoundException as error:
             await ctx.respond(str(error))

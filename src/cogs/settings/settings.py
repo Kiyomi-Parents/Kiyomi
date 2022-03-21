@@ -3,25 +3,24 @@ from typing import List
 import discord
 from discord import SlashCommandGroup, Option, OptionChoice
 
-from src.kiyomi.base_cog import BaseCog
-from .actions import Actions
-from .storage.model import Setting
-from .storage.uow import UnitOfWork
+from .services import SettingService
+from .settings_cog import SettingsCog
+from .storage import Setting
+from src.kiyomi import Kiyomi
 
 
-class Settings(BaseCog):
+class Settings(SettingsCog):
 
-    def __init__(self, uow: UnitOfWork, actions: Actions):
-        self.uow = uow
-        self.actions = actions
+    def __init__(self, bot: Kiyomi, setting_service: SettingService):
+        super().__init__(bot, setting_service)
 
         # Register events
         self.events()
 
     def events(self):
-        @self.uow.bot.events.on("setting_register")
+        @self.bot.events.on("setting_register")
         async def register_setting(settings: List[Setting]):
-            self.actions.register_settings(settings)
+            self.setting_service.register_settings(settings)
 
     settings = SlashCommandGroup(
         "setting",
@@ -30,10 +29,10 @@ class Settings(BaseCog):
 
     # Workaround
     async def get_settings(self, ctx: discord.AutocompleteContext) -> List[OptionChoice]:
-        return self.actions.get_settings()
+        return self.setting_service.get_settings()
 
     async def get_setting_values(self, ctx: discord.AutocompleteContext):
-        return await self.actions.get_setting_values(ctx)
+        return await self.setting_service.get_setting_values(ctx)
 
     @settings.command(name="set")
     async def settings_set(
@@ -51,12 +50,12 @@ class Settings(BaseCog):
         )
     ):
         """Set setting value"""
-        registered_settings = [choice.value for choice in self.actions.get_settings()]
+        registered_settings = [choice.value for choice in self.setting_service.get_settings()]
 
         if setting not in registered_settings:
             await ctx.respond(f"\"{setting}\" is not a valid setting name")
 
-        self.actions.set(ctx.guild.id, setting, value)
+        self.setting_service.set(ctx.guild.id, setting, value)
 
         await ctx.respond(f"{setting} is now {value}")
 

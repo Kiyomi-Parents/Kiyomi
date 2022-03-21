@@ -1,9 +1,10 @@
 from typing import overload, Optional
 
-from src.cogs.settings.errors import InvalidSettingTypeException
-from src.cogs.settings.storage.model import Setting
-from src.cogs.settings.storage.model.AbstractSetting import AbstractSetting
-from src.cogs.settings.storage.model.enums.setting_type import SettingType
+from ...errors import InvalidSettingTypeException
+from .setting import Setting
+from .abstract_setting import AbstractSetting
+from .enums.setting_type import SettingType
+
 
 
 class IntegerSetting(AbstractSetting[int]):

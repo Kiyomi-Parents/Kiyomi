@@ -4,8 +4,8 @@ from typing import TypeVar, Generic
 import discord
 from discord import OptionChoice
 
-from src.cogs.settings.storage.model import Setting
-from src.cogs.settings.storage.model.enums.setting_type import SettingType
+from .setting import Setting
+from .enums.setting_type import SettingType
 
 T = TypeVar('T')
 

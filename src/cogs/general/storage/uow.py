@@ -1,17 +1,19 @@
-from Kiyomi import Kiyomi
+from sqlalchemy.orm import Session
+
+from src.database import BaseUnitOfWork
 from .repository import GuildRepository, ChannelRepository, RoleRepository, MemberRepository, GuildMemberRepository, \
     MemberRoleRepository, EmojiRepository
 
 
-class UnitOfWork:
+class UnitOfWork(BaseUnitOfWork):
 
-    def __init__(self, bot: Kiyomi):
-        self.guild_repo = GuildRepository(bot.database)
-        self.channel_repo = ChannelRepository(bot.database)
-        self.role_repo = RoleRepository(bot.database)
-        self.member_repo = MemberRepository(bot.database)
-        self.guild_member_repo = GuildMemberRepository(bot.database)
-        self.member_role_repo = MemberRoleRepository(bot.database)
-        self.emoji_repo = EmojiRepository(bot.database)
+    def __init__(self, session: Session):
+        super().__init__(session)
 
-        self.bot = bot
+        self.guild_repo = GuildRepository(session)
+        self.channel_repo = ChannelRepository(session)
+        self.role_repo = RoleRepository(session)
+        self.member_repo = MemberRepository(session)
+        self.guild_member_repo = GuildMemberRepository(session)
+        self.member_role_repo = MemberRoleRepository(session)
+        self.emoji_repo = EmojiRepository(session)

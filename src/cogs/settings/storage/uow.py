@@ -1,10 +1,12 @@
-from Kiyomi import Kiyomi
-from .repository.settings_repository import SettingsRepository
+from sqlalchemy.orm import Session
+
+from src.database import BaseUnitOfWork, Database
+from .repository import SettingsRepository
 
 
-class UnitOfWork:
+class UnitOfWork(BaseUnitOfWork):
 
-    def __init__(self, bot: Kiyomi):
-        self.settings_repo = SettingsRepository(bot.database)
+    def __init__(self, session: Session):
+        super().__init__(session)
 
-        self.bot = bot
+        self.settings_repo = SettingsRepository(session)

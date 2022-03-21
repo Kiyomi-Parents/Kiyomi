@@ -4,10 +4,10 @@ from typing import overload, Optional
 import discord
 from discord import OptionChoice
 
-from . import Setting
-from .AbstractSetting import AbstractSetting
-from .enums.setting_type import SettingType
 from ...errors import InvalidSettingTypeException
+from .setting import Setting
+from .abstract_setting import AbstractSetting
+from .enums.setting_type import SettingType
 
 
 class ToggleSetting(AbstractSetting[bool]):

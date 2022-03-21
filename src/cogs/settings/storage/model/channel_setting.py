@@ -3,10 +3,10 @@ from typing import Optional
 import discord.abc
 from discord import OptionChoice
 
-from src.cogs.settings.errors import InvalidSettingTypeException
-from src.cogs.settings.storage.model import Setting
-from src.cogs.settings.storage.model.AbstractSetting import AbstractSetting
-from src.cogs.settings.storage.model.enums.setting_type import SettingType
+from ...errors import InvalidSettingTypeException
+from .setting import Setting
+from .abstract_setting import AbstractSetting
+from .enums.setting_type import SettingType
 
 
 class ChannelSetting(AbstractSetting[discord.abc.GuildChannel]):
@@ -58,6 +58,11 @@ class ChannelSetting(AbstractSetting[discord.abc.GuildChannel]):
 
         for channel in await ctx.interaction.guild.fetch_channels():
             if isinstance(channel, discord.TextChannel):
-                text_channels.append(OptionChoice(f"#{channel.name}{' (current)' if self.value.id == channel.id else ''}", str(channel.id)))
+                label = f"#{channel.name}"
+
+                if self.value is not None and self.value.id == channel.id:
+                    label += ' (current)'
+
+                text_channels.append(OptionChoice(label, str(channel.id)))
 
         return text_channels

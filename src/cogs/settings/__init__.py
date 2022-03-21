@@ -1,12 +1,14 @@
+from .services import SettingService
 from .settings import Settings
 from .settings_api import SettingsAPI
-from .storage.uow import UnitOfWork
-from .actions import Actions
+from .storage import UnitOfWork
+from src.kiyomi import Kiyomi
 
 
-def setup(bot):
-    uow = UnitOfWork(bot)
-    setting_actions = Actions(uow)
+def setup(bot: Kiyomi):
+    uow = UnitOfWork(bot.database.session)
 
-    bot.add_cog(Settings(uow, setting_actions))
-    bot.add_cog(SettingsAPI(uow, setting_actions))
+    setting_service = SettingService(bot, uow)
+
+    bot.add_cog(Settings(bot, setting_service))
+    bot.add_cog(SettingsAPI(bot, setting_service, uow))

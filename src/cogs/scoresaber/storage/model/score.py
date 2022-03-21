@@ -3,10 +3,9 @@ from typing import Optional
 import pyscoresaber
 from dateutil import tz
 from pyscoresaber import Difficulty
-from sqlalchemy import Column, String, Integer, ForeignKey, DateTime, Float, Enum
+from sqlalchemy import Column, String, Integer, ForeignKey, DateTime, Float, Enum, Boolean
 from sqlalchemy.orm import relationship
 
-from src.cogs.scoresaber.scoresaber_utils import ScoreSaberUtils
 from src.database import Base
 
 
@@ -18,78 +17,46 @@ class Score(Base):
     player_id = Column(String(128), ForeignKey("player.id", ondelete="CASCADE"))
 
     # ScoreSaber info
-    rank = Column(Integer)
     score_id = Column(Integer)
-    score = Column(Integer)
-    unmodified_score = Column(Integer)
-    mods = Column(String(128))
+    rank = Column(Integer)
+    base_score = Column(Integer)
+    modified_score = Column(Integer)
     pp = Column(Float)
     weight = Column(Float)
+    modifiers = Column(String(128))
+    multiplier = Column(String(128))
+    bad_cuts = Column(Integer)
+    missed_notes = Column(Integer)
+    max_combo = Column(Integer)
+    full_combo = Column(Boolean)
+    has_replay = Column(Boolean)
     time_set = Column(DateTime)
-    leaderboard_id = Column(Integer)
-    song_hash = Column(String(128))
-    song_name = Column(String(128))
-    song_sub_name = Column(String(128))
-    song_author_name = Column(String(128))
-    level_author_name = Column(String(128))
-    characteristic = Column(Enum(pyscoresaber.Characteristic))
-    difficulty = Column(Enum(pyscoresaber.Difficulty))
-    max_score = Column(Integer)
 
-    beatmap_version = relationship(
-        "BeatmapVersion",
-        primaryjoin='BeatmapVersion.hash == Score.song_hash',
-        foreign_keys=[song_hash],
+    leaderboard_id = Column(Integer, ForeignKey("leaderboard.id"))
+    leaderboard = relationship(
+        "Leaderboard",
         uselist=False
     )
 
-    def __init__(self, score_data: pyscoresaber.Score):
-        self.rank = score_data.rank
-        self.score_id = score_data.score_id
-        self.score = score_data.score
-        self.unmodified_score = score_data.unmodified_score
-        self.mods = score_data.mods
-        self.pp = score_data.pp
-        self.weight = score_data.weight
-        self.time_set = score_data.time_set
-        self.leaderboard_id = score_data.leaderboard_id
-        self.song_hash = score_data.song_hash.lower()
-        self.song_name = score_data.song_name
-        self.song_sub_name = score_data.song_sub_name
-        self.song_author_name = score_data.song_author_name
-        self.level_author_name = score_data.level_author_name
-        self.characteristic = score_data.characteristic
-        self.difficulty = score_data.difficulty
-        self.max_score = score_data.max_score
+    def __init__(self, player_score: pyscoresaber.PlayerScore):
+        self.score_id = player_score.score.id
+        self.rank = player_score.score.rank
+        self.base_score = player_score.score.base_score
+        self.modified_score = player_score.score.modified_score
+        self.pp = player_score.score.pp
+        self.weight = player_score.score.weight
+        self.modifiers = player_score.score.modifiers
+        self.multiplier = player_score.score.multiplier
+        self.bad_cuts = player_score.score.bad_cuts
+        self.missed_notes = player_score.score.missed_notes
+        self.max_combo = player_score.score.max_combo
+        self.full_combo = player_score.score.full_combo
+        self.has_replay = player_score.score.has_replay
+        self.time_set = player_score.score.time_set
 
-    @property
-    def leaderboard_url(self):
-        page = (self.rank - 1) // 12 + 1
-        return f"https://scoresaber.com/leaderboard/{self.leaderboard_id}?page={page}"
+        self.leaderboard_id = player_score.leaderboard.id
 
-    @property
-    def song_name_full(self):
-        if self.song_sub_name:
-            return f"{self.song_name}: {self.song_sub_name}"
-
-        return self.song_name
-
-    @property
-    def difficulty_name(self) -> str:
-        difficulties = {
-            Difficulty.EASY: "Easy",
-            Difficulty.NORMAL: "Normal",
-            Difficulty.HARD: "Hard",
-            Difficulty.EXPERT: "Expert",
-            Difficulty.EXPERT_PLUS: "Expert+"
-        }
-
-        return difficulties[self.difficulty]
-
-    @property
-    def song_image_url(self) -> str:
-        return f"https://scoresaber.com/imports/images/songs/{self.song_hash.upper()}.png"
-
+    # TODO: Probably broken
     @property
     def accuracy(self) -> Optional[float]:
         max_score = self.max_score
@@ -105,6 +72,7 @@ class Score(Base):
 
         return None
 
+    # TODO: Probably broken
     @property
     def weighted_pp(self) -> float:
         return round(self.pp * self.weight, 2)
@@ -113,9 +81,5 @@ class Score(Base):
     def get_date(self):
         return self.time_set.astimezone(tz.tzlocal())
 
-    @property
-    def is_ranked(self):
-        return True if self.pp else False
-
     def __str__(self):
-        return f"Score {self.song_name} ({self.score_id})"
+        return f"Score {self.score_id} ({self.id})"

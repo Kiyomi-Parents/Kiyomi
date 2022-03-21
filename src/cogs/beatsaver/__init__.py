@@ -1,12 +1,17 @@
-from .actions import Actions
+import pybeatsaver
+
 from .beatsaver import BeatSaver
 from .beatsaver_api import BeatSaverAPI
-from .storage.uow import UnitOfWork
+from .services import BeatmapService
+from .storage import UnitOfWork
+from src.kiyomi import Kiyomi
 
 
-def setup(bot):
-    uow = UnitOfWork(bot)
-    beat_saver_actions = Actions(uow)
+def setup(bot: Kiyomi):
+    beatsaver_api_client = pybeatsaver.BeatSaverAPI(bot.loop)
+    uow = UnitOfWork(bot.database.session)
 
-    bot.add_cog(BeatSaver(uow, beat_saver_actions))
-    bot.add_cog(BeatSaverAPI(uow, beat_saver_actions))
+    beatmap_service = BeatmapService(bot, uow, beatsaver_api_client)
+
+    bot.add_cog(BeatSaver(bot, beatmap_service))
+    bot.add_cog(BeatSaverAPI(bot, beatmap_service, uow))

@@ -3,46 +3,47 @@ from typing import List
 from discord import slash_command
 from discord.ext import commands
 
-from .actions import Actions
+from .services import BeatmapService
+from .beatsaver_cog import BeatSaverCog
 from .errors import SongNotFound
 from .message import Message
-from .storage.uow import UnitOfWork
 from src.log import Logger
-from src.kiyomi.base_cog import BaseCog
-from src.cogs.scoresaber.storage.model.score import Score
+from src.kiyomi import Kiyomi
+from src.cogs.leaderboard import LeaderboardAPI
+from src.cogs.settings import SettingsAPI
+from src.cogs.scoresaber.storage import Leaderboard
 
 
-class BeatSaver(BaseCog, name="Beat Saver"):
-    def __init__(self, uow: UnitOfWork, actions: Actions):
-        self.uow = uow
-        self.actions = actions
+class BeatSaver(BeatSaverCog, name="Beat Saver"):
+    def __init__(self, bot: Kiyomi, beatmap_service: BeatmapService):
+        super().__init__(bot, beatmap_service)
 
         # Register events
         self.events()
 
     def events(self):
 
-        @self.uow.bot.events.on("on_new_scores")
-        async def attach_song_to_score(scores: List[Score]):
-            song_hashes = [score.song_hash for score in scores]
+        @self.bot.events.on("on_new_leaderboards")
+        async def attach_song_to_score(leaderboards: List[Leaderboard]):
+            song_hashes = [leaderboard.song_hash for leaderboard in leaderboards]
 
             try:
-                await self.actions.get_beatmaps_by_hashes(list(set(song_hashes)))
+                await self.beatmap_service.get_beatmaps_by_hashes(list(set(song_hashes)))
             except SongNotFound as error:
-                Logger.log("on_new_score", error)
+                Logger.log("on_new_leaderboards", error)
 
     @commands.Cog.listener()
     async def on_ready(self):
-        await self.uow.beatsaver.start()
+        await self.beatmap_service.start_scoresaber_api_client()
 
     @slash_command(aliases=["bsr", "song"])
     async def map(self, ctx, key: str):
         """Displays song info."""
-        leaderboard = self.uow.bot.get_cog("LeaderboardAPI")
-        settings = self.uow.bot.get_cog("SettingsAPI")
+        leaderboard = self.bot.get_cog_api(LeaderboardAPI)
+        settings = self.bot.get_cog_api(SettingsAPI)
 
         try:
-            db_beatmap = await self.actions.get_beatmap_by_key(key)
+            db_beatmap = await self.beatmap_service.get_beatmap_by_key(key)
             song_embed = Message.get_song_embed(db_beatmap)
 
             await ctx.respond(embed=song_embed)

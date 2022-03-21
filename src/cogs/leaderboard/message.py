@@ -6,7 +6,7 @@ from dateutil import tz
 from discord import Embed
 from prettytable import PrettyTable
 
-from .actions import PlayerScoreLeaderboard
+from .services import PlayerScoreLeaderboard
 
 
 class Message:

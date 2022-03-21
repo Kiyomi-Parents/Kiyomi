@@ -1,12 +1,14 @@
-from .actions import Actions
 from .leaderboard_api import LeaderboardAPI
-from .storage.uow import UnitOfWork
+from .services.player_leaderboard_service import PlayerLeaderboardService
+from .storage.unit_of_work import UnitOfWork
 from .leaderboard import Leaderboard
+from src.kiyomi import Kiyomi
 
 
-def setup(bot):
-    uow = UnitOfWork(bot)
-    leaderboard_actions = Actions(uow)
+def setup(bot: Kiyomi):
+    uow = UnitOfWork(bot.database.session)
 
-    bot.add_cog(Leaderboard(uow, leaderboard_actions))
-    bot.add_cog(LeaderboardAPI(uow, leaderboard_actions))
+    player_leaderboard_service = PlayerLeaderboardService(bot, uow)
+
+    bot.add_cog(Leaderboard(bot, player_leaderboard_service))
+    bot.add_cog(LeaderboardAPI(bot, player_leaderboard_service, uow))

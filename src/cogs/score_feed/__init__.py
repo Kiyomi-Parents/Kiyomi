@@ -1,16 +1,19 @@
-from .actions import Actions
 from .score_feed import ScoreFeed
-from .storage.uow import UnitOfWork
+from .services import NotificationService, SentScoreService
+from .storage import UnitOfWork
 from .tasks import Tasks
 from src.kiyomi import Kiyomi
 
 
 def setup(bot: Kiyomi):
-    uow = UnitOfWork(bot)
-    score_feed_tasks = Tasks(uow)
-    score_feed_actions = Actions(uow, score_feed_tasks)
+    uow = UnitOfWork(bot.database.session)
+
+    notification_service = NotificationService(bot, uow)
+    sent_score_service = SentScoreService(bot, uow)
+
+    score_feed_tasks = Tasks(bot, notification_service)
 
     if not bot.running_tests:
         score_feed_tasks.send_notifications.start()
 
-    bot.add_cog(ScoreFeed(uow, score_feed_actions))
+    bot.add_cog(ScoreFeed(bot, notification_service, sent_score_service))

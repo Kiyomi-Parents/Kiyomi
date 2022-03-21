@@ -1,21 +1,19 @@
 from typing import List
 
-import pybeatsaver.errors
+import pybeatsaver
 
-from .errors import SongNotFound
-from .storage.model import Beatmap
-from .storage.uow import UnitOfWork
+from .beatsaver_service import BeatSaverService
+from ..errors import SongNotFound
+from ..storage import Beatmap
 
 
-class Actions:
-    def __init__(self, uow: UnitOfWork):
-        self.uow = uow
+class BeatmapService(BeatSaverService):
 
     async def get_missing_beatmaps_by_keys(self, beatmap_keys: List[str]) -> List[Beatmap]:
         beatmaps = []
 
         try:
-            async for map_detail in self.uow.beatsaver.beatmaps_by_keys(beatmap_keys):
+            async for map_detail in self.beatsaver.beatmaps_by_keys(beatmap_keys):
                 beatmap = Beatmap(map_detail)
                 self.uow.beatmap_repo.add_all(beatmap)
                 beatmaps.append(beatmap)
@@ -49,7 +47,7 @@ class Actions:
         beatmaps = []
 
         try:
-            async for map_details in self.uow.beatsaver.beatmaps_by_hashes_all(beatmap_hashes):
+            async for map_details in self.beatsaver.beatmaps_by_hashes_all(beatmap_hashes):
                 new_beatmaps = [Beatmap(map_detail) for map_detail in map_details]
                 self.uow.beatmap_repo.add_all(new_beatmaps)
                 beatmaps += new_beatmaps

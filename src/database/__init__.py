@@ -1,2 +1,3 @@
 from .database import Base, Database
-from .repository import Repository
+from .base_repository import BaseRepository
+from .base_unit_of_work import BaseUnitOfWork
