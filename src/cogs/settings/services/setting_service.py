@@ -1,25 +1,21 @@
+from src.kiyomi import Kiyomi
+from .settings_service import SettingsService
 from typing import Optional, List
 
 import discord
 from discord import OptionChoice
 
-from .errors import SettingNotFoundException, FailedSettingConvertException
-from .storage.model import Setting
-from .storage.model.AbstractSetting import AbstractSetting
-from .storage.model.ChannelSetting import ChannelSetting
-from .storage.model.IntegerSetting import IntegerSetting
-from .storage.model.TextSetting import TextSetting
-from .storage.model.ToggleSetting import ToggleSetting
-from .storage.model.enums.setting_type import SettingType
-from .storage.uow import UnitOfWork
-from .utils import Utils
+from ..errors import SettingNotFoundException, FailedSettingConvertException
+from ..storage import Setting, ChannelSetting, IntegerSetting, TextSetting, ToggleSetting, SettingType, AbstractSetting, UnitOfWork
+from src.cogs.settings.utils import Utils
 
 
-class Actions:
-    def __init__(self, uow: UnitOfWork):
-        self.uow = uow
+class SettingService(SettingsService):
 
-        self.settings = []
+    def __init__(self, bot: Kiyomi, uow: UnitOfWork):
+        super().__init__(bot, uow)
+
+        self.registered_settings = []
 
     @staticmethod
     def convert_value_to_setting_type(value: any) -> SettingType:
@@ -43,15 +39,15 @@ class Actions:
             raise FailedSettingConvertException(f"Unable to convert setting of type {setting.setting_type}")
 
     def get(self, guild_id: int, name: str) -> AbstractSetting:
-        setting = self.uow.settings_repo.find(guild_id, name)
+        setting = self.uow.settings_repo.get_by_guild_id_and_name(guild_id, name)
 
         if setting is not None:
-            return self.wrap_setting(self.uow.bot, setting)
+            return self.wrap_setting(self.bot, setting)
         else:
-            for reg_setting in self.settings:
+            for reg_setting in self.registered_settings:
                 if reg_setting.name == name:
                     if isinstance(reg_setting, ChannelSetting):
-                        new_setting = reg_setting.create(self.uow.bot, name, reg_setting.value)
+                        new_setting = reg_setting.create(self.bot, name, reg_setting.value)
                     else:
                         new_setting = reg_setting.create(name, reg_setting.value)
 
@@ -83,13 +79,12 @@ class Actions:
         self.uow.settings_repo.remove(setting)
 
     def register_settings(self, settings: List[Setting]) -> None:
-        self.settings += settings
+        self.registered_settings += settings
 
     def get_settings(self) -> List[OptionChoice]:
         settings = []
 
-        for setting in self.settings:
-
+        for setting in self.registered_settings:
             settings.append(OptionChoice(Utils.snake_case_to_sentence(setting.name), setting.name))
 
         return settings

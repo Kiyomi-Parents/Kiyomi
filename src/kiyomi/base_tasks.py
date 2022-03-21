@@ -1,7 +1,8 @@
-from Kiyomi import Kiyomi
+from src.kiyomi import Kiyomi
 
 
-class UnitOfWork:
+class BaseTasks:
 
     def __init__(self, bot: Kiyomi):
         self.bot = bot
+

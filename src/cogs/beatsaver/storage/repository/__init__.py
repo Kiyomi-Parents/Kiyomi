@@ -1,0 +1,2 @@
+from .beatmap_repository import BeatmapRepository
+from .beatmap_version_repository import BeatmapVersionRepository

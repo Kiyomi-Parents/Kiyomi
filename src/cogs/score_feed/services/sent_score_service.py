@@ -1,19 +1,15 @@
-from .errors import GuildRecentChannelExistsException, GuildRecentChannelNotFoundException
-from .storage.model import SentScore
-from .storage.uow import UnitOfWork
-from .tasks import Tasks
-from src.cogs.general.storage.model import Guild
-from src.cogs.scoresaber.storage.model.player import Player
+from .score_feed_service import ScoreFeedService
+from src.cogs.scoresaber import ScoreSaberAPI
 from src.log import Logger
+from src.cogs.scoresaber.storage import Player
+from src.cogs.general.storage import Guild
+from ..storage import SentScore
 
 
-class Actions:
-    def __init__(self, uow: UnitOfWork, tasks: Tasks):
-        self.uow = uow
-        self.tasks = tasks
+class SentScoreService(ScoreFeedService):
 
     def mark_all_guild_scores_sent(self, guild_id: int):
-        scoresaber = self.uow.bot.get_cog("ScoreSaberAPI")
+        scoresaber = self.bot.get_cog_api(ScoreSaberAPI)
         guild_players = scoresaber.get_guild_players_by_guild(guild_id)
 
         if len(guild_players) == 0:
@@ -41,15 +37,3 @@ class Actions:
 
         if len(sent_scores) != 0:
             self.uow.sent_score_repo.add_all(sent_scores)
-
-    async def send_notifications(self, guild_id: int):
-        scoresaber = self.uow.bot.get_cog("ScoreSaberAPI")
-        guild_players = scoresaber.get_guild_players_by_guild(guild_id)
-
-        if len(guild_players) == 0:
-            return
-
-        Logger.log(guild_players[0].guild, f"Sending notifications for {len(guild_players)} players")
-
-        for guild_player in guild_players:
-            await self.tasks.send_notification(guild_player.guild, guild_player.player)

@@ -1,4 +1,6 @@
 import traceback
+import typing
+from typing import TypeVar
 
 from discord.ext import commands
 from discord.ext.commands import MissingRequiredArgument, BadArgument, NotOwner, MissingPermissions, Context
@@ -7,6 +9,8 @@ from pyee import AsyncIOEventEmitter
 from src.cogs.errors import NoPrivateMessagesException
 from src.database import Database
 from src.log import Logger
+
+TCog = TypeVar('TCog')
 
 
 class Kiyomi(commands.Bot):
@@ -52,8 +56,10 @@ class Kiyomi(commands.Bot):
 
     async def send_dm_with_stacktrace(self, context: Context, exception):
         await self.is_owner(context.author)  # populates self.owner_ids or self.owner_id
+
         stacktrace = \
             ''.join(traceback.format_exception(etype=type(exception), value=exception, tb=exception.__traceback__))
+
         if self.owner_ids:
             for owner_id in self.owner_ids:
                 owner = await self.fetch_user(owner_id)
@@ -61,3 +67,11 @@ class Kiyomi(commands.Bot):
         elif self.owner_id is not None:
             owner = await self.fetch_user(self.owner_id)
             await owner.send(f"```python\n{stacktrace}```")
+
+    def get_cog_api(self, cog_type: typing.Type[TCog]) -> TCog:
+        cog = self.get_cog(cog_type.__name__)
+
+        if not isinstance(cog, cog_type):
+            raise TypeError(f"Expected cog type {cog_type.__name__}, but got {type(cog)}")
+
+        return typing.cast(TCog, cog)

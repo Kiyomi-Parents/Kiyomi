@@ -2,10 +2,14 @@ from discord import ApplicationContext
 from discord.ext import commands
 from termcolor import colored
 
+from src.kiyomi import Kiyomi
 from src.log import Logger
 
 
 class BaseCog(commands.Cog):
+    def __init__(self, bot: Kiyomi):
+        self.bot = bot
+
     async def cog_before_invoke(self, ctx: ApplicationContext):
         Logger.log(self.qualified_name,
                    f"{colored(ctx.interaction.user.name, 'blue')} executed command "

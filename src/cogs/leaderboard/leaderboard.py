@@ -1,17 +1,16 @@
 from discord import slash_command
 from discord.ext import commands
 
-from src.cogs.settings.storage.model.ToggleSetting import ToggleSetting
-from src.kiyomi.base_cog import BaseCog
-from .actions import Actions
+from src.cogs.settings.storage.model.toggle_setting import ToggleSetting
+from .services import PlayerLeaderboardService
+from .leaderboard_cog import LeaderboardCog
 from .message import Message
-from .storage.uow import UnitOfWork
+from src.kiyomi import Kiyomi
 
 
-class Leaderboard(BaseCog):
-    def __init__(self, uow: UnitOfWork, actions: Actions):
-        self.uow = uow
-        self.actions = actions
+class Leaderboard(LeaderboardCog):
+    def __init__(self, bot: Kiyomi, player_leaderboard_service: PlayerLeaderboardService):
+        super().__init__(bot, player_leaderboard_service)
 
         # Register events
         self.events()
@@ -25,12 +24,12 @@ class Leaderboard(BaseCog):
             ToggleSetting.create("map_leaderboard", False)
         ]
 
-        self.uow.bot.events.emit("setting_register", settings)
+        self.bot.events.emit("setting_register", settings)
 
     @slash_command()
     async def song_leaderboard(self, ctx, key: str):
         """Displays song leaderboard."""
-        leaderboard = await self.actions.get_player_score_leaderboard_by_guild_id_and_beatmap_key(ctx.guild.id, key)
+        leaderboard = await self.player_leaderboard_service.get_player_score_leaderboard_by_guild_id_and_beatmap_key(ctx.guild.id, key)
 
         guild_leaderboard_embed = Message.get_player_score_leaderboard_embed(leaderboard)
         await ctx.respond(embed=guild_leaderboard_embed)

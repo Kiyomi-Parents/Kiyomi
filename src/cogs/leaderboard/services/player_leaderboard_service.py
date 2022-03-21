@@ -1,40 +1,42 @@
+import typing
 from collections import OrderedDict
 from typing import Optional, List
 
-import typing
 
-from .storage.uow import UnitOfWork
-from ..scoresaber.storage.model.player import Player
-from ..scoresaber.storage.model.score import Score
+from src.cogs.leaderboard.services.leaderboard_service import LeaderboardService
+from src.cogs.scoresaber.storage import Score, Player
 
 PlayerScoreLeaderboard = Optional[typing.OrderedDict[Player, Score]]
 PlayerTopScoresLeaderboard = Optional[List[Score]]
 
 
-class Actions:
-    def __init__(self, uow: UnitOfWork):
-        self.uow = uow
+class PlayerLeaderboardService(LeaderboardService):
 
     async def get_player_score_leaderboard_by_guild_id_and_beatmap_key(self, guild_id: int, beatmap_key: str) -> PlayerScoreLeaderboard:
-        beatsaver = self.uow.bot.get_cog("BeatSaverAPI")
-        scoresaber = self.uow.bot.get_cog("ScoreSaberAPI")
+        from src.cogs.beatsaver import BeatSaverAPI
+        from src.cogs.scoresaber import ScoreSaberAPI
+
+        beatsaver = self.bot.get_cog_api(BeatSaverAPI)
+        scoresaber = self.bot.get_cog_api(ScoreSaberAPI)
 
         beatmap = await beatsaver.get_beatmap_by_key(beatmap_key)
 
         if beatmap is None:
             return None
 
-        score = scoresaber.get_score_by_song_hash(beatmap.latest_version.hash)
+        leaderboard = scoresaber.get_leaderboard_by_song_hash(beatmap.latest_version.hash)
 
-        if score is None:
+        if leaderboard is None:
             return None
 
         guild_players = scoresaber.get_guild_players_by_guild(guild_id)
 
-        return self.get_player_score_leaderboard([guild_player.player for guild_player in guild_players], score.leaderboard_id)
+        return self.get_player_score_leaderboard([guild_player.player for guild_player in guild_players], leaderboard.id)
 
     def get_player_score_leaderboard(self, players: List[Player], leaderboard_id: int) -> PlayerScoreLeaderboard:
-        scoresaber = self.uow.bot.get_cog("ScoreSaberAPI")
+        from src.cogs.scoresaber import ScoreSaberAPI
+
+        scoresaber = self.bot.get_cog_api(ScoreSaberAPI)
 
         leaderboard = {}
 
@@ -64,10 +66,14 @@ class Actions:
 
         return best_score
 
-    def get_player_top_scores_leaderboard(self, player_id: int) -> PlayerTopScoresLeaderboard:
-        scoresaber = self.uow.bot.get_cog("ScoreSaberAPI")
+    def get_player_top_scores_leaderboard(self, player_id: str) -> PlayerTopScoresLeaderboard:
+        from src.cogs.scoresaber import ScoreSaberAPI
+
+        scoresaber = self.bot.get_cog_api(ScoreSaberAPI)
+
         scores = scoresaber.get_player_scores_sorted_by_pp(player_id)
         unique_scores = []
+
         for score in scores:
             if score.score_id not in [unique_score.score_id for unique_score in unique_scores]:
                 unique_scores.append(score)

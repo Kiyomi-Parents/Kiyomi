@@ -59,20 +59,21 @@ class BeatmapVersionDifficulty(Base):
     def max_score(self) -> Integer:
         return BeatSaverUtils.get_max_score(self.notes)
 
-    @property
-    def scoresaber_characteristic(self) -> pyscoresaber.Characteristic:
-        characteristics = {
-            pybeatsaver.Characteristic.STANDARD: pyscoresaber.Characteristic.STANDARD,
-            pybeatsaver.Characteristic.ONE_SABER: pyscoresaber.Characteristic.ONE_SABER,
-            pybeatsaver.Characteristic.NO_ARROWS: pyscoresaber.Characteristic.NO_ARROWS,
-            pybeatsaver.Characteristic.DEGREE_90: pyscoresaber.Characteristic.DEGREE_90,
-            pybeatsaver.Characteristic.DEGREE_360: pyscoresaber.Characteristic.DEGREE_360,
-            pybeatsaver.Characteristic.LIGHTSHOW: pyscoresaber.Characteristic.LIGHTSHOW,
-            pybeatsaver.Characteristic.LAWLESS: pyscoresaber.Characteristic.LAWLESS,
-            pybeatsaver.Characteristic.UNKNOWN: pyscoresaber.Characteristic.UNKNOWN
-        }
-
-        return characteristics[self.characteristic]
+    # TODO: Fix for new version
+    # @property
+    # def scoresaber_characteristic(self) -> pyscoresaber.Characteristic:
+    #     characteristics = {
+    #         pybeatsaver.Characteristic.STANDARD: pyscoresaber.Characteristic.STANDARD,
+    #         pybeatsaver.Characteristic.ONE_SABER: pyscoresaber.Characteristic.ONE_SABER,
+    #         pybeatsaver.Characteristic.NO_ARROWS: pyscoresaber.Characteristic.NO_ARROWS,
+    #         pybeatsaver.Characteristic.DEGREE_90: pyscoresaber.Characteristic.DEGREE_90,
+    #         pybeatsaver.Characteristic.DEGREE_360: pyscoresaber.Characteristic.DEGREE_360,
+    #         pybeatsaver.Characteristic.LIGHTSHOW: pyscoresaber.Characteristic.LIGHTSHOW,
+    #         pybeatsaver.Characteristic.LAWLESS: pyscoresaber.Characteristic.LAWLESS,
+    #         pybeatsaver.Characteristic.UNKNOWN: pyscoresaber.Characteristic.UNKNOWN
+    #     }
+    #
+    #     return characteristics[self.characteristic]
 
     @property
     def scoresaber_difficulty(self) -> pyscoresaber.Difficulty:

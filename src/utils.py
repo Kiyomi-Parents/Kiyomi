@@ -1,11 +1,12 @@
+import asyncio
 import random
 import time
 from functools import wraps
+
+import discord
 from discord.ext import tasks
 
 from Kiyomi import Kiyomi
-import discord
-
 from src.log import Logger
 
 
@@ -28,9 +29,10 @@ class Utils:
     def discord_ready(func):
         @wraps(func)
         async def wrapper(self, *args, **kwargs):
-            if not self.uow.bot.is_ready() and not self.uow.bot.running_tests:
-                Logger.log("Discord", f"Discord client not ready, skipping task {func.__name__}")
-                return
+
+            if not self.bot.is_ready() and not self.bot.running_tests:
+                await self.bot.wait_until_ready()
+                await asyncio.sleep(1)
 
             return await func(self, *args, **kwargs)
 
@@ -70,18 +72,22 @@ class Utils:
             if bot.running_tasks:
                 await bot.change_presence(activity=discord.Game(" | ".join(bot.running_tasks)))
             else:
-                activity_index = random.randint(0, len(bot.activity_list)-1)
+                activity_index = random.randint(0, len(bot.activity_list) - 1)
                 await bot.change_presence(activity=discord.Game(bot.activity_list[activity_index]))
 
         @wraps(func)
         async def wrapper(self, *args, **kwargs):
-            if func.__doc__ not in self.uow.bot.running_tasks:
-                self.uow.bot.running_tasks.append(func.__doc__)
-            await update_status(self.uow.bot)
+            if func.__doc__ not in self.bot.running_tasks:
+                self.bot.running_tasks.append(func.__doc__)
+
+            await update_status(self.bot)
+
             result = await func(self, *args, **kwargs)
-            if func.__doc__ in self.uow.bot.running_tasks:
-                self.uow.bot.running_tasks.pop(self.uow.bot.running_tasks.index(func.__doc__))
-                await update_status(self.uow.bot)
+
+            if func.__doc__ in self.bot.running_tasks:
+                self.bot.running_tasks.pop(self.bot.running_tasks.index(func.__doc__))
+                await update_status(self.bot)
+
             return result
 
         return wrapper

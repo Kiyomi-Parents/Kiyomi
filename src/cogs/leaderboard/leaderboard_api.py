@@ -1,23 +1,25 @@
 from discord import Embed
-from discord.ext import commands
 
-from .actions import Actions, PlayerScoreLeaderboard, PlayerTopScoresLeaderboard
+from src.kiyomi import Kiyomi
+from .leaderboard_cog import LeaderboardCog
 from .message import Message
-from .storage.uow import UnitOfWork
+from .services import PlayerLeaderboardService, PlayerScoreLeaderboard, PlayerTopScoresLeaderboard
+from .storage import UnitOfWork
 
 
-class LeaderboardAPI(commands.Cog):
-    def __init__(self, uow: UnitOfWork, actions: Actions):
+class LeaderboardAPI(LeaderboardCog):
+    def __init__(self, bot: Kiyomi, player_leaderboard_service: PlayerLeaderboardService, uow: UnitOfWork):
+        super().__init__(bot, player_leaderboard_service)
+
         self.uow = uow
-        self.actions = actions
 
     async def get_player_score_leaderboard(self, guild_id: int, beatmap_key: str) -> PlayerScoreLeaderboard:
-        return await self.actions.get_player_score_leaderboard_by_guild_id_and_beatmap_key(guild_id, beatmap_key)
+        return await self.player_leaderboard_service.get_player_score_leaderboard_by_guild_id_and_beatmap_key(guild_id, beatmap_key)
 
     async def get_player_score_leaderboard_embed(self, guild_id: int, beatmap_key: str) -> Embed:
         leaderboard = await self.get_player_score_leaderboard(guild_id, beatmap_key)
 
         return Message.get_player_score_leaderboard_embed(leaderboard)
 
-    def get_player_top_scores_leaderboard(self, player_id: int) -> PlayerTopScoresLeaderboard:
-        return self.actions.get_player_top_scores_leaderboard(player_id)
+    def get_player_top_scores_leaderboard(self, player_id: str) -> PlayerTopScoresLeaderboard:
+        return self.player_leaderboard_service.get_player_top_scores_leaderboard(player_id)

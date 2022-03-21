@@ -14,7 +14,7 @@ class ScoreMessageBuilder:
 
     def author(self):
         player = self.player
-        self.embed.set_author(name=player.player_name, url=player.profile_url, icon_url=player.avatar_url)
+        self.embed.set_author(name=player.name, url=player.profile_url, icon_url=player.avatar)
         return self
 
     def title(self, country_rank=None):
