@@ -25,10 +25,11 @@ class BeatmapVersionDifficulty(Base):
     difficulty = Column(Enum(pybeatsaver.Difficulty))
     events = Column(Integer)
     chroma = Column(Boolean)
-    me = Column(Boolean)
-    ne = Column(Boolean)
+    me = Column(Boolean)  # Mapping extensions
+    ne = Column(Boolean)  # Noodle extensions
     cinema = Column(Boolean)
     seconds = Column(Float)
+    stars = Column(Float)
 
     # Party summary
     parity_errors = Column(Integer)
@@ -51,6 +52,8 @@ class BeatmapVersionDifficulty(Base):
         self.ne = version_difficulty.ne
         self.cinema = version_difficulty.cinema
         self.seconds = version_difficulty.seconds
+        self.stars = version_difficulty.stars
+
         self.parity_errors = version_difficulty.parity_summary.errors
         self.parity_warns = version_difficulty.parity_summary.warns
         self.parity_resets = version_difficulty.parity_summary.resets

@@ -19,6 +19,8 @@ from src.kiyomi.base_view import BaseView
 # Need to save the view type and the message id to the database, for it to be truly persistent.
 # When the bot restarts we need to attach all the attach all the views to the messages IDs in Kiyomi class (add_view)
 # This could probably be a new cog?
+
+# Add NPS graph button
 class SongView(BaseView):
 
     def __init__(self, bot: Kiyomi, guild: Guild, beatmap: Beatmap):
@@ -55,10 +57,10 @@ class SongView(BaseView):
     def update_buttons(self):
         self.clear_items()
 
+        self.add_item(MapDetailDifficultySelect(self.bot, self, self.beatmap))
         self.add_item(MapDetailsButton(self.bot, self, self.beatmap))
         self.add_item(GuildLeaderboardButton(self.bot, self, self.beatmap))
         self.add_item(MapPreviewButton(self.bot, self, self.beatmap))
-        self.add_item(MapDetailDifficultySelect(self.bot, self, self.beatmap))
 
     async def send(self, ctx: Context, target: Optional[discord.abc.Messageable] = None) -> discord.Message:
         if not isinstance(ctx, Context):

@@ -34,6 +34,7 @@ class MapDetailDifficultySelect(BeatSaverComponent, discord.ui.Select):
     def get_option(self, beatmap_difficulty: BeatmapVersionDifficulty) -> discord.SelectOption:
         return discord.SelectOption(
             label=f"{beatmap_difficulty.difficulty_text}",
+            description=self.difficulty_stars(beatmap_difficulty),
             value=f"{beatmap_difficulty.difficulty.value}",
             emoji=BeatSaverUtils.difficulty_to_emoji(self.bot, self.parent.guild, beatmap_difficulty.difficulty),
             default=self.parent.beatmap_difficulty == beatmap_difficulty.difficulty
@@ -50,3 +51,10 @@ class MapDetailDifficultySelect(BeatSaverComponent, discord.ui.Select):
     def selected_difficulty(self) -> pybeatsaver.Difficulty:
         if len(self.values) > 0:
             return pybeatsaver.Difficulty(self.values[0])
+
+    @staticmethod
+    def difficulty_stars(beatmap_difficulty: BeatmapVersionDifficulty) -> Optional[str]:
+        if beatmap_difficulty.stars is None:
+            return None
+
+        return f"{beatmap_difficulty.stars}★"
