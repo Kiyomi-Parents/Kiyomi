@@ -1,5 +1,6 @@
 from typing import List
 
+import discord
 from discord import slash_command
 from discord.ext import commands
 
@@ -37,7 +38,7 @@ class BeatSaver(BeatSaverCog, name="Beat Saver"):
         await self.beatmap_service.start_scoresaber_api_client()
 
     @slash_command(aliases=["bsr", "song"], guild_ids=[836609379142729758])
-    async def map(self, ctx, key: str):
+    async def map(self, ctx: discord.ApplicationContext, key: str):
         """Displays song info."""
         leaderboard = self.bot.get_cog_api(LeaderboardAPI)
         settings = self.bot.get_cog_api(SettingsAPI)
@@ -47,7 +48,7 @@ class BeatSaver(BeatSaverCog, name="Beat Saver"):
 
             song_view = SongView(self.bot, db_beatmap)
 
-            await ctx.send(embed=song_view.default_embed(), view=song_view)
+            await song_view.send(ctx)
 
             if settings.get(ctx.guild.id, "map_leaderboard"):
                 leaderboard_embed = await leaderboard.get_player_score_leaderboard_embed(ctx.guild.id, key)

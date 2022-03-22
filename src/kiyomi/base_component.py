@@ -1,9 +1,13 @@
-from pyee import AsyncIOEventEmitter
+from typing import Generic, TypeVar
+
+import discord.ui
 
 from src.kiyomi import Kiyomi
 
+T = TypeVar('T', bound=discord.ui.View)
 
-class BaseComponent:
-    def __init__(self, bot: Kiyomi, events: AsyncIOEventEmitter):
+
+class BaseComponent(Generic[T]):
+    def __init__(self, bot: Kiyomi, parent: T):
         self.bot = bot
-        self.events = events
+        self.parent = parent

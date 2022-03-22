@@ -1,9 +1,7 @@
-from typing import List, Callable
+from typing import List
 
-import asyncio
 import discord.ui
 import pybeatsaver
-from pyee import AsyncIOEventEmitter
 
 from src.cogs.beatsaver.messages.components.beatsaver_component import BeatSaverComponent
 from src.cogs.beatsaver.storage import Beatmap, BeatmapVersionDifficulty
@@ -11,8 +9,8 @@ from src.kiyomi import Kiyomi
 
 
 class MapDetailDifficultySelect(BeatSaverComponent, discord.ui.Select):
-    def __init__(self, bot: Kiyomi, beatmap: Beatmap, events: AsyncIOEventEmitter, update_funcs: List[Callable]):
-        BeatSaverComponent.__init__(self, bot, events, beatmap)
+    def __init__(self, bot: Kiyomi, parent, beatmap: Beatmap):
+        BeatSaverComponent.__init__(self, bot, parent, beatmap)
         discord.ui.Select.__init__(
             self,
             placeholder="Choose your favourite difficulty...",
@@ -20,7 +18,6 @@ class MapDetailDifficultySelect(BeatSaverComponent, discord.ui.Select):
             max_values=1,
             options=self.get_options(),
         )
-        self.update_funcs = update_funcs
 
     def get_options(self) -> List[discord.SelectOption]:
         options = []
@@ -38,6 +35,13 @@ class MapDetailDifficultySelect(BeatSaverComponent, discord.ui.Select):
         )
 
     async def callback(self, interaction: discord.Interaction):
-        for func in self.update_funcs:
-            if asyncio.iscoroutinefunction(func):
-                await func(interaction, pybeatsaver.Difficulty(self.values[0]))
+        beatmap_difficulty = pybeatsaver.Difficulty(self.values[0])
+
+        self.parent.beatmap_difficulty = beatmap_difficulty
+
+        await self.parent.update()
+
+    @property
+    def selected_difficulty(self) -> pybeatsaver.Difficulty:
+        if len(self.values) > 0:
+            return pybeatsaver.Difficulty(self.values[0])

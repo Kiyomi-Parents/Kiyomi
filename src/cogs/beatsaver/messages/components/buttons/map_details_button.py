@@ -1,6 +1,5 @@
 import discord
-import pybeatsaver
-from pyee import AsyncIOEventEmitter
+from discord import Embed
 
 from src.cogs.beatsaver.messages.components.beatsaver_component import BeatSaverComponent
 from src.cogs.beatsaver.messages.components.embeds.map_details_embed import MapDetailsEmbed
@@ -9,8 +8,8 @@ from src.kiyomi import Kiyomi
 
 
 class MapDetailsButton(BeatSaverComponent, discord.ui.Button):
-    def __init__(self, bot: Kiyomi, beatmap: Beatmap, events: AsyncIOEventEmitter):
-        BeatSaverComponent.__init__(self, bot, events, beatmap)
+    def __init__(self, bot: Kiyomi, parent, beatmap: Beatmap):
+        BeatSaverComponent.__init__(self, bot, parent, beatmap)
         discord.ui.Button.__init__(
             self,
             label="Map details",
@@ -18,14 +17,9 @@ class MapDetailsButton(BeatSaverComponent, discord.ui.Button):
             custom_id=str(f"map_details_button_{beatmap.id}"),
         )
 
-        self.beatmap_difficulty = beatmap.latest_version.difficulties[-1].difficulty
-
-    async def update(self, interaction: discord.Interaction, beatmap_difficulty: pybeatsaver.Difficulty):
-        self.beatmap_difficulty = beatmap_difficulty
-        await interaction.response.edit_message(embed=self.get_embed())
-
-    def get_embed(self):
-        return MapDetailsEmbed(self.bot, self.beatmap, self.beatmap_difficulty)
+    def get_embed(self) -> Embed:
+        return MapDetailsEmbed(self.bot, self.beatmap, self.parent.beatmap_difficulty)
 
     async def callback(self, interaction: discord.Interaction):
-        await interaction.response.edit_message(embed=self.get_embed())
+        self.parent.embed = self.get_embed
+        await self.parent.update()
