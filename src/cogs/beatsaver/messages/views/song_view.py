@@ -2,7 +2,7 @@ from typing import Union, Optional, Callable
 
 import discord
 import pybeatsaver
-from discord import Embed
+from discord import Embed, Guild
 from discord.ext.commands import Context
 
 from ..components.buttons.guild_leaderboard_button import GuildLeaderboardButton
@@ -21,8 +21,8 @@ from src.kiyomi.base_view import BaseView
 # This could probably be a new cog?
 class SongView(BaseView):
 
-    def __init__(self, bot: Kiyomi, beatmap: Beatmap):
-        super().__init__(bot)
+    def __init__(self, bot: Kiyomi, guild: Guild, beatmap: Beatmap):
+        super().__init__(bot, guild)
 
         self.beatmap = beatmap
 
