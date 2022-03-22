@@ -20,7 +20,7 @@ class MapDetailsButton(BeatSaverComponent, discord.ui.Button):
 
         self.beatmap_difficulty = beatmap.latest_version.difficulties[-1].difficulty
 
-    async def update_embed(self, interaction: discord.Interaction, beatmap_difficulty: pybeatsaver.Difficulty):
+    async def update(self, interaction: discord.Interaction, beatmap_difficulty: pybeatsaver.Difficulty):
         self.beatmap_difficulty = beatmap_difficulty
         await interaction.response.edit_message(embed=self.get_embed())
 

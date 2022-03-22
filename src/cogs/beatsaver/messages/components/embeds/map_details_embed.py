@@ -30,7 +30,6 @@ class MapDetailsEmbed(BeatSaverEmbed):
         return " ".join(f"**{diff.difficulty_text}**" for diff in self.beatmap.difficulties)
 
     def get_difficulty(self, beatmap_difficulty: pybeatsaver.Difficulty) -> BeatmapVersionDifficulty:
-        print(self.beatmap.difficulties)
         for difficulty in self.beatmap.difficulties:
             if difficulty.difficulty == beatmap_difficulty:
                 return difficulty
