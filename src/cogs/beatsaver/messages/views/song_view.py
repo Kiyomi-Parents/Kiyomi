@@ -19,15 +19,14 @@ class SongView(BaseView):
     def __init__(self, bot: Kiyomi, beatmap: Beatmap):
         super().__init__(bot)
 
-        self.bot = bot
         self.beatmap = beatmap
-
-        self.embed: Callable[..., Embed] = self.default_embed
 
         self._beatmap_difficulty: Optional[pybeatsaver.Difficulty] = None
         self.message: Union[discord.Message, discord.WebhookMessage, None] = None
 
         self.update_buttons()
+
+        self.embed: Callable[..., Embed] = self.default_embed
 
     @property
     def beatmap_difficulty(self) -> Optional[pybeatsaver.Difficulty]:
@@ -41,32 +40,20 @@ class SongView(BaseView):
         self._beatmap_difficulty = beatmap_difficulty
 
     async def update(self) -> discord.Message:
-        await self.update_buttons()
+        self.update_buttons()
 
         return await self.message.edit(
             embed=self.embed(),
             view=self,
         )
 
-    async def update_buttons(self):
-
+    def update_buttons(self):
         self.clear_items()
 
-        map_details_button = MapDetailsButton(self.bot, self, self.beatmap)
-        map_details_button.parent = self
-        self.add_item(map_details_button)
-
-        guild_leaderboard_button = GuildLeaderboardButton(self.bot, self, self.beatmap)
-        guild_leaderboard_button.parent = self
-        self.add_item(guild_leaderboard_button)
-
-        preview_map = MapPreviewButton(self.bot, self, self.beatmap)
-        preview_map.parent = self
-        self.add_item(preview_map)
-
-        self.difficulty_select = MapDetailDifficultySelect(self.bot, self, self.beatmap)
-        self.difficulty_select.parent = self
-        self.add_item(self.difficulty_select)
+        self.add_item(MapDetailsButton(self.bot, self, self.beatmap))
+        self.add_item(GuildLeaderboardButton(self.bot, self, self.beatmap))
+        self.add_item(MapPreviewButton(self.bot, self, self.beatmap))
+        self.add_item(MapDetailDifficultySelect(self.bot, self, self.beatmap))
 
     async def send(self, ctx: ApplicationContext, target: Optional[discord.abc.Messageable] = None):
         if not isinstance(ctx, ApplicationContext):
@@ -77,9 +64,6 @@ class SongView(BaseView):
 
         if target:
             ctx = target
-
-        if self.embed is None:
-            self.embed = self.default_embed
 
         self.message = await ctx.send(
             embed=self.embed(),
