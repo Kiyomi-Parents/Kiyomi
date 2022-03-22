@@ -55,7 +55,8 @@ class Settings(SettingsCog):
         if setting not in registered_settings:
             await ctx.respond(f"\"{setting}\" is not a valid setting name")
 
-        self.setting_service.set(ctx.guild.id, setting, value)
+        self.setting_service.set(ctx.interaction.guild.id, setting, value)
+        setting_value = self.setting_service.get_value(ctx.interaction.guild.id, setting)
 
-        await ctx.respond(f"{setting} is now {value}")
+        await ctx.respond(f"{setting} is now set to: {setting_value}")
 
