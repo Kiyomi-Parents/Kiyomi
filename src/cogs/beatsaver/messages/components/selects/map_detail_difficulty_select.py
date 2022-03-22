@@ -13,6 +13,7 @@ class MapDetailDifficultySelect(BeatSaverComponent, discord.ui.Select):
         BeatSaverComponent.__init__(self, bot, parent, beatmap)
         discord.ui.Select.__init__(
             self,
+            custom_id=f"map:detail:difficulty:select:beatmap:{beatmap.id}",
             placeholder="Choose your favourite difficulty...",
             min_values=1,
             max_values=1,

@@ -15,6 +15,10 @@ from src.kiyomi import Kiyomi
 from src.kiyomi.base_view import BaseView
 
 
+# TODO:
+# Need to save the view type and the message id to the database, for it to be truly persistent.
+# When the bot restarts we need to attach all the attach all the views to the messages IDs in Kiyomi class (add_view)
+# This could probably be a new cog?
 class SongView(BaseView):
 
     def __init__(self, bot: Kiyomi, beatmap: Beatmap):

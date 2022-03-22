@@ -12,9 +12,9 @@ class MapDetailsButton(BeatSaverComponent, discord.ui.Button):
         BeatSaverComponent.__init__(self, bot, parent, beatmap)
         discord.ui.Button.__init__(
             self,
+            custom_id=f"map:detail:button:beatmap:{beatmap.id}",
             label="Map details",
             style=discord.enums.ButtonStyle.primary,
-            custom_id=str(f"map_details_button_{beatmap.id}"),
         )
 
     def get_embed(self) -> Embed:

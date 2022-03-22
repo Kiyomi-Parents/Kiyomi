@@ -12,9 +12,9 @@ class GuildLeaderboardButton(BeatSaverComponent, discord.ui.Button):
         BeatSaverComponent.__init__(self, bot, parent, beatmap)
         discord.ui.Button.__init__(
             self,
+            custom_id=f"guild:leaderboard:button:beatmap:{beatmap.id}",
             label="Guild Leaderboard",
-            style=discord.enums.ButtonStyle.primary,
-            custom_id=str(beatmap.id),
+            style=discord.enums.ButtonStyle.primary
         )
 
     def get_embed(self) -> Embed:
