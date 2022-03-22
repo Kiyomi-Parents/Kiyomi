@@ -1,6 +1,7 @@
 import pybeatsaver
-from discord import Colour
+from discord import Colour, Guild
 
+from src.cogs.beatsaver.beatsaver_utils import BeatSaverUtils
 from src.cogs.beatsaver.messages.components.embeds.embed import BeatSaverEmbed
 from src.cogs.beatsaver.storage import Beatmap, BeatmapVersionDifficulty
 from src.kiyomi import Kiyomi
@@ -8,9 +9,10 @@ from src.kiyomi import Kiyomi
 
 class MapDetailsEmbed(BeatSaverEmbed):
 
-    def __init__(self, bot: Kiyomi, beatmap: Beatmap, beatmap_difficulty: pybeatsaver.Difficulty):
+    def __init__(self, bot: Kiyomi, guild: Guild, beatmap: Beatmap, beatmap_difficulty: pybeatsaver.Difficulty):
         super().__init__(bot)
 
+        self.guild = guild
         self.beatmap = beatmap
 
         self.title = f"{beatmap.name}"
@@ -27,7 +29,17 @@ class MapDetailsEmbed(BeatSaverEmbed):
         self.add_field(name="difficulty", value=self.get_difficulty(beatmap_difficulty).difficulty)
 
     def get_difficulties(self) -> str:
-        return " ".join(f"**{diff.difficulty_text}**" for diff in self.beatmap.difficulties)
+        difficulty_texts = []
+
+        for difficulty in self.beatmap.difficulties:
+            emoji = BeatSaverUtils.difficulty_to_emoji(self.bot, self.guild, difficulty.difficulty)
+
+            if emoji is None:
+                difficulty_texts.append(difficulty.difficulty_text)
+            else:
+                difficulty_texts.append(str(emoji))
+
+        return " ".join(difficulty_texts)
 
     def get_difficulty(self, beatmap_difficulty: pybeatsaver.Difficulty) -> BeatmapVersionDifficulty:
         for difficulty in self.beatmap.difficulties:

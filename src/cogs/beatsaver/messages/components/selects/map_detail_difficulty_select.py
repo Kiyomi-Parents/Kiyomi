@@ -4,6 +4,7 @@ import discord.ui
 import pybeatsaver
 from discord import Emoji
 
+from src.cogs.beatsaver.beatsaver_utils import BeatSaverUtils
 from src.cogs.beatsaver.messages.components.beatsaver_component import BeatSaverComponent
 from src.cogs.beatsaver.storage import Beatmap, BeatmapVersionDifficulty
 from src.cogs.settings import SettingsAPI
@@ -34,7 +35,7 @@ class MapDetailDifficultySelect(BeatSaverComponent, discord.ui.Select):
         return discord.SelectOption(
             label=f"{beatmap_difficulty.difficulty_text}",
             value=f"{beatmap_difficulty.difficulty.value}",
-            emoji=self.difficulty_to_emoji(beatmap_difficulty.difficulty),
+            emoji=BeatSaverUtils.difficulty_to_emoji(self.bot, self.parent.guild, beatmap_difficulty.difficulty),
             default=self.parent.beatmap_difficulty == beatmap_difficulty.difficulty
         )
 
@@ -49,22 +50,3 @@ class MapDetailDifficultySelect(BeatSaverComponent, discord.ui.Select):
     def selected_difficulty(self) -> pybeatsaver.Difficulty:
         if len(self.values) > 0:
             return pybeatsaver.Difficulty(self.values[0])
-
-    def difficulty_to_emoji(self, difficulty: pybeatsaver.Difficulty) -> Optional[Emoji]:
-        if self.parent.guild is None:
-            return None
-
-        settings = self.bot.get_cog_api(SettingsAPI)
-
-        if difficulty == pybeatsaver.Difficulty.EASY:
-            return settings.get(self.parent.guild.id, "easy_difficulty_emoji")
-        elif difficulty == pybeatsaver.Difficulty.NORMAL:
-            return settings.get(self.parent.guild.id, "normal_difficulty_emoji")
-        elif difficulty == pybeatsaver.Difficulty.HARD:
-            return settings.get(self.parent.guild.id, "hard_difficulty_emoji")
-        elif difficulty == pybeatsaver.Difficulty.EXPERT:
-            return settings.get(self.parent.guild.id, "expert_difficulty_emoji")
-        elif difficulty == pybeatsaver.Difficulty.EXPERT_PLUS:
-            return settings.get(self.parent.guild.id, "expert_plus_difficulty_emoji")
-
-        return None

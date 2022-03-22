@@ -18,7 +18,7 @@ class MapDetailsButton(BeatSaverComponent, discord.ui.Button):
         )
 
     def get_embed(self) -> Embed:
-        return MapDetailsEmbed(self.bot, self.beatmap, self.parent.beatmap_difficulty)
+        return MapDetailsEmbed(self.bot, self.parent.guild, self.beatmap, self.parent.beatmap_difficulty)
 
     async def callback(self, interaction: discord.Interaction):
         self.parent.embed = self.get_embed

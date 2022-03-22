@@ -1,4 +1,11 @@
 import math
+from typing import Optional
+
+import pybeatsaver
+from discord import Emoji, Guild
+
+from src.cogs.settings import SettingsAPI
+from src.kiyomi import Kiyomi
 
 
 class BeatSaverUtils:
@@ -18,3 +25,23 @@ class BeatSaverUtils:
         max_score += min(blocks, 1) * max_score_per_block
 
         return math.floor(max_score)
+
+    @staticmethod
+    def difficulty_to_emoji(bot: Kiyomi, guild: Optional[Guild], difficulty: pybeatsaver.Difficulty) -> Optional[Emoji]:
+        if guild is None:
+            return None
+
+        settings = bot.get_cog_api(SettingsAPI)
+
+        if difficulty == pybeatsaver.Difficulty.EASY:
+            return settings.get(guild.id, "easy_difficulty_emoji")
+        elif difficulty == pybeatsaver.Difficulty.NORMAL:
+            return settings.get(guild.id, "normal_difficulty_emoji")
+        elif difficulty == pybeatsaver.Difficulty.HARD:
+            return settings.get(guild.id, "hard_difficulty_emoji")
+        elif difficulty == pybeatsaver.Difficulty.EXPERT:
+            return settings.get(guild.id, "expert_difficulty_emoji")
+        elif difficulty == pybeatsaver.Difficulty.EXPERT_PLUS:
+            return settings.get(guild.id, "expert_plus_difficulty_emoji")
+
+        return None

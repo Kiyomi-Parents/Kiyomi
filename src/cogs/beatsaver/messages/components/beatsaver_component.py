@@ -1,7 +1,5 @@
 from typing import TypeVar, Generic
 
-from pyee import AsyncIOEventEmitter
-
 from src.cogs.beatsaver.storage import Beatmap
 from src.kiyomi import Kiyomi
 from src.kiyomi.base_component import BaseComponent
