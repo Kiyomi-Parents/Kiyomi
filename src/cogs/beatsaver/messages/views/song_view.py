@@ -5,10 +5,10 @@ import pybeatsaver
 from discord import Embed
 from discord.ext.commands import Context
 
-from src.cogs.beatsaver.messages.components.buttons.guild_leaderboard_button import GuildLeaderboardButton
-from src.cogs.beatsaver.messages.components.buttons.map_details_button import MapDetailsButton
-from src.cogs.beatsaver.messages.components.buttons.map_preview_button import MapPreviewButton
-from src.cogs.beatsaver.messages.components.selects.map_detail_difficulty_select import MapDetailDifficultySelect
+from ..components.buttons.guild_leaderboard_button import GuildLeaderboardButton
+from ..components.buttons.map_details_button import MapDetailsButton
+from ..components.buttons.map_preview_button import MapPreviewButton
+from ..components.selects.map_detail_difficulty_select import MapDetailDifficultySelect
 from src.cogs.beatsaver.storage import Beatmap
 from src.kiyomi import Kiyomi
 
@@ -27,7 +27,7 @@ class SongView(BaseView):
 
         self.update_buttons()
 
-        self.embed: Callable[..., Embed] = self.default_embed
+        self.embed: Callable[[], Embed] = self.default_embed
 
     @property
     def beatmap_difficulty(self) -> Optional[pybeatsaver.Difficulty]:

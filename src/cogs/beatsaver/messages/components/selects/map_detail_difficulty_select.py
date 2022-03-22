@@ -31,7 +31,8 @@ class MapDetailDifficultySelect(BeatSaverComponent, discord.ui.Select):
         return discord.SelectOption(
             label=f"{beatmap_difficulty.difficulty_text}",
             value=f"{beatmap_difficulty.difficulty.value}",
-            emoji="🟥"  # TODO: Add emoji here
+            emoji="🟥",  # TODO: Add emoji here
+            default=self.parent.beatmap_difficulty == beatmap_difficulty.difficulty
         )
 
     async def callback(self, interaction: discord.Interaction):
