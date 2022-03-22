@@ -28,4 +28,12 @@ class SongView(BaseView):
         self.add_item(MapDetailsButton(bot, beatmap, self.events))
         self.add_item(GuildLeaderboardButton(bot, beatmap.id))
         self.add_item(MapPreviewButton(bot, beatmap.id))
-        self.add_item(MapDetailDifficultySelect(bot, beatmap, self.events))
+        self.add_item(MapDetailDifficultySelect(bot, beatmap, self.events, self._get_embed_update_funcs()))
+
+    def _get_embed_update_funcs(self):
+        result = []
+        for component in self.children:
+            update_embed_func = getattr(component, "update_embed", None)
+            if update_embed_func is not None and callable(update_embed_func):
+                result.append(update_embed_func)
+        return result

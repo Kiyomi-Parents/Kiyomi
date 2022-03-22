@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Callable
 
 import asyncio
 import discord.ui
@@ -11,7 +11,7 @@ from src.kiyomi import Kiyomi
 
 
 class MapDetailDifficultySelect(BeatSaverComponent, discord.ui.Select):
-    def __init__(self, bot: Kiyomi, beatmap: Beatmap, events: AsyncIOEventEmitter):
+    def __init__(self, bot: Kiyomi, beatmap: Beatmap, events: AsyncIOEventEmitter, embed_update_funcs: List[Callable]):
         BeatSaverComponent.__init__(self, bot, events, beatmap)
 
         # options = [
@@ -27,13 +27,13 @@ class MapDetailDifficultySelect(BeatSaverComponent, discord.ui.Select):
                                    options=self.get_options(),
                                    )
 
+        self.embed_update_funcs = embed_update_funcs
+
     def get_options(self) -> List[discord.SelectOption]:
         options = []
 
         for beatmap_difficulty in self.beatmap.latest_version.difficulties:
             options.append(self.get_option(beatmap_difficulty))
-
-        options[0].default = True
 
         return options
 
@@ -45,8 +45,5 @@ class MapDetailDifficultySelect(BeatSaverComponent, discord.ui.Select):
         )
 
     async def callback(self, interaction: discord.Interaction):
-        print("start before event")
-
-        self.events.emit("on_difficulty_update", interaction, pybeatsaver.Difficulty(self.values[0]))
-        await asyncio.sleep(10)
-        print("start after event")
+        for func in self.embed_update_funcs:
+            await func(interaction, pybeatsaver.Difficulty(self.values[0]))
