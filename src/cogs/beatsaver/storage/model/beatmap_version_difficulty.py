@@ -115,3 +115,9 @@ class BeatmapVersionDifficulty(Base):
         }
 
         return difficulties[self.difficulty]
+
+    def __str__(self) -> str:
+        return f"Beatmap Version Difficulty {self.characteristic} {self.difficulty} ({self.id})"
+
+    def __repr__(self) -> str:
+        return self.__str__()

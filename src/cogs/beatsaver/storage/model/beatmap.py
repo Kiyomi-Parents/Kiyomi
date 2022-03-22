@@ -118,7 +118,7 @@ class Beatmap(Base):
         return time.strftime("%H:%M:%S", time.gmtime(self.metadata_duration))
 
     @property
-    def difficulties(self) -> BeatmapVersionDifficulty:
+    def difficulties(self) -> List[BeatmapVersionDifficulty]:
         return self.latest_version.difficulties
 
     def __str__(self):
