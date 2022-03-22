@@ -48,7 +48,7 @@ class BeatSaver(BeatSaverCog, name="Beat Saver"):
 
             song_view = SongView(self.bot, db_beatmap)
 
-            await song_view.send(ctx)
+            await song_view.respond(ctx.interaction)
 
             if settings.get(ctx.guild.id, "map_leaderboard"):
                 leaderboard_embed = await leaderboard.get_player_score_leaderboard_embed(ctx.guild.id, key)

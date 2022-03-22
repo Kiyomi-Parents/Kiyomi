@@ -2,7 +2,8 @@ from typing import Union, Optional, Callable
 
 import discord
 import pybeatsaver
-from discord import Embed, ApplicationContext
+from discord import Embed
+from discord.ext.commands import Context
 
 from src.cogs.beatsaver.messages.components.buttons.guild_leaderboard_button import GuildLeaderboardButton
 from src.cogs.beatsaver.messages.components.buttons.map_details_button import MapDetailsButton
@@ -55,8 +56,8 @@ class SongView(BaseView):
         self.add_item(MapPreviewButton(self.bot, self, self.beatmap))
         self.add_item(MapDetailDifficultySelect(self.bot, self, self.beatmap))
 
-    async def send(self, ctx: ApplicationContext, target: Optional[discord.abc.Messageable] = None):
-        if not isinstance(ctx, ApplicationContext):
+    async def send(self, ctx: Context, target: Optional[discord.abc.Messageable] = None) -> discord.Message:
+        if not isinstance(ctx, Context):
             raise TypeError(f"expected Context not {ctx.__class__!r}")
 
         if target is not None and not isinstance(target, discord.abc.Messageable):
@@ -69,5 +70,40 @@ class SongView(BaseView):
             embed=self.embed(),
             view=self,
         )
+
+        return self.message
+
+    async def respond(self, interaction: discord.Interaction, target: Optional[discord.abc.Messageable] = None) -> Union[discord.Message, discord.WebhookMessage]:
+        if not isinstance(interaction, discord.Interaction):
+            raise TypeError(f"expected Interaction not {interaction.__class__!r}")
+
+        if target is not None and not isinstance(target, discord.abc.Messageable):
+            raise TypeError(f"expected abc.Messageable not {target.__class__!r}")
+
+        if target:
+            self.message = await target.send(
+                embed=self.embed(),
+                view=self
+            )
+        else:
+            if interaction.response.is_done():
+                msg = await interaction.followup.send(
+                    embed=self.embed(),
+                    view=self
+                )
+                # convert from WebhookMessage to Message reference to bypass 15min webhook token timeout
+                msg = await msg.channel.fetch_message(msg.id)
+            else:
+                msg = await interaction.response.send_message(
+                    embed=self.embed(),
+                    view=self
+                )
+
+            if isinstance(msg, discord.WebhookMessage):
+                self.message = await msg.channel.fetch_message(msg.id)
+            elif isinstance(msg, discord.Message):
+                self.message = msg
+            elif isinstance(msg, discord.Interaction):
+                self.message = await msg.original_message()
 
         return self.message
