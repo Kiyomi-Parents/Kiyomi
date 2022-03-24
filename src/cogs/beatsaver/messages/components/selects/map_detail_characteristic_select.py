@@ -38,7 +38,7 @@ class MapDetailCharacteristicSelect(BeatSaverComponent, discord.ui.Select):
         return discord.SelectOption(
             label=f"{beatmap_difficulty.characteristic_text}",
             value=f"{beatmap_difficulty.characteristic.serialize}",
-            emoji=BeatSaverUtils.difficulty_to_emoji(self.bot, self.parent.guild, beatmap_difficulty.difficulty), # TODO: Add emoji support
+            emoji=BeatSaverUtils.characteristic_to_emoji(self.bot, self.parent.guild, beatmap_difficulty.characteristic),
             default=self.parent.beatmap_characteristic == beatmap_difficulty.characteristic
         )
 

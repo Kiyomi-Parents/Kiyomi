@@ -43,7 +43,14 @@ class BeatSaver(BeatSaverCog, name="Beat Saver"):
             EmojiSetting.create(self.bot, "normal_difficulty_emoji", None),
             EmojiSetting.create(self.bot, "hard_difficulty_emoji", None),
             EmojiSetting.create(self.bot, "expert_difficulty_emoji", None),
-            EmojiSetting.create(self.bot, "expert_plus_difficulty_emoji", None)
+            EmojiSetting.create(self.bot, "expert_plus_difficulty_emoji", None),
+            EmojiSetting.create(self.bot, "standard_game_mode_emoji", None),
+            EmojiSetting.create(self.bot, "one_saber_game_mode_emoji", None),
+            EmojiSetting.create(self.bot, "no_arrows_game_mode_emoji", None),
+            EmojiSetting.create(self.bot, "90_degree_game_mode_emoji", None),
+            EmojiSetting.create(self.bot, "360_degree_game_mode_emoji", None),
+            EmojiSetting.create(self.bot, "lightshow_game_mode_emoji", None),
+            EmojiSetting.create(self.bot, "lawless_game_mode_emoji", None)
         ]
 
         self.bot.events.emit("setting_register", settings)

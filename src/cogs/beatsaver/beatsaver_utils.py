@@ -45,3 +45,27 @@ class BeatSaverUtils:
             return settings.get(guild.id, "expert_plus_difficulty_emoji")
 
         return None
+
+    @staticmethod
+    def characteristic_to_emoji(bot: Kiyomi, guild: Optional[Guild], characteristic: pybeatsaver.ECharacteristic) -> Optional[Emoji]:
+        if guild is None:
+            return None
+
+        settings = bot.get_cog_api(SettingsAPI)
+
+        if characteristic == pybeatsaver.ECharacteristic.STANDARD:
+            return settings.get(guild.id, "standard_game_mode_emoji")
+        elif characteristic == pybeatsaver.ECharacteristic.ONE_SABER:
+            return settings.get(guild.id, "one_saber_game_mode_emoji")
+        elif characteristic == pybeatsaver.ECharacteristic.NO_ARROWS:
+            return settings.get(guild.id, "no_arrows_game_mode_emoji")
+        elif characteristic == pybeatsaver.ECharacteristic.DEGREE_90:
+            return settings.get(guild.id, "90_degree_game_mode_emoji")
+        elif characteristic == pybeatsaver.ECharacteristic.DEGREE_360:
+            return settings.get(guild.id, "360_degree_game_mode_emoji")
+        elif characteristic == pybeatsaver.ECharacteristic.LIGHTSHOW:
+            return settings.get(guild.id, "lightshow_game_mode_emoji")
+        elif characteristic == pybeatsaver.ECharacteristic.LAWLESS:
+            return settings.get(guild.id, "lawless_game_mode_emoji")
+
+        return None
