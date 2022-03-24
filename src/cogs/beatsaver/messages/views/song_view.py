@@ -28,7 +28,7 @@ class SongView(BaseView):
 
         self.beatmap = beatmap
 
-        self._beatmap_difficulty: Optional[pybeatsaver.Difficulty] = None
+        self._beatmap_difficulty: Optional[pybeatsaver.EDifficulty] = None
         self.message: Union[discord.Message, discord.WebhookMessage, None] = None
 
         self.update_buttons()
@@ -36,14 +36,14 @@ class SongView(BaseView):
         self.embed: Callable[[], Embed] = self.default_embed
 
     @property
-    def beatmap_difficulty(self) -> Optional[pybeatsaver.Difficulty]:
+    def beatmap_difficulty(self) -> Optional[pybeatsaver.EDifficulty]:
         if self._beatmap_difficulty is None:
             return self.beatmap.latest_version.difficulties[-1].difficulty
 
         return self._beatmap_difficulty
 
     @beatmap_difficulty.setter
-    def beatmap_difficulty(self, beatmap_difficulty: pybeatsaver.Difficulty):
+    def beatmap_difficulty(self, beatmap_difficulty: pybeatsaver.EDifficulty):
         self._beatmap_difficulty = beatmap_difficulty
 
     async def update(self) -> discord.Message:

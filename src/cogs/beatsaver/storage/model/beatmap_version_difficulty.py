@@ -21,8 +21,8 @@ class BeatmapVersionDifficulty(Base):
     obstacles = Column(Integer)
     nps = Column(Float)
     length = Column(Float)
-    characteristic = Column(Enum(pybeatsaver.Characteristic))
-    difficulty = Column(Enum(pybeatsaver.Difficulty))
+    characteristic = Column(Enum(pybeatsaver.ECharacteristic))
+    difficulty = Column(Enum(pybeatsaver.EDifficulty))
     events = Column(Integer)
     chroma = Column(Boolean)
     me = Column(Boolean)  # Mapping extensions
@@ -66,14 +66,13 @@ class BeatmapVersionDifficulty(Base):
     # @property
     # def scoresaber_characteristic(self) -> pyscoresaber.Characteristic:
     #     characteristics = {
-    #         pybeatsaver.Characteristic.STANDARD: pyscoresaber.Characteristic.STANDARD,
-    #         pybeatsaver.Characteristic.ONE_SABER: pyscoresaber.Characteristic.ONE_SABER,
-    #         pybeatsaver.Characteristic.NO_ARROWS: pyscoresaber.Characteristic.NO_ARROWS,
-    #         pybeatsaver.Characteristic.DEGREE_90: pyscoresaber.Characteristic.DEGREE_90,
-    #         pybeatsaver.Characteristic.DEGREE_360: pyscoresaber.Characteristic.DEGREE_360,
-    #         pybeatsaver.Characteristic.LIGHTSHOW: pyscoresaber.Characteristic.LIGHTSHOW,
-    #         pybeatsaver.Characteristic.LAWLESS: pyscoresaber.Characteristic.LAWLESS,
-    #         pybeatsaver.Characteristic.UNKNOWN: pyscoresaber.Characteristic.UNKNOWN
+    #         pybeatsaver.ECharacteristic.STANDARD: pyscoresaber.Characteristic.STANDARD,
+    #         pybeatsaver.ECharacteristic.ONE_SABER: pyscoresaber.Characteristic.ONE_SABER,
+    #         pybeatsaver.ECharacteristic.NO_ARROWS: pyscoresaber.Characteristic.NO_ARROWS,
+    #         pybeatsaver.ECharacteristic.DEGREE_90: pyscoresaber.Characteristic.DEGREE_90,
+    #         pybeatsaver.ECharacteristic.DEGREE_360: pyscoresaber.Characteristic.DEGREE_360,
+    #         pybeatsaver.ECharacteristic.LIGHTSHOW: pyscoresaber.Characteristic.LIGHTSHOW,
+    #         pybeatsaver.ECharacteristic.LAWLESS: pyscoresaber.Characteristic.LAWLESS,
     #     }
     #
     #     return characteristics[self.characteristic]
@@ -81,43 +80,22 @@ class BeatmapVersionDifficulty(Base):
     @property
     def scoresaber_difficulty(self) -> pyscoresaber.Difficulty:
         difficulties = {
-            pybeatsaver.Difficulty.EASY: pyscoresaber.Difficulty.EASY,
-            pybeatsaver.Difficulty.NORMAL: pyscoresaber.Difficulty.NORMAL,
-            pybeatsaver.Difficulty.HARD: pyscoresaber.Difficulty.HARD,
-            pybeatsaver.Difficulty.EXPERT: pyscoresaber.Difficulty.EXPERT,
-            pybeatsaver.Difficulty.EXPERT_PLUS: pyscoresaber.Difficulty.EXPERT_PLUS,
-            pybeatsaver.Difficulty.UNKNOWN: pyscoresaber.Difficulty.UNKNOWN
+            pybeatsaver.EDifficulty.EASY: pyscoresaber.Difficulty.EASY,
+            pybeatsaver.EDifficulty.NORMAL: pyscoresaber.Difficulty.NORMAL,
+            pybeatsaver.EDifficulty.HARD: pyscoresaber.Difficulty.HARD,
+            pybeatsaver.EDifficulty.EXPERT: pyscoresaber.Difficulty.EXPERT,
+            pybeatsaver.EDifficulty.EXPERT_PLUS: pyscoresaber.Difficulty.EXPERT_PLUS,
         }
 
         return difficulties[self.difficulty]
 
     @property
     def characteristic_text(self) -> str:
-        characteristics = {
-            pybeatsaver.Characteristic.STANDARD: "Standard",
-            pybeatsaver.Characteristic.ONE_SABER: "One Saber",
-            pybeatsaver.Characteristic.NO_ARROWS: "No Arrows",
-            pybeatsaver.Characteristic.DEGREE_90: "90 Degrees",
-            pybeatsaver.Characteristic.DEGREE_360: "360 Degrees",
-            pybeatsaver.Characteristic.LIGHTSHOW: "Lightshow",
-            pybeatsaver.Characteristic.LAWLESS: "Lawless",
-            pybeatsaver.Characteristic.UNKNOWN: "Unknown"
-        }
-
-        return characteristics[self.characteristic]
+        return self.characteristic.human_readable
 
     @property
     def difficulty_text(self) -> str:
-        difficulties = {
-            pybeatsaver.Difficulty.EASY: "Easy",
-            pybeatsaver.Difficulty.NORMAL: "Normal",
-            pybeatsaver.Difficulty.HARD: "Hard",
-            pybeatsaver.Difficulty.EXPERT: "Expert",
-            pybeatsaver.Difficulty.EXPERT_PLUS: "Expert+",
-            pybeatsaver.Difficulty.UNKNOWN: "Unknown"
-        }
-
-        return difficulties[self.difficulty]
+        return self.difficulty.human_readable
 
     def __str__(self) -> str:
         return f"Beatmap Version Difficulty {self.characteristic} {self.difficulty} ({self.id})"

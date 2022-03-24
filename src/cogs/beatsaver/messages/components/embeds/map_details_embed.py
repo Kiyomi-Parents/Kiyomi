@@ -11,7 +11,7 @@ from src.kiyomi import Kiyomi
 
 class MapDetailsEmbed(BeatSaverEmbed):
 
-    def __init__(self, bot: Kiyomi, guild: Guild, beatmap: Beatmap, beatmap_difficulty: pybeatsaver.Difficulty):
+    def __init__(self, bot: Kiyomi, guild: Guild, beatmap: Beatmap, beatmap_difficulty: pybeatsaver.EDifficulty):
         super().__init__(bot)
 
         self.guild = guild
@@ -27,9 +27,9 @@ class MapDetailsEmbed(BeatSaverEmbed):
 
         self.set_footer(icon_url="https://share.lucker.xyz/qahu5/FoZozoBE67.png/raw.png", text=f"{self.get_scoresaber_status(difficulty)}")
 
-        self.description = f"Tag 1 • Some larger tag • this tag"  # Add tags from score saber. Needs api client support
+        self.description = " • ".join([tag.human_readable for tag in beatmap.tags])
 
-        self.add_field(name="Rating", value=f"{beatmap.rating}%")  # This should be included in the embed
+        self.add_field(name="Rating", value=f"{beatmap.rating}%", inline=False)  # This should be included in the embed
         # self.add_field(name="Length", value=f"{beatmap.length}")  # This should be included in the embed
 
         # VR Headset used info somewhere?
@@ -46,7 +46,7 @@ class MapDetailsEmbed(BeatSaverEmbed):
 
         mapping_mods = self.get_mapping_mods(difficulty)
         if len(mapping_mods) > 0:
-            self.add_field(name="Mapping mods", value=" • ".join(mapping_mods))
+            self.add_field(name="Mapping mods", value=" • ".join(mapping_mods), inline=False)
 
     def get_difficulties(self) -> str:
         difficulty_texts = []
@@ -61,7 +61,7 @@ class MapDetailsEmbed(BeatSaverEmbed):
 
         return " ".join(difficulty_texts)
 
-    def get_difficulty(self, beatmap_difficulty: pybeatsaver.Difficulty) -> BeatmapVersionDifficulty:
+    def get_difficulty(self, beatmap_difficulty: pybeatsaver.EDifficulty) -> BeatmapVersionDifficulty:
         for difficulty in self.beatmap.difficulties:
             if difficulty.difficulty == beatmap_difficulty:
                 return difficulty

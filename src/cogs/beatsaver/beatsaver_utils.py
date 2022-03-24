@@ -27,21 +27,21 @@ class BeatSaverUtils:
         return math.floor(max_score)
 
     @staticmethod
-    def difficulty_to_emoji(bot: Kiyomi, guild: Optional[Guild], difficulty: pybeatsaver.Difficulty) -> Optional[Emoji]:
+    def difficulty_to_emoji(bot: Kiyomi, guild: Optional[Guild], difficulty: pybeatsaver.EDifficulty) -> Optional[Emoji]:
         if guild is None:
             return None
 
         settings = bot.get_cog_api(SettingsAPI)
 
-        if difficulty == pybeatsaver.Difficulty.EASY:
+        if difficulty == pybeatsaver.EDifficulty.EASY:
             return settings.get(guild.id, "easy_difficulty_emoji")
-        elif difficulty == pybeatsaver.Difficulty.NORMAL:
+        elif difficulty == pybeatsaver.EDifficulty.NORMAL:
             return settings.get(guild.id, "normal_difficulty_emoji")
-        elif difficulty == pybeatsaver.Difficulty.HARD:
+        elif difficulty == pybeatsaver.EDifficulty.HARD:
             return settings.get(guild.id, "hard_difficulty_emoji")
-        elif difficulty == pybeatsaver.Difficulty.EXPERT:
+        elif difficulty == pybeatsaver.EDifficulty.EXPERT:
             return settings.get(guild.id, "expert_difficulty_emoji")
-        elif difficulty == pybeatsaver.Difficulty.EXPERT_PLUS:
+        elif difficulty == pybeatsaver.EDifficulty.EXPERT_PLUS:
             return settings.get(guild.id, "expert_plus_difficulty_emoji")
 
         return None

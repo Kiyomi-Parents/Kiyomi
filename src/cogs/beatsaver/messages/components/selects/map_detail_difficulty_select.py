@@ -41,16 +41,16 @@ class MapDetailDifficultySelect(BeatSaverComponent, discord.ui.Select):
         )
 
     async def callback(self, interaction: discord.Interaction):
-        beatmap_difficulty = pybeatsaver.Difficulty(self.values[0])
+        beatmap_difficulty = pybeatsaver.EDifficulty(self.values[0])
 
         self.parent.beatmap_difficulty = beatmap_difficulty
 
         await self.parent.update()
 
     @property
-    def selected_difficulty(self) -> pybeatsaver.Difficulty:
+    def selected_difficulty(self) -> pybeatsaver.EDifficulty:
         if len(self.values) > 0:
-            return pybeatsaver.Difficulty(self.values[0])
+            return pybeatsaver.EDifficulty(self.values[0])
 
     @staticmethod
     def difficulty_stars(beatmap_difficulty: BeatmapVersionDifficulty) -> Optional[str]:

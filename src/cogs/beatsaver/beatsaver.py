@@ -48,8 +48,7 @@ class BeatSaver(BeatSaverCog, name="Beat Saver"):
 
         self.bot.events.emit("setting_register", settings)
 
-    # 22fcf
-    @slash_command(aliases=["bsr", "song"], guild_ids=[198040147189694464])
+    @slash_command(aliases=["bsr", "song"])
     async def map(self, ctx: discord.ApplicationContext, key: str):
         """Displays song info."""
         leaderboard = self.bot.get_cog_api(LeaderboardAPI)
