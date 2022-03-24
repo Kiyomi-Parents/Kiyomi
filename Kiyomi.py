@@ -20,6 +20,8 @@ if __name__ == "__main__":
 
     bot = Kiyomi(command_prefix="!", db=database)
 
+    bot.debug_guilds = os.getenv("DEBUG_GUILDS").split(",")
+
     Logger.log_init()
 
     bot.load_extension(name="src.cogs.general")
@@ -31,8 +33,8 @@ if __name__ == "__main__":
     bot.load_extension(name="src.cogs.achievements")
     bot.load_extension(name="src.cogs.achievement_roles")
 
-    # database.drop_tables()
-    # database.create_tables()
+    database.drop_tables()
+    database.create_tables()
     # database.create_schema_image()
 
     bot.run(TOKEN)
