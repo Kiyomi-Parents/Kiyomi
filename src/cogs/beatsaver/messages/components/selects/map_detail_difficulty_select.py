@@ -27,6 +27,11 @@ class MapDetailDifficultySelect(BeatSaverComponent, discord.ui.Select):
         options = []
 
         for beatmap_difficulty in self.beatmap.latest_version.difficulties:
+            # TODO: We should probably also implement a Characteristic/Game Mode selector
+            # Ignore everything else that isn't a standard game mode.
+            if beatmap_difficulty.characteristic is not pybeatsaver.ECharacteristic.STANDARD:
+                continue
+
             options.append(self.get_option(beatmap_difficulty))
 
         return options
