@@ -11,13 +11,13 @@ from src.kiyomi import Kiyomi
 
 class MapDetailsEmbed(BeatSaverEmbed):
 
-    def __init__(self, bot: Kiyomi, guild: Guild, beatmap: Beatmap, beatmap_difficulty: pybeatsaver.EDifficulty):
+    def __init__(self, bot: Kiyomi, guild: Guild, beatmap: Beatmap, beatmap_characteristic: pybeatsaver.ECharacteristic, beatmap_difficulty: pybeatsaver.EDifficulty):
         super().__init__(bot)
 
         self.guild = guild
         self.beatmap = beatmap
 
-        difficulty = self.get_difficulty(beatmap_difficulty)
+        difficulty = self.get_difficulty(beatmap_characteristic, beatmap_difficulty)
 
         self.title = f"{beatmap.name}"
         self.url = beatmap.beatsaver_url
@@ -62,10 +62,15 @@ class MapDetailsEmbed(BeatSaverEmbed):
 
         return " ".join(difficulty_texts)
 
-    def get_difficulty(self, beatmap_difficulty: pybeatsaver.EDifficulty) -> BeatmapVersionDifficulty:
+    def get_difficulty(self, beatmap_characteristic: pybeatsaver.ECharacteristic, beatmap_difficulty: pybeatsaver.EDifficulty) -> BeatmapVersionDifficulty:
         for difficulty in self.beatmap.difficulties:
-            if difficulty.difficulty == beatmap_difficulty:
-                return difficulty
+            if difficulty.characteristic is not beatmap_characteristic:
+                continue
+
+            if difficulty.difficulty is not beatmap_difficulty:
+                continue
+
+            return difficulty
 
     def get_scoresaber_status(self, difficulty: BeatmapVersionDifficulty) -> str:
         if difficulty.stars is not None:

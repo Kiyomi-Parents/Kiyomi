@@ -8,6 +8,7 @@ from discord.ext.commands import Context
 from ..components.buttons.guild_leaderboard_button import GuildLeaderboardButton
 from ..components.buttons.map_details_button import MapDetailsButton
 from ..components.buttons.map_preview_button import MapPreviewButton
+from ..components.selects.map_detail_characteristic_select import MapDetailCharacteristicSelect
 from ..components.selects.map_detail_difficulty_select import MapDetailDifficultySelect
 from src.cogs.beatsaver.storage import Beatmap
 from src.kiyomi import Kiyomi
@@ -29,6 +30,7 @@ class SongView(BaseView):
         self.beatmap = beatmap
 
         self._beatmap_difficulty: Optional[pybeatsaver.EDifficulty] = None
+        self._beatmap_characteristic: Optional[pybeatsaver.ECharacteristic] = None
         self.message: Union[discord.Message, discord.WebhookMessage, None] = None
 
         self.update_buttons()
@@ -46,6 +48,17 @@ class SongView(BaseView):
     def beatmap_difficulty(self, beatmap_difficulty: pybeatsaver.EDifficulty):
         self._beatmap_difficulty = beatmap_difficulty
 
+    @property
+    def beatmap_characteristic(self) -> Optional[pybeatsaver.ECharacteristic]:
+        if self._beatmap_characteristic is None:
+            return self.beatmap.latest_version.difficulties[-1].characteristic
+
+        return self._beatmap_characteristic
+
+    @beatmap_characteristic.setter
+    def beatmap_characteristic(self, beatmap_characteristic: pybeatsaver.ECharacteristic):
+        self._beatmap_characteristic = beatmap_characteristic
+
     async def update(self) -> discord.Message:
         self.update_buttons()
 
@@ -57,6 +70,7 @@ class SongView(BaseView):
     def update_buttons(self):
         self.clear_items()
 
+        self.add_item(MapDetailCharacteristicSelect(self.bot, self, self.beatmap))
         self.add_item(MapDetailDifficultySelect(self.bot, self, self.beatmap))
         self.add_item(MapDetailsButton(self.bot, self, self.beatmap))
         self.add_item(GuildLeaderboardButton(self.bot, self, self.beatmap))

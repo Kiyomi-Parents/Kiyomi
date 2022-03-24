@@ -27,9 +27,7 @@ class MapDetailDifficultySelect(BeatSaverComponent, discord.ui.Select):
         options = []
 
         for beatmap_difficulty in self.beatmap.latest_version.difficulties:
-            # TODO: We should probably also implement a Characteristic/Game Mode selector
-            # Ignore everything else that isn't a standard game mode.
-            if beatmap_difficulty.characteristic is not pybeatsaver.ECharacteristic.STANDARD:
+            if beatmap_difficulty.characteristic is not self.parent.beatmap_characteristic:
                 continue
 
             options.append(self.get_option(beatmap_difficulty))
@@ -40,22 +38,17 @@ class MapDetailDifficultySelect(BeatSaverComponent, discord.ui.Select):
         return discord.SelectOption(
             label=f"{beatmap_difficulty.difficulty_text}",
             description=self.difficulty_stars(beatmap_difficulty),
-            value=f"{beatmap_difficulty.difficulty.value}",
+            value=f"{beatmap_difficulty.difficulty.serialize}",
             emoji=BeatSaverUtils.difficulty_to_emoji(self.bot, self.parent.guild, beatmap_difficulty.difficulty),
             default=self.parent.beatmap_difficulty == beatmap_difficulty.difficulty
         )
 
     async def callback(self, interaction: discord.Interaction):
-        beatmap_difficulty = pybeatsaver.EDifficulty(self.values[0])
+        beatmap_difficulty = pybeatsaver.EDifficulty.deserialize(self.values[0])
 
         self.parent.beatmap_difficulty = beatmap_difficulty
 
         await self.parent.update()
-
-    @property
-    def selected_difficulty(self) -> pybeatsaver.EDifficulty:
-        if len(self.values) > 0:
-            return pybeatsaver.EDifficulty(self.values[0])
 
     @staticmethod
     def difficulty_stars(beatmap_difficulty: BeatmapVersionDifficulty) -> Optional[str]:
