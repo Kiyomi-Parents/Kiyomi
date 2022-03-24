@@ -27,7 +27,8 @@ class MapDetailsEmbed(BeatSaverEmbed):
 
         self.set_footer(icon_url="https://share.lucker.xyz/qahu5/FoZozoBE67.png/raw.png", text=f"{self.get_scoresaber_status(difficulty)}")
 
-        self.description = " • ".join([tag.human_readable for tag in beatmap.tags])
+        if beatmap.tags is not None:
+            self.description = " • ".join([tag.human_readable for tag in beatmap.tags])
 
         self.add_field(name="Rating", value=f"{beatmap.rating}%", inline=False)  # This should be included in the embed
         # self.add_field(name="Length", value=f"{beatmap.length}")  # This should be included in the embed
