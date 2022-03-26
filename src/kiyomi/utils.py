@@ -1,9 +1,10 @@
 import asyncio
 import random
-import time
+from datetime import datetime
 from functools import wraps
 
 import discord
+import timeago
 from discord.ext import tasks
 
 from src.log import Logger
@@ -16,10 +17,13 @@ class Utils:
         @wraps(func)
         async def wrapper(self, *args, **kwargs):
             Logger.log(func.__name__, "<===> Starting task <===>")
-            start_time = time.process_time()
+
+            start_time = datetime.now()
             res = await func(self, *args, **kwargs)
+            end_time = datetime.now()
+
             Logger.log(
-                    func.__name__, f"Finished task in {round(time.process_time() - start_time, 2)} seconds\n"
+                    func.__name__, f"Finished task in {timeago.format(start_time, end_time)}\n"
             )
 
             return res
