@@ -1,8 +1,8 @@
 from discord import Embed
 
-from src.kiyomi.message_builder.score_message_builder import ScoreMessageBuilder
 from src.cogs.scoresaber.storage.model.player import Player
 from src.cogs.scoresaber.storage.model.score import Score
+from src.kiyomi.message_builder.score_message_builder import ScoreMessageBuilder
 
 
 class Message:

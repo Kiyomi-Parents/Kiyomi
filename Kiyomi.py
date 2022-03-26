@@ -3,8 +3,7 @@ import os
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
 
-from src.database import Database
-from src.kiyomi.kiyomi import Kiyomi
+from src.kiyomi import Kiyomi, Database
 from src.log import Logger
 
 if __name__ == "__main__":
@@ -33,8 +32,8 @@ if __name__ == "__main__":
     bot.load_extension(name="src.cogs.achievements")
     bot.load_extension(name="src.cogs.achievement_roles")
 
-    database.drop_tables()
-    database.create_tables()
+    # database.drop_tables()
+    # database.create_tables()
     # database.create_schema_image()
 
     bot.run(TOKEN)

@@ -2,7 +2,7 @@ import pybeatsaver
 from sqlalchemy import Integer, Column, String, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
 
-from src.database import Base
+from src.kiyomi.database import Base
 from .beatmap_version_difficulty import BeatmapVersionDifficulty
 
 

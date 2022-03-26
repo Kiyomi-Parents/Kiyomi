@@ -1,8 +1,8 @@
 from typing import List
 
-from .achievement_generator import AchievementGenerator
-from src.cogs.general.storage.model import Member
+from src.cogs.general.storage.model.member import Member
 from .achievement import Achievement, Condition
+from .achievement_generator import AchievementGenerator
 
 
 class Rank(AchievementGenerator):

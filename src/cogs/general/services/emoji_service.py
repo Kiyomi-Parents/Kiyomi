@@ -5,9 +5,9 @@ from typing import List, Optional
 import discord
 from discord import OptionChoice
 
-from ..errors import EmojiAlreadyExistsException, EmojiNotFoundException
 from .general_service import GeneralService
-from ..storage import Emoji
+from ..errors import EmojiAlreadyExistsException, EmojiNotFoundException
+from ..storage.model.emoji import Emoji
 
 
 class EmojiService(GeneralService):

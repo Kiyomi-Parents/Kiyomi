@@ -2,8 +2,8 @@ from discord.ext import tasks
 
 from src.cogs.scoresaber import ScoreSaberAPI
 from src.kiyomi import Kiyomi, BaseTasks
+from src.kiyomi.utils import Utils
 from src.log import Logger
-from src.utils import Utils
 from .services.notification_service import NotificationService
 
 

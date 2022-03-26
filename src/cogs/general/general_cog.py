@@ -1,5 +1,5 @@
-from .services import EmojiService, GuildService, MemberService, RoleService
 from src.kiyomi import BaseCog, Kiyomi
+from .services import EmojiService, GuildService, MemberService, RoleService
 
 
 class GeneralCog(BaseCog):

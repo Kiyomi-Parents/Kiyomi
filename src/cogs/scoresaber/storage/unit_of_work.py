@@ -1,8 +1,10 @@
 from sqlalchemy.orm import Session
 
-from .repository import PlayerRepository, ScoreRepository, LeaderboardRepository, \
-    GuildPlayerRepository
-from src.database.base_unit_of_work import BaseUnitOfWork
+from .repository.guild_player_repository import GuildPlayerRepository
+from .repository.leaderboard_repository import LeaderboardRepository
+from .repository.player_repository import PlayerRepository
+from .repository.score_repository import ScoreRepository
+from src.kiyomi.database import BaseUnitOfWork
 
 
 class UnitOfWork(BaseUnitOfWork):

@@ -1,12 +1,12 @@
+from src.kiyomi import Kiyomi
 from .achievement_roles import AchievementRoles
 from .services import MemberAchievementRoleService
 from .storage import UnitOfWork
 from .tasks import Tasks
-from src.kiyomi import Kiyomi
 
 
 def setup(bot: Kiyomi):
-    uow = UnitOfWork(bot.database)
+    uow = UnitOfWork(bot.database.session)
 
     member_service = MemberAchievementRoleService(bot, uow)
 

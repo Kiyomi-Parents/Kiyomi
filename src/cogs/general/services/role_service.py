@@ -1,14 +1,16 @@
 import discord
 from discord import Colour, DiscordException
 
+from src.cogs.security import Security
 from src.kiyomi import Kiyomi
 from src.log import Logger
 from .general_service import GeneralService
 from .guild_service import GuildService
 from .member_service import MemberService
-from ..storage import UnitOfWork, Role, MemberRole
 from ..errors import RoleNotFoundException
-from src.cogs.security import Security
+from ..storage import UnitOfWork
+from ..storage.model.member_role import MemberRole
+from ..storage.model.role import Role
 
 
 class RoleService(GeneralService):

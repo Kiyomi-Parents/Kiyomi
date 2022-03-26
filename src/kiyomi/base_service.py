@@ -1,7 +1,7 @@
 from typing import Generic, TypeVar
 
-from src.database.base_unit_of_work import BaseUnitOfWork
-from src.kiyomi import Kiyomi
+from .database import BaseUnitOfWork
+from .kiyomi import Kiyomi
 
 T = TypeVar('T', bound=BaseUnitOfWork)
 

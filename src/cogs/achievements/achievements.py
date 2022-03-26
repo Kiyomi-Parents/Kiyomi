@@ -4,7 +4,7 @@ from discord import SlashCommandGroup, Option
 from src.kiyomi.base_cog import BaseCog
 from .actions import Actions
 from .message import Message
-from .storage.uow import UnitOfWork
+from .storage.unit_of_work import UnitOfWork
 
 
 class Achievements(BaseCog):

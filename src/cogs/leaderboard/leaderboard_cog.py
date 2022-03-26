@@ -1,5 +1,5 @@
-from .services import PlayerLeaderboardService
 from src.kiyomi import BaseCog, Kiyomi
+from .services import PlayerLeaderboardService
 
 
 class LeaderboardCog(BaseCog):

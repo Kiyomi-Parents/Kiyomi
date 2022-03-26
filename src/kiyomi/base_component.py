@@ -2,7 +2,7 @@ from typing import Generic, TypeVar
 
 import discord.ui
 
-from src.kiyomi import Kiyomi
+from .kiyomi import Kiyomi
 
 T = TypeVar('T', bound=discord.ui.View)
 

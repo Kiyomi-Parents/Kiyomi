@@ -2,8 +2,7 @@ from typing import Optional, List
 
 from sqlalchemy.orm import Query
 
-from src.database import BaseRepository
-from src.database.base_repository import T
+from src.kiyomi.database import BaseRepository
 from src.log import Logger
 from ..model import Setting
 

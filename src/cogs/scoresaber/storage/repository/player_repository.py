@@ -2,7 +2,7 @@ from typing import List, Optional
 
 from sqlalchemy.orm import Query
 
-from src.database import BaseRepository
+from src.kiyomi.database import BaseRepository
 from src.log import Logger
 from ..model.player import Player
 from ..model.score import Score
@@ -21,7 +21,4 @@ class PlayerRepository(BaseRepository[Player]):
     def add_score(self, player: Player, score: Score):
         player.scores.append(score)
 
-        self.commit_changes()
-
-        self.session.refresh(score)
         Logger.log(player, f"Added new {score}")

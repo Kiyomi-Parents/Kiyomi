@@ -1,5 +1,5 @@
-from ..storage import UnitOfWork
 from src.kiyomi import BaseService, Kiyomi
+from ..storage import UnitOfWork
 
 
 class GeneralService(BaseService[UnitOfWork]):

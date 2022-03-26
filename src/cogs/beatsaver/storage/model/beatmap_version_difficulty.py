@@ -3,8 +3,8 @@ import pyscoresaber.models.enum
 from pybeatsaver import MapDifficulty
 from sqlalchemy import Column, String, ForeignKey, Integer, Float, Boolean, Enum
 
+from src.kiyomi.database import Base
 from ...beatsaver_utils import BeatSaverUtils
-from src.database import Base
 
 
 class BeatmapVersionDifficulty(Base):
@@ -62,20 +62,19 @@ class BeatmapVersionDifficulty(Base):
     def max_score(self) -> Integer:
         return BeatSaverUtils.get_max_score(self.notes)
 
-    # TODO: Fix for new version
-    # @property
-    # def scoresaber_characteristic(self) -> pyscoresaber.Characteristic:
-    #     characteristics = {
-    #         pybeatsaver.ECharacteristic.STANDARD: pyscoresaber.Characteristic.STANDARD,
-    #         pybeatsaver.ECharacteristic.ONE_SABER: pyscoresaber.Characteristic.ONE_SABER,
-    #         pybeatsaver.ECharacteristic.NO_ARROWS: pyscoresaber.Characteristic.NO_ARROWS,
-    #         pybeatsaver.ECharacteristic.DEGREE_90: pyscoresaber.Characteristic.DEGREE_90,
-    #         pybeatsaver.ECharacteristic.DEGREE_360: pyscoresaber.Characteristic.DEGREE_360,
-    #         pybeatsaver.ECharacteristic.LIGHTSHOW: pyscoresaber.Characteristic.LIGHTSHOW,
-    #         pybeatsaver.ECharacteristic.LAWLESS: pyscoresaber.Characteristic.LAWLESS,
-    #     }
-    #
-    #     return characteristics[self.characteristic]
+    @property
+    def scoresaber_characteristic(self) -> pyscoresaber.GameMode:
+        characteristics = {
+            pybeatsaver.ECharacteristic.STANDARD: pyscoresaber.GameMode.STANDARD,
+            pybeatsaver.ECharacteristic.ONE_SABER: pyscoresaber.GameMode.ONE_SABER,
+            pybeatsaver.ECharacteristic.NO_ARROWS: pyscoresaber.GameMode.NO_ARROWS,
+            pybeatsaver.ECharacteristic.DEGREE_90: pyscoresaber.GameMode.DEGREE_90,
+            pybeatsaver.ECharacteristic.DEGREE_360: pyscoresaber.GameMode.DEGREE_360,
+            pybeatsaver.ECharacteristic.LIGHTSHOW: pyscoresaber.GameMode.LIGHTSHOW,
+            pybeatsaver.ECharacteristic.LAWLESS: pyscoresaber.GameMode.LAWLESS,
+        }
+
+        return characteristics[self.characteristic]
 
     @property
     def scoresaber_difficulty(self) -> pyscoresaber.Difficulty:

@@ -6,7 +6,7 @@ from dateutil import tz
 from discord import Embed
 from prettytable import PrettyTable
 
-from src.cogs.leaderboard.messages.components.embeds.embed import LeaderboardEmbed
+from .embed import LeaderboardEmbed
 from src.cogs.leaderboard.services import PlayerScoreLeaderboard
 from src.kiyomi import Kiyomi
 

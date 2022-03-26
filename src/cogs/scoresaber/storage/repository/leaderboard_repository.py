@@ -2,8 +2,8 @@ from typing import Optional, List
 
 from sqlalchemy.orm import Query
 
-from src.cogs.scoresaber.storage.model import Leaderboard
-from src.database import BaseRepository
+from ..model.leaderboard import Leaderboard
+from src.kiyomi.database import BaseRepository
 
 
 class LeaderboardRepository(BaseRepository[Leaderboard]):

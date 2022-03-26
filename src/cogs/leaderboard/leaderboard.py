@@ -2,10 +2,10 @@ from discord import slash_command
 from discord.ext import commands
 
 from src.cogs.settings.storage.model.toggle_setting import ToggleSetting
-from .services import PlayerLeaderboardService
+from src.kiyomi import Kiyomi
 from .leaderboard_cog import LeaderboardCog
 from .message import Message
-from src.kiyomi import Kiyomi
+from .services import PlayerLeaderboardService
 
 
 class Leaderboard(LeaderboardCog):

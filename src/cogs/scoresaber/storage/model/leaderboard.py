@@ -1,9 +1,9 @@
 import pyscoresaber
-from pyscoresaber import Difficulty
-from sqlalchemy import Column, String, Integer, DateTime, Boolean, Enum
+from pyscoresaber import BeatmapDifficulty
+from sqlalchemy import Column, String, Integer, DateTime, Boolean, Enum, Float
 from sqlalchemy.orm import relationship
 
-from src.database import Base
+from src.kiyomi.database import Base
 
 
 class Leaderboard(Base):
@@ -25,6 +25,7 @@ class Leaderboard(Base):
     plays = Column(Integer)
     daily_plays = Column(Integer)
     cover_image = Column(String(256))
+    max_pp = Column(Float)
     created_date = Column(DateTime)
     ranked_date = Column(DateTime)
     qualified_date = Column(DateTime)
@@ -57,6 +58,7 @@ class Leaderboard(Base):
         self.plays = leaderboard.plays
         self.daily_plays = leaderboard.daily_plays
         self.cover_image = leaderboard.cover_image
+        self.max_pp = leaderboard.max_pp
         self.created_date = leaderboard.created_date
         self.ranked_date = leaderboard.ranked_date
         self.qualified_date = leaderboard.qualified_date
@@ -73,10 +75,6 @@ class Leaderboard(Base):
         return f"https://scoresaber.com/leaderboard/{self.id}?page={page}"
 
     @property
-    def song_image_url(self) -> str:
-        return f"https://scoresaber.com/imports/images/songs/{self.song_hash.upper()}.png"
-
-    @property
     def song_name_full(self):
         if self.song_sub_name:
             return f"{self.song_name}: {self.song_sub_name}"
@@ -86,11 +84,11 @@ class Leaderboard(Base):
     @property
     def difficulty_name(self) -> str:
         difficulties = {
-            Difficulty.EASY: "Easy",
-            Difficulty.NORMAL: "Normal",
-            Difficulty.HARD: "Hard",
-            Difficulty.EXPERT: "Expert",
-            Difficulty.EXPERT_PLUS: "Expert+"
+            BeatmapDifficulty.EASY: "Easy",
+            BeatmapDifficulty.NORMAL: "Normal",
+            BeatmapDifficulty.HARD: "Hard",
+            BeatmapDifficulty.EXPERT: "Expert",
+            BeatmapDifficulty.EXPERT_PLUS: "Expert+"
         }
 
         return difficulties[self.difficulty]

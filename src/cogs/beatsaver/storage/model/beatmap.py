@@ -1,11 +1,11 @@
 import time
 from typing import List, Optional
 
-from pybeatsaver import MapDetail, EMapTag
-from sqlalchemy import Column, String, Integer, DateTime, Boolean, Float, Text, JSON
+from pybeatsaver import MapDetail
+from sqlalchemy import Column, String, Integer, DateTime, Boolean, Float, Text
 from sqlalchemy.orm import relationship
 
-from src.database import Base, EMapTagList
+from src.kiyomi.database import Base, EMapTagList
 from .beatmap_version import BeatmapVersion
 from .beatmap_version_difficulty import BeatmapVersionDifficulty
 

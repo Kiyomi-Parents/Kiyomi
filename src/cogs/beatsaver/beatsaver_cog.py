@@ -1,5 +1,5 @@
-from .services import BeatmapService
 from src.kiyomi import BaseCog, Kiyomi
+from .services import BeatmapService
 
 
 class BeatSaverCog(BaseCog):

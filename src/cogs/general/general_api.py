@@ -3,10 +3,13 @@ from typing import Optional, List
 import discord
 from discord import Colour, Emoji
 
+from src.kiyomi import Kiyomi
 from .general_cog import GeneralCog
 from .services import EmojiService, GuildService, MemberService, RoleService
-from .storage import UnitOfWork, Guild, Member, Role
-from src.kiyomi import Kiyomi
+from .storage import UnitOfWork
+from .storage.model.guild import Guild
+from .storage.model.member import Member
+from .storage.model.role import Role
 
 
 class GeneralAPI(GeneralCog):

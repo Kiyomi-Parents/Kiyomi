@@ -5,7 +5,7 @@ from alembic import context
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
-import src.cogs.general
+from src.kiyomi.database import Base
 import src.cogs.settings
 import src.cogs.scoresaber
 import src.cogs.beatsaver
@@ -13,7 +13,6 @@ import src.cogs.score_feed
 import src.cogs.leaderboard
 import src.cogs.achievements
 import src.cogs.achievement_roles
-from src.database import Base
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

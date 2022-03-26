@@ -2,9 +2,9 @@ import typing
 from collections import OrderedDict
 from typing import Optional, List
 
-
-from src.cogs.leaderboard.services.leaderboard_service import LeaderboardService
-from src.cogs.scoresaber.storage import Score, Player
+from .leaderboard_service import LeaderboardService
+from ...scoresaber.storage.model.player import Player
+from ...scoresaber.storage.model.score import Score
 
 PlayerScoreLeaderboard = Optional[typing.OrderedDict[Player, Score]]
 PlayerTopScoresLeaderboard = Optional[List[Score]]

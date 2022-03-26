@@ -1,13 +1,14 @@
-from src.kiyomi import Kiyomi
-from .settings_service import SettingsService
 from typing import Optional, List
 
 import discord
 from discord import OptionChoice
 
-from ..errors import SettingNotFoundException, FailedSettingConvertException
-from ..storage import Setting, ChannelSetting, IntegerSetting, TextSetting, ToggleSetting, SettingType, AbstractSetting, UnitOfWork
 from src.cogs.settings.utils import Utils
+from src.kiyomi import Kiyomi
+from .settings_service import SettingsService
+from ..errors import SettingNotFoundException, FailedSettingConvertException
+from ..storage import Setting, ChannelSetting, IntegerSetting, TextSetting, ToggleSetting, SettingType, AbstractSetting, \
+    UnitOfWork
 from ..storage.model.emoji_setting import EmojiSetting
 
 

@@ -1,10 +1,10 @@
 import pybeatsaver
 
+from src.kiyomi import Kiyomi
 from .beatsaver import BeatSaver
 from .beatsaver_api import BeatSaverAPI
 from .services import BeatmapService
 from .storage import UnitOfWork
-from src.kiyomi import Kiyomi
 
 
 def setup(bot: Kiyomi):

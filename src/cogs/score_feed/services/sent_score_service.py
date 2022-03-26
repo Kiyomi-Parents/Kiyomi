@@ -1,9 +1,10 @@
-from .score_feed_service import ScoreFeedService
+
 from src.cogs.scoresaber import ScoreSaberAPI
 from src.log import Logger
-from src.cogs.scoresaber.storage import Player
-from src.cogs.general.storage import Guild
-from ..storage import SentScore
+from .score_feed_service import ScoreFeedService
+from ..storage.model.sent_score import SentScore
+from src.cogs.general.storage.model.guild import Guild
+from src.cogs.scoresaber.storage.model.player import Player
 
 
 class SentScoreService(ScoreFeedService):

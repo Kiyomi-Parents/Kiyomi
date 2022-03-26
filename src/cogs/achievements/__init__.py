@@ -1,8 +1,8 @@
+from src.kiyomi import Kiyomi
+from .achievements import Achievements
 from .achievements_api import AchievementsAPI
 from .actions import Actions
-from .storage.uow import UnitOfWork
-from .achievements import Achievements
-from src.kiyomi import Kiyomi
+from .storage.unit_of_work import UnitOfWork
 
 
 def setup(bot: Kiyomi):

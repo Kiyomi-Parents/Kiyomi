@@ -5,7 +5,7 @@ import discord
 from discord import Embed, Guild
 from discord.ext.commands import Context
 
-from src.kiyomi import Kiyomi
+from .kiyomi import Kiyomi
 
 
 class BaseView(discord.ui.View, ABC):
@@ -41,12 +41,15 @@ class BaseView(discord.ui.View, ABC):
     def update_buttons(self):
         pass
 
-    async def send(self, ctx: Context, target: Optional[discord.abc.Messageable] = None) -> discord.Message:
-        if not isinstance(ctx, Context):
+    async def send(self, ctx: Optional[Context] = None, target: Optional[discord.abc.Messageable] = None) -> discord.Message:
+        if ctx is not None and not isinstance(ctx, Context):
             raise TypeError(f"expected Context not {ctx.__class__!r}")
 
         if target is not None and not isinstance(target, discord.abc.Messageable):
             raise TypeError(f"expected abc.Messageable not {target.__class__!r}")
+
+        if ctx is None and target is None:
+            raise RuntimeError("ctx and target were not provided")
 
         if target:
             ctx = target

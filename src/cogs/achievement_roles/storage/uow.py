@@ -1,7 +1,8 @@
 from sqlalchemy.orm import Session
 
-from src.database import BaseUnitOfWork
-from .repository import AchievementRoleRepository, AchievementRoleMemberRepository
+from .repository.achievement_role_member_repository import AchievementRoleMemberRepository
+from .repository.achievement_role_repository import AchievementRoleRepository
+from src.kiyomi.database import BaseUnitOfWork
 
 
 class UnitOfWork(BaseUnitOfWork):

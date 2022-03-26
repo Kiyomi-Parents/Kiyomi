@@ -4,16 +4,14 @@ import discord
 from discord import slash_command
 from discord.ext import commands
 
-from .messages.views.song_view import SongView
-from .services import BeatmapService
+from src.kiyomi import Kiyomi
+from src.log import Logger
 from .beatsaver_cog import BeatSaverCog
 from .errors import SongNotFound
-from src.log import Logger
-from src.kiyomi import Kiyomi
-from src.cogs.leaderboard import LeaderboardAPI
-from src.cogs.settings import SettingsAPI
-from src.cogs.scoresaber.storage import Leaderboard
+from .messages.views.song_view import SongView
+from .services import BeatmapService
 from src.cogs.settings.storage.model.emoji_setting import EmojiSetting
+from src.cogs.scoresaber.storage.model.leaderboard import Leaderboard
 
 
 class BeatSaver(BeatSaverCog, name="Beat Saver"):
@@ -58,20 +56,10 @@ class BeatSaver(BeatSaverCog, name="Beat Saver"):
     @slash_command(aliases=["bsr", "song"])
     async def map(self, ctx: discord.ApplicationContext, key: str):
         """Displays song info."""
-        leaderboard = self.bot.get_cog_api(LeaderboardAPI)
-        settings = self.bot.get_cog_api(SettingsAPI)
-
         try:
             db_beatmap = await self.beatmap_service.get_beatmap_by_key(key)
-
             song_view = SongView(self.bot, ctx.interaction.guild, db_beatmap)
 
             await song_view.respond(ctx.interaction)
-
-            # TODO: Remove this probably
-            if settings.get(ctx.guild.id, "map_leaderboard"):
-                leaderboard_embed = await leaderboard.get_player_score_leaderboard_embed(ctx.guild.id, key)
-
-                await ctx.respond(embed=leaderboard_embed)
         except SongNotFound as error:
             await ctx.respond(error)

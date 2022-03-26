@@ -1,5 +1,5 @@
-from .services import PlayerService, ScoreService
 from src.kiyomi import BaseCog, Kiyomi
+from .services import PlayerService, ScoreService
 
 
 class ScoreSaberCog(BaseCog):

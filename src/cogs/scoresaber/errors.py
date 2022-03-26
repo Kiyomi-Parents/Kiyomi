@@ -1,7 +1,8 @@
 from typing import Optional
 
-from src.cogs.general.storage.model import Member, Guild
-from .storage import Player
+from src.cogs.general.storage.model.guild import Guild
+from src.cogs.general.storage.model.member import Member
+from .storage.model.player import Player
 
 
 class ScoreSaberException(Exception):

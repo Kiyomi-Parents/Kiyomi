@@ -1,9 +1,9 @@
 import discord
 from discord import Embed
 
-from src.cogs.beatsaver.messages.components.beatsaver_component import BeatSaverComponent
-from src.cogs.beatsaver.messages.components.embeds.map_details_embed import MapDetailsEmbed
-from src.cogs.beatsaver.storage import Beatmap
+from ..beatsaver_component import BeatSaverComponent
+from ..embeds.map_details_embed import MapDetailsEmbed
+from ....storage.model.beatmap import Beatmap
 from src.kiyomi import Kiyomi
 
 

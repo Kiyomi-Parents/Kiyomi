@@ -1,11 +1,12 @@
 from typing import Optional
 
-from .services import BeatmapService
+from src.kiyomi import Kiyomi
+from src.log import Logger
 from .beatsaver_cog import BeatSaverCog
 from .errors import SongNotFound
-from .storage import Beatmap, UnitOfWork
-from src.log import Logger
-from src.kiyomi import Kiyomi
+from .services import BeatmapService
+from .storage import UnitOfWork
+from .storage.model.beatmap import Beatmap
 
 
 class BeatSaverAPI(BeatSaverCog):

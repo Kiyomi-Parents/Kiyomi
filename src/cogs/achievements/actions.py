@@ -4,7 +4,7 @@ import discord
 from discord import OptionChoice
 
 from .registry import Registry, AchievementGroups, Achievement
-from .storage.uow import UnitOfWork
+from .storage.unit_of_work import UnitOfWork
 
 
 class Actions:

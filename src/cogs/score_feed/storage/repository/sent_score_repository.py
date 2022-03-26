@@ -2,9 +2,9 @@ from typing import Optional, List
 
 from sqlalchemy.orm import Query
 
+from ..model.sent_score import SentScore
 from src.cogs.scoresaber.storage.model.score import Score
-from src.database import BaseRepository
-from ..model import SentScore
+from src.kiyomi.database import BaseRepository
 
 
 class SentScoreRepository(BaseRepository[SentScore]):

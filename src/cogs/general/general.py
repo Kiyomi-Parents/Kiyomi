@@ -5,12 +5,10 @@ from discord.ext.commands import EmojiNotFound
 
 from src.cogs.security import Security
 from src.cogs.settings.storage.model.toggle_setting import ToggleSetting
-from src.utils import Utils
 from .errors import EmojiAlreadyExistsException, EmojiNotFoundException
 from .general_cog import GeneralCog
 from .services import EmojiService, GuildService, MemberService, RoleService
-from ..settings import SettingsAPI
-from ...kiyomi import Kiyomi
+from src.kiyomi import Kiyomi, Utils
 
 
 class General(GeneralCog):
@@ -49,7 +47,7 @@ class General(GeneralCog):
         if msg.author.id == self.bot.user.id:
             return
 
-        settings = self.bot.get_cog_api(SettingsAPI)
+        settings = self.bot.get_cog_api("SettingsAPI")
 
         if settings.get(msg.guild.id, "repost_emoji"):
             emoji = self.emoji_service.get_emoji_from_message(msg.content)

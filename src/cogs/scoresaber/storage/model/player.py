@@ -1,9 +1,9 @@
 import pyscoresaber
-from sqlalchemy import Column, String, Integer, Float
+from sqlalchemy import Column, String, Integer, Float, BigInteger
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import relationship
 
-from src.database import Base
+from src.kiyomi.database import Base
 
 
 class Player(Base):
@@ -23,14 +23,14 @@ class Player(Base):
     banned = Column(Integer)
     inactive = Column(Integer)
 
-    score_stats_total_score = Column(Integer)
-    score_stats_total_ranked_score = Column(Integer)
+    score_stats_total_score = Column(BigInteger)
+    score_stats_total_ranked_score = Column(BigInteger)
     score_stats_average_ranked_accuracy = Column(Float)
     score_stats_total_play_count = Column(Integer)
     score_stats_ranked_play_count = Column(Integer)
     score_stats_replays_watched = Column(Integer)
 
-    scores = relationship("Score", cascade="all, delete-orphan")
+    scores = relationship("Score", back_populates="player", cascade="all, delete-orphan")
 
     guilds = association_proxy("guild_player", "guild")
 

@@ -4,8 +4,9 @@ import pybeatsaver
 from discord import Colour, Guild
 
 from src.cogs.beatsaver.beatsaver_utils import BeatSaverUtils
-from src.cogs.beatsaver.messages.components.embeds.beatsaver_embed import BeatSaverEmbed
-from src.cogs.beatsaver.storage import Beatmap, BeatmapVersionDifficulty
+from .beatsaver_embed import BeatSaverEmbed
+from ....storage.model.beatmap import Beatmap
+from ....storage.model.beatmap_version_difficulty import BeatmapVersionDifficulty
 from src.kiyomi import Kiyomi
 
 

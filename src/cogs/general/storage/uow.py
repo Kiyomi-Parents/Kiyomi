@@ -1,8 +1,13 @@
 from sqlalchemy.orm import Session
 
-from src.database import BaseUnitOfWork
-from .repository import GuildRepository, ChannelRepository, RoleRepository, MemberRepository, GuildMemberRepository, \
-    MemberRoleRepository, EmojiRepository
+from .repository.channel_repository import ChannelRepository
+from .repository.emoji_repository import EmojiRepository
+from .repository.guild_member_repository import GuildMemberRepository
+from .repository.guild_repository import GuildRepository
+from .repository.member_repository import MemberRepository
+from .repository.member_role_repository import MemberRoleRepository
+from .repository.role_repository import RoleRepository
+from src.kiyomi.database import BaseUnitOfWork
 
 
 class UnitOfWork(BaseUnitOfWork):

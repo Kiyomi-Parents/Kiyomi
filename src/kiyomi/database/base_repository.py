@@ -1,12 +1,11 @@
-import typing
 from abc import ABC, abstractmethod
 from typing import TypeVar, Generic, Optional, List
 
 from sqlalchemy.orm import Session, Query
 
-from src.database.database import Base
 from src.log import Logger
-from src.utils import Utils
+from .database import Base
+from ..utils import Utils
 
 T = TypeVar('T', bound=Base)
 

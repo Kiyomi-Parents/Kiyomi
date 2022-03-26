@@ -3,9 +3,9 @@ from typing import Optional
 import pybeatsaver
 from discord import Guild
 
-from src.cogs.beatsaver.storage import Beatmap
 from src.kiyomi import Kiyomi
 from src.kiyomi.base_view import BaseView
+from ...storage.model.beatmap import Beatmap
 from ..components.buttons.guild_leaderboard_button import GuildLeaderboardButton
 from ..components.buttons.map_details_button import MapDetailsButton
 from ..components.buttons.map_preview_button import MapPreviewButton

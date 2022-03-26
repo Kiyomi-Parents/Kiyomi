@@ -1,9 +1,9 @@
 from abc import ABC, abstractmethod
 from typing import List
 
+from src.cogs.general.storage.model.member import Member
 from .achievement import Achievement
-from ...storage.uow import UnitOfWork
-from src.cogs.general.storage.model import Member
+from ...storage.unit_of_work import UnitOfWork
 
 
 class AchievementGenerator(ABC):

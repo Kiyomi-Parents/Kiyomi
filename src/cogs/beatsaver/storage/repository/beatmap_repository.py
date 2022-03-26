@@ -2,8 +2,9 @@ from typing import List, Optional
 
 from sqlalchemy.orm import Query
 
-from src.database import BaseRepository
-from ..model import Beatmap, BeatmapVersion
+from ..model.beatmap import Beatmap
+from ..model.beatmap_version import BeatmapVersion
+from src.kiyomi.database import BaseRepository
 
 
 class BeatmapRepository(BaseRepository[Beatmap]):

@@ -2,7 +2,7 @@ from discord import ApplicationContext
 from discord.ext import commands
 from termcolor import colored
 
-from src.kiyomi import Kiyomi
+from .kiyomi import Kiyomi
 from src.log import Logger
 
 

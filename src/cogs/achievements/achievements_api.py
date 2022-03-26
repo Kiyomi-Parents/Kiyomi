@@ -4,7 +4,7 @@ from discord.ext import commands
 
 from .actions import Actions
 from .registry import Achievement
-from .storage.uow import UnitOfWork
+from .storage.unit_of_work import UnitOfWork
 
 
 class AchievementsAPI(commands.Cog):

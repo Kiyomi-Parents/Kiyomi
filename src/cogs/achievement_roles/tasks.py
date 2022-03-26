@@ -1,10 +1,10 @@
 from discord.ext import tasks
 
-from .services import MemberAchievementRoleService
 from src.cogs.general import GeneralAPI
 from src.cogs.settings import SettingsAPI
 from src.kiyomi import BaseTasks, Kiyomi
-from src.utils import Utils
+from src.kiyomi.utils import Utils
+from .services import MemberAchievementRoleService
 
 
 class Tasks(BaseTasks):

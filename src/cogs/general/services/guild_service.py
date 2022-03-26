@@ -1,8 +1,8 @@
 import discord
 
-from ..errors import GuildNotFoundException
 from .general_service import GeneralService
-from ..storage import Guild
+from ..errors import GuildNotFoundException
+from ..storage.model.guild import Guild
 
 
 class GuildService(GeneralService):

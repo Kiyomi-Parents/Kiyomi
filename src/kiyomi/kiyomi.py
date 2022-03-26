@@ -7,7 +7,7 @@ from discord.ext.commands import MissingRequiredArgument, BadArgument, NotOwner,
 from pyee import AsyncIOEventEmitter
 
 from src.cogs.errors import NoPrivateMessagesException
-from src.database import Database
+from .database import Database
 from src.log import Logger
 
 TCog = TypeVar('TCog')

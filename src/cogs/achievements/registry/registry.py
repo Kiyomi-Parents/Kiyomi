@@ -1,10 +1,10 @@
 from typing import List, Dict
 
-from src.cogs.general.storage.model import Member
-from src.utils import Utils
+from src.kiyomi.utils import Utils
 from .achievements import Achievement, AchievementGenerator
 from ..errors import AchievementGeneratorNotFound
-from ..storage.uow import UnitOfWork
+from ..storage.unit_of_work import UnitOfWork
+from ...general.storage.model.member import Member
 
 AchievementGroups = Dict[str, List[Achievement]]
 

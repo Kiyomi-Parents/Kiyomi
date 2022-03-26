@@ -1,11 +1,11 @@
+from src.cogs.scoresaber import ScoreSaberAPI
+from src.cogs.settings import SettingsAPI
 from src.log import Logger
 from .score_feed_service import ScoreFeedService
-from src.cogs.scoresaber import ScoreSaberAPI
-from src.cogs.general.storage import Guild
-from src.cogs.scoresaber.storage import Player
-from src.cogs.settings import SettingsAPI
-from ..message import Message
-from ..storage import SentScore
+from ..messages.views.ScoreNotificationView import ScoreNotificationView
+from ..storage.model.sent_score import SentScore
+from src.cogs.general.storage.model.guild import Guild
+from ...scoresaber.storage.model.player import Player
 
 
 class NotificationService(ScoreFeedService):
@@ -32,6 +32,7 @@ class NotificationService(ScoreFeedService):
             Logger.log(guild, "Recent scores channel not found, skipping!")
             return
 
+        discord_guild = self.bot.get_guild(guild.id)
         scores = self.uow.sent_score_repo.get_unsent_scores(guild.id, player.id)
 
         Logger.log(guild, f"{player} has {len(scores)} scores to notify")
@@ -39,15 +40,18 @@ class NotificationService(ScoreFeedService):
         for score in scores:
             previous_score = scoresaber.get_previous_score(score)
 
-            if previous_score is None:
-                # Post as new score
-                embed = Message.get_new_score_embed(player, score, score.leaderboard.beatmap_version)
-            else:
-                # Post as improvement
-                previous_score = scoresaber.update_score_pp_weight(previous_score)
-                embed = Message.get_improvement_score_embed(player, previous_score, score, score.leaderboard.beatmap_version)
+            # if previous_score is None:
+            #     # Post as new score
+            #     embed = Message.get_new_score_embed(player, score, score.leaderboard.beatmap_version)
+            # else:
+            #     # Post as improvement
+            #     previous_score = scoresaber.update_score_pp_weight(previous_score)
+            #     embed = Message.get_improvement_score_embed(player, previous_score, score, score.leaderboard.beatmap_version)
 
-            await channel.send(embed=embed)
+            song_view = ScoreNotificationView(self.bot, discord_guild, score, previous_score)
+
+            await song_view.send(target=channel)
+            # await channel.send(embed=embed)
             self.uow.sent_score_repo.add(SentScore(score.id, guild.id))
 
             # TODO: FIX LATER

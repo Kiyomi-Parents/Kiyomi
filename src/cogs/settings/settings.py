@@ -3,10 +3,10 @@ from typing import List
 import discord
 from discord import SlashCommandGroup, Option, OptionChoice
 
+from src.kiyomi import Kiyomi
 from .services import SettingService
 from .settings_cog import SettingsCog
 from .storage import Setting
-from src.kiyomi import Kiyomi
 
 
 class Settings(SettingsCog):

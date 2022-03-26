@@ -1,7 +1,8 @@
 from sqlalchemy.orm import Session
 
-from src.database import BaseUnitOfWork
-from .repository import BeatmapRepository, BeatmapVersionRepository
+from .repository.beatmap_repository import BeatmapRepository
+from .repository.beatmap_version_repository import BeatmapVersionRepository
+from src.kiyomi.database import BaseUnitOfWork
 
 
 class UnitOfWork(BaseUnitOfWork):

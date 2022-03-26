@@ -1,6 +1,7 @@
 from discord import Embed
 
-from .storage import Player, Score
+from .storage.model.player import Player
+from .storage.model.score import Score
 from src.kiyomi.message_builder.score_message_builder import ScoreMessageBuilder
 
 

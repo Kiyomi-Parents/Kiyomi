@@ -1,10 +1,10 @@
 import pyscoresaber
 
+from src.kiyomi import Kiyomi
 from .scoresaber import ScoreSaber
 from .scoresaber_api import ScoreSaberAPI
 from .services import PlayerService, ScoreService
 from .storage import UnitOfWork
-from src.kiyomi import Kiyomi
 from .tasks import Tasks
 
 

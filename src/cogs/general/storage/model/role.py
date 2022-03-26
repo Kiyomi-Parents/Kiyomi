@@ -1,7 +1,7 @@
 from sqlalchemy import Column, String, ForeignKey, BigInteger
 from sqlalchemy.orm import relationship
 
-from src.database import Base
+from src.kiyomi.database import Base
 
 
 class Role(Base):

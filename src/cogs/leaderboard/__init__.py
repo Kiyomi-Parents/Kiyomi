@@ -1,8 +1,8 @@
+from src.kiyomi import Kiyomi
+from .leaderboard import Leaderboard
 from .leaderboard_api import LeaderboardAPI
 from .services.player_leaderboard_service import PlayerLeaderboardService
 from .storage.unit_of_work import UnitOfWork
-from .leaderboard import Leaderboard
-from src.kiyomi import Kiyomi
 
 
 def setup(bot: Kiyomi):

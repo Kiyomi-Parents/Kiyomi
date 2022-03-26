@@ -4,7 +4,9 @@ from discord.ext.commands import MemberNotFound
 from src.kiyomi import Kiyomi
 from .general_service import GeneralService
 from .guild_service import GuildService
-from ..storage import UnitOfWork, Member, GuildMember
+from ..storage import UnitOfWork
+from ..storage.model.guild_member import GuildMember
+from ..storage.model.member import Member
 
 
 class MemberService(GeneralService):

@@ -6,8 +6,8 @@ from functools import wraps
 import discord
 from discord.ext import tasks
 
-from Kiyomi import Kiyomi
 from src.log import Logger
+from .kiyomi import Kiyomi
 
 
 class Utils:
@@ -18,8 +18,9 @@ class Utils:
             Logger.log(func.__name__, "<===> Starting task <===>")
             start_time = time.process_time()
             res = await func(self, *args, **kwargs)
-            Logger.log(func.__name__, "Finished task in "
-                                      f"{round(time.process_time() - start_time, 2)} seconds\n")
+            Logger.log(
+                    func.__name__, f"Finished task in {round(time.process_time() - start_time, 2)} seconds\n"
+            )
 
             return res
 
@@ -29,7 +30,6 @@ class Utils:
     def discord_ready(func):
         @wraps(func)
         async def wrapper(self, *args, **kwargs):
-
             if not self.bot.is_ready() and not self.bot.running_tests:
                 await self.bot.wait_until_ready()
                 await asyncio.sleep(1)
@@ -98,6 +98,7 @@ class Utils:
             for dec in reversed(decs):
                 f = dec(f)
             return f
+
         return deco
 
     @staticmethod
@@ -106,6 +107,7 @@ class Utils:
         @wraps(func)
         def wrapper():
             return func()
+
         return wrapper
 
     @staticmethod
@@ -115,5 +117,7 @@ class Utils:
             @wraps(func)
             async def wrapper(self, *args, **kwargs):
                 return await func(self, *args, **kwargs)
+
             return wrapper
+
         return decorator

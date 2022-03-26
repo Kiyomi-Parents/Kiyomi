@@ -1,6 +1,6 @@
 from sqlalchemy import Column, String, ForeignKey, BigInteger
 
-from src.database import Base
+from src.kiyomi.database import Base
 
 
 class Emoji(Base):

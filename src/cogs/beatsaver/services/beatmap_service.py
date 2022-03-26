@@ -4,7 +4,7 @@ import pybeatsaver
 
 from .beatsaver_service import BeatSaverService
 from ..errors import SongNotFound
-from ..storage import Beatmap
+from ..storage.model.beatmap import Beatmap
 
 
 class BeatmapService(BeatSaverService):

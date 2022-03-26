@@ -9,7 +9,9 @@ from .score_service import ScoreSaberService, ScoreService
 from ..errors import MemberUsingDifferentPlayerAlreadyException, \
     PlayerRegisteredInGuildAlreadyException, MemberHasPlayerAlreadyRegisteredInGuildException, PlayerNotFoundException, \
     MemberPlayerNotFoundInGuildException
-from ..storage import Player, GuildPlayer, UnitOfWork
+from ..storage import UnitOfWork
+from ..storage.model.guild_player import GuildPlayer
+from ..storage.model.player import Player
 
 
 class PlayerService(ScoreSaberService):

@@ -1,5 +1,5 @@
-from .services import MemberAchievementRoleService
 from src.kiyomi import BaseCog, Kiyomi
+from .services import MemberAchievementRoleService
 
 
 class AchievementRolesCog(BaseCog):

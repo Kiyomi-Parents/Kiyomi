@@ -4,8 +4,8 @@ import discord
 from discord import OptionChoice
 
 from .abstract_setting import AbstractSetting
-from .setting import Setting
 from .enums import SettingType
+from .setting import Setting
 from ...errors import InvalidSettingTypeException
 
 

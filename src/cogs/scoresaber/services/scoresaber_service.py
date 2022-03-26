@@ -1,7 +1,7 @@
 import pyscoresaber
 
-from ..storage import UnitOfWork
 from src.kiyomi import Kiyomi, BaseService
+from ..storage import UnitOfWork
 
 
 class ScoreSaberService(BaseService[UnitOfWork]):

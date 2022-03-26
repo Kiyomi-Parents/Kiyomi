@@ -1,7 +1,7 @@
 import discord
 
-from src.cogs.beatsaver.messages.components.beatsaver_component import BeatSaverComponent
-from src.cogs.beatsaver.storage import Beatmap
+from ....storage.model.beatmap import Beatmap
+from ..beatsaver_component import BeatSaverComponent
 from src.kiyomi import Kiyomi
 
 
