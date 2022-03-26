@@ -112,7 +112,7 @@ class Beatmap(Base):
 
     @property
     def one_click_install(self) -> str:
-        return f"beatsaver://{self.key}"
+        return f"beatsaver://{self.id}"
 
     @property
     def rating(self) -> float:

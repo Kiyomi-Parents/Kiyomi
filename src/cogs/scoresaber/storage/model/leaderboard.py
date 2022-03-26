@@ -20,7 +20,7 @@ class Leaderboard(Base):
     ranked = Column(Boolean)
     qualified = Column(Boolean)
     loved = Column(Boolean)
-    stars = Column(Integer)
+    stars = Column(Float)
     positive_modifiers = Column(Boolean)
     plays = Column(Integer)
     daily_plays = Column(Integer)
@@ -67,12 +67,6 @@ class Leaderboard(Base):
         self.difficulty_raw = leaderboard.difficulty.difficulty_raw
         self.game_mode = leaderboard.difficulty.game_mode
         self.difficulty = leaderboard.difficulty.difficulty
-
-    # TODO: Broken
-    @property
-    def leaderboard_url(self):
-        page = (self.rank - 1) // 12 + 1
-        return f"https://scoresaber.com/leaderboard/{self.id}?page={page}"
 
     @property
     def song_name_full(self):

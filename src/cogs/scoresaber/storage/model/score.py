@@ -31,6 +31,7 @@ class Score(Base):
     missed_notes = Column(Integer)
     max_combo = Column(Integer)
     full_combo = Column(Boolean)
+    hmd = Column(Integer)
     has_replay = Column(Boolean)
     time_set = Column(DateTime)
 
@@ -59,17 +60,22 @@ class Score(Base):
         self.missed_notes = player_score.score.missed_notes
         self.max_combo = player_score.score.max_combo
         self.full_combo = player_score.score.full_combo
+        self.hmd = player_score.score.hmd
         self.has_replay = player_score.score.has_replay
         self.time_set = player_score.score.time_set
 
         self.leaderboard_id = player_score.leaderboard.id
 
-    # TODO: Probably broken
+    @property
+    def leaderboard_url(self):
+        page = (self.rank - 1) // 12 + 1
+        return f"https://scoresaber.com/leaderboard/{self.leaderboard_id}?page={page}"
+
     @property
     def accuracy(self) -> Optional[float]:
         max_score = self.leaderboard.max_score
 
-        if not max_score:
+        if not max_score and self.beatmap_version is not None:
             max_score = self.beatmap_difficulty.max_score
 
         if max_score:
@@ -77,7 +83,6 @@ class Score(Base):
 
         return None
 
-    # TODO: Probably broken
     @property
     def weighted_pp(self) -> float:
         return round(self.pp * self.weight, 2)
@@ -88,6 +93,9 @@ class Score(Base):
 
     @property
     def beatmap(self) -> Optional[Beatmap]:
+        if self.beatmap_version is None:
+            return None
+
         return self.beatmap_version.beatmap
 
     @property
@@ -105,6 +113,23 @@ class Score(Base):
             return beatmap_difficulty
 
         return None
+
+    @property
+    def get_hmd_name(self):
+        if self.hmd == 0:
+            return "Unknown"
+        elif self.hmd == 64:
+            return "Valve Index"
+        elif self.hmd == 2:
+            return "HTC Vive"
+        elif self.hmd == 32:
+            return "Oculus Quest"
+        elif self.hmd == 16:
+            return "Oculus Rift S"
+        elif self.hmd == 1:
+            return "Oculus Rift CV1"
+
+        return "Unknown"
 
     @property
     def get_date(self):

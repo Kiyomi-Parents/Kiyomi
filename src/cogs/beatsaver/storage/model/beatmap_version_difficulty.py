@@ -77,13 +77,13 @@ class BeatmapVersionDifficulty(Base):
         return characteristics[self.characteristic]
 
     @property
-    def scoresaber_difficulty(self) -> pyscoresaber.Difficulty:
+    def scoresaber_difficulty(self) -> pyscoresaber.BeatmapDifficulty:
         difficulties = {
-            pybeatsaver.EDifficulty.EASY: pyscoresaber.Difficulty.EASY,
-            pybeatsaver.EDifficulty.NORMAL: pyscoresaber.Difficulty.NORMAL,
-            pybeatsaver.EDifficulty.HARD: pyscoresaber.Difficulty.HARD,
-            pybeatsaver.EDifficulty.EXPERT: pyscoresaber.Difficulty.EXPERT,
-            pybeatsaver.EDifficulty.EXPERT_PLUS: pyscoresaber.Difficulty.EXPERT_PLUS,
+            pybeatsaver.EDifficulty.EASY: pyscoresaber.BeatmapDifficulty.EASY,
+            pybeatsaver.EDifficulty.NORMAL: pyscoresaber.BeatmapDifficulty.NORMAL,
+            pybeatsaver.EDifficulty.HARD: pyscoresaber.BeatmapDifficulty.HARD,
+            pybeatsaver.EDifficulty.EXPERT: pyscoresaber.BeatmapDifficulty.EXPERT,
+            pybeatsaver.EDifficulty.EXPERT_PLUS: pyscoresaber.BeatmapDifficulty.EXPERT_PLUS,
         }
 
         return difficulties[self.difficulty]

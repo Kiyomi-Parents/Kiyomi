@@ -20,13 +20,14 @@ class MapDetailsEmbed(BeatSaverEmbed):
 
         difficulty = self.get_difficulty(beatmap_characteristic, beatmap_difficulty)
 
-        self.title = f"{beatmap.name}"
-        self.url = beatmap.beatsaver_url
         self.set_thumbnail(url=beatmap.cover_url)
         self.colour = Colour.random(seed=beatmap.uploader_id)
-        self.set_author(name=beatmap.uploader_name, url=beatmap.mapper_url, icon_url=beatmap.uploader_avatar)
 
+        self.set_author(name=beatmap.uploader_name, url=beatmap.mapper_url, icon_url=beatmap.uploader_avatar)
         self.set_footer(icon_url="https://share.lucker.xyz/qahu5/FoZozoBE67.png/raw.png", text=f"{self.get_scoresaber_status(difficulty)}")
+
+        self.title = f"{beatmap.name}"
+        self.url = beatmap.beatsaver_url
 
         if beatmap.tags is not None:
             self.description = " • ".join([tag.human_readable for tag in beatmap.tags])
