@@ -9,18 +9,25 @@ from src.kiyomi import Kiyomi
 
 
 class ScoreEmbed(ScoreFeedEmbed):
-    def __init__(self, bot: Kiyomi, guild: Guild, score: Score, previous_score: Score):
+    def __init__(self, bot: Kiyomi, guild: Guild, score: Score):
         super().__init__(bot)
 
         self.guild = guild
         self.score = score
-        self.previous_score = previous_score
 
         self.set_thumbnail(url=score.leaderboard.cover_image)
         self.colour = Colour.random(seed=score.player.id)
 
-        self.set_author(name=f"{score.player.name} ({self.score.get_hmd_name})", url=score.player.profile_url, icon_url=score.player.avatar)
-        self.set_footer(icon_url="https://share.lucker.xyz/qahu5/FoZozoBE67.png/raw.png", text=self.get_scoresaber_status)
+        self.set_author(
+                name=f"{score.player.name} ({self.score.get_hmd_name})",
+                url=score.player.profile_url,
+                icon_url=score.player.avatar
+        )
+
+        self.set_footer(
+                icon_url="https://share.lucker.xyz/qahu5/FoZozoBE67.png/raw.png",
+                text=self.get_scoresaber_status
+        )
 
         self.title = f"New • #{score.rank} • {score.leaderboard.song_name_full} • {score.leaderboard.difficulty_name}"
         self.url = score.leaderboard_url
@@ -28,21 +35,21 @@ class ScoreEmbed(ScoreFeedEmbed):
         self.description = f"Mapped by {self.get_mapper}"
 
         if self.get_pp is not None:
-            self.add_field(name="PP", value=self.get_pp)  # This should be included in the embed
+            self.add_field(name="PP", value=self.get_pp)
 
-        if score.accuracy is not None:
-            self.add_field(name="Accuracy", value=f"{score.accuracy}%")  # This should be included in the embed
+        if self.get_accuracy is not None:
+            self.add_field(name="Accuracy", value=self.get_accuracy)
 
-        if score.modifiers is not None and len(score.modifiers) > 0:
-            self.add_field(name="Modifiers", value=f"{score.modifiers}")  # This should be included in the embed
+        if self.get_modifiers is not None:
+            self.add_field(name="Modifiers", value=self.get_modifiers)
 
-        if score.bad_cuts > 0:
-            self.add_field(name="Bad Cuts", value=f"{score.bad_cuts}")  # This should be included in the embed
+        if self.get_bad_cuts is not None:
+            self.add_field(name="Bad Cuts", value=self.get_bad_cuts)
 
-        if score.missed_notes > 0:
-            self.add_field(name="Missed Notes", value=f"{score.missed_notes}")  # This should be included in the embed
+        if self.get_missed_notes is not None:
+            self.add_field(name="Missed Notes", value=self.get_missed_notes)
 
-        self.add_field(name="Max Combo", value=self.get_max_combo)  # This should be included in the embed
+        self.add_field(name="Max Combo", value=self.get_max_combo)
 
         # TODO: Make buttons
         # self.add_field(name="\u200b", value=f"[Beat Saver]({score.beatmap_version.beatmap.beatsaver_url})")
@@ -63,14 +70,12 @@ class ScoreEmbed(ScoreFeedEmbed):
             pp = round(self.score.pp, 2)
             output = f"**{pp} PP**"
 
-            pp_improvement = round(self.score.pp - self.previous_score.pp, 2)
+            weighted_pp = self.get_weighted_pp
+            
+            if weighted_pp is None:
+                return f"{output}"
 
-            if pp_improvement > 0:
-                output += f" +{pp_improvement} PP"
-            elif pp_improvement < 0:
-                output += f" {pp_improvement} PP"
-
-            return f"{output} {self.get_weighted_pp}"
+            return f"{output} {weighted_pp}"
 
         return None
 
@@ -79,16 +84,39 @@ class ScoreEmbed(ScoreFeedEmbed):
         if self.score.weighted_pp > 0:
             output = f"{self.score.weighted_pp} PP"
 
-            weighted_pp_improvement = round(self.score.weighted_pp - self.previous_score.weighted_pp, 2)
-
-            if weighted_pp_improvement > 0:
-                output += f" +{weighted_pp_improvement} PP"
-            elif weighted_pp_improvement < 0:
-                output += f" {weighted_pp_improvement} PP"
-
             return f"_({output})_"
 
         return None
+
+    @property
+    def get_accuracy(self) -> Optional[str]:
+        if self.score.accuracy is None:
+            return None
+
+        return f"{self.score.accuracy}%"
+
+    @property
+    def get_modifiers(self) -> Optional[str]:
+        if self.score.modifiers is None or len(self.score.modifiers) <= 0:
+            return None
+
+        modifiers = self.score.modifiers.split(",")
+
+        return ", ".join(modifiers)
+
+    @property
+    def get_bad_cuts(self) -> Optional[str]:
+        if self.score.bad_cuts <= 0:
+            return None
+
+        return f"{self.score.bad_cuts}"
+
+    @property
+    def get_missed_notes(self) -> Optional[str]:
+        if self.score.missed_notes <= 0:
+            return None
+
+        return f"{self.score.missed_notes}"
 
     @property
     def get_max_pp(self) -> Optional[str]:

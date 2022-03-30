@@ -40,18 +40,9 @@ class NotificationService(ScoreFeedService):
         for score in scores:
             previous_score = scoresaber.get_previous_score(score)
 
-            # if previous_score is None:
-            #     # Post as new score
-            #     embed = Message.get_new_score_embed(player, score, score.leaderboard.beatmap_version)
-            # else:
-            #     # Post as improvement
-            #     previous_score = scoresaber.update_score_pp_weight(previous_score)
-            #     embed = Message.get_improvement_score_embed(player, previous_score, score, score.leaderboard.beatmap_version)
-
             song_view = ScoreNotificationView(self.bot, discord_guild, score, previous_score)
-
             await song_view.send(target=channel)
-            # await channel.send(embed=embed)
+
             self.uow.sent_score_repo.add(SentScore(score.id, guild.id))
 
             # TODO: FIX LATER
