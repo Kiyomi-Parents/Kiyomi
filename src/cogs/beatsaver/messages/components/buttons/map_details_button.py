@@ -3,7 +3,7 @@ from discord import Embed
 
 from ..beatsaver_component import BeatSaverComponent
 from ..embeds.map_details_embed import MapDetailsEmbed
-from ....storage.model.beatmap import Beatmap
+from src.cogs.beatsaver.storage.model.beatmap import Beatmap
 from src.kiyomi import Kiyomi
 
 
@@ -22,4 +22,4 @@ class MapDetailsButton(BeatSaverComponent, discord.ui.Button):
 
     async def callback(self, interaction: discord.Interaction):
         self.parent.embed = self.get_embed
-        await self.parent.update()
+        await self.parent.update(button_clicked=self)

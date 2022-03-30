@@ -25,17 +25,29 @@ class BaseView(discord.ui.View, ABC):
             get_embed = getattr(child, "get_embed", None)
 
             if callable(get_embed):
+                if isinstance(child, discord.ui.Button):
+                    self.disabled_clicked_button(child)
+
                 return get_embed()
         # TODO: error embed
 
-    async def update(self) -> discord.Message:
+    async def update(self, button_clicked: Optional[discord.ui.Button] = None) -> discord.Message:
         self.clear_items()
         self.update_buttons()
+
+        if button_clicked is not None:
+            self.disabled_clicked_button(button_clicked)
 
         return await self.message.edit(
             embed=self.embed(),
             view=self,
         )
+
+    def disabled_clicked_button(self, button_clicked: discord.ui.Button):
+        for child in self.children:
+            if isinstance(child, button_clicked.__class__):
+                if child.custom_id == button_clicked.custom_id:
+                    child.disabled = True
 
     @abstractmethod
     def update_buttons(self):
