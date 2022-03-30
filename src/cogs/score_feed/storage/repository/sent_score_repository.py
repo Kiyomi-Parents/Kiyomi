@@ -35,4 +35,5 @@ class SentScoreRepository(BaseRepository[SentScore]):
         return self.session.query(Score) \
             .filter(Score.player_id == player_id) \
             .filter(Score.id.not_in(sent_score_ids.select())) \
+            .order_by(Score.time_set.desc()) \
             .all()
