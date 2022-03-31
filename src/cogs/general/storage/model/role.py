@@ -9,9 +9,10 @@ class Role(Base):
     __tablename__ = "role"
 
     id = Column(BigInteger, primary_key=True, autoincrement=False)
-    guild_id = Column(BigInteger, ForeignKey("guild.id", ondelete="CASCADE"))
-
     name = Column(String(128))
+
+    guild_id = Column(BigInteger, ForeignKey("guild.id", ondelete="CASCADE"))
+    guild = relationship("Guild", back_populates="roles", uselist=False)
 
     members = relationship("MemberRole", back_populates="role")
 

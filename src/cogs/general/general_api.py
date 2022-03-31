@@ -9,6 +9,7 @@ from .services import EmojiService, GuildService, MemberService, RoleService
 from .storage import UnitOfWork
 from .storage.model.guild import Guild
 from .storage.model.member import Member
+from .storage.model.message import Message
 from .storage.model.role import Role
 
 
@@ -54,6 +55,9 @@ class GeneralAPI(GeneralCog):
 
     async def remove_role_from_member(self, guild_id: int, member_id: int, role_id: int, reason: str) -> None:
         await self.role_service.remove_role_from_member(guild_id, member_id, role_id, reason)
+
+    async def add_message(self, guild_id: int, channel_id: int, message_id: int) -> None:
+        self.uow.message_repo.add(Message(guild_id, channel_id, message_id))
 
     def get_emoji(self, emoji_name: str) -> Optional[Emoji]:
         emoji_name = emoji_name.replace(":", "")

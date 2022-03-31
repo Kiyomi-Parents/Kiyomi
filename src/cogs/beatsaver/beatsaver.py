@@ -57,7 +57,6 @@ class BeatSaver(BeatSaverCog, name="Beat Saver"):
     @slash_command(aliases=["bsr", "song"])
     async def map(self, ctx: discord.ApplicationContext, key: str):
         """Displays song info."""
-        asd
         try:
             db_beatmap = await self.beatmap_service.get_beatmap_by_key(key)
             song_view = SongView(self.bot, ctx.interaction.guild, db_beatmap)

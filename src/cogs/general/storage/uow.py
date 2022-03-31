@@ -6,6 +6,7 @@ from .repository.guild_member_repository import GuildMemberRepository
 from .repository.guild_repository import GuildRepository
 from .repository.member_repository import MemberRepository
 from .repository.member_role_repository import MemberRoleRepository
+from .repository.message_repository import MessageRepository
 from .repository.role_repository import RoleRepository
 from src.kiyomi.database import BaseUnitOfWork
 
@@ -22,3 +23,4 @@ class UnitOfWork(BaseUnitOfWork):
         self.guild_member_repo = GuildMemberRepository(session)
         self.member_role_repo = MemberRoleRepository(session)
         self.emoji_repo = EmojiRepository(session)
+        self.message_repo = MessageRepository(session)

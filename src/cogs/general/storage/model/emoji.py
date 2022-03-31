@@ -1,4 +1,5 @@
 from sqlalchemy import Column, String, ForeignKey, BigInteger
+from sqlalchemy.orm import relationship
 
 from src.kiyomi.database import Base
 
@@ -8,8 +9,10 @@ class Emoji(Base):
     __tablename__ = "emoji"
 
     id = Column(BigInteger, primary_key=True, autoincrement=False)
-    guild_id = Column(BigInteger, ForeignKey("guild.id", ondelete="CASCADE"))
     name = Column(String(128))
+
+    guild_id = Column(BigInteger, ForeignKey("guild.id", ondelete="CASCADE"))
+    guild = relationship("Guild", back_populates="emojis", uselist=False)
 
     def __init__(self, emoji_id: int, guild_id: int, name: str):
         self.id = emoji_id
