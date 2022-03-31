@@ -43,7 +43,7 @@ class RoleService(GeneralService):
 
         try:
             role = await discord_guild.create_role(name=name, colour=colour, hoist=hoist, reason=reason)
-            return self.uow.role_repo.add(Role(role.id, discord_guild.id, role.name))
+            return self.uow.roles.add(Role(role.id, discord_guild.id, role.name))
         except DiscordException as error:
             Logger.log(discord_guild.name, f"Failed to add role: {name}")
             raise error
@@ -53,10 +53,10 @@ class RoleService(GeneralService):
         try:
             discord_role = await self.get_discord_role(guild_id, role_id)
         except RoleNotFoundException as error:
-            role = self.uow.role_repo.get_by_id(role_id)
+            role = self.uow.roles.get_by_id(role_id)
 
             if role is not None:
-                self.uow.role_repo.remove(role)
+                self.uow.roles.remove(role)
 
             raise error
 
@@ -66,10 +66,10 @@ class RoleService(GeneralService):
             Logger.log(guild_id, f"Failed to remove role: {discord_role.name} ({discord_role.id})")
             raise error
         finally:
-            role = self.uow.role_repo.get_by_id(role_id)
+            role = self.uow.roles.get_by_id(role_id)
 
             if role is not None:
-                self.uow.role_repo.remove(role)
+                self.uow.roles.remove(role)
 
     @Security.can_edit_roles()
     async def add_role_to_member(self, guild_id: int, member_id: int, role_id: int, reason: str) -> None:
@@ -78,7 +78,7 @@ class RoleService(GeneralService):
 
         try:
             await discord_member.add_roles(discord_role, reason=reason)
-            self.uow.member_role_repo.add(MemberRole(guild_id, member_id, role_id))
+            self.uow.member_roles.add(MemberRole(guild_id, member_id, role_id))
         except DiscordException as error:
             Logger.log(guild_id, f"Failed to add role {discord_role.name} ({discord_role.id}) to member {discord_member.name} ({discord_member.id})")
             raise error
@@ -91,10 +91,10 @@ class RoleService(GeneralService):
         try:
             await discord_member.remove_roles(discord_role, reason=reason)
 
-            role = self.uow.member_role_repo.get_by_guild_id_and_member_id_and_role_id(guild_id, member_id, role_id)
+            role = self.uow.member_roles.get_by_guild_id_and_member_id_and_role_id(guild_id, member_id, role_id)
 
             if role is not None:
-                self.uow.member_role_repo.remove(role)
+                self.uow.member_roles.remove(role)
 
         except DiscordException as error:
             Logger.log(guild_id, f"Failed to add role {discord_role.name} ({discord_role.id}) to member {discord_member.name} ({discord_member.id})")

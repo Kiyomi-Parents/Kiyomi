@@ -28,17 +28,17 @@ class MemberService(GeneralService):
         return discord_member
 
     def register_member(self, discord_member: discord.Member):
-        member = self.uow.member_repo.get_by_id(discord_member.id)
+        member = self.uow.members.get_by_id(discord_member.id)
 
         if member is None:
-            self.uow.member_repo.add(Member(discord_member.id, discord_member.name))
+            self.uow.members.add(Member(discord_member.id, discord_member.name))
         else:
             if member.name != discord_member.name:
-                self.uow.member_repo.update(Member(member.id, discord_member.name))
+                self.uow.members.update(Member(member.id, discord_member.name))
                 self.uow.save_changes()  # TODO: Figure out if this is a good place for this
 
     def register_guild_member(self, discord_member: discord.Member):
-        guild_member = self.uow.guild_member_repo.get_by_guild_id_and_member_id(discord_member.guild.id, discord_member.id)
+        guild_member = self.uow.guild_members.get_by_guild_id_and_member_id(discord_member.guild.id, discord_member.id)
 
         if guild_member is None:
-            self.uow.member_repo.add(GuildMember(discord_member.guild.id, discord_member.id))
+            self.uow.members.add(GuildMember(discord_member.guild.id, discord_member.id))

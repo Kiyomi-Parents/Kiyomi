@@ -18,7 +18,7 @@ class GuildService(GeneralService):
         return discord_guild
 
     def register_guild(self, discord_guild: discord.Guild):
-        guild = self.uow.guild_repo.get_by_id(discord_guild.id)
+        guild = self.uow.guilds.get_by_id(discord_guild.id)
 
         if guild is None:
-            self.uow.guild_repo.add(Guild(discord_guild.id, discord_guild.name))
+            self.uow.guilds.add(Guild(discord_guild.id, discord_guild.name))
