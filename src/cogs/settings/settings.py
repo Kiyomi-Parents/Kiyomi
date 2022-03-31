@@ -31,7 +31,7 @@ class Settings(SettingsCog):
     async def get_settings(self, ctx: discord.AutocompleteContext) -> List[OptionChoice]:
         return self.setting_service.get_settings()
 
-    async def get_setting_values(self, ctx: discord.AutocompleteContext):
+    async def get_setting_values(self, ctx: discord.AutocompleteContext) -> List[OptionChoice]:
         return await self.setting_service.get_setting_values(ctx)
 
     # TODO: Fix auto complete support for partially typed setting names

@@ -1,5 +1,6 @@
 from typing import Optional, List
 
+import pyscoresaber
 from sqlalchemy.orm import Query
 
 from ..model.leaderboard import Leaderboard
@@ -15,7 +16,13 @@ class LeaderboardRepository(BaseRepository[Leaderboard]):
         return self.session.query(Leaderboard) \
             .all()
 
-    def get_by_song_hash(self, song_hash: str) -> Optional[Leaderboard]:
+    def get_by_song_hash(self,
+        song_hash: str,
+        song_game_mode: pyscoresaber.GameMode,
+        song_difficulty: pyscoresaber.BeatmapDifficulty
+    ) -> Optional[Leaderboard]:
         return self.session.query(Leaderboard) \
             .filter(Leaderboard.song_hash == song_hash) \
+            .filter(Leaderboard.game_mode == song_game_mode.name) \
+            .filter(Leaderboard.difficulty == song_difficulty.name) \
             .first()

@@ -6,6 +6,7 @@ from discord.ext import commands
 
 from src.kiyomi import Kiyomi
 from src.log import Logger
+from .services import BeatmapAutocompleteService
 from .beatsaver_cog import BeatSaverCog
 from .errors import SongNotFound
 from .messages.views.song_view import SongView
@@ -15,8 +16,8 @@ from src.cogs.scoresaber.storage.model.leaderboard import Leaderboard
 
 
 class BeatSaver(BeatSaverCog, name="Beat Saver"):
-    def __init__(self, bot: Kiyomi, beatmap_service: BeatmapService):
-        super().__init__(bot, beatmap_service)
+    def __init__(self, bot: Kiyomi, beatmap_service: BeatmapService, beatmap_autocomplete_service: BeatmapAutocompleteService):
+        super().__init__(bot, beatmap_service, beatmap_autocomplete_service)
 
         # Register events
         self.events()
@@ -56,6 +57,7 @@ class BeatSaver(BeatSaverCog, name="Beat Saver"):
     @slash_command(aliases=["bsr", "song"])
     async def map(self, ctx: discord.ApplicationContext, key: str):
         """Displays song info."""
+        asd
         try:
             db_beatmap = await self.beatmap_service.get_beatmap_by_key(key)
             song_view = SongView(self.bot, ctx.interaction.guild, db_beatmap)

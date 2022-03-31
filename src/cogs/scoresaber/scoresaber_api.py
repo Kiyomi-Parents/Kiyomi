@@ -1,6 +1,5 @@
 from typing import Optional, List
 
-from src.cogs.leaderboard.leaderboard_api import LeaderboardAPI
 from src.kiyomi import Kiyomi
 from .scoresaber_cog import ScoreSaberCog
 from .scoresaber_utils import ScoreSaberUtils
@@ -44,7 +43,7 @@ class ScoreSaberAPI(ScoreSaberCog):
         return self.uow.scores.get_player_scores_sorted_by_pp(player_id)
 
     def update_score_pp_weight(self, score: Score) -> Score:
-        leaderboard = self.bot.get_cog_api(LeaderboardAPI)
+        leaderboard = self.bot.get_cog("LeaderboardAPI")
         top_scores_leaderboard = leaderboard.get_player_top_scores_leaderboard(score.player_id)
 
         position = 0

@@ -71,9 +71,9 @@ class ImprovementScoreEmbed(ScoreEmbed):
             improvement_output = f"{accuracy_improvement}%"
 
         if improvement_output is None:
-            return f"**{self.score.accuracy}**"
+            return f"**{output}**"
 
-        return f"**{self.score.accuracy}** {improvement_output}"
+        return f"**{output}** {improvement_output}"
 
     @property
     def get_modifiers(self) -> Optional[str]:

@@ -22,25 +22,43 @@ class MapDetailDifficultySelect(BeatSaverComponent, discord.ui.Select):
             options=self.get_options(),
         )
 
-    def get_options(self) -> List[discord.SelectOption]:
-        options = []
+    async def after_init(self):
+        self.options = await self.get_options_async()
+
+    def get_beatmap_difficulties(self) -> List[BeatmapVersionDifficulty]:
+        beatmap_difficulties = []
 
         for beatmap_difficulty in self.beatmap.latest_version.difficulties:
             if beatmap_difficulty.characteristic is not self.parent.beatmap_characteristic:
                 continue
 
-            options.append(self.get_option(beatmap_difficulty))
+            beatmap_difficulties.append(beatmap_difficulty)
 
-        return options
+        return beatmap_difficulties
 
-    def get_option(self, beatmap_difficulty: BeatmapVersionDifficulty) -> discord.SelectOption:
-        return discord.SelectOption(
+    def get_options(self) -> List[discord.SelectOption]:
+        return [discord.SelectOption(
             label=f"{beatmap_difficulty.difficulty_text}",
             description=self.difficulty_stars(beatmap_difficulty),
             value=f"{beatmap_difficulty.difficulty.serialize}",
-            emoji=BeatSaverUtils.difficulty_to_emoji(self.bot, self.parent.guild, beatmap_difficulty.difficulty),
             default=self.parent.beatmap_difficulty == beatmap_difficulty.difficulty
-        )
+        ) for beatmap_difficulty in self.get_beatmap_difficulties()]
+
+    async def get_options_async(self) -> List[discord.SelectOption]:
+        options = []
+
+        for beatmap_difficulty in self.get_beatmap_difficulties():
+            difficulty_emoji = await BeatSaverUtils.difficulty_to_emoji(self.bot, self.parent.guild, beatmap_difficulty.difficulty)
+
+            options.append(discord.SelectOption(
+                label=f"{beatmap_difficulty.difficulty_text}",
+                description=self.difficulty_stars(beatmap_difficulty),
+                value=f"{beatmap_difficulty.difficulty.serialize}",
+                emoji=difficulty_emoji,
+                default=self.parent.beatmap_difficulty == beatmap_difficulty.difficulty
+            ))
+
+        return options
 
     async def callback(self, interaction: discord.Interaction):
         beatmap_difficulty = pybeatsaver.EDifficulty.deserialize(self.values[0])

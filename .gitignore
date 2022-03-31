@@ -9,3 +9,4 @@ scores.json
 *.db
 schema.png
 .dmypy.json
+./tmp/*

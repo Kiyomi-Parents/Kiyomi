@@ -8,7 +8,6 @@ import timeago
 from discord.ext import tasks
 
 from src.log import Logger
-from .kiyomi import Kiyomi
 
 
 class Utils:
@@ -72,7 +71,7 @@ class Utils:
 
     @staticmethod
     def update_tasks_list(func):
-        async def update_status(bot: Kiyomi):
+        async def update_status(bot):
             if bot.running_tasks:
                 await bot.change_presence(activity=discord.Game(" | ".join(bot.running_tasks)))
             else:
@@ -125,3 +124,11 @@ class Utils:
             return wrapper
 
         return decorator
+
+    @staticmethod
+    def text_to_file(text: str, file_name: str) -> discord.File:
+        with open(f"./tmp/{file_name}", "w") as file:
+            file.write(text)
+
+        with open(f"./tmp/{file_name}", "rb") as file:
+            return discord.File(file, filename=file_name)

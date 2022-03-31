@@ -23,7 +23,7 @@ class ScoreButton(ScoreFeedComponent, discord.ui.Button):
             style=discord.enums.ButtonStyle.primary,
         )
 
-    def get_embed(self) -> Embed:
+    async def get_embed(self) -> Embed:
         if self.previous_score is not None:
             return ImprovementScoreEmbed(self.bot, self.parent.guild, self.score, self.previous_score)
 

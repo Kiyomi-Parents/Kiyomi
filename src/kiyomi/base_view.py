@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Optional, Union, Callable
+from typing import Optional, Union, Callable, Awaitable
 
 import discord
 from discord import Embed, Guild
@@ -9,18 +9,28 @@ from .kiyomi import Kiyomi
 
 
 class BaseView(discord.ui.View, ABC):
+
     def __init__(self, bot: Kiyomi, guild: Guild):
         super().__init__(timeout=None)
 
         self.bot = bot
         self.guild = guild
 
-        self.embed: Callable[[], Embed] = self.default_embed
+        self.embed: Optional[Callable[[], Awaitable[Embed]]] = None
         self.message: Union[discord.Message, discord.WebhookMessage, None] = None
 
         self.update_buttons()
 
-    def default_embed(self) -> Optional[Embed]:
+    async def get_current_embed(self) -> Embed:
+        if self.embed is None:
+            default_embed = self.default_embed()
+
+            if default_embed is not None:
+                return await default_embed()
+
+        return await self.embed()
+
+    def default_embed(self) -> Optional[Callable[[], Awaitable[Embed]]]:
         for child in self.children:
             get_embed = getattr(child, "get_embed", None)
 
@@ -28,18 +38,19 @@ class BaseView(discord.ui.View, ABC):
                 if isinstance(child, discord.ui.Button):
                     self.disabled_clicked_button(child)
 
-                return get_embed()
+                return get_embed
         # TODO: error embed
 
     async def update(self, button_clicked: Optional[discord.ui.Button] = None) -> discord.Message:
         self.clear_items()
         self.update_buttons()
+        await self.run_component_after_init()
 
         if button_clicked is not None:
             self.disabled_clicked_button(button_clicked)
 
         return await self.message.edit(
-            embed=self.embed(),
+            embed=await self.get_current_embed(),
             view=self,
         )
 
@@ -51,7 +62,14 @@ class BaseView(discord.ui.View, ABC):
 
     @abstractmethod
     def update_buttons(self):
-        pass
+        raise NotImplementedError("Derived classes need to implement this.")
+
+    async def run_component_after_init(self):
+        from .base_component import BaseComponent  # Avoiding circular import
+
+        for child in self.children:
+            if isinstance(child, BaseComponent):
+                await child.after_init()
 
     async def send(self, ctx: Optional[Context] = None, target: Optional[discord.abc.Messageable] = None) -> discord.Message:
         if ctx is not None and not isinstance(ctx, Context):
@@ -66,8 +84,10 @@ class BaseView(discord.ui.View, ABC):
         if target:
             ctx = target
 
+        await self.run_component_after_init()
+
         self.message = await ctx.send(
-            embed=self.embed(),
+            embed=await self.get_current_embed(),
             view=self,
         )
 
@@ -80,22 +100,24 @@ class BaseView(discord.ui.View, ABC):
         if target is not None and not isinstance(target, discord.abc.Messageable):
             raise TypeError(f"expected abc.Messageable not {target.__class__!r}")
 
+        await self.run_component_after_init()
+
         if target:
             self.message = await target.send(
-                embed=self.embed(),
+                embed=await self.get_current_embed(),
                 view=self
             )
         else:
             if interaction.response.is_done():
                 msg = await interaction.followup.send(
-                    embed=self.embed(),
+                    embed=await self.get_current_embed(),
                     view=self
                 )
                 # convert from WebhookMessage to Message reference to bypass 15min webhook token timeout
                 msg = await msg.channel.fetch_message(msg.id)
             else:
                 msg = await interaction.response.send_message(
-                    embed=self.embed(),
+                    embed=await self.get_current_embed(),
                     view=self
                 )
 

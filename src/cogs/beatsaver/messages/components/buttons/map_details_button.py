@@ -17,7 +17,16 @@ class MapDetailsButton(BeatSaverComponent, discord.ui.Button):
             style=discord.enums.ButtonStyle.primary,
         )
 
-    def get_embed(self) -> Embed:
+    async def get_embed(self) -> Embed:
+        if self.parent.guild is None:
+            raise RuntimeError("Parent guild can not be None")
+
+        if self.parent.beatmap_characteristic is None:
+            raise RuntimeError("Parent beatmap_characteristic can not be None")
+
+        if self.parent.beatmap_difficulty is None:
+            raise RuntimeError("Parent beatmap_difficulty can not be None")
+
         return MapDetailsEmbed(self.bot, self.parent.guild, self.beatmap, self.parent.beatmap_characteristic, self.parent.beatmap_difficulty)
 
     async def callback(self, interaction: discord.Interaction):

@@ -27,7 +27,7 @@ class BeatSaverUtils:
         return math.floor(max_score)
 
     @staticmethod
-    def difficulty_to_emoji(bot: Kiyomi, guild: Optional[Guild], difficulty: pybeatsaver.EDifficulty) -> Optional[Emoji]:
+    async def difficulty_to_emoji(bot: Kiyomi, guild: Optional[Guild], difficulty: pybeatsaver.EDifficulty) -> Optional[Emoji]:
         if guild is None:
             return None
 
@@ -47,7 +47,7 @@ class BeatSaverUtils:
         return None
 
     @staticmethod
-    def characteristic_to_emoji(bot: Kiyomi, guild: Optional[Guild], characteristic: pybeatsaver.ECharacteristic) -> Optional[Emoji]:
+    async def characteristic_to_emoji(bot: Kiyomi, guild: Optional[Guild], characteristic: pybeatsaver.ECharacteristic) -> Optional[Emoji]:
         if guild is None:
             return None
 

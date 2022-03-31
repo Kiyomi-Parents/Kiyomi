@@ -2,6 +2,7 @@ import pybeatsaver.models.enum
 import pyscoresaber.models.enum
 from pybeatsaver import MapDifficulty
 from sqlalchemy import Column, String, ForeignKey, Integer, Float, Boolean, Enum
+from sqlalchemy.orm import relationship
 
 from src.kiyomi.database import Base
 from ...beatsaver_utils import BeatSaverUtils
@@ -35,6 +36,8 @@ class BeatmapVersionDifficulty(Base):
     parity_errors = Column(Integer)
     parity_warns = Column(Integer)
     parity_resets = Column(Integer)
+
+    beatmap_version = relationship("BeatmapVersion", uselist=False, back_populates="difficulties")
 
     def __init__(self, version_difficulty: MapDifficulty):
         self.njs = version_difficulty.njs

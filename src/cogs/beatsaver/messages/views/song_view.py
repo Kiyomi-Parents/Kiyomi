@@ -6,7 +6,6 @@ from discord import Guild
 from src.kiyomi import Kiyomi
 from src.kiyomi.base_view import BaseView
 from ...storage.model.beatmap import Beatmap
-from ..components.buttons.guild_leaderboard_button import GuildLeaderboardButton
 from ..components.buttons.map_details_button import MapDetailsButton
 from ..components.buttons.map_preview_button import MapPreviewButton
 from ..components.selects.map_detail_characteristic_select import MapDetailCharacteristicSelect
@@ -19,6 +18,9 @@ from ..components.selects.map_detail_difficulty_select import MapDetailDifficult
 # This could probably be a new cog?
 
 # Add NPS graph button
+from ...storage.model.beatmap_version_difficulty import BeatmapVersionDifficulty
+
+
 class SongView(BaseView):
 
     def __init__(self, bot: Kiyomi, guild: Guild, beatmap: Beatmap):
@@ -51,9 +53,26 @@ class SongView(BaseView):
     def beatmap_characteristic(self, beatmap_characteristic: pybeatsaver.ECharacteristic):
         self._beatmap_characteristic = beatmap_characteristic
 
+    @property
+    def beatmap_version_difficulty(self) -> Optional[BeatmapVersionDifficulty]:
+        for beatmap_difficulty in self.beatmap.latest_version.difficulties:
+            if beatmap_difficulty.characteristic is not self.beatmap_characteristic:
+                continue
+
+            if beatmap_difficulty.difficulty is not self.beatmap_difficulty:
+                continue
+
+            return beatmap_difficulty
+
+        return None
+
     def update_buttons(self):
         self.add_item(MapDetailCharacteristicSelect(self.bot, self, self.beatmap))
         self.add_item(MapDetailDifficultySelect(self.bot, self, self.beatmap))
         self.add_item(MapDetailsButton(self.bot, self, self.beatmap))
-        self.add_item(GuildLeaderboardButton(self.bot, self, self.beatmap))
+
+        leaderboard = self.bot.get_cog("LeaderboardAPI")
+        guild_leaderboard_button = leaderboard.get_guild_leaderboard_button(self.bot, self, self.beatmap)
+        self.add_item(guild_leaderboard_button)
+
         self.add_item(MapPreviewButton(self.bot, self, self.beatmap))

@@ -1,45 +1,70 @@
 from datetime import datetime
-from typing import Optional
+from typing import List
 
 import timeago
 from dateutil import tz
-from discord import Embed
+from discord import Colour
 from prettytable import PrettyTable
 
+from src.cogs.beatsaver.storage.model.beatmap_version_difficulty import BeatmapVersionDifficulty
+from src.cogs.scoresaber.storage.model.score import Score
 from .embed import LeaderboardEmbed
-from src.cogs.leaderboard.services import PlayerScoreLeaderboard
 from src.kiyomi import Kiyomi
 
 
-# TODO: handle multiple difficulties somehow
-
 class GuildLeaderboardEmbed(LeaderboardEmbed):
-    def __init__(self, bot: Kiyomi, beatmap_id: str):
+    def __init__(self, bot: Kiyomi, guild_name: str, beatmap_difficulty: BeatmapVersionDifficulty, leaderboard: List[Score]):
         super().__init__(bot)
 
-        self.beatmap_id = beatmap_id
+        self.guild_name = guild_name
+        self.beatmap_difficulty = beatmap_difficulty
+        self.beatmap = beatmap_difficulty.beatmap_version.beatmap
+        self.leaderboard = leaderboard
 
-    async def get_embed(self, leaderboard: Optional[PlayerScoreLeaderboard]) -> Embed:
-        embed = Embed()
+        self.set_author(name=self.get_title)
 
-        embed.title = "Discord Leaderboard"
+        self.colour = Colour.random(seed=self.beatmap.uploader_id)
 
-        if leaderboard is None:
-            embed.description = f"```Leaderboard is empty!```"
+        self.title = f"{self.beatmap.name}"
+        self.url = self.beatmap.beatsaver_url
 
-            return embed
+        self.set_footer(
+                icon_url="https://share.lucker.xyz/qahu5/FoZozoBE67.png/raw.png",
+                text=self.get_scoresaber_status
+        )
 
+        if len(leaderboard) <= 0:
+            self.description = f"```Leaderboard is empty!```"
+        else:
+            self.description = f"```{self.get_table()}```"
+
+    @property
+    def get_title(self) -> str:
+        return f"{self.guild_name} Leaderboard"
+
+    @property
+    def get_scoresaber_status(self) -> str:
+        if self.beatmap_difficulty.stars is not None:
+            if self.beatmap.ranked:
+                return f"Ranked {self.beatmap_difficulty.stars}★"
+
+        if self.beatmap.qualified:
+            return "Qualified"
+
+        return "Unranked"
+
+    def get_table(self) -> str:
         table = PrettyTable()
         table.border = False
         table.field_names = ["#", "Player", "Date", "Mods", "%", "PP"]
 
-        for index, (player, score) in enumerate(leaderboard.items()):
+        for index, score in enumerate(self.leaderboard):
             rank = f"#{index + 1}"
-            name = player.player_name
+            name = score.player.name
             date = timeago.format(score.get_date, datetime.now(tz=tz.UTC))
 
-            if len(score.mods):
-                mods = score.mods
+            if len(score.modifiers):
+                mods = score.modifiers
             else:
                 mods = "-"
 
@@ -48,6 +73,4 @@ class GuildLeaderboardEmbed(LeaderboardEmbed):
 
             table.add_row([rank, name, date, mods, acc, pp])
 
-        embed.description = f"```{table.get_string()}```"
-
-        return embed
+        return table.get_string()
