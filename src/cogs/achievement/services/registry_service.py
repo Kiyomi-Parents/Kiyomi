@@ -1,21 +1,24 @@
 from typing import List, Dict
 
+from src.kiyomi import Kiyomi
 from src.kiyomi.utils import Utils
+from .achievement_service import AchievementService
 from .achievements import Achievement, AchievementGenerator
 from ..errors import AchievementGeneratorNotFound
 from ..storage.unit_of_work import UnitOfWork
-from ...general.storage.model.member import Member
+from src.cogs.general.storage.model.member import Member
 
 AchievementGroups = Dict[str, List[Achievement]]
 
 
-class Registry:
-    def __init__(self, uow: UnitOfWork):
-        self.uow = uow
+class RegistryService(AchievementService):
+    def __init__(self, bot: Kiyomi, uow: UnitOfWork):
+        super().__init__(bot, uow)
+
         self._generators = []
 
         for generator in Utils.class_inheritors(AchievementGenerator):
-            self._generators.append(generator(self.uow))
+            self._generators.append(generator(bot))
 
     def _find_generator(self, generator_name: str) -> AchievementGenerator:
         for generator in self._generators:

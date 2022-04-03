@@ -1,6 +1,7 @@
 from typing import List
 
 from src.cogs.general.storage.model.member import Member
+from src.cogs.scoresaber import ScoreSaberAPI
 from .achievement import Achievement, Condition
 from .achievement_generator import AchievementGenerator
 
@@ -27,7 +28,10 @@ class Rank(AchievementGenerator):
 
     def get_achievement_condition(self, index: int, member: Member) -> Condition:
         def condition() -> bool:
-            scoresaber = self.uow.bot.get_cog("ScoreSaberAPI")
+            if member is None:
+                return False
+            
+            scoresaber = self.bot.get_cog_api(ScoreSaberAPI)
             guild_players = scoresaber.get_guild_players_by_member_id(member.id)
 
             for guild_player in guild_players:

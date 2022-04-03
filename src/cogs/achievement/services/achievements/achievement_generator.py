@@ -2,13 +2,13 @@ from abc import ABC, abstractmethod
 from typing import List
 
 from src.cogs.general.storage.model.member import Member
+from src.kiyomi import Kiyomi
 from .achievement import Achievement
-from ...storage.unit_of_work import UnitOfWork
 
 
 class AchievementGenerator(ABC):
-    def __init__(self, uow: UnitOfWork):
-        self.uow = uow
+    def __init__(self, bot: Kiyomi):
+        self.bot = bot
 
     @property
     def name(self):

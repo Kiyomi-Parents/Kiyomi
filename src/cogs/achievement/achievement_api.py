@@ -1,16 +1,10 @@
 from typing import Optional, List
 
-from discord.ext import commands
-
-from .actions import Actions
-from .registry import Achievement
-from .storage.unit_of_work import UnitOfWork
+from .achievement_cog import AchievementCog
+from .services.achievements import Achievement
 
 
-class AchievementsAPI(commands.Cog):
-    def __init__(self, uow: UnitOfWork, actions: Actions):
-        self.uow = uow
-        self.actions = actions
+class AchievementsAPI(AchievementCog):
 
     def get_best_achievement_in_group(self, group: str, member_id: int) -> Optional[Achievement]:
         return self.actions.get_best_completed_achievement_in_group(group, member_id)

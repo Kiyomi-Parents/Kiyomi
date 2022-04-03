@@ -29,7 +29,7 @@ if __name__ == "__main__":
     bot.load_extension(name="src.cogs.beatsaver")
     bot.load_extension(name="src.cogs.score_feed")
     bot.load_extension(name="src.cogs.leaderboard")
-    bot.load_extension(name="src.cogs.achievements")
+    bot.load_extension(name="src.cogs.achievement")
     bot.load_extension(name="src.cogs.achievement_roles")
     bot.load_extension(name="src.cogs.view_persistence")
 
