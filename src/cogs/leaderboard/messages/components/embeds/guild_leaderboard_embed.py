@@ -8,7 +8,7 @@ from prettytable import PrettyTable
 
 from src.cogs.beatsaver.storage.model.beatmap_version_difficulty import BeatmapVersionDifficulty
 from src.cogs.scoresaber.storage.model.score import Score
-from .embed import LeaderboardEmbed
+from .leaderboard_embed import LeaderboardEmbed
 from src.kiyomi import Kiyomi
 
 
