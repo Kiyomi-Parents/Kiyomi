@@ -41,7 +41,10 @@ class BaseView(discord.ui.View, ABC):
                 return get_embed
         # TODO: error embed
 
-    async def update(self, button_clicked: Optional[discord.ui.Button] = None) -> discord.Message:
+    async def update(self, interaction: discord.Interaction, button_clicked: Optional[discord.ui.Button] = None) -> discord.Message:
+        if self.message is None:
+            self.message = interaction.message
+
         self.clear_items()
         self.update_buttons()
         await self.run_component_after_init()
@@ -50,8 +53,8 @@ class BaseView(discord.ui.View, ABC):
             self.disabled_clicked_button(button_clicked)
 
         return await self.message.edit(
-            embed=await self.get_current_embed(),
-            view=self,
+                embed=await self.get_current_embed(),
+                view=self,
         )
 
     def disabled_clicked_button(self, button_clicked: discord.ui.Button):
@@ -71,7 +74,11 @@ class BaseView(discord.ui.View, ABC):
             if isinstance(child, BaseComponent):
                 await child.after_init()
 
-    async def send(self, ctx: Optional[Context] = None, target: Optional[discord.abc.Messageable] = None) -> discord.Message:
+    async def send(
+        self,
+        ctx: Optional[Context] = None,
+        target: Optional[discord.abc.Messageable] = None
+    ) -> discord.Message:
         if ctx is not None and not isinstance(ctx, Context):
             raise TypeError(f"expected Context not {ctx.__class__!r}")
 
@@ -87,13 +94,17 @@ class BaseView(discord.ui.View, ABC):
         await self.run_component_after_init()
 
         self.message = await ctx.send(
-            embed=await self.get_current_embed(),
-            view=self,
+                embed=await self.get_current_embed(),
+                view=self,
         )
 
         return self.message
 
-    async def respond(self, interaction: discord.Interaction, target: Optional[discord.abc.Messageable] = None) -> Union[discord.Message, discord.WebhookMessage]:
+    async def respond(
+        self,
+        interaction: discord.Interaction,
+        target: Optional[discord.abc.Messageable] = None
+    ) -> Union[discord.Message, discord.WebhookMessage]:
         if not isinstance(interaction, discord.Interaction):
             raise TypeError(f"expected Interaction not {interaction.__class__!r}")
 
@@ -104,21 +115,21 @@ class BaseView(discord.ui.View, ABC):
 
         if target:
             self.message = await target.send(
-                embed=await self.get_current_embed(),
-                view=self
+                    embed=await self.get_current_embed(),
+                    view=self
             )
         else:
             if interaction.response.is_done():
                 msg = await interaction.followup.send(
-                    embed=await self.get_current_embed(),
-                    view=self
+                        embed=await self.get_current_embed(),
+                        view=self
                 )
                 # convert from WebhookMessage to Message reference to bypass 15min webhook token timeout
                 msg = await msg.channel.fetch_message(msg.id)
             else:
                 msg = await interaction.response.send_message(
-                    embed=await self.get_current_embed(),
-                    view=self
+                        embed=await self.get_current_embed(),
+                        view=self
                 )
 
             if isinstance(msg, discord.WebhookMessage):

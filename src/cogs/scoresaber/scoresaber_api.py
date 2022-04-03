@@ -42,6 +42,9 @@ class ScoreSaberAPI(ScoreSaberCog):
     def get_player_scores_sorted_by_pp(self, player_id: str) -> List[Score]:
         return self.uow.scores.get_player_scores_sorted_by_pp(player_id)
 
+    def get_score_by_id(self, score_id: int) -> Score:
+        return self.uow.scores.get_by_id(score_id)
+
     def update_score_pp_weight(self, score: Score) -> Score:
         leaderboard = self.bot.get_cog("LeaderboardAPI")
         top_scores_leaderboard = leaderboard.get_player_top_scores_leaderboard(score.player_id)

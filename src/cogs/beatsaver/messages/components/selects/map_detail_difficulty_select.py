@@ -65,7 +65,7 @@ class MapDetailDifficultySelect(BeatSaverComponent, discord.ui.Select):
 
         self.parent.beatmap_difficulty = beatmap_difficulty
 
-        await self.parent.update()
+        await self.parent.update(interaction)
 
     @staticmethod
     def difficulty_stars(beatmap_difficulty: BeatmapVersionDifficulty) -> Optional[str]:

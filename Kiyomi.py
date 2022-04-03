@@ -31,6 +31,7 @@ if __name__ == "__main__":
     bot.load_extension(name="src.cogs.leaderboard")
     bot.load_extension(name="src.cogs.achievements")
     bot.load_extension(name="src.cogs.achievement_roles")
+    bot.load_extension(name="src.cogs.view_persistence")
 
     # database.drop_tables()
     # database.create_tables()

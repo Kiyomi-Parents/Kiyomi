@@ -2,8 +2,7 @@ import traceback
 import typing
 from typing import TypeVar
 
-from discord import ApplicationContext, DiscordException, ApplicationCommandInvokeError
-from discord.ext import commands
+from discord import ApplicationContext, DiscordException, ApplicationCommandInvokeError, Bot
 from pyee import AsyncIOEventEmitter
 
 from src.cogs.errors import NoPrivateMessagesException
@@ -15,7 +14,7 @@ from .errors import BadArgument
 TCog = TypeVar('TCog')
 
 
-class Kiyomi(commands.Bot):
+class Kiyomi(Bot):
     running_tests = False
     events = AsyncIOEventEmitter()
     running_tasks = []

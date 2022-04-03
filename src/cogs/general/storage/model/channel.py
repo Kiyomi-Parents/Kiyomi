@@ -14,3 +14,11 @@ class Channel(Base):
     guild = relationship("Guild", back_populates="channels", uselist=False)
 
     messages = relationship("Message", back_populates="channel")
+
+    def __init__(self, guild_id: int, channel_id: int, channel_name: str):
+        self.guild_id = guild_id
+        self.id = channel_id
+        self.name = channel_name
+
+    def __str__(self):
+        return f"Channel {self.name} ({self.id})"

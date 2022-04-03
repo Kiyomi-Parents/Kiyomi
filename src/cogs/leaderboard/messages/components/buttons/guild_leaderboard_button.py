@@ -1,7 +1,6 @@
 import discord.ui
 from discord import Embed
 
-from src.cogs.beatsaver.storage.model.beatmap import Beatmap
 from ..embeds.guild_leaderboard_embed import GuildLeaderboardEmbed
 from ..leaderboard_component import LeaderboardComponent
 from src.kiyomi import Kiyomi
@@ -9,13 +8,12 @@ from src.kiyomi.base_view import BaseView
 
 
 class GuildLeaderboardButton(LeaderboardComponent, discord.ui.Button):
-    def __init__(self, bot: Kiyomi, parent: BaseView, beatmap: Beatmap):
-        self.beatmap = beatmap
+    def __init__(self, bot: Kiyomi, parent: BaseView, song_hash: str):
 
         LeaderboardComponent.__init__(self, bot, parent)
         discord.ui.Button.__init__(
             self,
-            custom_id=f"guild:leaderboard:button:beatmap:{beatmap.id}",
+            custom_id=f"guild:leaderboard:button:beatmap:{song_hash}",
             label="Guild Leaderboard",
             style=discord.enums.ButtonStyle.primary
         )
@@ -29,4 +27,4 @@ class GuildLeaderboardButton(LeaderboardComponent, discord.ui.Button):
 
     async def callback(self, interaction: discord.Interaction):
         self.parent.embed = self.get_embed
-        await self.parent.update(button_clicked=self)
+        await self.parent.update(interaction, button_clicked=self)

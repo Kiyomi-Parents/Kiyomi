@@ -63,4 +63,4 @@ class MapDetailCharacteristicSelect(BeatSaverComponent, discord.ui.Select):
 
         self.parent.beatmap_characteristic = beatmap_characteristic
 
-        await self.parent.update()
+        await self.parent.update(interaction)

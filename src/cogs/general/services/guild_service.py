@@ -17,8 +17,11 @@ class GuildService(GeneralService):
 
         return discord_guild
 
-    def register_guild(self, discord_guild: discord.Guild):
-        guild = self.uow.guilds.get_by_id(discord_guild.id)
+    async def register_guild(self, guild_id: int) -> Guild:
+        guild = self.uow.guilds.get_by_id(guild_id)
 
         if guild is None:
-            self.uow.guilds.add(Guild(discord_guild.id, discord_guild.name))
+            discord_guild = await self.get_discord_guild(guild_id)
+            guild = self.uow.guilds.add(Guild(guild_id, discord_guild.name))
+
+        return guild

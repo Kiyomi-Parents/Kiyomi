@@ -31,4 +31,4 @@ class MapDetailsButton(BeatSaverComponent, discord.ui.Button):
 
     async def callback(self, interaction: discord.Interaction):
         self.parent.embed = self.get_embed
-        await self.parent.update(button_clicked=self)
+        await self.parent.update(interaction, button_clicked=self)

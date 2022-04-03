@@ -7,7 +7,7 @@ from src.cogs.security import Security
 from src.cogs.settings.storage.model.toggle_setting import ToggleSetting
 from .errors import EmojiAlreadyExistsException, EmojiNotFoundException
 from .general_cog import GeneralCog
-from .services import EmojiService, GuildService, MemberService, RoleService
+from .services import EmojiService, GuildService, MemberService, RoleService, ChannelService, MessageService
 from src.kiyomi import Kiyomi, Utils
 from src.cogs.settings import SettingsAPI
 
@@ -18,9 +18,11 @@ class General(GeneralCog):
         emoji_service: EmojiService,
         guild_service: GuildService,
         member_service: MemberService,
+        channel_service: ChannelService,
+        message_service: MessageService,
         role_service: RoleService
     ):
-        super().__init__(bot, emoji_service, guild_service, member_service, role_service)
+        super().__init__(bot, emoji_service, guild_service, member_service, channel_service, message_service, role_service)
 
         # Register events
         self.events()
@@ -40,7 +42,7 @@ class General(GeneralCog):
         self.bot.events.emit("setting_register", settings)
 
         for discord_guild in self.bot.guilds:
-            self.guild_service.register_guild(discord_guild)
+            await self.guild_service.register_guild(discord_guild.id)
 
     @commands.Cog.listener()
     async def on_message(self, msg: discord.Message):

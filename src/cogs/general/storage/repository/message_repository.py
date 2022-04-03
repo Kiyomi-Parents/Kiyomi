@@ -14,3 +14,8 @@ class MessageRepository(BaseRepository[Message]):
     def get_all(self) -> Optional[List[Message]]:
         return self.session.query(Message) \
             .all()
+
+    def get_by_channel_id(self, channel_id: int) -> List[Message]:
+        return self.session.query(Message) \
+            .filter(Message.channel_id == channel_id) \
+            .all()

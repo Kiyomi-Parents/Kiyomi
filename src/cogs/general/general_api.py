@@ -5,8 +5,9 @@ from discord import Colour, Emoji
 
 from src.kiyomi import Kiyomi
 from .general_cog import GeneralCog
-from .services import EmojiService, GuildService, MemberService, RoleService
+from .services import EmojiService, GuildService, MemberService, RoleService, ChannelService, MessageService
 from .storage import UnitOfWork
+from .storage.model.channel import Channel
 from .storage.model.guild import Guild
 from .storage.model.member import Member
 from .storage.model.message import Message
@@ -14,15 +15,18 @@ from .storage.model.role import Role
 
 
 class GeneralAPI(GeneralCog):
-    def __init__(self,
+    def __init__(
+        self,
         bot: Kiyomi,
         emoji_service: EmojiService,
         guild_service: GuildService,
         member_service: MemberService,
+        channel_service: ChannelService,
+        message_service: MessageService,
         role_service: RoleService,
         uow: UnitOfWork
     ):
-        super().__init__(bot, emoji_service, guild_service, member_service, role_service)
+        super().__init__(bot, emoji_service, guild_service, member_service, channel_service, message_service, role_service)
 
         self.uow = uow
 
@@ -56,8 +60,14 @@ class GeneralAPI(GeneralCog):
     async def remove_role_from_member(self, guild_id: int, member_id: int, role_id: int, reason: str) -> None:
         await self.role_service.remove_role_from_member(guild_id, member_id, role_id, reason)
 
-    async def add_message(self, guild_id: int, channel_id: int, message_id: int) -> None:
-        self.uow.messages.add(Message(guild_id, channel_id, message_id))
+    async def register_message(self, guild_id: int, channel_id: int, message_id: int) -> Message:
+        return await self.message_service.register_message(guild_id, channel_id, message_id)
+
+    async def get_guild_channels(self, guild_id: int) -> List[Channel]:
+        return await self.channel_service.get_channels_in_guild(guild_id)
+
+    async def get_channel_messages(self, channel_id: int) -> List[Message]:
+        return await self.message_service.get_messages_in_channel(channel_id)
 
     def get_emoji(self, emoji_name: str) -> Optional[Emoji]:
         emoji_name = emoji_name.replace(":", "")
