@@ -3,8 +3,7 @@ import os
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
 
-from src.database import Database
-from src.kiyomi.kiyomi import Kiyomi
+from src.kiyomi import Kiyomi, Database
 from src.log import Logger
 
 if __name__ == "__main__":
@@ -20,6 +19,8 @@ if __name__ == "__main__":
 
     bot = Kiyomi(command_prefix="!", db=database)
 
+    bot.debug_guilds = os.getenv("DEBUG_GUILDS").split(",")
+
     Logger.log_init()
 
     bot.load_extension(name="src.cogs.general")
@@ -28,8 +29,9 @@ if __name__ == "__main__":
     bot.load_extension(name="src.cogs.beatsaver")
     bot.load_extension(name="src.cogs.score_feed")
     bot.load_extension(name="src.cogs.leaderboard")
-    bot.load_extension(name="src.cogs.achievements")
+    bot.load_extension(name="src.cogs.achievement")
     bot.load_extension(name="src.cogs.achievement_roles")
+    bot.load_extension(name="src.cogs.view_persistence")
 
     # database.drop_tables()
     # database.create_tables()

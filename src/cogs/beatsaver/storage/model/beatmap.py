@@ -5,7 +5,7 @@ from pybeatsaver import MapDetail
 from sqlalchemy import Column, String, Integer, DateTime, Boolean, Float, Text
 from sqlalchemy.orm import relationship
 
-from src.database import Base
+from src.kiyomi.database import Base, EMapTagList
 from .beatmap_version import BeatmapVersion
 from .beatmap_version_difficulty import BeatmapVersionDifficulty
 
@@ -22,6 +22,7 @@ class Beatmap(Base):
     automapper = Column(Boolean)
     ranked = Column(Boolean)
     qualified = Column(Boolean)
+    tags = Column(EMapTagList)
 
     # Uploader
     uploader_id = Column(Integer)
@@ -54,16 +55,20 @@ class Beatmap(Base):
         self.automapper = map_detail.automapper
         self.ranked = map_detail.ranked
         self.qualified = map_detail.qualified
+        self.tags = map_detail.tags
+
         self.uploader_id = map_detail.uploader.id
         self.uploader_name = map_detail.uploader.name
         self.uploader_hash = map_detail.uploader.hash
         self.uploader_avatar = map_detail.uploader.avatar
+
         self.metadata_bpm = map_detail.metadata.bpm
         self.metadata_duration = map_detail.metadata.duration
         self.metadata_song_name = map_detail.metadata.song_name
         self.metadata_song_sub_name = map_detail.metadata.song_sub_name
         self.metadata_song_author_name = map_detail.metadata.song_author_name
         self.metadata_level_author_name = map_detail.metadata.level_author_name
+
         self.stats_plays = map_detail.stats.plays
         self.stats_downloads = map_detail.stats.downloads
         self.stats_upvotes = map_detail.stats.upvotes
@@ -107,7 +112,7 @@ class Beatmap(Base):
 
     @property
     def one_click_install(self) -> str:
-        return f"beatsaver://{self.key}"
+        return f"beatsaver://{self.id}"
 
     @property
     def rating(self) -> float:
@@ -118,7 +123,7 @@ class Beatmap(Base):
         return time.strftime("%H:%M:%S", time.gmtime(self.metadata_duration))
 
     @property
-    def difficulties(self) -> BeatmapVersionDifficulty:
+    def difficulties(self) -> List[BeatmapVersionDifficulty]:
         return self.latest_version.difficulties
 
     def __str__(self):

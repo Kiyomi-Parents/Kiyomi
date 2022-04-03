@@ -1,5 +1,5 @@
-from .services import SentScoreService, NotificationService
 from src.kiyomi import BaseCog, Kiyomi
+from .services import SentScoreService, NotificationService
 
 
 class ScoreFeedCog(BaseCog):

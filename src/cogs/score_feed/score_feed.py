@@ -5,9 +5,9 @@ from src.cogs.scoresaber import ScoreSaberAPI
 from src.cogs.scoresaber.storage.model.guild_player import GuildPlayer
 from src.cogs.security import Security
 from src.cogs.settings.storage.model.channel_setting import ChannelSetting
+from src.kiyomi import Kiyomi
 from .score_feed_cog import ScoreFeedCog
 from .services import SentScoreService, NotificationService
-from src.kiyomi import Kiyomi
 
 
 class ScoreFeed(ScoreFeedCog, name="Score Feed"):
@@ -36,6 +36,8 @@ class ScoreFeed(ScoreFeedCog, name="Score Feed"):
     async def send_notifications(self, ctx):
         """Send recent score notifications."""
         await self.notification_service.send_notifications(ctx.guild.id)
+
+        await ctx.respond("Doing the thing...")
 
     @slash_command()
     @Security.owner_or_permissions(administrator=True)

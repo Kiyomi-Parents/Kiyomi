@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, ForeignKey, String, BigInteger
 from sqlalchemy.orm import relationship, backref
 
-from src.database import Base
+from src.kiyomi.database import Base
 
 
 class GuildPlayer(Base):

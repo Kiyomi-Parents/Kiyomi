@@ -2,8 +2,8 @@ from typing import Optional
 
 from sqlalchemy import Column, String, Integer, ForeignKey, Enum, BigInteger
 
+from src.kiyomi.database.database import Base
 from .enums.setting_type import SettingType
-from src.database.database import Base
 
 
 class Setting(Base):

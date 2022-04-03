@@ -1,22 +1,23 @@
 from typing import List
 
+import discord
 from discord import slash_command
 from discord.ext import commands
 
-from .services import BeatmapService
+from src.kiyomi import Kiyomi
+from src.log import Logger
+from .services import BeatmapAutocompleteService
 from .beatsaver_cog import BeatSaverCog
 from .errors import SongNotFound
-from .message import Message
-from src.log import Logger
-from src.kiyomi import Kiyomi
-from src.cogs.leaderboard import LeaderboardAPI
-from src.cogs.settings import SettingsAPI
-from src.cogs.scoresaber.storage import Leaderboard
+from .messages.views.song_view import SongView
+from .services import BeatmapService
+from src.cogs.settings.storage.model.emoji_setting import EmojiSetting
+from src.cogs.scoresaber.storage.model.leaderboard import Leaderboard
 
 
 class BeatSaver(BeatSaverCog, name="Beat Saver"):
-    def __init__(self, bot: Kiyomi, beatmap_service: BeatmapService):
-        super().__init__(bot, beatmap_service)
+    def __init__(self, bot: Kiyomi, beatmap_service: BeatmapService, beatmap_autocomplete_service: BeatmapAutocompleteService):
+        super().__init__(bot, beatmap_service, beatmap_autocomplete_service)
 
         # Register events
         self.events()
@@ -36,21 +37,30 @@ class BeatSaver(BeatSaverCog, name="Beat Saver"):
     async def on_ready(self):
         await self.beatmap_service.start_scoresaber_api_client()
 
-    @slash_command(aliases=["bsr", "song"])
-    async def map(self, ctx, key: str):
-        """Displays song info."""
-        leaderboard = self.bot.get_cog_api(LeaderboardAPI)
-        settings = self.bot.get_cog_api(SettingsAPI)
+        settings = [
+            EmojiSetting.create(self.bot, "easy_difficulty_emoji", None),
+            EmojiSetting.create(self.bot, "normal_difficulty_emoji", None),
+            EmojiSetting.create(self.bot, "hard_difficulty_emoji", None),
+            EmojiSetting.create(self.bot, "expert_difficulty_emoji", None),
+            EmojiSetting.create(self.bot, "expert_plus_difficulty_emoji", None),
+            EmojiSetting.create(self.bot, "standard_game_mode_emoji", None),
+            EmojiSetting.create(self.bot, "one_saber_game_mode_emoji", None),
+            EmojiSetting.create(self.bot, "no_arrows_game_mode_emoji", None),
+            EmojiSetting.create(self.bot, "90_degree_game_mode_emoji", None),
+            EmojiSetting.create(self.bot, "360_degree_game_mode_emoji", None),
+            EmojiSetting.create(self.bot, "lightshow_game_mode_emoji", None),
+            EmojiSetting.create(self.bot, "lawless_game_mode_emoji", None)
+        ]
 
+        self.bot.events.emit("setting_register", settings)
+
+    @slash_command(aliases=["bsr", "song"])
+    async def map(self, ctx: discord.ApplicationContext, key: str):
+        """Displays song info."""
         try:
             db_beatmap = await self.beatmap_service.get_beatmap_by_key(key)
-            song_embed = Message.get_song_embed(db_beatmap)
+            song_view = SongView(self.bot, ctx.interaction.guild, db_beatmap)
 
-            await ctx.respond(embed=song_embed)
-
-            if settings.get(ctx.guild.id, "map_leaderboard"):
-                leaderboard_embed = await leaderboard.get_player_score_leaderboard_embed(ctx.guild.id, key)
-
-                await ctx.respond(embed=leaderboard_embed)
+            await song_view.respond(ctx.interaction)
         except SongNotFound as error:
             await ctx.respond(error)

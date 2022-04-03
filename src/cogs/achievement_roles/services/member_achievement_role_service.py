@@ -2,13 +2,14 @@ from typing import List
 
 import discord
 
+from src.cogs.general import GeneralAPI
 from src.log import Logger
 from .achievement_roles_service import AchievementRolesService
-from src.cogs.general.storage.model import GuildMember
-from src.cogs.achievements import AchievementsAPI
-from ..storage import AchievementRole, AchievementRoleMember
-from src.cogs.general import GeneralAPI
-from src.cogs.achievements.registry import Achievement
+from ..storage.model.achievement_role import AchievementRole
+from ..storage.model.achievement_role_member import AchievementRoleMember
+from src.cogs.general.storage.model.guild_member import GuildMember
+from src.cogs.achievement import AchievementsAPI
+from src.cogs.achievement.services.achievements import Achievement
 
 
 class MemberAchievementRoleService(AchievementRolesService):

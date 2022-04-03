@@ -6,3 +6,4 @@ class SettingType(Enum):
     STRING = "String"
     BOOLEAN = "Boolean"
     CHANNEL = "Channel"
+    EMOJI = "Emoji"

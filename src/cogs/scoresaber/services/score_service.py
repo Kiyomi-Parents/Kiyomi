@@ -4,7 +4,9 @@ import pyscoresaber
 
 from src.log import Logger
 from .scoresaber_service import ScoreSaberService
-from ..storage import Score, Player, Leaderboard
+from ..storage.model.leaderboard import Leaderboard
+from ..storage.model.player import Player
+from ..storage.model.score import Score
 
 
 class ScoreService(ScoreSaberService):
@@ -33,6 +35,9 @@ class ScoreService(ScoreSaberService):
 
         self.uow.save_changes()
 
+        for new_score in new_scores:
+            self.uow.session.refresh(new_score)
+
         # Emit event for new leaderboards
         self.bot.events.emit("on_new_leaderboards", new_leaderboards)
 
@@ -57,11 +62,15 @@ class ScoreService(ScoreSaberService):
 
         try:
             async for player_scores in self.scoresaber.player_scores_all(int(player.id), pyscoresaber.ScoreSort.RECENT):
+                before_page_add_count = len(new_player_scores)
+
                 for player_score in player_scores:
                     if self.uow.scores.exists_by_score_id_and_time_set(player_score.score.id, player_score.score.time_set):
                         return new_player_scores
                     else:
                         new_player_scores.append(player_score)
+
+                Logger.log(player, f"Found {len(new_player_scores) - before_page_add_count} new scores from Score Saber")
         except pyscoresaber.NotFoundException as error:
             Logger.log(player, f"Got HTTP code {error.status} when trying to access {error.url}")
 

@@ -2,7 +2,7 @@ from typing import Optional, List
 
 from sqlalchemy.orm import Query
 
-from src.database import BaseRepository
+from src.kiyomi.database import BaseRepository
 from ..model.guild_player import GuildPlayer
 
 

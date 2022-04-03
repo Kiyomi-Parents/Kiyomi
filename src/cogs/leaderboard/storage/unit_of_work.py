@@ -1,4 +1,4 @@
-from src.database import BaseUnitOfWork
+from src.kiyomi.database import BaseUnitOfWork
 
 
 class UnitOfWork(BaseUnitOfWork):

@@ -1,8 +1,8 @@
+from src.kiyomi import Kiyomi
 from .score_feed import ScoreFeed
 from .services import NotificationService, SentScoreService
 from .storage import UnitOfWork
 from .tasks import Tasks
-from src.kiyomi import Kiyomi
 
 
 def setup(bot: Kiyomi):

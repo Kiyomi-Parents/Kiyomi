@@ -3,10 +3,10 @@ from typing import Optional
 import discord.abc
 from discord import OptionChoice
 
-from ...errors import InvalidSettingTypeException
-from .setting import Setting
 from .abstract_setting import AbstractSetting
 from .enums.setting_type import SettingType
+from .setting import Setting
+from ...errors import InvalidSettingTypeException
 
 
 class ChannelSetting(AbstractSetting[discord.abc.GuildChannel]):

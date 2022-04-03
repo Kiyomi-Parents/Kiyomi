@@ -4,7 +4,7 @@ import pybeatsaver
 
 from .beatsaver_service import BeatSaverService
 from ..errors import SongNotFound
-from ..storage import Beatmap
+from ..storage.model.beatmap import Beatmap
 
 
 class BeatmapService(BeatSaverService):
@@ -19,6 +19,7 @@ class BeatmapService(BeatSaverService):
             raise SongNotFound(f"Could not find song at {error.url}") from error
 
         self.uow.beatmap_repo.add_all(beatmaps)
+        self.uow.save_changes()
 
         return beatmaps
 
@@ -36,7 +37,7 @@ class BeatmapService(BeatSaverService):
         return beatmaps
 
     async def get_beatmap_by_key(self, beatmap_key: str) -> Beatmap:
-        beatmap = self.uow.beatmap_repo.get_beatmap_by_key(beatmap_key)
+        beatmap = self.uow.beatmap_repo.get_by_id(beatmap_key)
 
         if beatmap is None:
             return (await self.get_missing_beatmaps_by_keys([beatmap_key]))[0]
@@ -53,6 +54,8 @@ class BeatmapService(BeatSaverService):
                 beatmaps += new_beatmaps
         except pybeatsaver.NotFoundException as error:
             raise SongNotFound(f"Could not find song with hash {beatmap_hashes}") from error
+
+        self.uow.save_changes()
 
         return beatmaps
 

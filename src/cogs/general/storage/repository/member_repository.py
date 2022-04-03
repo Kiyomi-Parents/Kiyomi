@@ -2,8 +2,8 @@ from typing import Optional, List
 
 from sqlalchemy.orm import Query
 
-from ..model import Member
-from src.database import BaseRepository
+from ..model.member import Member
+from src.kiyomi.database import BaseRepository
 
 
 class MemberRepository(BaseRepository[Member]):

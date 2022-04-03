@@ -2,8 +2,8 @@ from typing import Optional, List
 
 from sqlalchemy.orm import Query
 
-from ..model import Guild
-from src.database import BaseRepository
+from ..model.guild import Guild
+from src.kiyomi.database import BaseRepository
 
 
 class GuildRepository(BaseRepository[Guild]):

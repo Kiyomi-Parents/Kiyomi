@@ -3,10 +3,10 @@ from typing import List
 import discord
 from discord import SlashCommandGroup, Option, OptionChoice
 
+from src.kiyomi import Kiyomi
 from .services import SettingService
 from .settings_cog import SettingsCog
 from .storage import Setting
-from src.kiyomi import Kiyomi
 
 
 class Settings(SettingsCog):
@@ -31,9 +31,10 @@ class Settings(SettingsCog):
     async def get_settings(self, ctx: discord.AutocompleteContext) -> List[OptionChoice]:
         return self.setting_service.get_settings()
 
-    async def get_setting_values(self, ctx: discord.AutocompleteContext):
+    async def get_setting_values(self, ctx: discord.AutocompleteContext) -> List[OptionChoice]:
         return await self.setting_service.get_setting_values(ctx)
 
+    # TODO: Fix auto complete support for partially typed setting names
     @settings.command(name="set")
     async def settings_set(
         self,
@@ -55,7 +56,8 @@ class Settings(SettingsCog):
         if setting not in registered_settings:
             await ctx.respond(f"\"{setting}\" is not a valid setting name")
 
-        self.setting_service.set(ctx.guild.id, setting, value)
+        self.setting_service.set(ctx.interaction.guild.id, setting, value)
+        setting_value = self.setting_service.get_value(ctx.interaction.guild.id, setting)
 
-        await ctx.respond(f"{setting} is now {value}")
+        await ctx.respond(f"{setting} is now set to: {setting_value}")
 

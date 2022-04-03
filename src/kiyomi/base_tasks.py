@@ -1,4 +1,4 @@
-from src.kiyomi import Kiyomi
+from .kiyomi import Kiyomi
 
 
 class BaseTasks:

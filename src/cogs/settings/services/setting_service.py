@@ -1,13 +1,15 @@
-from src.kiyomi import Kiyomi
-from .settings_service import SettingsService
 from typing import Optional, List
 
 import discord
 from discord import OptionChoice
 
-from ..errors import SettingNotFoundException, FailedSettingConvertException
-from ..storage import Setting, ChannelSetting, IntegerSetting, TextSetting, ToggleSetting, SettingType, AbstractSetting, UnitOfWork
 from src.cogs.settings.utils import Utils
+from src.kiyomi import Kiyomi
+from .settings_service import SettingsService
+from ..errors import SettingNotFoundException, FailedSettingConvertException
+from ..storage import Setting, ChannelSetting, IntegerSetting, TextSetting, ToggleSetting, SettingType, AbstractSetting, \
+    UnitOfWork
+from ..storage.model.emoji_setting import EmojiSetting
 
 
 class SettingService(SettingsService):
@@ -35,6 +37,8 @@ class SettingService(SettingsService):
             return TextSetting.get_from_setting(setting)
         elif setting.setting_type is SettingType.CHANNEL:
             return ChannelSetting.get_from_setting(bot, setting)
+        elif setting.setting_type is SettingType.EMOJI:
+            return EmojiSetting.get_from_setting(bot, setting)
         else:
             raise FailedSettingConvertException(f"Unable to convert setting of type {setting.setting_type}")
 
@@ -46,7 +50,7 @@ class SettingService(SettingsService):
         else:
             for reg_setting in self.registered_settings:
                 if reg_setting.name == name:
-                    if isinstance(reg_setting, ChannelSetting):
+                    if isinstance(reg_setting, ChannelSetting) or isinstance(reg_setting, EmojiSetting):
                         new_setting = reg_setting.create(self.bot, name, reg_setting.value)
                     else:
                         new_setting = reg_setting.create(name, reg_setting.value)

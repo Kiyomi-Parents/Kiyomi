@@ -1,11 +1,11 @@
-from abc import ABC, abstractmethod
+from abc import ABC
 from typing import TypeVar, Generic
 
 import discord
 from discord import OptionChoice
 
-from .setting import Setting
 from .enums.setting_type import SettingType
+from .setting import Setting
 
 T = TypeVar('T')
 

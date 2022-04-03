@@ -1,10 +1,9 @@
-from typing import overload, Optional
+from typing import Optional
 
-from ...errors import InvalidSettingTypeException
-from .setting import Setting
 from .abstract_setting import AbstractSetting
 from .enums.setting_type import SettingType
-
+from .setting import Setting
+from ...errors import InvalidSettingTypeException
 
 
 class IntegerSetting(AbstractSetting[int]):

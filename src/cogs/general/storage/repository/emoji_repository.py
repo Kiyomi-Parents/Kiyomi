@@ -2,8 +2,8 @@ from typing import Optional, List
 
 from sqlalchemy.orm import Query
 
-from ..model import Emoji
-from src.database import BaseRepository
+from ..model.emoji import Emoji
+from src.kiyomi.database import BaseRepository
 
 
 class EmojiRepository(BaseRepository[Emoji]):

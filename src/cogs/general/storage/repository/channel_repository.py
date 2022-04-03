@@ -2,8 +2,8 @@ from typing import Optional, List
 
 from sqlalchemy.orm import Query
 
-from src.database import BaseRepository
-from ..model import Channel
+from ..model.channel import Channel
+from src.kiyomi.database import BaseRepository
 
 
 class ChannelRepository(BaseRepository[Channel]):

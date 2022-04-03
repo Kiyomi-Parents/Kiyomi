@@ -2,9 +2,9 @@ from typing import Optional, List
 
 from sqlalchemy.orm import Query
 
+from ..model.sent_score import SentScore
 from src.cogs.scoresaber.storage.model.score import Score
-from src.database import BaseRepository
-from ..model import SentScore
+from src.kiyomi.database import BaseRepository
 
 
 class SentScoreRepository(BaseRepository[SentScore]):
@@ -35,4 +35,5 @@ class SentScoreRepository(BaseRepository[SentScore]):
         return self.session.query(Score) \
             .filter(Score.player_id == player_id) \
             .filter(Score.id.not_in(sent_score_ids.select())) \
+            .order_by(Score.time_set.desc()) \
             .all()

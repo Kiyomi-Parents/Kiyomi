@@ -1,8 +1,8 @@
+from src.kiyomi import Kiyomi
 from .services import SettingService
 from .settings import Settings
 from .settings_api import SettingsAPI
 from .storage import UnitOfWork
-from src.kiyomi import Kiyomi
 
 
 def setup(bot: Kiyomi):

@@ -9,7 +9,6 @@ from src.cogs.security import Security
 from .errors import PlayerNotFoundException, \
     MemberUsingDifferentPlayerAlreadyException, PlayerRegisteredInGuildAlreadyException, \
     MemberHasPlayerAlreadyRegisteredInGuildException, MemberPlayerNotFoundInGuildException
-from .message import Message
 from .scoresaber_cog import ScoreSaberCog
 
 
@@ -89,8 +88,10 @@ class ScoreSaber(ScoreSaberCog, name="Score Saber"):
                 return
 
             for score in scores:
-                score_embed = Message.get_score_embed(guild_player.player, score)
-                await ctx.respond(embed=score_embed)
+                pass
+                # TODO: FIX
+                # score_embed = Message.get_score_embed(guild_player.player, score)
+                # await ctx.respond(embed=score_embed)
 
         except IndexError as e:
             await ctx.respond("Song argument too large")

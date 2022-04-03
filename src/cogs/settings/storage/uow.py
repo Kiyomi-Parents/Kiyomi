@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 
-from src.database import BaseUnitOfWork, Database
+from src.kiyomi.database import BaseUnitOfWork
 from .repository import SettingsRepository
 
 

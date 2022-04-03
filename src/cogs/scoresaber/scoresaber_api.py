@@ -1,11 +1,14 @@
 from typing import Optional, List
 
-from src.cogs.leaderboard.leaderboard_api import LeaderboardAPI
-from .services import PlayerService, ScoreService
-from .storage import UnitOfWork, Leaderboard, GuildPlayer, Player, Score
+from src.kiyomi import Kiyomi
 from .scoresaber_cog import ScoreSaberCog
 from .scoresaber_utils import ScoreSaberUtils
-from src.kiyomi import Kiyomi
+from .services import PlayerService, ScoreService
+from .storage import UnitOfWork
+from .storage.model.guild_player import GuildPlayer
+from .storage.model.leaderboard import Leaderboard
+from .storage.model.player import Player
+from .storage.model.score import Score
 
 
 class ScoreSaberAPI(ScoreSaberCog):
@@ -39,8 +42,11 @@ class ScoreSaberAPI(ScoreSaberCog):
     def get_player_scores_sorted_by_pp(self, player_id: str) -> List[Score]:
         return self.uow.scores.get_player_scores_sorted_by_pp(player_id)
 
+    def get_score_by_id(self, score_id: int) -> Score:
+        return self.uow.scores.get_by_id(score_id)
+
     def update_score_pp_weight(self, score: Score) -> Score:
-        leaderboard = self.bot.get_cog_api(LeaderboardAPI)
+        leaderboard = self.bot.get_cog("LeaderboardAPI")
         top_scores_leaderboard = leaderboard.get_player_top_scores_leaderboard(score.player_id)
 
         position = 0

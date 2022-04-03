@@ -2,6 +2,10 @@ class GuildNotFoundException(Exception):
     pass
 
 
+class ChannelNotFoundException(Exception):
+    pass
+
+
 class MemberNotFoundException(Exception):
     pass
 

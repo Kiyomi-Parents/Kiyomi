@@ -1,5 +1,5 @@
-from .services import SettingService
 from src.kiyomi import BaseCog, Kiyomi
+from .services import SettingService
 
 
 class SettingsCog(BaseCog):
