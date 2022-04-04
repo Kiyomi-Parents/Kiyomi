@@ -1,22 +1,20 @@
 from typing import Optional
 
-from .abstract_setting import AbstractSetting
+from .abstract_regular_setting import AbstractRegularSetting
 from .enums.setting_type import SettingType
 from .setting import Setting
-from ...errors import InvalidSettingTypeException
+from ...errors import InvalidSettingType
 
 
-class IntegerSetting(AbstractSetting[int]):
-
-    def __init__(self, setting: Setting):
-        self.setting = setting
+class IntegerSetting(AbstractRegularSetting[int]):
+    setting_type = SettingType.INT
 
     @staticmethod
-    def create(name: str, default_value: Optional[int]):
+    def create(name: str, name_human: str, default_value: Optional[int]):
         if default_value is not None:
             default_value = IntegerSetting.from_type(default_value)
 
-        return IntegerSetting(Setting(None, SettingType.INT, name, default_value))
+        return IntegerSetting(name_human, Setting(None, SettingType.INT, name, default_value))
 
     @property
     def value(self) -> int:
@@ -41,8 +39,8 @@ class IntegerSetting(AbstractSetting[int]):
         return str(value)
 
     @staticmethod
-    def get_from_setting(setting: Setting):
+    def get_from_setting(name_human: str, setting: Setting):
         if setting.setting_type is not SettingType.INT:
-            raise InvalidSettingTypeException(f"Can't convert setting of type {setting.setting_type} to {SettingType.INT}")
+            raise InvalidSettingType(setting.setting_type, SettingType.INT)
 
-        return IntegerSetting(setting)
+        return IntegerSetting(name_human, setting)

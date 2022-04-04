@@ -11,8 +11,12 @@ T = TypeVar('T')
 
 
 class AbstractSetting(ABC, Generic[T]):
-
+    setting_type: SettingType
     setting: Setting
+
+    def __init__(self, name_human: str, setting: Setting):
+        self.setting = setting
+        self.name_human = name_human
 
     def set(self, value: str) -> None:
         self.setting.value = value

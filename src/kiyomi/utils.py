@@ -2,6 +2,7 @@ import asyncio
 import random
 from datetime import datetime
 from functools import wraps
+from typing import TypeVar, Type, List
 
 import discord
 import timeago
@@ -9,6 +10,7 @@ from discord.ext import tasks
 
 from src.log import Logger
 
+TClass = TypeVar('TClass')
 
 class Utils:
     @staticmethod
@@ -56,7 +58,7 @@ class Utils:
                     setattr(old_class, var, getattr(new_class, var))
 
     @staticmethod
-    def class_inheritors(cls):
+    def class_inheritors(cls: Type[TClass]) -> List[TClass]:
         subclasses = set()
         work = [cls]
 
@@ -67,7 +69,7 @@ class Utils:
                     subclasses.add(child)
                     work.append(child)
 
-        return subclasses
+        return list(subclasses)
 
     @staticmethod
     def update_tasks_list(func):

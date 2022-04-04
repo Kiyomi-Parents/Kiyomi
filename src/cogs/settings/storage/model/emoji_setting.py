@@ -3,26 +3,22 @@ from typing import Optional
 import discord
 from discord import OptionChoice
 
-from .abstract_setting import AbstractSetting
+from src.kiyomi import Kiyomi
+from .abstract_bot_setting import AbstractBotSetting
 from .enums import SettingType
 from .setting import Setting
-from ...errors import InvalidSettingTypeException
+from ...errors import InvalidSettingType
 
 
-class EmojiSetting(AbstractSetting[discord.Emoji]):
-
-    bot: discord.Bot
-
-    def __init__(self, bot: discord.Bot, setting: Setting):
-        self.bot = bot
-        self.setting = setting
+class EmojiSetting(AbstractBotSetting[discord.Emoji]):
+    setting_type = SettingType.EMOJI
 
     @staticmethod
-    def create(bot: discord.Bot, name: str, default_value: Optional[discord.Emoji]):
+    def create(bot: Kiyomi, name_human: str, name: str, default_value: Optional[discord.Emoji]):
         if default_value is not None:
             default_value = EmojiSetting.from_type(default_value)
 
-        return EmojiSetting(bot, Setting(None, SettingType.EMOJI, name, default_value))
+        return EmojiSetting(bot, name_human, Setting(None, SettingType.EMOJI, name, default_value))
 
     @property
     def value(self) -> discord.Emoji:
@@ -33,7 +29,7 @@ class EmojiSetting(AbstractSetting[discord.Emoji]):
         self.setting.value = self.from_type(value)
 
     @staticmethod
-    def to_type(bot: discord.Bot, value: Optional[str]) -> Optional[discord.Emoji]:
+    def to_type(bot: Kiyomi, value: Optional[str]) -> Optional[discord.Emoji]:
         if value is None:
             return None
 
@@ -47,16 +43,19 @@ class EmojiSetting(AbstractSetting[discord.Emoji]):
         return str(value.id)
 
     @staticmethod
-    def get_from_setting(bot: discord.Bot, setting: Setting):
+    def get_from_setting(bot: Kiyomi, name_human: str, setting: Setting):
         if setting.setting_type is not SettingType.EMOJI:
-            raise InvalidSettingTypeException(f"Can't convert setting of type {setting.setting_type} to {SettingType.EMOJI}")
+            raise InvalidSettingType(setting.setting_type, SettingType.EMOJI)
 
-        return EmojiSetting(bot, setting)
+        return EmojiSetting(bot, name_human, setting)
 
     async def get_autocomplete(self, ctx: discord.AutocompleteContext):
         emojis = []
 
         for emoji in await ctx.interaction.guild.fetch_emojis():
+            if ctx.value.lower() not in emoji.name.lower():
+                continue
+
             label = f"{emoji.name}"
 
             if self.value is not None and self.value.id == emoji.id:

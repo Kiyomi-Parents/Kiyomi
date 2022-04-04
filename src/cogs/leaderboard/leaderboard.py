@@ -1,11 +1,8 @@
 from typing import List
 
 import discord
-from discord import slash_command, Option, OptionChoice, ApplicationContext, ApplicationCommandError, \
-    ApplicationCommandInvokeError
-from discord.ext import commands
+from discord import slash_command, Option, OptionChoice
 
-from src.cogs.settings.storage.model.toggle_setting import ToggleSetting
 from src.kiyomi import Kiyomi
 from .leaderboard_cog import LeaderboardCog
 from .messages.components.embeds.guild_leaderboard_embed import GuildLeaderboardEmbed
@@ -26,14 +23,6 @@ class Leaderboard(LeaderboardCog):
 
     def events(self):
         pass
-
-    @commands.Cog.listener()
-    async def on_ready(self):
-        settings = [
-            ToggleSetting.create("map_leaderboard", False)
-        ]
-
-        self.bot.events.emit("setting_register", settings)
 
     async def get_beatmap_difficulties(self, ctx: discord.AutocompleteContext) -> List[OptionChoice]:
         beatsaver = self.bot.get_cog_api(BeatSaverAPI)

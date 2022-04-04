@@ -1,9 +1,13 @@
-from typing import Optional, Dict, Tuple, Any, Union
+from typing import Optional, Dict, Union
 
 from discord import ApplicationContext, AutocompleteContext
 
 
 class KiyomiException(Exception):
+    pass
+
+
+class CogException(KiyomiException):
     pass
 
 

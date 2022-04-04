@@ -3,26 +3,22 @@ from typing import Optional
 import discord.abc
 from discord import OptionChoice
 
-from .abstract_setting import AbstractSetting
+from src.kiyomi import Kiyomi
+from .abstract_bot_setting import AbstractBotSetting
 from .enums.setting_type import SettingType
 from .setting import Setting
-from ...errors import InvalidSettingTypeException
+from ...errors import InvalidSettingType
 
 
-class ChannelSetting(AbstractSetting[discord.abc.GuildChannel]):
-
-    bot: discord.Bot
-
-    def __init__(self, bot: discord.Bot, setting: Setting):
-        self.bot = bot
-        self.setting = setting
+class ChannelSetting(AbstractBotSetting[discord.abc.GuildChannel]):
+    setting_type = SettingType.CHANNEL
 
     @staticmethod
-    def create(bot: discord.Bot, name: str, default_value: Optional[discord.abc.GuildChannel]):
+    def create(bot: discord.Bot, name_human: str, name: str, default_value: Optional[discord.abc.GuildChannel]):
         if default_value is not None:
             default_value = ChannelSetting.from_type(default_value)
 
-        return ChannelSetting(bot, Setting(None, SettingType.CHANNEL, name, default_value))
+        return ChannelSetting(bot, name_human, Setting(None, SettingType.CHANNEL, name, default_value))
 
     @property
     def value(self) -> discord.abc.GuildChannel:
@@ -33,7 +29,7 @@ class ChannelSetting(AbstractSetting[discord.abc.GuildChannel]):
         self.setting.value = self.from_type(value)
 
     @staticmethod
-    def to_type(bot: discord.Bot, value: Optional[str]) -> Optional[discord.abc.GuildChannel]:
+    def to_type(bot: Kiyomi, value: Optional[str]) -> Optional[discord.abc.GuildChannel]:
         if value is None:
             return None
 
@@ -47,22 +43,27 @@ class ChannelSetting(AbstractSetting[discord.abc.GuildChannel]):
         return str(value.id)
 
     @staticmethod
-    def get_from_setting(bot: discord.Bot, setting: Setting):
+    def get_from_setting(bot: Kiyomi, name_human: str, setting: Setting):
         if setting.setting_type is not SettingType.CHANNEL:
-            raise InvalidSettingTypeException(f"Can't convert setting of type {setting.setting_type} to {SettingType.CHANNEL}")
+            raise InvalidSettingType(setting.setting_type, SettingType.CHANNEL)
 
-        return ChannelSetting(bot, setting)
+        return ChannelSetting(bot, name_human, setting)
 
     async def get_autocomplete(self, ctx: discord.AutocompleteContext):
         text_channels = []
 
         for channel in await ctx.interaction.guild.fetch_channels():
-            if isinstance(channel, discord.TextChannel):
-                label = f"#{channel.name}"
+            if not isinstance(channel, discord.TextChannel):
+                continue
 
-                if self.value is not None and self.value.id == channel.id:
-                    label += ' (current)'
+            if ctx.value.lower() not in channel.name.lower():
+                continue
 
-                text_channels.append(OptionChoice(label, str(channel.id)))
+            label = f"#{channel.name}"
+
+            if self.value is not None and self.value.id == channel.id:
+                label += ' (current)'
+
+            text_channels.append(OptionChoice(label, str(channel.id)))
 
         return text_channels

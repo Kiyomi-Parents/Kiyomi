@@ -36,7 +36,7 @@ class General(GeneralCog):
     @commands.Cog.listener()
     async def on_ready(self):
         settings = [
-            ToggleSetting.create("repost_emoji", False)
+            ToggleSetting.create("let Kiyomi repost enabled emojis", "repost_emoji", False)
         ]
 
         self.bot.events.emit("setting_register", settings)

@@ -26,7 +26,7 @@ class ScoreFeed(ScoreFeedCog, name="Score Feed"):
     @commands.Cog.listener()
     async def on_ready(self):
         settings = [
-            ChannelSetting.create(self.bot, "score_feed_channel_id", None)
+            ChannelSetting.create(self.bot, "Score feed channel", "score_feed_channel_id", None)
         ]
 
         self.bot.events.emit("setting_register", settings)

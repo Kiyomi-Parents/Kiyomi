@@ -9,7 +9,7 @@ from src.cogs.errors import NoPrivateMessagesException
 from .utils import Utils
 from .database import Database
 from src.log import Logger
-from .errors import BadArgument
+from .errors import BadArgument, CogException
 
 TCog = TypeVar('TCog')
 
@@ -40,6 +40,9 @@ class Kiyomi(Bot):
         Logger.log("Global Exception", f"Got error {type(exception)}: {exception}")
 
         if isinstance(exception, ApplicationCommandInvokeError):
+            if isinstance(exception.original, CogException):
+                return
+
             if isinstance(exception.original, BadArgument):
                 await context.respond(str(exception.original))
                 return

@@ -1,22 +1,20 @@
 from typing import Optional
 
-from .abstract_setting import AbstractSetting
+from .abstract_regular_setting import AbstractRegularSetting
 from .enums.setting_type import SettingType
 from .setting import Setting
-from ...errors import InvalidSettingTypeException
+from ...errors import InvalidSettingType
 
 
-class TextSetting(AbstractSetting[str]):
-
-    def __init__(self, setting: Setting):
-        self.setting = setting
+class TextSetting(AbstractRegularSetting[str]):
+    setting_type = SettingType.STRING
 
     @staticmethod
-    def create(name: str, default_value: Optional[str]):
+    def create(name_human: str, name: str, default_value: Optional[str]):
         if default_value is not None:
             default_value = TextSetting.from_type(default_value)
 
-        return TextSetting(Setting(None, SettingType.STRING, name, default_value))
+        return TextSetting(name_human, Setting(None, SettingType.STRING, name, default_value))
 
     @property
     def value(self) -> str:
@@ -41,8 +39,8 @@ class TextSetting(AbstractSetting[str]):
         return value
 
     @staticmethod
-    def get_from_setting(setting: Setting):
+    def get_from_setting(name_human: str, setting: Setting):
         if setting.setting_type is not SettingType.STRING:
-            raise InvalidSettingTypeException(f"Can't convert setting of type {setting.setting_type} to {SettingType.STRING}")
+            raise InvalidSettingType(setting.setting_type, SettingType.STRING)
 
-        return TextSetting(setting)
+        return TextSetting(name_human, setting)

@@ -12,7 +12,8 @@ from ..storage.model.beatmap import Beatmap
 
 class BeatmapAutocompleteService(BeatSaverService):
 
-    def __init__(self,
+    def __init__(
+        self,
         bot: Kiyomi,
         uow: UnitOfWork,
         beatsaver: pybeatsaver.BeatSaverAPI,

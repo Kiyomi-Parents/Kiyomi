@@ -1,18 +1,20 @@
 from typing import List
 
 import discord
-from discord import SlashCommandGroup, Option, OptionChoice
+from discord import SlashCommandGroup, Option, OptionChoice, ApplicationCommandInvokeError
 
 from src.kiyomi import Kiyomi
+from .errors import SettingsCogException
 from .services import SettingService
+from .services.settings_autocomplete_service import SettingAutocompleteService
 from .settings_cog import SettingsCog
 from .storage import Setting
 
 
 class Settings(SettingsCog):
 
-    def __init__(self, bot: Kiyomi, setting_service: SettingService):
-        super().__init__(bot, setting_service)
+    def __init__(self, bot: Kiyomi, setting_service: SettingService, settings_autocomplete_service: SettingAutocompleteService):
+        super().__init__(bot, setting_service, settings_autocomplete_service)
 
         # Register events
         self.events()
@@ -29,12 +31,11 @@ class Settings(SettingsCog):
 
     # Workaround
     async def get_settings(self, ctx: discord.AutocompleteContext) -> List[OptionChoice]:
-        return self.setting_service.get_settings()
+        return self.settings_autocomplete_service.get_settings(ctx)
 
     async def get_setting_values(self, ctx: discord.AutocompleteContext) -> List[OptionChoice]:
-        return await self.setting_service.get_setting_values(ctx)
+        return await self.settings_autocomplete_service.get_setting_values(ctx)
 
-    # TODO: Fix auto complete support for partially typed setting names
     @settings.command(name="set")
     async def settings_set(
         self,
@@ -51,13 +52,15 @@ class Settings(SettingsCog):
         )
     ):
         """Set setting value"""
-        registered_settings = [choice.value for choice in self.setting_service.get_settings()]
 
-        if setting not in registered_settings:
-            await ctx.respond(f"\"{setting}\" is not a valid setting name")
-
-        self.setting_service.set(ctx.interaction.guild.id, setting, value)
+        abstract_setting = self.setting_service.set(ctx.interaction.guild.id, setting, value)
         setting_value = self.setting_service.get_value(ctx.interaction.guild.id, setting)
 
-        await ctx.respond(f"{setting} is now set to: {setting_value}")
+        await ctx.respond(f"{abstract_setting.name_human} is now set to: {setting_value}")
 
+    @settings_set.error
+    async def settings_set_error(self, ctx: discord.ApplicationContext, error: Exception):
+        if isinstance(error, ApplicationCommandInvokeError):
+            if isinstance(error.original, SettingsCogException):
+                await ctx.respond(str(error.original))
+                return
