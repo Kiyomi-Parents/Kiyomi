@@ -4,7 +4,12 @@ from discord import ApplicationContext, AutocompleteContext
 
 
 class KiyomiException(Exception):
-    pass
+    is_handled: bool = False
+
+    async def handle(self, ctx: ApplicationContext, message: str):
+        await ctx.respond(message)
+
+        self.is_handled = True
 
 
 class CogException(KiyomiException):

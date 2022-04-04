@@ -24,3 +24,9 @@ class EmojiRepository(BaseRepository[Emoji]):
         return self.session.query(Emoji) \
             .filter(Emoji.guild_id == guild_id) \
             .all()
+
+    def get_by_guild_id_and_id(self, guild_id: int, emoji_id: int):
+        return self.session.query(Emoji) \
+            .filter(Emoji.guild_id == guild_id) \
+            .filter(Emoji.id == emoji_id) \
+            .first()

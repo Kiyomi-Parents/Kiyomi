@@ -69,6 +69,12 @@ class GeneralAPI(GeneralCog):
     async def get_channel_messages(self, channel_id: int) -> List[Message]:
         return await self.message_service.get_messages_in_channel(channel_id)
 
+    async def register_emoji(self, guild_id: int, emoji_id: int, emoji_name: str) -> Emoji:
+        return await self.emoji_service.register_emoji(guild_id, emoji_id, emoji_name)
+
+    async def unregister_emoji(self, guild_id: int, emoji_id: int) -> Emoji:
+        return await self.emoji_service.unregister_emoji(guild_id, emoji_id)
+
     def get_emoji(self, emoji_name: str) -> Optional[Emoji]:
         emoji_name = emoji_name.replace(":", "")
         emoji = self.bot.get_emoji(self.uow.emojis.get_by_name(emoji_name).id)

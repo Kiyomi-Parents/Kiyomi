@@ -1,7 +1,8 @@
-from discord import ApplicationContext
+from discord import ApplicationContext, ApplicationCommandInvokeError
 from discord.ext import commands
 from termcolor import colored
 
+from .errors import KiyomiException
 from .kiyomi import Kiyomi
 from src.log import Logger
 
@@ -18,3 +19,9 @@ class BaseCog(commands.Cog):
                    f"{colored(ctx.interaction.guild.name, 'blue')}")
 
         await ctx.trigger_typing()
+
+    async def cog_command_error(self, ctx: ApplicationContext, error: Exception):
+        if isinstance(error, ApplicationCommandInvokeError):
+            if isinstance(error.original, KiyomiException):
+                if error.original.is_handled:
+                    return
