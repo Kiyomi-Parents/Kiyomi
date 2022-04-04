@@ -38,6 +38,8 @@ class ScoreNotificationView(PersistentView):
         if self.score.beatmap is not None:
             self.add_item(BeatSaverButton(self.bot, self, self.score.beatmap.id))
 
+        # TODO: Add beatmap preview button
+
     async def serialize_persistence(self) -> Persistence:
         if self.previous_score is not None:
             return Persistence(self.guild.id, self.message.channel.id, self.message.id, ScoreNotificationView.__name__, str(self.score.id), str(self.previous_score.id))

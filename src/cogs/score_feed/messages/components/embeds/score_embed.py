@@ -51,10 +51,6 @@ class ScoreEmbed(ScoreFeedEmbed):
 
         self.add_field(name="Max Combo", value=self.get_max_combo)
 
-        # TODO: Make buttons
-        # self.add_field(name="\u200b", value=f"[Beat Saver]({score.beatmap_version.beatmap.beatsaver_url})")
-        # self.add_field(name="\u200b", value=f"[Preview Map]({score.beatmap_version.beatmap.preview_url})")
-
     @property
     def get_max_combo(self) -> str:
         output = f"{self.score.max_combo}"
