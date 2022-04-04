@@ -26,6 +26,7 @@ Discord bot that has various functionality related to Beat Saber 💜</br>
     export DATABASE_PW=<Database password>
     export DATABASE_NAME=<Database name>
     export DEBUG_GUILDS=<Comma seperated list of guild ids. This is for development only. Leave empty on production>
+    export ADMIN_GUILDS=<Comma seperated list of guild ids. This is for bot owner commands.>
 
     # Run database migrations
     alembic upgrade head

@@ -7,6 +7,7 @@ from src.kiyomi import Kiyomi
 from src.kiyomi.base_view import BaseView
 
 
+# TODO: Fix leaderboard not updating after a player has been added to a guild
 class GuildLeaderboardButton(LeaderboardComponent, discord.ui.Button):
     def __init__(self, bot: Kiyomi, parent: BaseView, song_hash: str):
 

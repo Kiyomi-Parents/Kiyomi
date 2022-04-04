@@ -1,4 +1,3 @@
-import re
 from typing import Optional, List
 
 import pyscoresaber
@@ -19,16 +18,6 @@ class PlayerService(ScoreSaberService):
         super().__init__(bot, uow, scoresaber)
 
         self.score_service = score_service
-
-    @staticmethod
-    def scoresaber_id_from_url(url: str) -> Optional[str]:
-        pattern = re.compile(r"(https?://scoresaber\.com/u/)?(\d{16,17})")
-        match = re.match(pattern, url)
-
-        if match:
-            return match.group(2)
-
-        return None
 
     async def check_member_player_parity(self, member_id: int, player_id: str):
         """Check if member has another player_id attached to them (Can't register as a different user)"""

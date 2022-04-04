@@ -3,17 +3,17 @@ from discord import SlashCommandGroup, Option
 from discord.ext import commands
 from discord.ext.commands import EmojiNotFound
 
-from src.cogs.security import Security
 from src.cogs.settings.storage.model.toggle_setting import ToggleSetting
 from .errors import EmojiAlreadyExistsException, EmojiNotFoundException
 from .general_cog import GeneralCog
 from .services import EmojiService, GuildService, MemberService, RoleService, ChannelService, MessageService
-from src.kiyomi import Kiyomi, Utils
+from src.kiyomi import Kiyomi, Utils, permissions
 from src.cogs.settings import SettingsAPI
 
 
 class General(GeneralCog):
-    def __init__(self,
+    def __init__(
+        self,
         bot: Kiyomi,
         emoji_service: EmojiService,
         guild_service: GuildService,
@@ -60,15 +60,15 @@ class General(GeneralCog):
 
     @commands.Cog.listener()
     async def on_guild_join(self, guild: discord.Guild):
-        self.guild_service.register_guild(guild)
+        await self.guild_service.register_guild(guild.id)
 
     @commands.slash_command()
     async def hello(self, ctx):
         """Greet the bot"""
         await ctx.respond("Hello there!")
 
-    @commands.slash_command()
-    @Security.is_owner()
+    @commands.slash_command(default_permission=False)
+    @permissions.is_bot_owner()
     async def say(self, ctx, text: str):
         """I repeat what you say"""
         await ctx.respond(text)
@@ -77,13 +77,14 @@ class General(GeneralCog):
         "status", "Commands related to Kiyomi's status"
     )
 
-    @status.command(name="update")
-    @Security.is_owner()
+    @status.command(name="update", default_permission=False)
+    @permissions.is_bot_owner()
     @Utils.update_tasks_list
     async def status_update(self, ctx):
         """owo"""
         await ctx.respond("status should've updated")
 
+    # TODO: Fetches emojies from all guilds????
     emoji = SlashCommandGroup(
         "emoji",
         "Emojis that Kiyomi is allowed to play with"
@@ -96,8 +97,9 @@ class General(GeneralCog):
 
         await ctx.respond(str(emoji))
 
-    @emoji.command(name="all")
-    @Security.is_owner()
+    @emoji.command(name="all", default_permission=False)
+    @permissions.is_bot_owner()
+    @permissions.is_guild_only()
     async def emoji_all(self, ctx):
         """Posts all the emojis, not a good idea to use :)"""
         emoji_list = []
@@ -115,8 +117,9 @@ class General(GeneralCog):
     async def get_available_emojis(self, ctx: discord.AutocompleteContext):
         return await self.emoji_service.get_available_emojis(ctx)
 
-    @emoji.command(name="enable")
-    @Security.is_owner()
+    @emoji.command(name="enable", default_permission=False)
+    @permissions.is_bot_owner()
+    @permissions.is_guild_only()
     async def emoji_enable(
         self,
         ctx: discord.ApplicationContext,
@@ -139,8 +142,9 @@ class General(GeneralCog):
     async def get_enabled_emojis(self, ctx: discord.AutocompleteContext):
         return await self.emoji_service.get_enabled_emojis(ctx)
 
-    @emoji.command(name="disable")
-    @Security.is_owner()
+    @emoji.command(name="disable", default_permission=False)
+    @permissions.is_bot_owner()
+    @permissions.is_guild_only()
     async def emoji_disable(self,
         ctx: discord.ApplicationContext,
         emoji: Option(
