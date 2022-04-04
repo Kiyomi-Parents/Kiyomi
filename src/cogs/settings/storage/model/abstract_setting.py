@@ -37,6 +37,10 @@ class AbstractSetting(ABC, Generic[T]):
     def type(self) -> SettingType:
         return self.setting.setting_type
 
+    @property
+    def guild_id(self) -> int:
+        return self.setting.guild_id
+
     async def get_autocomplete(self, ctx: discord.AutocompleteContext):
         if self.setting.value is None:
             return []

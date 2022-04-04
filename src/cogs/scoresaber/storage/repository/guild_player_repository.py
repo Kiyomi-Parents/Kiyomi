@@ -1,6 +1,6 @@
 from typing import Optional, List
 
-from sqlalchemy.orm import Query
+from sqlalchemy.orm import Query, joinedload
 
 from src.kiyomi.database import BaseRepository
 from ..model.guild_player import GuildPlayer
@@ -43,4 +43,9 @@ class GuildPlayerRepository(BaseRepository[GuildPlayer]):
             .filter(GuildPlayer.guild_id == guild_id) \
             .filter(GuildPlayer.member_id == member_id) \
             .filter(GuildPlayer.player_id == player_id) \
+            .options(
+                joinedload(GuildPlayer.guild),
+                joinedload(GuildPlayer.member),
+                joinedload(GuildPlayer.player)
+            ) \
             .first()

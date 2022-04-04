@@ -76,6 +76,8 @@ class SettingService(SettingsService):
         else:
             self.uow.settings_repo.set(setting.setting, value)
 
+        self.bot.events.emit("on_setting_change", setting)
+
         return setting
 
     def get_value(self, guild_id: int, name: str) -> Optional[any]:

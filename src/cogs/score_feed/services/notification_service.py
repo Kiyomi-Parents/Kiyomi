@@ -44,12 +44,3 @@ class NotificationService(ScoreFeedService):
             await song_view.send(target=channel)
 
             self.uow.sent_score_repo.add(SentScore(score.id, guild.id))
-
-            # TODO: FIX LATER
-            # Guild snipes leaderboard
-            # if db_guild.guild_snipes:
-            #     leaderboard = GuildLeaderboard(self.uow, db_guild, db_score.leaderboard_id)
-            #
-            #     if len(leaderboard.leaderboard_scores) > 0:
-            #         guild_leaderboard_embed = Message.get_leaderboard_embed(leaderboard.get_top_scores(3))
-            #         await channel.send(embed=guild_leaderboard_embed)

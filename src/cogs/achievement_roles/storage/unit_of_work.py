@@ -10,5 +10,5 @@ class UnitOfWork(BaseUnitOfWork):
     def __init__(self, session: Session):
         super().__init__(session)
 
-        self.achievement_role_repo = AchievementRoleRepository(session)
-        self.achievement_role_member_repo = AchievementRoleMemberRepository(session)
+        self.achievement_roles = AchievementRoleRepository(session)
+        self.achievement_role_members = AchievementRoleMemberRepository(session)
