@@ -6,7 +6,7 @@ from src.kiyomi import Kiyomi
 from src.log import Logger
 from .services import BeatmapAutocompleteService
 from .beatsaver_cog import BeatSaverCog
-from .errors import SongNotFound
+from .errors import BeatmapNotFound
 from .services import BeatmapService
 from .storage import UnitOfWork
 from .storage.model.beatmap import Beatmap
@@ -22,7 +22,7 @@ class BeatSaverAPI(BeatSaverCog):
     async def get_beatmap_by_key(self, key: str) -> Optional[Beatmap]:
         try:
             return await self.beatmap_service.get_beatmap_by_key(key)
-        except SongNotFound as error:
+        except BeatmapNotFound as error:
             Logger.log(self.__class__.__name__, error)
             return None
 

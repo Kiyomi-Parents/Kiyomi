@@ -3,7 +3,7 @@ from typing import List
 import pybeatsaver
 
 from .beatsaver_service import BeatSaverService
-from ..errors import SongNotFound
+from ..errors import BeatmapHashNotFound, BeatmapKeyNotFound
 from ..storage.model.beatmap import Beatmap
 
 
@@ -16,7 +16,7 @@ class BeatmapService(BeatSaverService):
             async for map_detail in self.beatsaver.beatmaps_by_keys(beatmap_keys):
                 beatmaps.append(Beatmap(map_detail))
         except pybeatsaver.NotFoundException as error:
-            raise SongNotFound(f"Could not find song at {error.url}") from error
+            raise BeatmapKeyNotFound(error.url.split("/")[-1]) from error
 
         self.uow.beatmap_repo.add_all(beatmaps)
         self.uow.save_changes()
@@ -53,7 +53,7 @@ class BeatmapService(BeatSaverService):
                 self.uow.beatmap_repo.add_all(new_beatmaps)
                 beatmaps += new_beatmaps
         except pybeatsaver.NotFoundException as error:
-            raise SongNotFound(f"Could not find song with hash {beatmap_hashes}") from error
+            raise BeatmapHashNotFound(error.url.split("/")[-1]) from error
 
         self.uow.save_changes()
 

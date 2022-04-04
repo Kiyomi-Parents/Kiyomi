@@ -1,14 +1,15 @@
 from typing import List
 
 import discord
-from discord import slash_command
+from discord import slash_command, Option, ApplicationCommandInvokeError
 from discord.ext import commands
 
 from src.kiyomi import Kiyomi
 from src.log import Logger
+from .converters.beatmap_converter import BeatmapConverter
 from .services import BeatmapAutocompleteService
 from .beatsaver_cog import BeatSaverCog
-from .errors import SongNotFound
+from .errors import BeatmapNotFound, BeatSaverCogException
 from .messages.views.song_view import SongView
 from .services import BeatmapService
 from src.cogs.settings.storage.model.emoji_setting import EmojiSetting
@@ -30,7 +31,7 @@ class BeatSaver(BeatSaverCog, name="Beat Saver"):
 
             try:
                 await self.beatmap_service.get_beatmaps_by_hashes(list(set(song_hashes)))
-            except SongNotFound as error:
+            except BeatmapNotFound as error:
                 Logger.log("on_new_leaderboards", error)
 
     @commands.Cog.listener()
@@ -54,13 +55,25 @@ class BeatSaver(BeatSaverCog, name="Beat Saver"):
 
         self.bot.events.emit("setting_register", settings)
 
-    @slash_command(aliases=["bsr", "song"])
-    async def map(self, ctx: discord.ApplicationContext, key: str):
+    @slash_command()
+    async def map(
+        self,
+        ctx: discord.ApplicationContext,
+        key: Option(
+                BeatmapConverter,
+                "Beatmap key (25f)"
+        )
+    ):
         """Displays song info."""
-        try:
-            db_beatmap = await self.beatmap_service.get_beatmap_by_key(key)
-            song_view = SongView(self.bot, ctx.interaction.guild, db_beatmap)
 
-            await song_view.respond(ctx.interaction)
-        except SongNotFound as error:
-            await ctx.respond(error)
+        song_view = SongView(self.bot, ctx.interaction.guild, key)
+
+        await song_view.respond(ctx.interaction)
+
+    @map.error
+    async def map_error(self, ctx: discord.ApplicationContext, error: Exception):
+        if isinstance(error, ApplicationCommandInvokeError):
+            if isinstance(error.original, BeatSaverCogException):
+                await ctx.respond(str(error.original))
+                return
+

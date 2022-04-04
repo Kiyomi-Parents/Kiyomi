@@ -51,7 +51,7 @@ class Leaderboard(LeaderboardCog):
         ctx: discord.ApplicationContext,
         key: Option(
                 BeatmapConverter,
-                "Beatmap key (!bsr 25f)"
+                "Beatmap key (25f)"
         ),
         game_mode: Option(
                 BeatmapCharacteristicConverter,
