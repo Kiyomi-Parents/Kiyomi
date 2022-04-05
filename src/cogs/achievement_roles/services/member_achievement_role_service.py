@@ -114,16 +114,16 @@ class MemberAchievementRoleService(AchievementRolesService):
             achievement.identifier
         )
 
+        if achievement_role is None:
+            return await self.create_achievement_role(guild_id, group, achievement)
+
         general = self.bot.get_cog_api(GeneralAPI)
 
         role = await general.get_role(guild_id, achievement_role.role_id)
 
         if role is None:
             self.uow.achievement_roles.remove(achievement_role)
-            achievement_role = await self.create_achievement_role(guild_id, group, achievement)
-
-        if achievement_role is None:
-            achievement_role = await self.create_achievement_role(guild_id, group, achievement)
+            return await self.create_achievement_role(guild_id, group, achievement)
 
         return achievement_role
 
