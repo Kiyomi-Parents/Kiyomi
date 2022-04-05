@@ -16,7 +16,6 @@ class Score(Base):
     __tablename__ = "score"
 
     id = Column(Integer, primary_key=True)
-    player_id = Column(String(128), ForeignKey("player.id", ondelete="CASCADE"))
 
     # ScoreSaber info
     score_id = Column(Integer)
@@ -35,16 +34,17 @@ class Score(Base):
     has_replay = Column(Boolean)
     time_set = Column(DateTime)
 
-    leaderboard_id = Column(Integer, ForeignKey("leaderboard.id"))
+    leaderboard_id = Column(Integer, ForeignKey("leaderboard.id", ondelete="CASCADE"))
     leaderboard = relationship(
-        "Leaderboard",
-        uselist=False
+            "Leaderboard",
+            uselist=False
     )
 
+    player_id = Column(String(128), ForeignKey("player.id", ondelete="CASCADE"))
     player = relationship(
-        "Player",
-        uselist=False,
-        back_populates="scores"
+            "Player",
+            uselist=False,
+            back_populates="scores"
     )
 
     def __init__(self, player_score: pyscoresaber.PlayerScore):

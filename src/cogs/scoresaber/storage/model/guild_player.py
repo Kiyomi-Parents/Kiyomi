@@ -11,11 +11,14 @@ class GuildPlayer(Base):
 
     guild_id = Column(BigInteger, ForeignKey("guild.id"))
     member_id = Column(BigInteger, ForeignKey("member.id"))
-    player_id = Column(String(128), ForeignKey("player.id"))
+    player_id = Column(String(128), ForeignKey("player.id", ondelete="CASCADE"))
 
     guild = relationship("Guild")
     member = relationship("Member")
-    player = relationship("Player", backref=backref("guild_player"))
+    player = relationship(
+            "Player",
+            backref=backref("guild_player")
+    )
 
     def __init__(self, guild_id: int, member_id: int, player_id: str):
         self.guild_id = guild_id

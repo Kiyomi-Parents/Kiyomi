@@ -82,9 +82,6 @@ class PlayerService(ScoreSaberService):
 
         self.bot.events.emit("on_new_player", guild_player)
 
-        # Add role to player
-        # await self.update_player_roles(db_community, player) # TODO: Add to event bus
-
         return guild_player
 
     async def remove_player(self, guild_id: int, member_id: int, player_id: str) -> GuildPlayer:
@@ -97,9 +94,6 @@ class PlayerService(ScoreSaberService):
         self.uow.save_changes()
 
         self.bot.events.emit("on_remove_player", guild_player)
-
-        # Remove player roles
-        # await self.remove_player_roles(db_community, db_player) # TODO: Add to event bus
 
         return guild_player
 

@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List
 
 import pyscoresaber
 
@@ -14,7 +14,6 @@ class ScoreService(ScoreSaberService):
     def get_recent_scores(self, player_id: str, limit: int) -> List[Score]:
         return self.uow.scores.get_player_recent_scores(player_id, limit)
 
-    # TODO: This can be optimized further, needs bulk leaderboard and score db inserting
     async def update_player_scores(self, player: Player):
         new_player_scores = await self.get_missing_recent_scores(player)
         Logger.log(player, f"Got {len(new_player_scores)} new recent scores from Score Saber")
@@ -22,21 +21,13 @@ class ScoreService(ScoreSaberService):
         if len(new_player_scores) == 0:
             return
 
-        new_leaderboards = []
-        for new_player_score in new_player_scores:
-            new_leaderboard = await self.add_new_leaderboard(new_player_score.leaderboard)
+        new_leaderboards = await self.get_new_leaderboards([new_player_score.leaderboard for new_player_score in new_player_scores])
+        self.uow.leaderboards.add_all(new_leaderboards)
 
-            if new_leaderboard is not None:
-                new_leaderboards.append(new_leaderboard)
-
-        new_scores = []
-        for new_player_score in new_player_scores:
-            new_scores.append(await self.add_new_score(player, new_player_score))
+        new_scores = await self.get_new_scores(player, new_player_scores)
+        self.uow.scores.add_all(new_scores)
 
         self.uow.save_changes()
-
-        for new_score in new_scores:
-            self.uow.session.refresh(new_score)
 
         # Emit event for new leaderboards
         self.bot.events.emit("on_new_leaderboards", new_leaderboards)
@@ -44,18 +35,25 @@ class ScoreService(ScoreSaberService):
         # Emit event for new scores
         self.bot.events.emit("on_new_scores", new_scores)
 
-    async def add_new_leaderboard(self, leaderboard: pyscoresaber.LeaderboardInfo) -> Optional[Leaderboard]:
-        if not self.uow.leaderboards.exists(leaderboard.id):
-            return self.uow.leaderboards.add(Leaderboard(leaderboard))
+    async def get_new_leaderboards(self, leaderboards: List[pyscoresaber.LeaderboardInfo]) -> List[Leaderboard]:
+        new_leaderboards = []
 
-        return None
+        for leaderboard in leaderboards:
+            if not self.uow.leaderboards.exists(leaderboard.id):
+                new_leaderboards.append(Leaderboard(leaderboard))
 
-    async def add_new_score(self, player: Player, player_score: pyscoresaber.PlayerScore) -> Score:
-        new_score = Score(player_score)
+        return new_leaderboards
 
-        self.uow.players.add_score(player, new_score)
+    async def get_new_scores(self, player: Player, player_scores: List[pyscoresaber.PlayerScore]) -> List[Score]:
+        new_scores = []
 
-        return new_score
+        for player_score in player_scores:
+            new_score = Score(player_score)
+            new_score.player_id = player.id
+
+            new_scores.append(new_score)
+
+        return new_scores
 
     async def get_missing_recent_scores(self, player: Player) -> List[pyscoresaber.PlayerScore]:
         new_player_scores = []

@@ -35,7 +35,7 @@ class ScoreSaber(ScoreSaberCog, name="Score Saber"):
         """Link yourself to your ScoreSaber profile."""
         self.bot.events.emit("register_member", ctx.author)
 
-        message = await ctx.respond(f"Getting scores.... This may take a bit")
+        await ctx.defer()
 
         guild_player = await self.player_service.add_player_with_checks(
                 ctx.interaction.guild_id,
@@ -43,14 +43,14 @@ class ScoreSaber(ScoreSaberCog, name="Score Saber"):
                 profile
         )
 
-        await message.edit_original_message(content=f"Successfully linked **{guild_player.player.name}** ScoreSaber profile!")
+        await ctx.respond(content=f"Successfully linked **{guild_player.player.name}** ScoreSaber profile!")
 
     @player.command(name="remove")
     @permissions.is_guild_only()
     async def player_remove(self, ctx: discord.ApplicationContext):
         """Remove the currently linked ScoreSaber profile from yourself."""
 
-        await self.actions.remove_player_with_checks(ctx.guild.id, ctx.author.id)
+        await self.player_service.remove_player_with_checks(ctx.guild.id, ctx.author.id)
         await ctx.respond("Successfully unlinked your ScoreSaber account!")
 
     @slash_command(name="showpp")
