@@ -1,9 +1,16 @@
-from sqlalchemy.orm import Session
+from typing import Callable
+
+from sqlalchemy.ext.asyncio import AsyncSession
 
 
 class BaseUnitOfWork:
-    def __init__(self, session: Session):
-        self.session = session
+    _session: AsyncSession
 
-    def save_changes(self):
-        self.session.commit()
+    def __init__(self, session_maker: Callable[[], AsyncSession]):
+        self._session_maker = session_maker
+
+    async def start(self):
+        self._session = self._session_maker()
+
+    async def save_changes(self):
+        await self._session.commit()

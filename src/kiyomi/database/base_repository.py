@@ -1,7 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import TypeVar, Generic, Optional, List
 
-from sqlalchemy.orm import Session, Query
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import Query
 
 from src.log import Logger
 from .database import Base
@@ -11,7 +12,7 @@ T = TypeVar('T', bound=Base)
 
 
 class BaseRepository(ABC, Generic[T]):
-    def __init__(self, session: Session):
+    def __init__(self, session: AsyncSession):
         self.session = session
 
     @abstractmethod

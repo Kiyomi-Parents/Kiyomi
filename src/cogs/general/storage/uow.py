@@ -1,4 +1,6 @@
-from sqlalchemy.orm import Session
+from typing import Callable
+
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from .repository.channel_repository import ChannelRepository
 from .repository.emoji_repository import EmojiRepository
@@ -13,8 +15,8 @@ from src.kiyomi.database import BaseUnitOfWork
 
 class UnitOfWork(BaseUnitOfWork):
 
-    def __init__(self, session: Session):
-        super().__init__(session)
+    def __init__(self, session_maker: Callable[[], AsyncSession]):
+        super().__init__(session_maker)
 
         self.guilds = GuildRepository(session)
         self.channels = ChannelRepository(session)

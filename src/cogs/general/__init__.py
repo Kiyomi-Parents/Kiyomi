@@ -6,7 +6,7 @@ from ...kiyomi import Kiyomi
 
 
 def setup(bot: Kiyomi):
-    uow = UnitOfWork(bot.database.session)
+    uow = UnitOfWork(bot.database.get_session())
 
     emoji_service = EmojiService(bot, uow)
     guild_service = GuildService(bot, uow)

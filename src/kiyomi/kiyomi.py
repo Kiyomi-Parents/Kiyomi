@@ -1,6 +1,5 @@
 import traceback
-import typing
-from typing import TypeVar
+from typing import TypeVar, Type, cast
 
 from discord import ApplicationContext, DiscordException, ApplicationCommandInvokeError, Bot
 from pyee import AsyncIOEventEmitter
@@ -25,6 +24,10 @@ class Kiyomi(Bot):
 
         self.add_check(self.global_block_dms)
         self.database = db
+
+    async def start(self, token: str, *, reconnect: bool = True) -> None:
+        await super(Kiyomi, self).start(token, reconnect=reconnect)
+        await self.database.init()
 
     async def on_ready(self):
         Logger.log(self.user.name, "Connected to Discord!")
@@ -79,10 +82,10 @@ class Kiyomi(Bot):
             else:
                 await owner.send(text)
 
-    def get_cog_api(self, cog_type: typing.Type[TCog]) -> TCog:
+    def get_cog_api(self, cog_type: Type[TCog]) -> TCog:
         cog = self.get_cog(cog_type.__name__)
 
         if not isinstance(cog, cog_type):
             raise TypeError(f"Expected cog type {cog_type.__name__}, but got {type(cog)}")
 
-        return typing.cast(TCog, cog)
+        return cast(TCog, cog)
