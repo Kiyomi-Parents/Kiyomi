@@ -1,13 +1,13 @@
 import discord
 from discord import SlashCommandGroup, slash_command, ApplicationCommandInvokeError, Option, ApplicationContext, \
     user_command
+from discord.commands import permissions
 from discord.ext import commands
 
 from src.cogs.general import GeneralAPI
 from .converters.score_saber_player_id_converter import ScoreSaberPlayerIdConverter
 from .errors import MemberPlayerNotFoundInGuildException, ScoreSaberCogException
 from .scoresaber_cog import ScoreSaberCog
-from ...kiyomi import permissions
 
 
 class ScoreSaber(ScoreSaberCog, name="Score Saber"):
@@ -23,7 +23,6 @@ class ScoreSaber(ScoreSaberCog, name="Score Saber"):
 
     # TODO: Fix command concurrency. We should probably somehow do the import later?
     @player.command(name="add")
-    @permissions.is_guild_only()
     async def player_add(
         self,
         ctx: discord.ApplicationContext,
@@ -46,7 +45,6 @@ class ScoreSaber(ScoreSaberCog, name="Score Saber"):
         await ctx.respond(content=f"Successfully linked **{guild_player.player.name}** ScoreSaber profile!")
 
     @player.command(name="remove")
-    @permissions.is_guild_only()
     async def player_remove(self, ctx: discord.ApplicationContext):
         """Remove the currently linked ScoreSaber profile from yourself."""
 
@@ -54,7 +52,6 @@ class ScoreSaber(ScoreSaberCog, name="Score Saber"):
         await ctx.respond("Successfully unlinked your ScoreSaber account!")
 
     @slash_command(name="showpp")
-    @permissions.is_guild_only()
     async def show_pp(self, ctx: discord.ApplicationContext):
         """Gives bot permission to check the persons PP."""
         guild_player = await self.player_service.get_player_by_guild_id_and_guild_id(ctx.guild.id, ctx.author.id)
@@ -100,7 +97,7 @@ class ScoreSaber(ScoreSaberCog, name="Score Saber"):
     #         await ctx.respond("Song argument too large")
 
     @player.command(name="manual-add", default_permission=False)
-    @permissions.is_bot_owner()
+    @permissions.is_owner()
     async def manual_add_player(
         self,
         ctx: discord.ApplicationContext,
@@ -138,7 +135,7 @@ class ScoreSaber(ScoreSaberCog, name="Score Saber"):
         )
 
     @player.command(name="manual-remove", default_permission=False)
-    @permissions.is_bot_owner()
+    @permissions.is_owner()
     async def manual_remove_player(
         self,
         ctx: discord.ApplicationContext,

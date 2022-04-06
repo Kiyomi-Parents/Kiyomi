@@ -3,7 +3,7 @@ from typing import List
 import discord
 from discord import slash_command, Option, OptionChoice
 
-from src.kiyomi import Kiyomi, permissions
+from src.kiyomi import Kiyomi
 from .leaderboard_cog import LeaderboardCog
 from .messages.components.embeds.guild_leaderboard_embed import GuildLeaderboardEmbed
 from .services import PlayerLeaderboardService, ScoreLeaderboardService
@@ -46,7 +46,6 @@ class Leaderboard(LeaderboardCog):
         return await beatsaver.beatmap_autocomplete_service.get_beatmap_characteristics_by_key(beatmap)
 
     @slash_command()
-    @permissions.is_guild_only()
     async def leaderboard(
         self,
         ctx: discord.ApplicationContext,

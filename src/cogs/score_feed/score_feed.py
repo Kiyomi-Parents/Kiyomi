@@ -1,10 +1,11 @@
 from discord import slash_command
+from discord.commands import permissions
 from discord.ext import commands
 
 from src.cogs.scoresaber import ScoreSaberAPI
 from src.cogs.scoresaber.storage.model.guild_player import GuildPlayer
 from src.cogs.settings.storage.model.channel_setting import ChannelSetting
-from src.kiyomi import Kiyomi, permissions
+from src.kiyomi import Kiyomi
 from .score_feed_cog import ScoreFeedCog
 from .services import SentScoreService, NotificationService
 
@@ -31,8 +32,7 @@ class ScoreFeed(ScoreFeedCog, name="Score Feed"):
         self.bot.events.emit("setting_register", settings)
 
     @slash_command(default_permission=False)
-    @permissions.is_bot_owner()
-    @permissions.is_guild_only()
+    @permissions.is_owner()
     async def send_notifications(self, ctx):
         """Send recent score notifications."""
         await self.notification_service.send_notifications(ctx.guild.id)
@@ -40,8 +40,7 @@ class ScoreFeed(ScoreFeedCog, name="Score Feed"):
         await ctx.respond("Doing the thing...")
 
     @slash_command(default_permission=False)
-    @permissions.is_bot_owner()
-    @permissions.is_guild_only()
+    @permissions.is_owner()
     async def mark_sent(self, ctx, player_id: str = None):
         """Mark all scores send for player."""
         scoresaber = self.bot.get_cog_api(ScoreSaberAPI)

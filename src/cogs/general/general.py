@@ -1,10 +1,11 @@
 import discord.member
 from discord import SlashCommandGroup
+from discord.commands import permissions
 from discord.ext import commands
 
 from .general_cog import GeneralCog
 from .services import EmojiService, GuildService, MemberService, RoleService, ChannelService, MessageService
-from src.kiyomi import Kiyomi, Utils, permissions
+from src.kiyomi import Kiyomi, Utils
 
 
 class General(GeneralCog):
@@ -44,7 +45,7 @@ class General(GeneralCog):
         await ctx.respond("Hello there!")
 
     @commands.slash_command(default_permission=False)
-    @permissions.is_bot_owner()
+    @permissions.is_owner()
     async def say(self, ctx, text: str):
         """I repeat what you say"""
         await ctx.respond(text)
@@ -54,7 +55,7 @@ class General(GeneralCog):
     )
 
     @status.command(name="update", default_permission=False)
-    @permissions.is_bot_owner()
+    @permissions.is_owner()
     @Utils.update_tasks_list
     async def status_update(self, ctx):
         """owo"""

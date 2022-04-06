@@ -26,6 +26,7 @@ class BeatSaverUtils:
 
         return math.floor(max_score)
 
+    # TODO: Make smuggle sticks guild default for emojis
     @staticmethod
     async def difficulty_to_emoji(bot: Kiyomi, guild: Optional[Guild], difficulty: pybeatsaver.EDifficulty) -> Optional[Emoji]:
         if guild is None:

@@ -2,8 +2,9 @@ from typing import List
 
 import discord
 from discord import SlashCommandGroup, Option, OptionChoice, ApplicationCommandInvokeError
+from discord.commands import permissions
 
-from src.kiyomi import Kiyomi, permissions
+from src.kiyomi import Kiyomi
 from .errors import SettingsCogException
 from .services import SettingService
 from .services.settings_autocomplete_service import SettingAutocompleteService
@@ -37,8 +38,7 @@ class Settings(SettingsCog):
         return await self.settings_autocomplete_service.get_setting_values(ctx)
 
     @settings.command(name="set", default_permission=False)
-    @permissions.is_bot_owner()
-    @permissions.is_guild_only()
+    @permissions.is_owner()
     async def settings_set(
         self,
         ctx: discord.ApplicationContext,

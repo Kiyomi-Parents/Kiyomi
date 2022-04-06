@@ -4,7 +4,7 @@ import discord
 from discord import slash_command, Option, ApplicationCommandInvokeError
 from discord.ext import commands
 
-from src.kiyomi import Kiyomi, permissions
+from src.kiyomi import Kiyomi
 from src.log import Logger
 from .converters.beatmap_converter import BeatmapConverter
 from .services import BeatmapAutocompleteService
@@ -56,7 +56,6 @@ class BeatSaver(BeatSaverCog, name="Beat Saver"):
         self.bot.events.emit("setting_register", settings)
 
     @slash_command()
-    @permissions.is_guild_only()
     async def map(
         self,
         ctx: discord.ApplicationContext,
