@@ -15,7 +15,7 @@ class Tasks(BaseTasks):
 
         self.notification_service = notification_service
 
-    @tasks.loop(minutes=2)
+    @tasks.loop(minutes=1)
     @Utils.time_task
     @Utils.discord_ready
     @FancyPresenceAPI.presence_task
