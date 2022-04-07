@@ -27,7 +27,7 @@ class Tasks(BaseTasks):
         for player in players:
             await self.player_service.update_player(player)
 
-    @tasks.loop(minutes=1)
+    @tasks.loop(minutes=3)
     @Utils.time_task
     @Utils.discord_ready
     @FancyPresenceAPI.presence_task
