@@ -54,7 +54,7 @@ class MapDetailsEmbed(BeatSaverEmbed):
         difficulty_texts = []
 
         for difficulty in self.beatmap.difficulties:
-            emoji = BeatSaverUtils.difficulty_to_emoji(self.bot, self.guild, difficulty.difficulty)
+            emoji = BeatSaverUtils.difficulty_to_emoji(self.bot, self.guild.id, difficulty.difficulty)
 
             if emoji is None:
                 difficulty_texts.append(difficulty.difficulty_text)

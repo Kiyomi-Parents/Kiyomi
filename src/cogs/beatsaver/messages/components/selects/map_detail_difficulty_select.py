@@ -48,7 +48,7 @@ class MapDetailDifficultySelect(BeatSaverComponent, discord.ui.Select):
         options = []
 
         for beatmap_difficulty in self.get_beatmap_difficulties():
-            difficulty_emoji = await BeatSaverUtils.difficulty_to_emoji(self.bot, self.parent.guild, beatmap_difficulty.difficulty)
+            difficulty_emoji = await BeatSaverUtils.difficulty_to_emoji(self.bot, self.parent.guild.id, beatmap_difficulty.difficulty)
 
             options.append(discord.SelectOption(
                 label=f"{beatmap_difficulty.difficulty_text}",
