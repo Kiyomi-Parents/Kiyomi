@@ -1,10 +1,10 @@
 import discord
 from discord import NotFound
-from discord.ext.commands import MemberNotFound
 
 from src.kiyomi import Kiyomi
 from .general_service import GeneralService
 from .guild_service import GuildService
+from ..errors import MemberNotFoundException
 from ..storage import UnitOfWork
 from ..storage.model.guild_member import GuildMember
 from ..storage.model.member import Member
@@ -24,10 +24,10 @@ class MemberService(GeneralService):
             try:
                 discord_member = await discord_guild.fetch_member(member_id)
             except NotFound:
-                raise MemberNotFound(f"Could not find member with id {member_id} in guild {discord_guild.name}")
+                raise MemberNotFoundException(f"Could not find member with id {member_id} in guild {discord_guild.name}")
 
         if discord_member is None:
-            raise MemberNotFound(f"Could not find member with id {member_id} in guild {discord_guild.name}")
+            raise MemberNotFoundException(f"Could not find member with id {member_id} in guild {discord_guild.name}")
 
         return discord_member
 

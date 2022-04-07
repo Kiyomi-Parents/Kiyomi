@@ -1,22 +1,29 @@
-class GuildNotFoundException(Exception):
+from src.kiyomi.errors import CogException
+
+
+class GeneralCogException(CogException):
     pass
 
 
-class ChannelNotFoundException(Exception):
+class GuildNotFoundException(GeneralCogException):
     pass
 
 
-class MemberNotFoundException(Exception):
+class ChannelNotFoundException(GeneralCogException):
     pass
 
 
-class RoleNotFoundException(Exception):
+class MemberNotFoundException(GeneralCogException):
     pass
 
 
-class EmojiAlreadyExistsException(Exception):
+class RoleNotFoundException(GeneralCogException):
     pass
 
 
-class EmojiNotFoundException(Exception):
+class EmojiAlreadyExistsException(GeneralCogException):
+    pass
+
+
+class EmojiNotFoundException(GeneralCogException):
     pass

@@ -7,7 +7,7 @@ from src.log import Logger
 from .general_service import GeneralService
 from .guild_service import GuildService
 from .member_service import MemberService
-from ..errors import RoleNotFoundException
+from ..errors import RoleNotFoundException, GeneralCogException
 from ..storage import UnitOfWork
 from ..storage.model.member_role import MemberRole
 from ..storage.model.role import Role
@@ -73,10 +73,10 @@ class RoleService(GeneralService):
 
     @Security.can_edit_roles()
     async def add_role_to_member(self, guild_id: int, member_id: int, role_id: int, reason: str) -> None:
-        discord_member = await self.member_service.get_discord_member(guild_id, member_id)
-        discord_role = await self.get_discord_role(guild_id, role_id)
-
         try:
+            discord_member = await self.member_service.get_discord_member(guild_id, member_id)
+            discord_role = await self.get_discord_role(guild_id, role_id)
+
             await discord_member.add_roles(discord_role, reason=reason)
             self.uow.member_roles.add(MemberRole(guild_id, member_id, role_id))
         except DiscordException as error:
@@ -85,17 +85,16 @@ class RoleService(GeneralService):
 
     @Security.can_edit_roles()
     async def remove_role_from_member(self, guild_id: int, member_id: int, role_id: int, reason: str) -> None:
-        discord_member = await self.member_service.get_discord_member(guild_id, member_id)
-        discord_role = await self.get_discord_role(guild_id, role_id)
-
         try:
-            await discord_member.remove_roles(discord_role, reason=reason)
+            discord_member = await self.member_service.get_discord_member(guild_id, member_id)
+            discord_role = await self.get_discord_role(guild_id, role_id)
 
+            await discord_member.remove_roles(discord_role, reason=reason)
+        except (DiscordException, GeneralCogException):
+            Logger.log(guild_id, f"Failed to remove role {discord_role.name} ({discord_role.id}) from member {discord_member.name} ({discord_member.id})")
+            # raise error
+        finally:
             role = self.uow.member_roles.get_by_guild_id_and_member_id_and_role_id(guild_id, member_id, role_id)
 
             if role is not None:
                 self.uow.member_roles.remove(role)
-
-        except DiscordException as error:
-            Logger.log(guild_id, f"Failed to remove role {discord_role.name} ({discord_role.id}) from member {discord_member.name} ({discord_member.id})")
-            # raise error
