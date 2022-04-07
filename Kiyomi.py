@@ -24,7 +24,7 @@ if __name__ == "__main__":
 
     bot = Kiyomi(command_prefix="!", intents=intents, db=database)
 
-    bot.debug_guilds = os.getenv("DEBUG_GUILDS").split(",")
+    bot.debug_guilds = [int(guild_id) for guild_id in os.getenv("DEBUG_GUILDS").split(",")]
 
     Logger.log_init()
 

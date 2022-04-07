@@ -1,26 +1,35 @@
 import os
-from typing import Callable
+from typing import List, Dict
 
-from discord import SlashCommand
-from discord.commands import permissions
-
-
-def is_guild_staff():
-    return permissions.has_permissions(manage_messages=True)
+from discord import CommandPermission
 
 
-def is_guild_administrator():
-    return permissions.has_permissions(administrator=True)
+def admin_guild_only() -> Dict[str, List[int]]:
+    admin_guilds = [int(guild_id) for guild_id in os.getenv("ADMIN_GUILDS").split(",")]
+
+    return {"guild_ids": admin_guilds}
 
 
-def is_bot_owner():
-    def inner(command: Callable):
-        if isinstance(command, SlashCommand):
-            command.guild_ids = os.getenv("ADMIN_GUILDS").split(",")
-        return command
-
-    return inner
+def is_guild_staff() -> List[CommandPermission]:
+    raise RuntimeError("Not implemented!")
 
 
-def is_guild_only():
-    return permissions.guild_only()
+def is_guild_administrator() -> List[CommandPermission]:
+    raise RuntimeError("Not implemented!")
+
+
+def is_bot_owner() -> Dict[str, List[CommandPermission]]:
+    permissions = [CommandPermission("owner", 2, True, None)]
+
+    return {"permissions": permissions}
+
+
+def is_bot_owner_and_admin_guild() -> Dict[str, List[any]]:
+    return {
+        **is_bot_owner(),
+        **admin_guild_only()
+    }
+
+
+def is_guild_only() -> List[CommandPermission]:
+    raise RuntimeError("Not implemented!")

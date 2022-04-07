@@ -1,13 +1,12 @@
 import discord
-from discord import SlashCommandGroup, slash_command, ApplicationCommandInvokeError, Option, ApplicationContext, \
-    user_command
-from discord.commands import permissions
+from discord import SlashCommandGroup, slash_command, ApplicationCommandInvokeError, Option, ApplicationContext
 from discord.ext import commands
 
 from src.cogs.general import GeneralAPI
 from .converters.score_saber_player_id_converter import ScoreSaberPlayerIdConverter
 from .errors import MemberPlayerNotFoundInGuildException, ScoreSaberCogException
 from .scoresaber_cog import ScoreSaberCog
+from src.kiyomi import permissions
 
 
 class ScoreSaber(ScoreSaberCog, name="Score Saber"):
@@ -96,8 +95,7 @@ class ScoreSaber(ScoreSaberCog, name="Score Saber"):
     #     except IndexError as e:
     #         await ctx.respond("Song argument too large")
 
-    @player.command(name="manual-add", default_permission=False)
-    @permissions.is_owner()
+    @slash_command(name="manual-add", **permissions.is_bot_owner_and_admin_guild())
     async def manual_add_player(
         self,
         ctx: discord.ApplicationContext,
@@ -134,8 +132,7 @@ class ScoreSaber(ScoreSaberCog, name="Score Saber"):
                 f"Successfully linked Score Saber profile {guild_player.player.name} to member {guild_player.member.name} in guild {guild_player.guild.name}"
         )
 
-    @player.command(name="manual-remove", default_permission=False)
-    @permissions.is_owner()
+    @slash_command(name="manual-remove", **permissions.is_bot_owner_and_admin_guild())
     async def manual_remove_player(
         self,
         ctx: discord.ApplicationContext,
@@ -176,9 +173,10 @@ class ScoreSaber(ScoreSaberCog, name="Score Saber"):
                 )
                 return
 
-    @user_command(name="Refresh Score Saber Profile", default_permission=False)
-    async def refresh(self, ctx: ApplicationContext, member: discord.Member):
-        await ctx.respond(f"{ctx.author.name} just mentioned {member.mention}!")
+    # TODO: Re-enable when Pycord becomes more stable. Currently throws error about missing localization!
+    # @user_command(name="Refresh Score Saber Profile", **permissions.is_bot_owner())
+    # async def refresh(self, ctx: ApplicationContext, member: discord.Member):
+    #     await ctx.respond(f"{ctx.author.name} just mentioned {member.mention}!")
 
     async def cog_command_error(self, ctx: ApplicationContext, error: Exception):
         if isinstance(error, ApplicationCommandInvokeError):

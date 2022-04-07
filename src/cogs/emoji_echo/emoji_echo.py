@@ -1,6 +1,5 @@
 import discord
-from discord import SlashCommandGroup, Option, ApplicationCommandInvokeError, ApplicationContext, message_command
-from discord.commands import permissions
+from discord import SlashCommandGroup, Option, ApplicationCommandInvokeError, ApplicationContext, slash_command
 from discord.ext import commands
 from discord.ext.commands import EmojiConverter
 
@@ -8,6 +7,7 @@ from src.cogs.emoji_echo.emoji_echo_cog import EmojiEchoCog
 from src.cogs.emoji_echo.errors import EmojiEchoCogException, NotFound
 from src.cogs.settings import SettingsAPI
 from src.cogs.settings.storage import ToggleSetting
+from src.kiyomi import permissions
 from src.kiyomi.errors import KiyomiException
 
 
@@ -38,24 +38,26 @@ class EmojiEcho(EmojiEchoCog):
 
     emoji = SlashCommandGroup(
             "emoji",
-            "Emojis that Kiyomi is allowed to play with"
+            "Emojis that Kiyomi is allowed to play with",
+            **permissions.is_bot_owner()
     )
 
-    @message_command(name="Random reaction")
-    async def random_reaction(self, ctx: discord.ApplicationContext, message: discord.Message):
-        emoji = await self.emoji_service.get_random_enabled_emoji()
+    # TODO: Re-enable when Pycord becomes more stable. Currently throws error about missing localization!
+    # @message_command(name="Random reaction")
+    # async def random_reaction(self, ctx: discord.ApplicationContext, message: discord.Message):
+    #     emoji = await self.emoji_service.get_random_enabled_emoji()
+    #
+    #     await message.add_reaction(emoji)
+    #     await ctx.delete()
 
-        await message.add_reaction(emoji)
-        await ctx.delete()
-
-    @emoji.command(name="random")
+    @slash_command(name="emoji-random")
     async def emoji_random(self, ctx: discord.ApplicationContext):
         """Posts a random enabled emoji"""
         emoji = await self.emoji_service.get_random_enabled_emoji()
 
         await ctx.respond(str(emoji))
 
-    @random_reaction.error
+    # @random_reaction.error # TODO: Re-enable when Pycord becomes more stable. Currently throws error about missing localization!
     @emoji_random.error
     async def emoji_random_error(self, ctx: discord.ApplicationContext, error: Exception):
         if isinstance(error, ApplicationCommandInvokeError):
@@ -82,8 +84,7 @@ class EmojiEcho(EmojiEchoCog):
     async def get_available_emojis(self, ctx: discord.AutocompleteContext):
         return await self.emoji_autocomplete_service.get_available_emojis(ctx)
 
-    @emoji.command(name="enable", default_permission=False)
-    @permissions.is_owner()
+    @emoji.command(name="enable", **permissions.is_bot_owner())
     async def emoji_enable(
         self,
         ctx: discord.ApplicationContext,
@@ -102,8 +103,7 @@ class EmojiEcho(EmojiEchoCog):
     async def get_enabled_emojis(self, ctx: discord.AutocompleteContext):
         return await self.emoji_autocomplete_service.get_enabled_emojis(ctx)
 
-    @emoji.command(name="disable", default_permission=False)
-    @permissions.is_owner()
+    @emoji.command(name="disable", **permissions.is_bot_owner())
     async def emoji_disable(self,
         ctx: discord.ApplicationContext,
         emoji: Option(
