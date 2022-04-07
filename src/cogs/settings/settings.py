@@ -56,6 +56,8 @@ class Settings(SettingsCog):
         if not self.setting_service.has_permission(setting, ctx.interaction.user):
             raise PermissionDenied(setting)
 
+        await self.setting_service.validate_setting_value(ctx.interaction.guild.id, setting, value)
+
         abstract_setting = self.setting_service.set(ctx.interaction.guild.id, setting, value)
         setting_value = self.setting_service.get_value(ctx.interaction.guild.id, setting)
 

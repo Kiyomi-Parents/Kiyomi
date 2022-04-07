@@ -59,3 +59,7 @@ class IntegerSetting(AbstractRegularSetting[int]):
             raise InvalidSettingType(setting.setting_type, SettingType.INT)
 
         return IntegerSetting(name_human, setting, permissions)
+
+    @staticmethod
+    async def is_valid(value: str) -> bool:
+        return value.isdigit()

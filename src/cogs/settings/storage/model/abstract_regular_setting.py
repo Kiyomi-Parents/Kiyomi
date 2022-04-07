@@ -13,6 +13,11 @@ class AbstractRegularSetting(AbstractSetting[T], Generic[T]):
 
     @staticmethod
     @abstractmethod
+    async def is_valid(value: str) -> bool:
+        pass
+
+    @staticmethod
+    @abstractmethod
     def create(
         name_human: str,
         name: str,

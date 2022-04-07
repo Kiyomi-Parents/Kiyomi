@@ -59,3 +59,7 @@ class TextSetting(AbstractRegularSetting[str]):
             raise InvalidSettingType(setting.setting_type, SettingType.STRING)
 
         return TextSetting(name_human, setting, permissions)
+
+    @staticmethod
+    async def is_valid(value: str) -> bool:
+        return isinstance(value, str)

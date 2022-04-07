@@ -45,3 +45,13 @@ class PermissionDenied(SettingsCogException):
 
     def __str__(self):
         return f"I can't let you edit that setting mister"
+
+
+class InvalidSettingValue(SettingsCogException):
+    def __init__(self, setting_name: str, setting_type: SettingType, setting_value: str):
+        self.setting_name = setting_name
+        self.setting_type = setting_type
+        self.setting_value = setting_value
+
+    def __str__(self):
+        return f"{self.setting_value} is not a {self.setting_type.name}!"

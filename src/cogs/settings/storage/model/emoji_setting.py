@@ -68,6 +68,15 @@ class EmojiSetting(AbstractBotSetting[discord.Emoji]):
 
         return EmojiSetting(bot, name_human, setting, permissions)
 
+    @staticmethod
+    async def is_valid(bot: Kiyomi, guild_id: int, value: str) -> bool:
+        guild = bot.get_guild(guild_id)
+
+        if guild is None:
+            return False
+
+        return value in [str(emoji.id) for emoji in await guild.fetch_emojis()]
+
     async def get_autocomplete(self, ctx: discord.AutocompleteContext):
         emojis = []
 

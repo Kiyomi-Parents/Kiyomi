@@ -68,6 +68,15 @@ class ChannelSetting(AbstractBotSetting[discord.abc.GuildChannel]):
 
         return ChannelSetting(bot, name_human, setting, permissions)
 
+    @staticmethod
+    async def is_valid(bot: Kiyomi, guild_id: int, value: str) -> bool:
+        guild = bot.get_guild(guild_id)
+
+        if guild is None:
+            return False
+
+        return value in [str(channel.id) for channel in await guild.fetch_channels()]
+
     async def get_autocomplete(self, ctx: discord.AutocompleteContext):
         text_channels = []
 

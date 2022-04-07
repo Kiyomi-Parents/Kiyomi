@@ -27,6 +27,11 @@ class AbstractBotSetting(AbstractSetting[T], Generic[T]):
 
     @staticmethod
     @abstractmethod
+    async def is_valid(bot: Kiyomi, guild_id: int, value: str) -> bool:
+        pass
+
+    @staticmethod
+    @abstractmethod
     def create(
         bot: Kiyomi,
         name_human: str,

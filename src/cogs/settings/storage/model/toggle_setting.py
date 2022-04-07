@@ -62,6 +62,16 @@ class ToggleSetting(AbstractRegularSetting[bool]):
 
         return ToggleSetting(name_human, setting, permissions)
 
+    @staticmethod
+    async def is_valid(value: str) -> bool:
+        if value.lower() == "true":
+            return True
+
+        if value.lower() == "false":
+            return True
+
+        return False
+
     async def get_autocomplete(self, ctx: discord.AutocompleteContext):
         if not self.has_permission(ctx.interaction.user):
             return []

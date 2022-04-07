@@ -5,7 +5,7 @@ from discord import Member
 from src.kiyomi import Kiyomi, Utils
 from .settings_service import SettingsService
 from ..errors import FailedToCreateSetting, \
-    FailedToFindSetting, FailedToConvertSetting
+    FailedToFindSetting, FailedToConvertSetting, InvalidSettingValue
 from ..storage import Setting, SettingType, AbstractSetting, \
     UnitOfWork
 from ..storage.model.abstract_bot_setting import AbstractBotSetting
@@ -48,6 +48,16 @@ class SettingService(SettingsService):
         registered_setting = self.find_registered_setting(name)
 
         return registered_setting.has_permission(member)
+
+    async def validate_setting_value(self, guild_id: int, name: str, value: Optional[str]) -> bool:
+        registered_setting = self.find_registered_setting(name)
+
+        if isinstance(registered_setting, AbstractBotSetting):
+            if not await registered_setting.is_valid(self.bot, guild_id, value):
+                raise InvalidSettingValue(name, registered_setting.setting_type, value)
+        elif isinstance(registered_setting, AbstractRegularSetting):
+            if not await registered_setting.is_valid(value):
+                raise InvalidSettingValue(name, registered_setting.setting_type, value)
 
     def find_registered_setting(self, name: str) -> AbstractSetting:
         for reg_setting in self.registered_settings:
