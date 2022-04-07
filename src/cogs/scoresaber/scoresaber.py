@@ -1,165 +1,195 @@
-from typing import Optional
-
 import discord
+from discord import SlashCommandGroup, slash_command, ApplicationCommandInvokeError, Option, ApplicationContext, \
+    user_command
 from discord.ext import commands
-from discord.ext.commands import Context
 
-from .storage.uow import UnitOfWork
-from .tasks import Tasks
-from .actions import Actions
-from .errors import PlayerExistsException, PlayerNotFoundException, GuildNotFoundException, InvalidPlayerException
-from .message import Message
-from .scoresaber_utils import ScoreSaberUtils
-from src.cogs.security import Security
-from src.kiyomi.base_cog import BaseCog
+from src.cogs.general import GeneralAPI
+from .converters.score_saber_player_id_converter import ScoreSaberPlayerIdConverter
+from .errors import MemberPlayerNotFoundInGuildException, ScoreSaberCogException
+from .scoresaber_cog import ScoreSaberCog
+from src.kiyomi import permissions
 
 
-class ScoreSaber(BaseCog, name="Score Saber"):
-    def __init__(self, uow: UnitOfWork, tasks: Tasks, actions: Actions):
-        self.uow = uow
-        self.tasks = tasks
-        self.actions = actions
+class ScoreSaber(ScoreSaberCog, name="Score Saber"):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        await self.uow.scoresaber.start()
+        await self.player_service.start_scoresaber_api_client()
 
-    @commands.group(invoke_without_command=True)
-    async def player(self, ctx):
-        """Link ScoreSaber profile to Discord member."""
-        await ctx.send_help(ctx.command)
+    player = SlashCommandGroup(
+            "player",
+            "Link ScoreSaber profile to Discord member."
+    )
 
+    # TODO: Fix command concurrency. We should probably somehow do the import later?
     @player.command(name="add")
-    async def player_add(self, ctx, profile: str):
+    async def player_add(
+        self,
+        ctx: discord.ApplicationContext,
+        profile: Option(
+                ScoreSaberPlayerIdConverter,
+                "Score Saber profile URL"
+        )
+    ):
         """Link yourself to your ScoreSaber profile."""
-        player_id = ScoreSaberUtils.scoresaber_id_from_url(profile)
-        self.uow.bot.events.emit("register_member", ctx.author)
+        self.bot.events.emit("register_member", ctx.author)
 
-        try:
-            await ctx.send(f"Getting scores.... This may take a while")
-            player = await self.actions.add_player(ctx.guild.id, ctx.author.id, player_id)
-            await ctx.send(f"Successfully linked **{player.player_name}** ScoreSaber profile!")
-        except (PlayerExistsException, PlayerNotFoundException) as error:
-            await ctx.send(error)
+        await ctx.defer()
+
+        guild_player = await self.player_service.add_player_with_checks(
+                ctx.interaction.guild_id,
+                ctx.author.id,
+                profile
+        )
+
+        await ctx.respond(content=f"Successfully linked **{guild_player.player.name}** ScoreSaber profile!", ephemeral=True)
 
     @player.command(name="remove")
-    async def player_remove(self, ctx):
+    async def player_remove(self, ctx: discord.ApplicationContext):
         """Remove the currently linked ScoreSaber profile from yourself."""
-        try:
-            self.actions.remove_player(ctx.guild.id, ctx.author.id)
-            await ctx.send("Successfully unlinked your ScoreSaber account!")
-        except (PlayerNotFoundException, GuildNotFoundException) as error:
-            await ctx.send(error)
 
-    @commands.command(name="showpp")
-    async def show_pp(self, ctx):
+        await self.player_service.remove_player_with_checks(ctx.guild.id, ctx.author.id)
+        await ctx.respond("Successfully unlinked your ScoreSaber account!", ephemeral=True)
+
+    @slash_command(name="showpp")
+    async def show_pp(self, ctx: discord.ApplicationContext):
         """Gives bot permission to check the persons PP."""
-        guild_player = self.uow.guild_player_repo.get_by_guild_id_and_member_id(ctx.guild.id, ctx.author.id)
+        guild_player = await self.player_service.get_guild_player(ctx.guild.id, ctx.author.id)
 
-        if guild_player is None or guild_player.player.pp == 0:
-            await ctx.send(f"**{ctx.author.name}** doesn't have a PP")
+        if guild_player.player.pp == 0:
+            await ctx.respond(f"**{ctx.author.name}** doesn't have a PP")
             return
 
         pp_size = round(guild_player.player.pp / 100)
-        await ctx.send(f"**{ctx.author.name}**'s PP is this big:\n8{'=' * pp_size}D")
+        await ctx.respond(f"**{ctx.author.name}**'s PP is this big:\n8{'=' * pp_size}D")
 
-    @commands.command(name="recent")
-    async def recent_score(self, ctx: Context, index: int = 0, discord_member: discord.Member = None):
-        """Displays your most recent scores"""
-        if discord_member is None:
-            discord_member = ctx.author
+    @show_pp.error
+    async def show_pp_error(self, ctx: discord.ApplicationContext, error: Exception):
+        if isinstance(error, ApplicationCommandInvokeError):
+            if isinstance(error.original, MemberPlayerNotFoundInGuildException):
+                return await error.original.handle(ctx, f"**{ctx.author.name}** doesn't have a PP")
 
-        guild_player = self.uow.guild_player_repo.get_by_guild_id_and_member_id(ctx.guild.id, discord_member.id)
+    # @slash_command(name="recent")
+    # @Security.owner_or_permissions()
+    # async def recent_scores(self, ctx: discord.ApplicationContext, discord_member: discord.Member = None, count: int = 1):
+    #     """Displays your most recent scores"""
+    #     if discord_member is None:
+    #         discord_member = ctx.author
+    #
+    #     guild_player = await self.player_service.get_player_by_guild_id_and_guild_id(ctx.guild.id, discord_member.id)
+    #
+    #     if guild_player is None:
+    #         await ctx.respond("Player not found!")
+    #         return
+    #
+    #     if count <= 0:
+    #         await ctx.respond("Score count needs to be positive!")
+    #         return
+    #
+    #     try:
+    #         scores = self.score_service.get_recent_scores(guild_player.player.id, count)
+    #
+    #         if scores is None:
+    #             await ctx.respond("No scores found!")
+    #             return
+    #
+    #         for score in scores:
+    #             pass
+    #             # TODO: FIX.
+    #             # score_embed = Message.get_score_embed(guild_player.player, score)
+    #             # await ctx.respond(embed=score_embed)
+    #
+    #     except IndexError as e:
+    #         await ctx.respond("Song argument too large")
 
-        if guild_player is None:
-            await ctx.send("Player not found!")
-            return
+    @slash_command(name="manual-add", **permissions.is_bot_owner_and_admin_guild())
+    async def manual_add_player(
+        self,
+        ctx: discord.ApplicationContext,
+        member_id: Option(
+                int,
+                "Discord member ID"
+        ),
+        player_id: Option(
+                str,
+                "Score Saber player ID"
+        ),
+        guild_id: Option(
+                int,
+                "Discord guild ID",
+                required=False
+        )
+    ):
+        """Add a Score Saber profile manually"""
 
-        if index < 0:
-            await ctx.send("Score index needs to be positive!")
-            return
-
-        try:
-            score = self.uow.score_repo.get_player_recent_score(guild_player.player.id, index)
-
-            if score is None:
-                await ctx.send("No scores found!")
-                return
-
-            score_embed = Message.get_score_embed(guild_player.player, score)
-            await ctx.send(embed=score_embed)
-
-        except IndexError as e:
-            await ctx.send("Song argument too large")
-
-    @commands.command(name="recentscores")
-    @Security.owner_or_permissions()
-    async def recent_scores(self, ctx: Context, count: int = 1, discord_member: discord.Member = None):
-        """Displays your most recent scores"""
-        if discord_member is None:
-            discord_member = ctx.author
-
-        guild_player = self.uow.guild_player_repo.get_by_guild_id_and_member_id(ctx.guild.id, discord_member.id)
-
-        if guild_player is None:
-            await ctx.send("Player not found!")
-            return
-
-        if count <= 0:
-            await ctx.send("Score count needs to be positive!")
-            return
-
-        try:
-            scores = self.uow.score_repo.get_player_recent_scores(guild_player.player.id, count)
-
-            if scores is None:
-                await ctx.send("No scores found!")
-                return
-
-            for score in scores:
-                score_embed = Message.get_score_embed(guild_player.player, score)
-                await ctx.send(embed=score_embed)
-
-        except IndexError as e:
-            await ctx.send("Song argument too large")
-
-    # DEBUGGING COMMANDS
-    @commands.command(name="getscoresbyid", hidden=True)
-    @Security.is_owner()
-    async def get_scores_by_id(self, ctx: Context, score_id: int):
-        db_scores = self.uow.score_repo.get_all_by_score_id(score_id)
-
-        if len(db_scores) == 0:
-            await ctx.send("No scores found!")
-            return
-
-        for score in db_scores:
-            if score is not None:
-                await ctx.send(f"{score.score} on {score.song_name} at {score.time_set}")
-            else:
-                await ctx.send("Score was None")
-
-    @player.command(name="manualadd", hidden=True)
-    @Security.is_owner()
-    async def manual_add_player(self, ctx: Context, player_id: str, member_id: Optional[int], guild_id: Optional[int]):
         if guild_id is None:
-            guild_id = ctx.guild.id
-        await self.actions.manual_add_player(ctx, player_id, member_id, guild_id)
+            guild_id = ctx.interaction.guild_id
 
-    @player.command(name="adminadd")
-    @Security.owner_or_permissions(administrator=True)
-    async def admin_add_player(self, ctx: Context, player_id: str, member_id: Optional[int]):
-        guild_id = ctx.guild.id
-        await self.actions.manual_add_player(ctx, player_id, member_id, guild_id)
+        if member_id is None:
+            await ctx.respond(f"Please specify a member!", ephemeral=True)
+            return
 
-    @player.command(name="manualremove", hidden=True)
-    @Security.is_owner()
-    async def manual_remove_player(self, ctx: Context, member_id: Optional[int], guild_id: Optional[int]):
+        general = self.uow.bot.get_cog_api(GeneralAPI)
+        member = await general.get_discord_member(guild_id, member_id)
+        self.bot.events.emit("register_member", member)
+
+        guild_player = await self.player_service.add_player(guild_id, member_id, player_id)
+
+        await ctx.respond(
+                f"Successfully linked Score Saber profile {guild_player.player.name} to member {guild_player.member.name} in guild {guild_player.guild.name}",
+                ephemeral=True
+        )
+
+    @slash_command(name="manual-remove", **permissions.is_bot_owner_and_admin_guild())
+    async def manual_remove_player(
+        self,
+        ctx: discord.ApplicationContext,
+        member_id: Option(
+                int,
+                "Discord member ID"
+        ),
+        player_id: Option(
+                str,
+                "Score Saber player ID"
+        ),
+        guild_id: Option(
+                int,
+                "Discord guild ID",
+                required=False
+        )
+    ):
+        """Remove a Score Saber profile manually"""
         if guild_id is None:
-            guild_id = ctx.guild.id
-        await self.actions.manual_remove_player(ctx, member_id, guild_id)
+            guild_id = ctx.interaction.guild_id
 
-    @player.command(name="adminremove")
-    @Security.owner_or_permissions(administrator=True)
-    async def admin_remove_player(self, ctx: Context, member_id: Optional[int]):
-        await self.actions.manual_remove_player(ctx, member_id, ctx.guild.id)
+        if member_id is None:
+            await ctx.respond(f"Please specify a member!", ephemeral=True)
+            return
+
+        guild_player = await self.player_service.remove_player(guild_id, member_id, player_id)
+
+        await ctx.respond(
+                f"Successfully unlinked Score Saber profile {guild_player.player.name} from member {guild_player.member.name} in guild {guild_player.guild.name}!",
+                ephemeral=True
+        )
+
+    @manual_remove_player.error
+    async def manual_remove_player_error(self, ctx: discord.ApplicationContext, error: Exception):
+        if isinstance(error, ApplicationCommandInvokeError):
+            if isinstance(error.original, MemberPlayerNotFoundInGuildException):
+                return await error.original.handle(ctx, f"{error.original.member_id} doesn't have a Score Saber profile with ID {error.original.player_id} linked in guild {error.original.guild_id}.")
+
+    @user_command(name="Refresh Score Saber Profile", **permissions.is_bot_owner())
+    async def refresh(self, ctx: ApplicationContext, member: discord.Member):
+        guild_player = await self.player_service.get_guild_player(ctx.interaction.guild.id, member.id)
+
+        await self.player_service.update_player(guild_player.player)
+        await self.score_service.update_player_scores(guild_player.player)
+
+        await ctx.respond(f"Updated {member.name}'s Score Saber profile ({guild_player.player.name})", ephemeral=True)
+
+    async def cog_command_error(self, ctx: ApplicationContext, error: Exception):
+        if isinstance(error, ApplicationCommandInvokeError):
+            if isinstance(error.original, ScoreSaberCogException):
+                return await error.original.handle(ctx)
+

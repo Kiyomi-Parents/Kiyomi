@@ -1,22 +1,23 @@
 from typing import Optional
 
-from discord.ext import commands
-
-from .actions import Actions
+from src.kiyomi import Kiyomi
+from .services import SettingService, SettingAutocompleteService
+from .settings_cog import SettingsCog
 from .storage.uow import UnitOfWork
 
 
-class SettingsAPI(commands.Cog):
+class SettingsAPI(SettingsCog):
 
-    def __init__(self, uow: UnitOfWork, actions: Actions):
+    def __init__(self, bot: Kiyomi, setting_service: SettingService, settings_autocomplete_service: SettingAutocompleteService, uow: UnitOfWork):
+        super().__init__(bot, setting_service, settings_autocomplete_service)
+
         self.uow = uow
-        self.actions = actions
 
     def set(self, guild_id: int, name: str, value: any) -> None:
-        self.actions.set(guild_id, name, value)
+        self.setting_service.set(guild_id, name, value)
 
     def get(self, guild_id: int, name: str) -> Optional[any]:
-        return self.actions.get_value(guild_id, name)
+        return self.setting_service.get_value(guild_id, name)
 
     def delete(self, guild_id: int, name: str) -> None:
-        self.actions.delete(guild_id, name)
+        self.setting_service.delete(guild_id, name)

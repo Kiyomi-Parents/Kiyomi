@@ -2,7 +2,7 @@ import pybeatsaver
 from sqlalchemy import Integer, Column, String, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
 
-from src.database import Base
+from src.kiyomi.database import Base
 from .beatmap_version_difficulty import BeatmapVersionDifficulty
 
 
@@ -26,7 +26,7 @@ class BeatmapVersion(Base):
     beatmap = relationship("Beatmap", uselist=False, back_populates="versions")
 
     def __init__(self, map_version: pybeatsaver.MapVersion):
-        self.hash = map_version.hash
+        self.hash = map_version.hash.lower()
         self.key = map_version.key
         self.state = map_version.state.value
         self.created_at = map_version.created_at

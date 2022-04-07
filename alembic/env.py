@@ -5,15 +5,29 @@ from alembic import context
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
-import src.cogs.general
-import src.cogs.settings
-import src.cogs.scoresaber
-import src.cogs.beatsaver
-import src.cogs.score_feed
-import src.cogs.leaderboard
-import src.cogs.achievements
+from src.kiyomi.database import Base
+# noinspection PyUnresolvedReferences
+import src.cogs.achievement
+# noinspection PyUnresolvedReferences
 import src.cogs.achievement_roles
-from src.database import Base
+# noinspection PyUnresolvedReferences
+import src.cogs.beatsaver
+# noinspection PyUnresolvedReferences
+import src.cogs.emoji_echo
+# noinspection PyUnresolvedReferences
+import src.cogs.fancy_presence
+# noinspection PyUnresolvedReferences
+import src.cogs.general
+# noinspection PyUnresolvedReferences
+import src.cogs.leaderboard
+# noinspection PyUnresolvedReferences
+import src.cogs.score_feed
+# noinspection PyUnresolvedReferences
+import src.cogs.scoresaber
+# noinspection PyUnresolvedReferences
+import src.cogs.settings
+# noinspection PyUnresolvedReferences
+import src.cogs.view_persistence
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -36,10 +50,10 @@ target_metadata = Base.metadata
 # ... etc.
 section = config.config_ini_section
 
-config.set_section_option(section, "DB_USER", os.environ.get("DATABASE_USER"))
-config.set_section_option(section, "DB_PW", os.environ.get("DATABASE_PW"))
-config.set_section_option(section, "DB_IP", os.environ.get("DATABASE_IP"))
-config.set_section_option(section, "DB_NAME", os.environ.get("DATABASE_NAME"))
+config.set_section_option(section, "DB_USER", os.getenv("DATABASE_USER"))
+config.set_section_option(section, "DB_PW", os.getenv("DATABASE_PW"))
+config.set_section_option(section, "DB_IP", os.getenv("DATABASE_IP"))
+config.set_section_option(section, "DB_NAME", os.getenv("DATABASE_NAME"))
 
 
 def run_migrations_offline():

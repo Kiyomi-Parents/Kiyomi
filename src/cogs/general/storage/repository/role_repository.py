@@ -1,15 +1,16 @@
 from typing import Optional, List
 
-from ..model import Role
-from src.database import Repository
+from sqlalchemy.orm import Query
+
+from ..model.role import Role
+from src.kiyomi.database import BaseRepository
 
 
-class RoleRepository(Repository[Role]):
-    def get_by_id(self, entry_id: int) -> Optional[Role]:
-        return self._db.session.query(Role) \
-            .filter(Role.id == entry_id) \
-            .first()
+class RoleRepository(BaseRepository[Role]):
+    def query_by_id(self, entry_id: int) -> Query:
+        return self.session.query(Role) \
+            .filter(Role.id == entry_id)
 
     def get_all(self) -> Optional[List[Role]]:
-        return self._db.session.query(Role) \
+        return self.session.query(Role) \
             .all()

@@ -1,7 +1,7 @@
-from sqlalchemy import Column, String, Integer, BigInteger
+from sqlalchemy import Column, String, BigInteger
 from sqlalchemy.orm import relationship
 
-from src.database import Base
+from src.kiyomi.database import Base
 
 
 class Guild(Base):
@@ -12,8 +12,10 @@ class Guild(Base):
     name = Column(String(128))
 
     members = relationship("GuildMember", back_populates="guild", cascade="all, delete-orphan")
-    channels = relationship("Channel", cascade="all, delete-orphan")
-    roles = relationship("Role", cascade="all, delete-orphan")
+    channels = relationship("Channel", back_populates="guild", cascade="all, delete-orphan")
+    roles = relationship("Role", back_populates="guild", cascade="all, delete-orphan")
+    emojis = relationship("Emoji", back_populates="guild", cascade="all, delete-orphan")
+    messages = relationship("Message", back_populates="guild", cascade="all, delete-orphan")
 
     def __init__(self, guild_id: int, guild_name: str):
         self.id = guild_id

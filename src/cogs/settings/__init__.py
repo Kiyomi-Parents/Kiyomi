@@ -1,12 +1,15 @@
+from src.kiyomi import Kiyomi
+from .services import SettingService, SettingAutocompleteService
 from .settings import Settings
 from .settings_api import SettingsAPI
-from .storage.uow import UnitOfWork
-from .actions import Actions
+from .storage import UnitOfWork
 
 
-def setup(bot):
-    uow = UnitOfWork(bot)
-    setting_actions = Actions(uow)
+def setup(bot: Kiyomi):
+    uow = UnitOfWork(bot.database.session)
 
-    bot.add_cog(Settings(uow, setting_actions))
-    bot.add_cog(SettingsAPI(uow, setting_actions))
+    setting_service = SettingService(bot, uow)
+    settings_autocomplete_service = SettingAutocompleteService(bot, uow, setting_service)
+
+    bot.add_cog(Settings(bot, setting_service, settings_autocomplete_service))
+    bot.add_cog(SettingsAPI(bot, setting_service, settings_autocomplete_service, uow))

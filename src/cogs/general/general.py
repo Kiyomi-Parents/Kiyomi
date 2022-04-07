@@ -1,123 +1,48 @@
-import re
-
 import discord.member
-from discord import Forbidden
 from discord.ext import commands
-from discord.ext.commands import Context, NotOwner, EmojiNotFound
 
-from src.cogs.security import Security
-from .actions import Actions
-from .errors import EmojiAlreadyExistsException, EmojiNotFoundException
-from .storage.uow import UnitOfWork
-from src.kiyomi.base_cog import BaseCog
-from src.utils import Utils
+from .general_cog import GeneralCog
+from .services import EmojiService, GuildService, MemberService, RoleService, ChannelService, MessageService
+from src.kiyomi import Kiyomi, permissions
 
 
-class General(BaseCog):
-
-    def __init__(self, uow: UnitOfWork, actions: Actions):
-        self.uow = uow
-        self.actions = actions
+class General(GeneralCog):
+    def __init__(
+        self,
+        bot: Kiyomi,
+        emoji_service: EmojiService,
+        guild_service: GuildService,
+        member_service: MemberService,
+        channel_service: ChannelService,
+        message_service: MessageService,
+        role_service: RoleService
+    ):
+        super().__init__(bot, emoji_service, guild_service, member_service, channel_service, message_service, role_service)
 
         # Register events
         self.events()
 
     def events(self):
-
-        @self.uow.bot.events.on("register_member")
+        @self.bot.events.on("register_member")
         async def register_member(discord_member: discord.Member):
-            self.actions.register_member(discord_member)
-            self.actions.register_guild_member(discord_member)
+            self.member_service.register_member(discord_member)
+            self.member_service.register_guild_member(discord_member)
 
     @commands.Cog.listener()
     async def on_ready(self):
-        for discord_guild in self.uow.bot.guilds:
-            self.actions.register_guild(discord_guild)
-
-    @commands.Cog.listener()
-    async def on_message(self, msg: discord.Message):
-        """Repost emoji if enabled"""
-        if msg.author.id == self.uow.bot.user.id:
-            return
-
-        settings = self.uow.bot.get_cog("SettingsAPI")
-
-        if settings.get(msg.guild.id, "repost_emoji"):
-            emoji = self.actions.get_emoji_from_message(msg.content)
-            if emoji is not None:
-                await msg.channel.send(emoji)
+        for discord_guild in self.bot.guilds:
+            await self.guild_service.register_guild(discord_guild.id)
 
     @commands.Cog.listener()
     async def on_guild_join(self, guild: discord.Guild):
-        self.actions.register_guild(guild)
+        await self.guild_service.register_guild(guild.id)
 
-    @commands.command()
+    @commands.slash_command()
     async def hello(self, ctx):
-        """Greet the bot."""
-        await ctx.send("Hello there!")
+        """Greet the bot"""
+        await ctx.respond("Hello there!")
 
-    @commands.command(hidden=True)
-    @Security.is_owner()
-    async def say(self, ctx: Context, text: str):
-        await ctx.send(text)
-
-    @commands.command(name="many emoji", hidden=True)
-    @Security.is_owner()
-    async def many_emoji(self, ctx):
-        emoji_list = []
-        for emoji in self.uow.bot.emojis:
-            emoji_list.append(str(self.uow.bot.get_emoji(emoji.id)))
-            if len(emoji_list) >= 20:
-                await ctx.send("".join(emoji_list))
-                emoji_list.clear()
-        await ctx.send("".join(emoji_list))
-
-    @commands.command(name="su", hidden=True)
-    @Security.is_owner()
-    @Utils.update_tasks_list
-    async def status_update(self, ctx):
-        """owo"""
-        await ctx.send("status should've updated")
-
-    @commands.command(name="admintest", hidden=True)
-    @Security.owner_or_permissions(administrator=True)
-    async def admin_test(self, ctx):
-        """Command to test if security is working"""
-        await ctx.send("This message should only be seen if !admintest was called by a server admin.")
-
-    @commands.group(invoke_without_command=True)
-    async def emoji(self, ctx: Context):
-        if ctx.subcommand_passed is None:
-            try:
-                await ctx.message.delete()
-            except Forbidden:
-                pass
-            emoji = await self.actions.get_random_enabled_emoji()
-            await ctx.send(str(emoji))
-
-    @emoji.command(name="enable", hidden=True)
-    @Security.is_owner()
-    async def emoji_enable(self, ctx: Context, emoji: discord.Emoji):
-        """Allow the given emoji to be used by the bot"""
-        try:
-            await self.actions.enable_emoji(emoji.id, emoji.guild_id, emoji.name)
-            await ctx.send(f"Enabled {str(emoji)}")
-        except EmojiAlreadyExistsException as error:
-            await ctx.send(str(error))
-
-    @emoji.command(name="disable", hidden=True)
-    @Security.is_owner()
-    async def emoji_disable(self, ctx: Context, emoji: discord.Emoji):
-        """Disallow the given emoji from being used by the bot"""
-        try:
-            await self.actions.disable_emoji(emoji.id)
-            await ctx.send(f"Disabled {str(emoji)}")
-        except EmojiNotFoundException as error:
-            await ctx.send(str(error))
-
-    @emoji_enable.error
-    @emoji_disable.error
-    async def emoji_error(self, ctx, error):
-        if isinstance(error, EmojiNotFound):
-            await ctx.send("You can't use unicode emojis and emojis from servers the bot isn't in!")
-        return
+    @commands.slash_command(**permissions.is_bot_owner())
+    async def say(self, ctx, text: str):
+        """I repeat what you say"""
+        await ctx.respond(text)

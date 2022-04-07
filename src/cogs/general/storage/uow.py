@@ -1,17 +1,26 @@
-from Kiyomi import Kiyomi
-from .repository import GuildRepository, ChannelRepository, RoleRepository, MemberRepository, GuildMemberRepository, \
-    MemberRoleRepository, EmojiRepository
+from sqlalchemy.orm import Session
+
+from .repository.channel_repository import ChannelRepository
+from .repository.emoji_repository import EmojiRepository
+from .repository.guild_member_repository import GuildMemberRepository
+from .repository.guild_repository import GuildRepository
+from .repository.member_repository import MemberRepository
+from .repository.member_role_repository import MemberRoleRepository
+from .repository.message_repository import MessageRepository
+from .repository.role_repository import RoleRepository
+from src.kiyomi.database import BaseUnitOfWork
 
 
-class UnitOfWork:
+class UnitOfWork(BaseUnitOfWork):
 
-    def __init__(self, bot: Kiyomi):
-        self.guild_repo = GuildRepository(bot.database)
-        self.channel_repo = ChannelRepository(bot.database)
-        self.role_repo = RoleRepository(bot.database)
-        self.member_repo = MemberRepository(bot.database)
-        self.guild_member_repo = GuildMemberRepository(bot.database)
-        self.member_role_repo = MemberRoleRepository(bot.database)
-        self.emoji_repo = EmojiRepository(bot.database)
+    def __init__(self, session: Session):
+        super().__init__(session)
 
-        self.bot = bot
+        self.guilds = GuildRepository(session)
+        self.channels = ChannelRepository(session)
+        self.roles = RoleRepository(session)
+        self.members = MemberRepository(session)
+        self.guild_members = GuildMemberRepository(session)
+        self.member_roles = MemberRoleRepository(session)
+        self.emojis = EmojiRepository(session)
+        self.messages = MessageRepository(session)

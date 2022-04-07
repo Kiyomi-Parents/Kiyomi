@@ -2,9 +2,10 @@ import pybeatsaver.models.enum
 import pyscoresaber.models.enum
 from pybeatsaver import MapDifficulty
 from sqlalchemy import Column, String, ForeignKey, Integer, Float, Boolean, Enum
+from sqlalchemy.orm import relationship
 
+from src.kiyomi.database import Base
 from ...beatsaver_utils import BeatSaverUtils
-from src.database import Base
 
 
 class BeatmapVersionDifficulty(Base):
@@ -21,19 +22,22 @@ class BeatmapVersionDifficulty(Base):
     obstacles = Column(Integer)
     nps = Column(Float)
     length = Column(Float)
-    characteristic = Column(Enum(pybeatsaver.Characteristic))
-    difficulty = Column(Enum(pybeatsaver.Difficulty))
+    characteristic = Column(Enum(pybeatsaver.ECharacteristic))
+    difficulty = Column(Enum(pybeatsaver.EDifficulty))
     events = Column(Integer)
     chroma = Column(Boolean)
-    me = Column(Boolean)
-    ne = Column(Boolean)
+    me = Column(Boolean)  # Mapping extensions
+    ne = Column(Boolean)  # Noodle extensions
     cinema = Column(Boolean)
     seconds = Column(Float)
+    stars = Column(Float)
 
     # Party summary
     parity_errors = Column(Integer)
     parity_warns = Column(Integer)
     parity_resets = Column(Integer)
+
+    beatmap_version = relationship("BeatmapVersion", uselist=False, back_populates="difficulties")
 
     def __init__(self, version_difficulty: MapDifficulty):
         self.njs = version_difficulty.njs
@@ -51,6 +55,8 @@ class BeatmapVersionDifficulty(Base):
         self.ne = version_difficulty.ne
         self.cinema = version_difficulty.cinema
         self.seconds = version_difficulty.seconds
+        self.stars = version_difficulty.stars
+
         self.parity_errors = version_difficulty.parity_summary.errors
         self.parity_warns = version_difficulty.parity_summary.warns
         self.parity_resets = version_difficulty.parity_summary.resets
@@ -60,57 +66,41 @@ class BeatmapVersionDifficulty(Base):
         return BeatSaverUtils.get_max_score(self.notes)
 
     @property
-    def scoresaber_characteristic(self) -> pyscoresaber.Characteristic:
+    def scoresaber_characteristic(self) -> pyscoresaber.GameMode:
         characteristics = {
-            pybeatsaver.Characteristic.STANDARD: pyscoresaber.Characteristic.STANDARD,
-            pybeatsaver.Characteristic.ONE_SABER: pyscoresaber.Characteristic.ONE_SABER,
-            pybeatsaver.Characteristic.NO_ARROWS: pyscoresaber.Characteristic.NO_ARROWS,
-            pybeatsaver.Characteristic.DEGREE_90: pyscoresaber.Characteristic.DEGREE_90,
-            pybeatsaver.Characteristic.DEGREE_360: pyscoresaber.Characteristic.DEGREE_360,
-            pybeatsaver.Characteristic.LIGHTSHOW: pyscoresaber.Characteristic.LIGHTSHOW,
-            pybeatsaver.Characteristic.LAWLESS: pyscoresaber.Characteristic.LAWLESS,
-            pybeatsaver.Characteristic.UNKNOWN: pyscoresaber.Characteristic.UNKNOWN
+            pybeatsaver.ECharacteristic.STANDARD: pyscoresaber.GameMode.STANDARD,
+            pybeatsaver.ECharacteristic.ONE_SABER: pyscoresaber.GameMode.ONE_SABER,
+            pybeatsaver.ECharacteristic.NO_ARROWS: pyscoresaber.GameMode.NO_ARROWS,
+            pybeatsaver.ECharacteristic.DEGREE_90: pyscoresaber.GameMode.DEGREE_90,
+            pybeatsaver.ECharacteristic.DEGREE_360: pyscoresaber.GameMode.DEGREE_360,
+            pybeatsaver.ECharacteristic.LIGHTSHOW: pyscoresaber.GameMode.LIGHTSHOW,
+            pybeatsaver.ECharacteristic.LAWLESS: pyscoresaber.GameMode.LAWLESS,
         }
 
         return characteristics[self.characteristic]
 
     @property
-    def scoresaber_difficulty(self) -> pyscoresaber.Difficulty:
+    def scoresaber_difficulty(self) -> pyscoresaber.BeatmapDifficulty:
         difficulties = {
-            pybeatsaver.Difficulty.EASY: pyscoresaber.Difficulty.EASY,
-            pybeatsaver.Difficulty.NORMAL: pyscoresaber.Difficulty.NORMAL,
-            pybeatsaver.Difficulty.HARD: pyscoresaber.Difficulty.HARD,
-            pybeatsaver.Difficulty.EXPERT: pyscoresaber.Difficulty.EXPERT,
-            pybeatsaver.Difficulty.EXPERT_PLUS: pyscoresaber.Difficulty.EXPERT_PLUS,
-            pybeatsaver.Difficulty.UNKNOWN: pyscoresaber.Difficulty.UNKNOWN
+            pybeatsaver.EDifficulty.EASY: pyscoresaber.BeatmapDifficulty.EASY,
+            pybeatsaver.EDifficulty.NORMAL: pyscoresaber.BeatmapDifficulty.NORMAL,
+            pybeatsaver.EDifficulty.HARD: pyscoresaber.BeatmapDifficulty.HARD,
+            pybeatsaver.EDifficulty.EXPERT: pyscoresaber.BeatmapDifficulty.EXPERT,
+            pybeatsaver.EDifficulty.EXPERT_PLUS: pyscoresaber.BeatmapDifficulty.EXPERT_PLUS,
         }
 
         return difficulties[self.difficulty]
 
     @property
     def characteristic_text(self) -> str:
-        characteristics = {
-            pybeatsaver.Characteristic.STANDARD: "Standard",
-            pybeatsaver.Characteristic.ONE_SABER: "One Saber",
-            pybeatsaver.Characteristic.NO_ARROWS: "No Arrows",
-            pybeatsaver.Characteristic.DEGREE_90: "90 Degrees",
-            pybeatsaver.Characteristic.DEGREE_360: "360 Degrees",
-            pybeatsaver.Characteristic.LIGHTSHOW: "Lightshow",
-            pybeatsaver.Characteristic.LAWLESS: "Lawless",
-            pybeatsaver.Characteristic.UNKNOWN: "Unknown"
-        }
-
-        return characteristics[self.characteristic]
+        return self.characteristic.human_readable
 
     @property
     def difficulty_text(self) -> str:
-        difficulties = {
-            pybeatsaver.Difficulty.EASY: "Easy",
-            pybeatsaver.Difficulty.NORMAL: "Normal",
-            pybeatsaver.Difficulty.HARD: "Hard",
-            pybeatsaver.Difficulty.EXPERT: "Expert",
-            pybeatsaver.Difficulty.EXPERT_PLUS: "Expert+",
-            pybeatsaver.Difficulty.UNKNOWN: "Unknown"
-        }
+        return self.difficulty.human_readable
 
-        return difficulties[self.difficulty]
+    def __str__(self) -> str:
+        return f"Beatmap Version Difficulty {self.characteristic} {self.difficulty} ({self.id})"
+
+    def __repr__(self) -> str:
+        return self.__str__()
