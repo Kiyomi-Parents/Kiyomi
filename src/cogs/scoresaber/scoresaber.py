@@ -1,5 +1,6 @@
 import discord
-from discord import SlashCommandGroup, slash_command, ApplicationCommandInvokeError, Option, ApplicationContext
+from discord import SlashCommandGroup, slash_command, ApplicationCommandInvokeError, Option, ApplicationContext, \
+    user_command
 from discord.ext import commands
 
 from src.cogs.general import GeneralAPI
@@ -7,6 +8,7 @@ from .converters.score_saber_player_id_converter import ScoreSaberPlayerIdConver
 from .errors import MemberPlayerNotFoundInGuildException, ScoreSaberCogException
 from .scoresaber_cog import ScoreSaberCog
 from src.kiyomi import permissions
+from ...kiyomi.errors import KiyomiException
 
 
 class ScoreSaber(ScoreSaberCog, name="Score Saber"):
@@ -53,14 +55,21 @@ class ScoreSaber(ScoreSaberCog, name="Score Saber"):
     @slash_command(name="showpp")
     async def show_pp(self, ctx: discord.ApplicationContext):
         """Gives bot permission to check the persons PP."""
-        guild_player = await self.player_service.get_player_by_guild_id_and_guild_id(ctx.guild.id, ctx.author.id)
+        guild_player = await self.player_service.get_guild_player(ctx.guild.id, ctx.author.id)
 
-        if guild_player is None or guild_player.player.pp == 0:
+        if guild_player.player.pp == 0:
             await ctx.respond(f"**{ctx.author.name}** doesn't have a PP")
             return
 
         pp_size = round(guild_player.player.pp / 100)
         await ctx.respond(f"**{ctx.author.name}**'s PP is this big:\n8{'=' * pp_size}D")
+
+    @show_pp.error
+    async def show_pp_error(self, ctx: discord.ApplicationContext, error: Exception):
+        if isinstance(error, ApplicationCommandInvokeError):
+            if isinstance(error.original, MemberPlayerNotFoundInGuildException):
+                await error.original.handle(ctx, f"**{ctx.author.name}** doesn't have a PP")
+                return
 
     # @slash_command(name="recent")
     # @Security.owner_or_permissions()
@@ -174,12 +183,21 @@ class ScoreSaber(ScoreSaberCog, name="Score Saber"):
                 return
 
     # TODO: Re-enable when Pycord becomes more stable. Currently throws error about missing localization!
-    # @user_command(name="Refresh Score Saber Profile", **permissions.is_bot_owner())
-    # async def refresh(self, ctx: ApplicationContext, member: discord.Member):
-    #     await ctx.respond(f"{ctx.author.name} just mentioned {member.mention}!")
+    @user_command(name="Refresh Score Saber Profile", **permissions.is_bot_owner())
+    async def refresh(self, ctx: ApplicationContext, member: discord.Member):
+        guild_player = await self.player_service.get_guild_player(ctx.interaction.guild.id, member.id)
+
+        await self.player_service.update_player(guild_player.player)
+        await self.score_service.update_player_scores(guild_player.player)
+
+        await ctx.respond(f"Updated {member.name}'s Score Saber profile ({guild_player.player.name})", ephemeral=True)
 
     async def cog_command_error(self, ctx: ApplicationContext, error: Exception):
         if isinstance(error, ApplicationCommandInvokeError):
+            if isinstance(error.original, KiyomiException):
+                if error.original.is_handled:
+                    return
+
             if isinstance(error.original, ScoreSaberCogException):
                 await ctx.respond(str(error.original))
                 return

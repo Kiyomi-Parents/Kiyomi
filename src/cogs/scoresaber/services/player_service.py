@@ -1,4 +1,4 @@
-from typing import Optional, List
+from typing import List
 
 import pyscoresaber
 
@@ -95,8 +95,13 @@ class PlayerService(ScoreSaberService):
 
         return guild_player
 
-    async def get_player_by_guild_id_and_guild_id(self, guild_id: int, member_id: int) -> Optional[GuildPlayer]:
-        return self.uow.guild_players.get_by_guild_id_and_member_id(guild_id, member_id)
+    async def get_guild_player(self, guild_id: int, member_id: int) -> GuildPlayer:
+        guild_player = self.uow.guild_players.get_by_guild_id_and_member_id(guild_id, member_id)
+
+        if guild_player is None:
+            raise MemberPlayerNotFoundInGuildException(guild_id, member_id)
+
+        return guild_player
 
     async def update_player(self, player: Player):
         try:

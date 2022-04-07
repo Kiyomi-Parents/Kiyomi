@@ -119,9 +119,6 @@ class EmojiEcho(EmojiEchoCog):
         await ctx.respond(f"Disabled {str(emoji)}")
 
     async def cog_command_error(self, ctx: ApplicationContext, error: Exception):
-        await super(EmojiEcho, self).cog_command_error(ctx, error)
-
-        print("after sup")
         if isinstance(error, ApplicationCommandInvokeError):
             if isinstance(error.original, KiyomiException):
                 if error.original.is_handled:
