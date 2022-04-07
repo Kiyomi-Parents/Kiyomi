@@ -133,7 +133,7 @@ class Score(Base):
 
     @property
     def get_date(self):
-        return self.time_set.astimezone(tz.tzlocal())
+        return self.time_set.astimezone(tz.UTC)
 
     def __str__(self):
         return f"Score {self.score_id} ({self.id})"
