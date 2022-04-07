@@ -22,10 +22,12 @@ class ScoreService(ScoreSaberService):
             return
 
         new_leaderboards = await self.get_new_leaderboards([new_player_score.leaderboard for new_player_score in new_player_scores])
-        self.uow.leaderboards.add_all(new_leaderboards)
+        if len(new_leaderboards) > 0:
+            self.uow.leaderboards.add_all(new_leaderboards)
 
         new_scores = await self.get_new_scores(player, new_player_scores)
-        self.uow.scores.add_all(new_scores)
+        if len(new_scores) > 0:
+            self.uow.scores.add_all(new_scores)
 
         self.uow.save_changes()
 
