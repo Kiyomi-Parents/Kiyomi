@@ -32,8 +32,8 @@ class MapDetailsEmbed(BeatSaverEmbed):
         if beatmap.tags is not None:
             self.description = " • ".join([tag.human_readable for tag in beatmap.tags])
 
-        self.add_field(name="Rating", value=f"{beatmap.rating}%")  # This should be included in the embed
-        self.add_field(name="Length", value=f"{beatmap.length}")  # This should be included in the embed
+        self.add_field(name="Rating", value=f"{beatmap.rating}%")
+        self.add_field(name="Length", value=f"{beatmap.length}")
         self.add_field(name="\u200b", value="\u200b")  # Filler for style
 
         # Combo these three
@@ -42,9 +42,9 @@ class MapDetailsEmbed(BeatSaverEmbed):
         self.add_field(name="NJS", value=difficulty.njs)
 
         # Combo these three on a single line with icons?
-        self.add_field(name="Notes", value=difficulty.notes)  # This should be included in the embed
-        self.add_field(name="Bombs", value=difficulty.bombs)  # This should be included in the embed
-        self.add_field(name="Obstacles", value=difficulty.obstacles)  # This should be included in the embed
+        self.add_field(name="Notes", value=difficulty.notes)
+        self.add_field(name="Bombs", value=difficulty.bombs)
+        self.add_field(name="Obstacles", value=difficulty.obstacles)
 
         mapping_mods = self.get_mapping_mods(difficulty)
         if len(mapping_mods) > 0:
