@@ -8,7 +8,6 @@ from .converters.score_saber_player_id_converter import ScoreSaberPlayerIdConver
 from .errors import MemberPlayerNotFoundInGuildException, ScoreSaberCogException
 from .scoresaber_cog import ScoreSaberCog
 from src.kiyomi import permissions
-from ...kiyomi.errors import KiyomiException
 
 
 class ScoreSaber(ScoreSaberCog, name="Score Saber"):
@@ -43,14 +42,14 @@ class ScoreSaber(ScoreSaberCog, name="Score Saber"):
                 profile
         )
 
-        await ctx.respond(content=f"Successfully linked **{guild_player.player.name}** ScoreSaber profile!")
+        await ctx.respond(content=f"Successfully linked **{guild_player.player.name}** ScoreSaber profile!", ephemeral=True)
 
     @player.command(name="remove")
     async def player_remove(self, ctx: discord.ApplicationContext):
         """Remove the currently linked ScoreSaber profile from yourself."""
 
         await self.player_service.remove_player_with_checks(ctx.guild.id, ctx.author.id)
-        await ctx.respond("Successfully unlinked your ScoreSaber account!")
+        await ctx.respond("Successfully unlinked your ScoreSaber account!", ephemeral=True)
 
     @slash_command(name="showpp")
     async def show_pp(self, ctx: discord.ApplicationContext):
@@ -68,8 +67,7 @@ class ScoreSaber(ScoreSaberCog, name="Score Saber"):
     async def show_pp_error(self, ctx: discord.ApplicationContext, error: Exception):
         if isinstance(error, ApplicationCommandInvokeError):
             if isinstance(error.original, MemberPlayerNotFoundInGuildException):
-                await error.original.handle(ctx, f"**{ctx.author.name}** doesn't have a PP")
-                return
+                return await error.original.handle(ctx, f"**{ctx.author.name}** doesn't have a PP")
 
     # @slash_command(name="recent")
     # @Security.owner_or_permissions()
@@ -128,7 +126,7 @@ class ScoreSaber(ScoreSaberCog, name="Score Saber"):
             guild_id = ctx.interaction.guild_id
 
         if member_id is None:
-            await ctx.respond(f"Please specify a member!")
+            await ctx.respond(f"Please specify a member!", ephemeral=True)
             return
 
         general = self.uow.bot.get_cog_api(GeneralAPI)
@@ -138,7 +136,8 @@ class ScoreSaber(ScoreSaberCog, name="Score Saber"):
         guild_player = await self.player_service.add_player(guild_id, member_id, player_id)
 
         await ctx.respond(
-                f"Successfully linked Score Saber profile {guild_player.player.name} to member {guild_player.member.name} in guild {guild_player.guild.name}"
+                f"Successfully linked Score Saber profile {guild_player.player.name} to member {guild_player.member.name} in guild {guild_player.guild.name}",
+                ephemeral=True
         )
 
     @slash_command(name="manual-remove", **permissions.is_bot_owner_and_admin_guild())
@@ -164,25 +163,22 @@ class ScoreSaber(ScoreSaberCog, name="Score Saber"):
             guild_id = ctx.interaction.guild_id
 
         if member_id is None:
-            await ctx.respond(f"Please specify a member!")
+            await ctx.respond(f"Please specify a member!", ephemeral=True)
             return
 
         guild_player = await self.player_service.remove_player(guild_id, member_id, player_id)
 
         await ctx.respond(
-                f"Successfully unlinked Score Saber profile {guild_player.player.name} from member {guild_player.member.name} in guild {guild_player.guild.name}!"
+                f"Successfully unlinked Score Saber profile {guild_player.player.name} from member {guild_player.member.name} in guild {guild_player.guild.name}!",
+                ephemeral=True
         )
 
     @manual_remove_player.error
     async def manual_remove_player_error(self, ctx: discord.ApplicationContext, error: Exception):
         if isinstance(error, ApplicationCommandInvokeError):
             if isinstance(error.original, MemberPlayerNotFoundInGuildException):
-                await ctx.respond(
-                        f"{error.original.member_id} doesn't have a Score Saber profile with ID {error.original.player_id} linked in guild {error.original.guild_id}."
-                )
-                return
+                return await error.original.handle(ctx, f"{error.original.member_id} doesn't have a Score Saber profile with ID {error.original.player_id} linked in guild {error.original.guild_id}.")
 
-    # TODO: Re-enable when Pycord becomes more stable. Currently throws error about missing localization!
     @user_command(name="Refresh Score Saber Profile", **permissions.is_bot_owner())
     async def refresh(self, ctx: ApplicationContext, member: discord.Member):
         guild_player = await self.player_service.get_guild_player(ctx.interaction.guild.id, member.id)
@@ -194,10 +190,6 @@ class ScoreSaber(ScoreSaberCog, name="Score Saber"):
 
     async def cog_command_error(self, ctx: ApplicationContext, error: Exception):
         if isinstance(error, ApplicationCommandInvokeError):
-            if isinstance(error.original, KiyomiException):
-                if error.original.is_handled:
-                    return
-
             if isinstance(error.original, ScoreSaberCogException):
-                await ctx.respond(str(error.original))
-                return
+                return await error.original.handle(ctx)
+

@@ -19,7 +19,7 @@ class FancyPresence(FancyPresenceCog):
 
         await self.presence_service.update_status()
 
-        await ctx.respond("Status force updated!")
+        await ctx.respond("Status force updated!", ephemeral=True)
 
     @status.command(name="set", **permissions.is_bot_owner_and_admin_guild())
     async def status_set(
@@ -34,7 +34,7 @@ class FancyPresence(FancyPresenceCog):
 
         await self.presence_service.set_presence(Presence(0, text))
 
-        await ctx.respond("Status updated!")
+        await ctx.respond("Status updated!", ephemeral=True)
 
     @status.command(name="reset", **permissions.is_bot_owner_and_admin_guild())
     async def status_set(
@@ -45,4 +45,4 @@ class FancyPresence(FancyPresenceCog):
 
         await self.presence_service.reset_presence()
 
-        await ctx.respond("Status updated!")
+        await ctx.respond("Status updated!", ephemeral=True)

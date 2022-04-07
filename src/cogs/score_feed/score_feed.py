@@ -34,7 +34,7 @@ class ScoreFeed(ScoreFeedCog, name="Score Feed"):
         """Send recent score notifications."""
         await self.notification_service.send_notifications(ctx.guild.id)
 
-        await ctx.respond("Doing the thing...")
+        await ctx.respond("Doing the thing...", ephemeral=True)
 
     @slash_command(**permissions.is_bot_owner_and_admin_guild())
     async def mark_sent(self, ctx, player_id: str = None):
@@ -47,13 +47,13 @@ class ScoreFeed(ScoreFeedCog, name="Score Feed"):
             for player in players:
                 self.sent_score_service.mark_all_player_scores_sent(player)
 
-            await ctx.respond(f"Marked scores as sent for {len(players)} players")
+            await ctx.respond(f"Marked scores as sent for {len(players)} players", ephemeral=True)
             return
 
         player = scoresaber.get_player(player_id)
 
         if player is None:
-            await ctx.respond(f"Could not find player with id {player_id}")
+            await ctx.respond(f"Could not find player with id {player_id}", ephemeral=True)
             return
 
         self.sent_score_service.mark_all_player_scores_sent(player)

@@ -59,11 +59,10 @@ class Settings(SettingsCog):
         abstract_setting = self.setting_service.set(ctx.interaction.guild.id, setting, value)
         setting_value = self.setting_service.get_value(ctx.interaction.guild.id, setting)
 
-        await ctx.respond(f"{abstract_setting.name_human} is now set to: {setting_value}")
+        await ctx.respond(f"{abstract_setting.name_human} is now set to: {setting_value}", ephemeral=True)
 
     @settings_set.error
     async def settings_set_error(self, ctx: discord.ApplicationContext, error: Exception):
         if isinstance(error, ApplicationCommandInvokeError):
             if isinstance(error.original, SettingsCogException):
-                await ctx.respond(str(error.original))
-                return
+                return await error.original.handle(ctx)

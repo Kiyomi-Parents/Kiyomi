@@ -6,8 +6,14 @@ from discord import ApplicationContext, AutocompleteContext
 class KiyomiException(Exception):
     is_handled: bool = False
 
-    async def handle(self, ctx: ApplicationContext, message: str):
-        await ctx.respond(message)
+    async def handle(self, ctx: ApplicationContext, message: Optional[str] = None, **kwargs):
+        if self.is_handled:
+            return
+
+        if message is None:
+            message = str(self)
+
+        await ctx.respond(message, ephemeral=True, **kwargs)
 
         self.is_handled = True
 

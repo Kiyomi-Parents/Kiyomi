@@ -74,5 +74,4 @@ class BeatSaver(BeatSaverCog, name="Beat Saver"):
     async def map_error(self, ctx: discord.ApplicationContext, error: Exception):
         if isinstance(error, ApplicationCommandInvokeError):
             if isinstance(error.original, BeatSaverCogException):
-                await ctx.respond(str(error.original))
-                return
+                return await error.original.handle(ctx)
