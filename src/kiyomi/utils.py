@@ -58,7 +58,7 @@ class Utils:
                     setattr(old_class, var, getattr(new_class, var))
 
     @staticmethod
-    def class_inheritors(cls: Type[TClass]) -> List[TClass]:
+    def class_inheritors(cls: Type[TClass]) -> List[Type[TClass]]:
         subclasses = set()
         work = [cls]
 

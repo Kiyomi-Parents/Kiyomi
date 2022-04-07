@@ -37,3 +37,11 @@ class InvalidSettingType(SettingsCogException):
 
     def __str__(self):
         return f"Can't convert setting of type {self.setting_type} to {self.expected_setting_type}"
+
+
+class PermissionDenied(SettingsCogException):
+    def __init__(self, setting_name: str):
+        self.setting_name = setting_name
+
+    def __str__(self):
+        return f"I can't let you edit that setting mister"

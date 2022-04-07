@@ -3,8 +3,8 @@ from typing import List
 import discord
 from discord import SlashCommandGroup, Option, OptionChoice, ApplicationCommandInvokeError
 
-from src.kiyomi import Kiyomi, permissions
-from .errors import SettingsCogException
+from src.kiyomi import Kiyomi
+from .errors import SettingsCogException, PermissionDenied
 from .services import SettingService
 from .services.settings_autocomplete_service import SettingAutocompleteService
 from .settings_cog import SettingsCog
@@ -26,8 +26,7 @@ class Settings(SettingsCog):
 
     settings = SlashCommandGroup(
         "setting",
-        "Various settings",
-        **permissions.is_bot_owner()
+        "Various settings"
     )
 
     # Workaround
@@ -37,7 +36,7 @@ class Settings(SettingsCog):
     async def get_setting_values(self, ctx: discord.AutocompleteContext) -> List[OptionChoice]:
         return await self.settings_autocomplete_service.get_setting_values(ctx)
 
-    @settings.command(name="set", **permissions.is_bot_owner())
+    @settings.command(name="set")
     async def settings_set(
         self,
         ctx: discord.ApplicationContext,
@@ -53,6 +52,9 @@ class Settings(SettingsCog):
         )
     ):
         """Set setting value"""
+
+        if not self.setting_service.has_permission(setting, ctx.interaction.user):
+            raise PermissionDenied(setting)
 
         abstract_setting = self.setting_service.set(ctx.interaction.guild.id, setting, value)
         setting_value = self.setting_service.get_value(ctx.interaction.guild.id, setting)

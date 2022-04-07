@@ -1,5 +1,7 @@
 from typing import Optional, List
 
+from discord import Member
+
 from src.kiyomi import Kiyomi, Utils
 from .settings_service import SettingsService
 from ..errors import FailedToCreateSetting, \
@@ -26,8 +28,11 @@ class SettingService(SettingsService):
         return setting_type.value(value)
 
     def wrap_setting(self, name_human: str, setting: Setting) -> AbstractSetting:
-        setting_classes = Utils.class_inheritors(AbstractRegularSetting)
-        setting_classes += Utils.class_inheritors(AbstractBotSetting)
+        abstract_setting_classes = Utils.class_inheritors(AbstractSetting)
+        setting_classes = []
+
+        for abstract_setting_class in abstract_setting_classes:
+            setting_classes += Utils.class_inheritors(abstract_setting_class)
 
         for setting_class in setting_classes:
             if issubclass(setting_class, AbstractSetting):
@@ -38,6 +43,11 @@ class SettingService(SettingsService):
                         return setting_class.get_from_setting(self.bot, name_human, setting)
 
         raise FailedToConvertSetting(setting.setting_type)
+
+    def has_permission(self, name: str, member: Member) -> bool:
+        registered_setting = self.find_registered_setting(name)
+
+        return registered_setting.has_permission(member)
 
     def find_registered_setting(self, name: str) -> AbstractSetting:
         for reg_setting in self.registered_settings:

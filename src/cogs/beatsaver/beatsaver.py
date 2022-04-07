@@ -39,18 +39,18 @@ class BeatSaver(BeatSaverCog, name="Beat Saver"):
         await self.beatmap_service.start_scoresaber_api_client()
 
         settings = [
-            EmojiSetting.create(self.bot, "Easy emoji", "easy_difficulty_emoji", None),
-            EmojiSetting.create(self.bot, "Normal emoji", "normal_difficulty_emoji", None),
-            EmojiSetting.create(self.bot, "Hard emoji", "hard_difficulty_emoji", None),
-            EmojiSetting.create(self.bot, "Expert emoji", "expert_difficulty_emoji", None),
-            EmojiSetting.create(self.bot, "Expert+ emoji", "expert_plus_difficulty_emoji", None),
-            EmojiSetting.create(self.bot, "Standard emoji", "standard_game_mode_emoji", None),
-            EmojiSetting.create(self.bot, "One Saber emoji", "one_saber_game_mode_emoji", None),
-            EmojiSetting.create(self.bot, "No Arrows emoji", "no_arrows_game_mode_emoji", None),
-            EmojiSetting.create(self.bot, "90 Degree emoji", "90_degree_game_mode_emoji", None),
-            EmojiSetting.create(self.bot, "360 Degree emoji", "360_degree_game_mode_emoji", None),
-            EmojiSetting.create(self.bot, "Lightshow emoji", "lightshow_game_mode_emoji", None),
-            EmojiSetting.create(self.bot, "Lawless emoji", "lawless_game_mode_emoji", None)
+            EmojiSetting.create(self.bot, "Easy emoji", "easy_difficulty_emoji"),
+            EmojiSetting.create(self.bot, "Normal emoji", "normal_difficulty_emoji"),
+            EmojiSetting.create(self.bot, "Hard emoji", "hard_difficulty_emoji"),
+            EmojiSetting.create(self.bot, "Expert emoji", "expert_difficulty_emoji"),
+            EmojiSetting.create(self.bot, "Expert+ emoji", "expert_plus_difficulty_emoji"),
+            EmojiSetting.create(self.bot, "Standard emoji", "standard_game_mode_emoji"),
+            EmojiSetting.create(self.bot, "One Saber emoji", "one_saber_game_mode_emoji"),
+            EmojiSetting.create(self.bot, "No Arrows emoji", "no_arrows_game_mode_emoji"),
+            EmojiSetting.create(self.bot, "90 Degree emoji", "90_degree_game_mode_emoji"),
+            EmojiSetting.create(self.bot, "360 Degree emoji", "360_degree_game_mode_emoji"),
+            EmojiSetting.create(self.bot, "Lightshow emoji", "lightshow_game_mode_emoji"),
+            EmojiSetting.create(self.bot, "Lawless emoji", "lawless_game_mode_emoji")
         ]
 
         self.bot.events.emit("setting_register", settings)

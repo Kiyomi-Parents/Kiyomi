@@ -1,5 +1,6 @@
 import discord
-from discord import SlashCommandGroup, Option, ApplicationCommandInvokeError, ApplicationContext, slash_command
+from discord import SlashCommandGroup, Option, ApplicationCommandInvokeError, ApplicationContext, slash_command, \
+    Permissions
 from discord.ext import commands
 from discord.ext.commands import EmojiConverter
 
@@ -16,7 +17,7 @@ class EmojiEcho(EmojiEchoCog):
     @commands.Cog.listener()
     async def on_ready(self):
         settings = [
-            ToggleSetting.create("let Kiyomi repost enabled emojis", "repost_emoji", False)
+            ToggleSetting.create("let Kiyomi repost enabled emojis", "repost_emoji", Permissions(manage_messages=True))
         ]
 
         self.bot.events.emit("setting_register", settings)

@@ -21,6 +21,10 @@ class SettingAutocompleteService(SettingsService):
         settings = []
 
         for setting in self.setting_service.registered_settings:
+
+            if not setting.has_permission(ctx.interaction.user):
+                continue
+
             if ctx.value.lower() in setting.name_human.lower():
                 settings.append(OptionChoice(setting.name_human, setting.name))
 
@@ -35,6 +39,9 @@ class SettingAutocompleteService(SettingsService):
             return []
 
         if setting is None:
+            return []
+
+        if not setting.has_permission(ctx.interaction.user):
             return []
 
         return await setting.get_autocomplete(ctx)

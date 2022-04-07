@@ -1,3 +1,4 @@
+from discord import Permissions
 from discord.ext import commands
 
 from src.cogs.settings.storage.model.toggle_setting import ToggleSetting
@@ -37,9 +38,11 @@ class AchievementRoles(AchievementRolesCog, name="Achievement Roles"):
 
     @commands.Cog.listener()
     async def on_ready(self):
+        permissions = Permissions(manage_roles=True)
+
         settings = [
-            ToggleSetting.create("Roles based on PP", "achievement_roles_pp", False),
-            ToggleSetting.create("Roles based on rank", "achievement_roles_rank", False)
+            ToggleSetting.create("Roles based on PP", "achievement_roles_pp", permissions),
+            ToggleSetting.create("Roles based on rank", "achievement_roles_rank", permissions)
         ]
 
         self.bot.events.emit("setting_register", settings)
