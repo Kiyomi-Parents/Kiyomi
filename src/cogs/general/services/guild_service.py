@@ -1,4 +1,5 @@
 import discord
+from discord import NotFound
 
 from .general_service import GeneralService
 from ..errors import GuildNotFoundException
@@ -10,7 +11,10 @@ class GuildService(GeneralService):
         discord_guild = self.bot.get_guild(guild_id)
 
         if discord_guild is None:
-            discord_guild = await self.bot.fetch_guild(guild_id)
+            try:
+                discord_guild = await self.bot.fetch_guild(guild_id)
+            except NotFound:
+                raise GuildNotFoundException(f"Could not find guild with id {guild_id}")
 
         if discord_guild is None:
             raise GuildNotFoundException(f"Could not find guild with id {guild_id}")
