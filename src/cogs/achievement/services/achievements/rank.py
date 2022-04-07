@@ -35,6 +35,9 @@ class Rank(AchievementGenerator):
             guild_players = scoresaber.get_guild_players_by_member_id(member.id)
 
             for guild_player in guild_players:
+                if guild_player.player.rank == 0:
+                    return False
+
                 player_rank_index = guild_player.player.rank // 100
 
                 if player_rank_index <= index:
