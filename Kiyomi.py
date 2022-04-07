@@ -24,8 +24,13 @@ if __name__ == "__main__":
 
     bot = Kiyomi(command_prefix="!", intents=intents, db=database)
 
-    bot.default_guild = int(os.getenv("DEFAULT_GUILD"))
-    bot.debug_guilds = [int(guild_id) for guild_id in os.getenv("DEBUG_GUILDS").split(",")]
+    default_guild = os.getenv("DEFAULT_GUILD")
+    if default_guild is not None:
+        bot.default_guild = int(default_guild)
+        
+    debug_guilds = os.getenv("DEBUG_GUILDS")
+    if debug_guilds is not None:
+        bot.debug_guilds = [int(guild_id) for guild_id in debug_guilds.split(",") if guild_id]
 
     Logger.log_init()
 
