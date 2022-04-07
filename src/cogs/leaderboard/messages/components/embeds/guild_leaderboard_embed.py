@@ -2,7 +2,6 @@ from datetime import datetime
 from typing import List
 
 import timeago
-from dateutil import tz
 from discord import Colour
 from prettytable import PrettyTable
 
@@ -61,7 +60,7 @@ class GuildLeaderboardEmbed(LeaderboardEmbed):
         for index, score in enumerate(self.leaderboard):
             rank = f"#{index + 1}"
             name = score.player.name
-            date = timeago.format(score.get_date, datetime.now(tz=tz.UTC))
+            date = timeago.format(score.get_date, datetime.utcnow())
 
             if len(score.modifiers):
                 mods = score.modifiers
