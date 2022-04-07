@@ -81,7 +81,7 @@ class RoleService(GeneralService):
             self.uow.member_roles.add(MemberRole(guild_id, member_id, role_id))
         except DiscordException as error:
             Logger.log(guild_id, f"Failed to add role {discord_role.name} ({discord_role.id}) to member {discord_member.name} ({discord_member.id})")
-            raise error
+            # raise error
 
     @Security.can_edit_roles()
     async def remove_role_from_member(self, guild_id: int, member_id: int, role_id: int, reason: str) -> None:
@@ -97,5 +97,5 @@ class RoleService(GeneralService):
                 self.uow.member_roles.remove(role)
 
         except DiscordException as error:
-            Logger.log(guild_id, f"Failed to add role {discord_role.name} ({discord_role.id}) to member {discord_member.name} ({discord_member.id})")
-            raise error
+            Logger.log(guild_id, f"Failed to remove role {discord_role.name} ({discord_role.id}) from member {discord_member.name} ({discord_member.id})")
+            # raise error
