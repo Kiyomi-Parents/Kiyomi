@@ -24,8 +24,10 @@ class MemberService(GeneralService):
             try:
                 discord_member = await discord_guild.fetch_member(member_id)
             except NotFound:
-                if self.uow.members.exists(member_id):
-                    self.uow.members.remove_by_id(member_id)
+                guild_member = self.uow.guild_members.get_by_guild_id_and_member_id(guild_id, member_id)
+
+                if guild_member is not None:
+                    self.uow.guild_members.remove(guild_member)
 
                 raise MemberNotFoundException(f"Could not find member with id {member_id} in guild {discord_guild.name}")
 
