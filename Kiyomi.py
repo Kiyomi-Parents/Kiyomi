@@ -16,7 +16,15 @@ if __name__ == "__main__":
     DATABASE_NAME = os.getenv("DATABASE_NAME")
 
     # Init database
-    database = Database(create_engine(f"mariadb+pymysql://{DATABASE_USER}:{DATABASE_PW}@{DATABASE_IP}/{DATABASE_NAME}?charset=utf8mb4", echo=False, pool_pre_ping=True, pool_recycle=3600))
+    database = Database(
+            create_engine(
+                    f"mariadb+pymysql://{DATABASE_USER}:{DATABASE_PW}@{DATABASE_IP}/{DATABASE_NAME}?charset=utf8mb4",
+                    echo=False,
+                    pool_pre_ping=True,
+                    pool_recycle=3600,
+                    connect_args={"connect_args": {"init_command": "SET time_zone = '+00:00'"}}
+            )
+    )
 
     intents = discord.Intents.default()
     intents.members = True
