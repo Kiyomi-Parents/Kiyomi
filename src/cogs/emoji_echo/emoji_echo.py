@@ -25,6 +25,9 @@ class EmojiEcho(EmojiEchoCog):
     async def on_message(self, msg: discord.Message):
         """Repost emoji if enabled"""
 
+        if msg.guild is None:
+            return
+
         if msg.author.id == self.bot.user.id:
             return
 
