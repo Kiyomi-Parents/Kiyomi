@@ -32,7 +32,7 @@ class Score(Base):
     full_combo = Column(Boolean)
     hmd = Column(Integer)
     has_replay = Column(Boolean)
-    time_set = Column(DateTime)
+    time_set = Column(DateTime(timezone=True))
 
     leaderboard_id = Column(Integer, ForeignKey("leaderboard.id", ondelete="CASCADE"))
     leaderboard = relationship(
