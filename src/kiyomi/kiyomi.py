@@ -50,7 +50,7 @@ class Kiyomi(Bot):
                 return
 
         await self.send_dm_with_stacktrace(context, exception)
-        await context.respond("Something went horribly wrong, Kiyomi has fallen out of her box!")
+        await context.respond("Something went horribly wrong, Kiyomi has fallen out of her box!", ephemeral=True)
         raise exception
 
     async def send_dm_with_stacktrace(self, context: ApplicationContext, exception: DiscordException):
