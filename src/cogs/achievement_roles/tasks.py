@@ -4,6 +4,7 @@ from src.cogs.general import GeneralAPI
 from src.kiyomi import BaseTasks, Kiyomi
 from src.kiyomi.utils import Utils
 from .services import MemberAchievementRoleService
+from src.cogs.fancy_presence import FancyPresenceAPI
 
 
 class Tasks(BaseTasks):
@@ -13,11 +14,10 @@ class Tasks(BaseTasks):
 
         self.member_service = member_service
 
-    # TODO: Better error handling
     @tasks.loop(minutes=5)
     @Utils.time_task
     @Utils.discord_ready
-    @Utils.update_tasks_list
+    @FancyPresenceAPI.presence_task
     async def update_member_roles(self):
         """Updating roles"""
         general = self.bot.get_cog_api(GeneralAPI)

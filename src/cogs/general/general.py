@@ -1,10 +1,9 @@
 import discord.member
-from discord import SlashCommandGroup
 from discord.ext import commands
 
 from .general_cog import GeneralCog
 from .services import EmojiService, GuildService, MemberService, RoleService, ChannelService, MessageService
-from src.kiyomi import Kiyomi, Utils, permissions
+from src.kiyomi import Kiyomi, permissions
 
 
 class General(GeneralCog):
@@ -47,15 +46,3 @@ class General(GeneralCog):
     async def say(self, ctx, text: str):
         """I repeat what you say"""
         await ctx.respond(text)
-
-    status = SlashCommandGroup(
-        "status", "Commands related to Kiyomi's status",
-        **permissions.is_bot_owner_and_admin_guild()
-    )
-
-    @status.command(name="update", **permissions.is_bot_owner_and_admin_guild())
-    @Utils.update_tasks_list
-    async def status_update(self, ctx):
-        """owo"""
-        await ctx.respond("status should've updated")
-

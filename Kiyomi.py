@@ -38,6 +38,7 @@ if __name__ == "__main__":
     bot.load_extension(name="src.cogs.achievement_roles")
     bot.load_extension(name="src.cogs.view_persistence")
     bot.load_extension(name="src.cogs.emoji_echo")
+    bot.load_extension(name="src.cogs.fancy_presence")
 
     # database.drop_tables()
     # database.create_tables()

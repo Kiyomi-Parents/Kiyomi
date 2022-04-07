@@ -4,6 +4,7 @@ from src.kiyomi import Kiyomi, BaseTasks
 from src.kiyomi.utils import Utils
 from src.log import Logger
 from .services import PlayerService, ScoreService
+from src.cogs.fancy_presence import FancyPresenceAPI
 
 
 class Tasks(BaseTasks):
@@ -17,7 +18,7 @@ class Tasks(BaseTasks):
     @tasks.loop(minutes=10)
     @Utils.time_task
     @Utils.discord_ready
-    @Utils.update_tasks_list
+    @FancyPresenceAPI.presence_task
     async def update_players(self):
         """Updating players"""
         players = await self.player_service.get_all_players()
@@ -29,7 +30,7 @@ class Tasks(BaseTasks):
     @tasks.loop(minutes=2)
     @Utils.time_task
     @Utils.discord_ready
-    @Utils.update_tasks_list
+    @FancyPresenceAPI.presence_task
     async def update_players_scores(self):
         """Updating scores"""
         players = await self.player_service.get_all_players()

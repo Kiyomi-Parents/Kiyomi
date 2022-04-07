@@ -1,5 +1,4 @@
 import asyncio
-import random
 from datetime import datetime
 from functools import wraps
 from typing import TypeVar, Type, List
@@ -11,6 +10,7 @@ from discord.ext import tasks
 from src.log import Logger
 
 TClass = TypeVar('TClass')
+
 
 class Utils:
     @staticmethod
@@ -70,32 +70,6 @@ class Utils:
                     work.append(child)
 
         return list(subclasses)
-
-    @staticmethod
-    def update_tasks_list(func):
-        async def update_status(bot):
-            if bot.running_tasks:
-                await bot.change_presence(activity=discord.Game(" | ".join(bot.running_tasks)))
-            else:
-                activity_index = random.randint(0, len(bot.activity_list) - 1)
-                await bot.change_presence(activity=discord.Game(bot.activity_list[activity_index]))
-
-        @wraps(func)
-        async def wrapper(self, *args, **kwargs):
-            if func.__doc__ not in self.bot.running_tasks:
-                self.bot.running_tasks.append(func.__doc__)
-
-            await update_status(self.bot)
-
-            result = await func(self, *args, **kwargs)
-
-            if func.__doc__ in self.bot.running_tasks:
-                self.bot.running_tasks.pop(self.bot.running_tasks.index(func.__doc__))
-                await update_status(self.bot)
-
-            return result
-
-        return wrapper
 
     @staticmethod
     def combine_decorators(*decs):

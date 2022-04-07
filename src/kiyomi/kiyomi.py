@@ -17,8 +17,6 @@ TCog = TypeVar('TCog')
 class Kiyomi(Bot):
     running_tests = False
     events = AsyncIOEventEmitter()
-    running_tasks = []
-    activity_list = ["Sleeping", "Sitting in a tiny box", "Chilling @ Smugle Stick", "Drinking wine"]
 
     def __init__(self, *args, db: Database, **kwargs):
         super().__init__(*args, **kwargs)
