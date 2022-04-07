@@ -38,6 +38,11 @@ class General(GeneralCog):
         await self.guild_service.register_guild(guild.id)
 
     @commands.slash_command()
+    async def invite(self, ctx):
+        """Get the invite link for the bot"""
+        await ctx.respond("https://discord.com/api/oauth2/authorize?client_id=834048194085650462&permissions=139855260736&scope=bot%20applications.commands", ephemeral=True)
+
+    @commands.slash_command()
     async def hello(self, ctx):
         """Greet the bot"""
         await ctx.respond("Hello there!")
