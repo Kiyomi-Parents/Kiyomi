@@ -22,7 +22,7 @@ if __name__ == "__main__":
                     echo=False,
                     pool_pre_ping=True,
                     pool_recycle=3600,
-                    connect_args={"connect_args": {"init_command": "SET time_zone = '+00:00'"}}
+                    connect_args={"init_command": "SET time_zone = '+00:00'"}
             )
     )
 
