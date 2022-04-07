@@ -2,11 +2,11 @@ from discord import slash_command
 from discord.ext import commands
 
 from src.cogs.scoresaber import ScoreSaberAPI
-from src.cogs.scoresaber.storage.model.guild_player import GuildPlayer
 from src.cogs.settings.storage.model.channel_setting import ChannelSetting
 from src.kiyomi import Kiyomi, permissions
 from .score_feed_cog import ScoreFeedCog
 from .services import SentScoreService, NotificationService
+from src.cogs.scoresaber.storage.model.guild_player import GuildPlayer
 
 
 class ScoreFeed(ScoreFeedCog, name="Score Feed"):
@@ -17,7 +17,6 @@ class ScoreFeed(ScoreFeedCog, name="Score Feed"):
         self.events()
 
     def events(self):
-
         @self.bot.events.on("on_new_player")
         async def mark_scores_sent(guild_player: GuildPlayer):
             self.sent_score_service.mark_player_scores_sent(guild_player.player, guild_player.guild)

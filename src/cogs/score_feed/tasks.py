@@ -29,4 +29,3 @@ class Tasks(BaseTasks):
         for player in players:
             for guild in player.guilds:
                 await self.notification_service.send_notification(guild, player)
-

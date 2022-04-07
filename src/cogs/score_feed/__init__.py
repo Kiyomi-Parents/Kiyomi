@@ -8,8 +8,8 @@ from .tasks import Tasks
 def setup(bot: Kiyomi):
     uow = UnitOfWork(bot.database.session)
 
-    notification_service = NotificationService(bot, uow)
     sent_score_service = SentScoreService(bot, uow)
+    notification_service = NotificationService(bot, uow, sent_score_service)
 
     score_feed_tasks = Tasks(bot, notification_service)
 

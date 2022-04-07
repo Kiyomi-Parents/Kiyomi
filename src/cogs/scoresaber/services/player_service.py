@@ -76,8 +76,6 @@ class PlayerService(ScoreSaberService):
         self.uow.guild_players.add(GuildPlayer(guild_id, member_id, player_id))
         self.uow.save_changes()
 
-        await self.score_service.update_player_scores(player)
-
         guild_player = self.uow.guild_players.get_by_guild_id_and_member_id_and_player_id(guild_id, member_id, player_id)
 
         self.bot.events.emit("on_new_player", guild_player)

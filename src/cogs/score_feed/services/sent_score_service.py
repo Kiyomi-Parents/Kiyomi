@@ -38,3 +38,17 @@ class SentScoreService(ScoreFeedService):
 
         if len(sent_scores) != 0:
             self.uow.sent_score_repo.add_all(sent_scores)
+
+    def should_send_scores(self, guild: Guild, player: Player):
+        sent_scores = self.uow.sent_score_repo.get_sent_scores_count(guild.id, player.id)
+        unsent_scores = self.uow.sent_score_repo.get_unsent_scores_count(guild.id, player.id)
+
+        # If there are not sent scores, then the player must be new to the system. Don't send scores
+        if sent_scores == 0:
+            return False
+
+        # If there are more than 50 unsent scores then don't send.
+        if unsent_scores > 50:
+            return False
+
+        return True
