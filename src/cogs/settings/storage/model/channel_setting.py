@@ -15,11 +15,11 @@ class ChannelSetting(AbstractBotSetting[discord.abc.GuildChannel]):
 
     @staticmethod
     def create(
-        bot: Kiyomi,
-        name_human: str,
-        name: str,
-        permissions: Optional[Permissions] = None,
-        default_value: Optional[discord.abc.GuildChannel] = None
+            bot: Kiyomi,
+            name_human: str,
+            name: str,
+            permissions: Optional[Permissions] = None,
+            default_value: Optional[discord.abc.GuildChannel] = None
     ):
         if permissions is None:
             permissions = Permissions(manage_channels=True)
@@ -58,10 +58,10 @@ class ChannelSetting(AbstractBotSetting[discord.abc.GuildChannel]):
 
     @staticmethod
     def get_from_setting(
-        bot: Kiyomi,
-        name_human: str,
-        setting: Setting,
-        permissions: Optional[Permissions] = None
+            bot: Kiyomi,
+            name_human: str,
+            setting: Setting,
+            permissions: Optional[Permissions] = None
     ):
         if setting.setting_type is not SettingType.CHANNEL:
             raise InvalidSettingType(setting.setting_type, SettingType.CHANNEL)

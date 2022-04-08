@@ -60,4 +60,3 @@ class PresenceService(FancyPresenceService):
         self.static_presence = None
 
         await self.update_status()
-

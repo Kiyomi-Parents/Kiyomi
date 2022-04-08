@@ -15,11 +15,11 @@ class EmojiSetting(AbstractBotSetting[discord.Emoji]):
 
     @staticmethod
     def create(
-        bot: Kiyomi,
-        name_human: str,
-        name: str,
-        permissions: Optional[Permissions] = None,
-        default_value: Optional[discord.Emoji] = None
+            bot: Kiyomi,
+            name_human: str,
+            name: str,
+            permissions: Optional[Permissions] = None,
+            default_value: Optional[discord.Emoji] = None
     ):
         if permissions is None:
             permissions = Permissions(manage_emojis=True)
@@ -58,10 +58,10 @@ class EmojiSetting(AbstractBotSetting[discord.Emoji]):
 
     @staticmethod
     def get_from_setting(
-        bot: Kiyomi,
-        name_human: str,
-        setting: Setting,
-        permissions: Optional[Permissions] = None
+            bot: Kiyomi,
+            name_human: str,
+            setting: Setting,
+            permissions: Optional[Permissions] = None
     ):
         if setting.setting_type is not SettingType.EMOJI:
             raise InvalidSettingType(setting.setting_type, SettingType.EMOJI)

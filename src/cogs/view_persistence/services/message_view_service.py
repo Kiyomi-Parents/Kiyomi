@@ -30,7 +30,15 @@ class MessageViewService(ViewPersistenceService):
             message_view = self.uow.message_views.get_by_message_id(message.id)
 
             if message_view is not None:
-                persistences.append(Persistence(message.guild_id, channel_id, message.id, message_view.view_name, *message_view.view_parameters))
+                persistences.append(
+                        Persistence(
+                                message.guild_id,
+                                channel_id,
+                                message.id,
+                                message_view.view_name,
+                                *message_view.view_parameters
+                        )
+                )
 
         return persistences
 
@@ -55,5 +63,3 @@ class MessageViewService(ViewPersistenceService):
             persistences += await self.get_guild_persistent_views(guild.id)
 
         return persistences
-
-

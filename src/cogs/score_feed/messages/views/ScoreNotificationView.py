@@ -42,9 +42,22 @@ class ScoreNotificationView(PersistentView):
 
     async def serialize_persistence(self) -> Persistence:
         if self.previous_score is not None:
-            return Persistence(self.guild.id, self.message.channel.id, self.message.id, ScoreNotificationView.__name__, str(self.score.id), str(self.previous_score.id))
+            return Persistence(
+                    self.guild.id,
+                    self.message.channel.id,
+                    self.message.id,
+                    ScoreNotificationView.__name__,
+                    str(self.score.id),
+                    str(self.previous_score.id)
+            )
 
-        return Persistence(self.guild.id, self.message.channel.id, self.message.id, ScoreNotificationView.__name__, str(self.score.id))
+        return Persistence(
+                self.guild.id,
+                self.message.channel.id,
+                self.message.id,
+                ScoreNotificationView.__name__,
+                str(self.score.id)
+        )
 
     @staticmethod
     async def deserialize_persistence(bot: Kiyomi, persistence: Persistence):

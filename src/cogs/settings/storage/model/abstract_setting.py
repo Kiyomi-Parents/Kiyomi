@@ -16,10 +16,10 @@ class AbstractSetting(ABC, Generic[T]):
     permissions: Optional[Permissions] = None
 
     def __init__(
-        self,
-        name_human: str,
-        setting: Setting,
-        permissions: Optional[Permissions] = None
+            self,
+            name_human: str,
+            setting: Setting,
+            permissions: Optional[Permissions] = None
     ):
         self.setting = setting
         self.name_human = name_human

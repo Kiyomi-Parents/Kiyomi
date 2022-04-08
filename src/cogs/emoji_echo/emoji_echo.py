@@ -89,13 +89,13 @@ class EmojiEcho(EmojiEchoCog):
 
     @emoji.command(name="enable", **permissions.is_bot_owner())
     async def emoji_enable(
-        self,
-        ctx: discord.ApplicationContext,
-        emoji: Option(
-                EmojiConverter,
-                "Choose an emoji",
-                autocomplete=get_available_emojis
-        )
+            self,
+            ctx: discord.ApplicationContext,
+            emoji: Option(
+                    EmojiConverter,
+                    "Choose an emoji",
+                    autocomplete=get_available_emojis
+            )
     ):
         """Allow the given emoji to be used by the bot"""
 
@@ -107,13 +107,14 @@ class EmojiEcho(EmojiEchoCog):
         return await self.emoji_autocomplete_service.get_enabled_emojis(ctx)
 
     @emoji.command(name="disable", **permissions.is_bot_owner())
-    async def emoji_disable(self,
-        ctx: discord.ApplicationContext,
-        emoji: Option(
-                EmojiConverter,
-                "Choose an emoji",
-                autocomplete=get_enabled_emojis
-        )
+    async def emoji_disable(
+            self,
+            ctx: discord.ApplicationContext,
+            emoji: Option(
+                    EmojiConverter,
+                    "Choose an emoji",
+                    autocomplete=get_enabled_emojis
+            )
     ):
         """Disallow the given emoji from being used by the bot"""
 

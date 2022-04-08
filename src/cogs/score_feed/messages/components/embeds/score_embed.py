@@ -67,7 +67,7 @@ class ScoreEmbed(ScoreFeedEmbed):
             output = f"**{pp} PP**"
 
             weighted_pp = self.get_weighted_pp
-            
+
             if weighted_pp is None:
                 return f"{output}"
 
@@ -155,5 +155,3 @@ class ScoreEmbed(ScoreFeedEmbed):
             return f"[{beatmap.uploader_name}]({beatmap.mapper_url}) ({beatmap.metadata_level_author_name})"
 
         return f"{self.score.leaderboard.level_author_name}"
-
-

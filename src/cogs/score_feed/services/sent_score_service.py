@@ -1,4 +1,3 @@
-
 from src.cogs.scoresaber import ScoreSaberAPI
 from src.log import Logger
 from .score_feed_service import ScoreFeedService

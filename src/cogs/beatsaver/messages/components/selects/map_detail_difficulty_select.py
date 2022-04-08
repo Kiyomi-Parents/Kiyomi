@@ -14,13 +14,15 @@ class MapDetailDifficultySelect(BeatSaverComponent, discord.ui.Select):
     def __init__(self, bot: Kiyomi, parent, beatmap: Beatmap):
         BeatSaverComponent.__init__(self, bot, parent, beatmap)
         discord.ui.Select.__init__(
-            self,
-            custom_id=f"map:detail:difficulty:select:beatmap:{beatmap.id}",
-            placeholder="Choose your favourite difficulty...",
-            min_values=1,
-            max_values=1,
-            options=self.get_options(),
+                self,
+                custom_id=f"map:detail:difficulty:select:beatmap:{beatmap.id}",
+                placeholder="Choose your favourite difficulty...",
+                min_values=1,
+                max_values=1,
+                options=self.get_options(),
         )
+
+        self.options: Optional[List[discord.SelectOption]] = None
 
     async def after_init(self):
         self.options = await self.get_options_async()
@@ -37,26 +39,34 @@ class MapDetailDifficultySelect(BeatSaverComponent, discord.ui.Select):
         return beatmap_difficulties
 
     def get_options(self) -> List[discord.SelectOption]:
-        return [discord.SelectOption(
-            label=f"{beatmap_difficulty.difficulty_text}",
-            description=self.difficulty_stars(beatmap_difficulty),
-            value=f"{beatmap_difficulty.difficulty.serialize}",
-            default=self.parent.beatmap_difficulty == beatmap_difficulty.difficulty
-        ) for beatmap_difficulty in self.get_beatmap_difficulties()]
+        return [
+            discord.SelectOption(
+                label=f"{beatmap_difficulty.difficulty_text}",
+                description=self.difficulty_stars(beatmap_difficulty),
+                value=f"{beatmap_difficulty.difficulty.serialize}",
+                default=self.parent.beatmap_difficulty == beatmap_difficulty.difficulty
+            ) for beatmap_difficulty in self.get_beatmap_difficulties()
+        ]
 
     async def get_options_async(self) -> List[discord.SelectOption]:
         options = []
 
         for beatmap_difficulty in self.get_beatmap_difficulties():
-            difficulty_emoji = await BeatSaverUtils.difficulty_to_emoji(self.bot, self.parent.guild.id, beatmap_difficulty.difficulty)
+            difficulty_emoji = await BeatSaverUtils.difficulty_to_emoji(
+                    self.bot,
+                    self.parent.guild.id,
+                    beatmap_difficulty.difficulty
+            )
 
-            options.append(discord.SelectOption(
-                label=f"{beatmap_difficulty.difficulty_text}",
-                description=self.difficulty_stars(beatmap_difficulty),
-                value=f"{beatmap_difficulty.difficulty.serialize}",
-                emoji=difficulty_emoji,
-                default=self.parent.beatmap_difficulty == beatmap_difficulty.difficulty
-            ))
+            options.append(
+                    discord.SelectOption(
+                            label=f"{beatmap_difficulty.difficulty_text}",
+                            description=self.difficulty_stars(beatmap_difficulty),
+                            value=f"{beatmap_difficulty.difficulty.serialize}",
+                            emoji=difficulty_emoji,
+                            default=self.parent.beatmap_difficulty == beatmap_difficulty.difficulty
+                    )
+            )
 
         return options
 

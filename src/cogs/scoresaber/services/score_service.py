@@ -21,7 +21,9 @@ class ScoreService(ScoreSaberService):
         if len(new_player_scores) == 0:
             return
 
-        new_leaderboards = await self.get_new_leaderboards([new_player_score.leaderboard for new_player_score in new_player_scores])
+        new_leaderboards = await self.get_new_leaderboards(
+                [new_player_score.leaderboard for new_player_score in new_player_scores]
+        )
         if len(new_leaderboards) > 0:
             self.uow.leaderboards.add_all(new_leaderboards)
 
@@ -65,12 +67,18 @@ class ScoreService(ScoreSaberService):
                 before_page_add_count = len(new_player_scores)
 
                 for player_score in player_scores:
-                    if self.uow.scores.exists_by_score_id_and_time_set(player_score.score.id, player_score.score.time_set):
+                    if self.uow.scores.exists_by_score_id_and_time_set(
+                            player_score.score.id,
+                            player_score.score.time_set
+                    ):
                         return new_player_scores
                     else:
                         new_player_scores.append(player_score)
 
-                Logger.log(player, f"Found {len(new_player_scores) - before_page_add_count} new scores from Score Saber")
+                Logger.log(
+                        player,
+                        f"Found {len(new_player_scores) - before_page_add_count} new scores from Score Saber"
+                )
         except pyscoresaber.NotFoundException as error:
             Logger.log(player, f"Got HTTP code {error.status} when trying to access {error.url}")
 

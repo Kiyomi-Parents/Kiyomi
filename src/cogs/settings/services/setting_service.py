@@ -49,7 +49,7 @@ class SettingService(SettingsService):
 
         return registered_setting.has_permission(member)
 
-    async def validate_setting_value(self, guild_id: int, name: str, value: Optional[str]) -> bool:
+    async def validate_setting_value(self, guild_id: int, name: str, value: Optional[str]):
         registered_setting = self.find_registered_setting(name)
 
         if isinstance(registered_setting, AbstractBotSetting):
@@ -76,7 +76,12 @@ class SettingService(SettingsService):
             new_setting = None
 
             if isinstance(registered_setting, AbstractBotSetting):
-                new_setting = registered_setting.create(self.bot, registered_setting.name_human, name, registered_setting.value)
+                new_setting = registered_setting.create(
+                        self.bot,
+                        registered_setting.name_human,
+                        name,
+                        registered_setting.value
+                )
             elif isinstance(registered_setting, AbstractRegularSetting):
                 new_setting = registered_setting.create(registered_setting.name_human, name, registered_setting.value)
 
@@ -114,5 +119,3 @@ class SettingService(SettingsService):
 
     def register_settings(self, settings: List[Setting]) -> None:
         self.registered_settings += settings
-
-

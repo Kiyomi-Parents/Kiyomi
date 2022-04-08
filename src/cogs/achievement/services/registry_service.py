@@ -76,4 +76,3 @@ class RegistryService(AchievementService):
         achievement_groups = self.get_all_achievements(member)
 
         return self._filter_achievements(achievement_groups, False)
-

@@ -68,7 +68,11 @@ class SongView(PersistentView):
         self.add_item(MapDetailsButton(self.bot, self, self.beatmap))
 
         leaderboard = self.bot.get_cog("LeaderboardAPI")
-        guild_leaderboard_button = leaderboard.get_guild_leaderboard_button(self.bot, self, self.beatmap.latest_version.hash)
+        guild_leaderboard_button = leaderboard.get_guild_leaderboard_button(
+                self.bot,
+                self,
+                self.beatmap.latest_version.hash
+        )
         self.add_item(guild_leaderboard_button)
 
         self.add_item(MapPreviewButton(self.bot, self, self.beatmap))
@@ -83,4 +87,3 @@ class SongView(PersistentView):
         beatmap = await beatsaver.get_beatmap_by_key(persistence.view_parameters[0])
 
         return SongView(bot, guild, beatmap)
-

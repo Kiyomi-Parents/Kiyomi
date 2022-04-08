@@ -7,10 +7,9 @@ from src.kiyomi import permissions
 
 
 class FancyPresence(FancyPresenceCog):
-
     status = SlashCommandGroup(
-        "status", "Commands related to Kiyomi's status",
-        **permissions.is_bot_owner_and_admin_guild()
+            "status", "Commands related to Kiyomi's status",
+            **permissions.is_bot_owner_and_admin_guild()
     )
 
     @status.command(name="update", **permissions.is_bot_owner_and_admin_guild())
@@ -23,12 +22,12 @@ class FancyPresence(FancyPresenceCog):
 
     @status.command(name="set", **permissions.is_bot_owner_and_admin_guild())
     async def status_set(
-        self,
-        ctx: discord.ApplicationContext,
-        text: Option(
-                str,
-                "Text to display as status"
-        )
+            self,
+            ctx: discord.ApplicationContext,
+            text: Option(
+                    str,
+                    "Text to display as status"
+            )
     ):
         """Force status text"""
 
@@ -38,8 +37,8 @@ class FancyPresence(FancyPresenceCog):
 
     @status.command(name="reset", **permissions.is_bot_owner_and_admin_guild())
     async def status_set(
-        self,
-        ctx: discord.ApplicationContext
+            self,
+            ctx: discord.ApplicationContext
     ):
         """Reset forced status"""
 

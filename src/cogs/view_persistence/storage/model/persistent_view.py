@@ -24,9 +24,9 @@ class PersistentView(BaseView, ABC):
         pass
 
     async def send(
-        self,
-        ctx: Optional[Context] = None,
-        target: Optional[discord.abc.Messageable] = None
+            self,
+            ctx: Optional[Context] = None,
+            target: Optional[discord.abc.Messageable] = None
     ) -> discord.Message:
         message = await super(PersistentView, self).send(ctx, target)
 
@@ -35,9 +35,9 @@ class PersistentView(BaseView, ABC):
         return message
 
     async def respond(
-        self,
-        interaction: discord.Interaction,
-        target: Optional[discord.abc.Messageable] = None
+            self,
+            interaction: discord.Interaction,
+            target: Optional[discord.abc.Messageable] = None
     ) -> Union[discord.Message, discord.WebhookMessage]:
         message = await super(PersistentView, self).respond(interaction, target)
 

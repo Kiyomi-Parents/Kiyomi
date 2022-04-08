@@ -29,7 +29,9 @@ class MemberService(GeneralService):
                 if guild_member is not None:
                     self.uow.guild_members.remove(guild_member)
 
-                raise MemberNotFoundException(f"Could not find member with id {member_id} in guild {discord_guild.name}")
+                raise MemberNotFoundException(
+                        f"Could not find member with id {member_id} in guild {discord_guild.name}"
+                )
 
         if discord_member is None:
             raise MemberNotFoundException(f"Could not find member with id {member_id} in guild {discord_guild.name}")

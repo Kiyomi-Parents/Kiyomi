@@ -12,5 +12,5 @@ class BeatmapVersionRepository(BaseRepository[BeatmapVersion]):
             .filter(BeatmapVersion.hash == entry_id)
 
     def get_all(self) -> Optional[List[BeatmapVersion]]:
-        return self.session.query(BeatmapVersion)\
+        return self.session.query(BeatmapVersion) \
             .all()

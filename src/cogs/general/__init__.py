@@ -15,5 +15,26 @@ def setup(bot: Kiyomi):
     message_service = MessageService(bot, uow, guild_service, channel_service)
     role_service = RoleService(bot, uow, guild_service, member_service)
 
-    bot.add_cog(General(bot, emoji_service, guild_service, member_service, channel_service, message_service, role_service))
-    bot.add_cog(GeneralAPI(bot, emoji_service, guild_service, member_service, channel_service, message_service, role_service, uow))
+    bot.add_cog(
+            General(
+                    bot,
+                    emoji_service,
+                    guild_service,
+                    member_service,
+                    channel_service,
+                    message_service,
+                    role_service
+            )
+    )
+    bot.add_cog(
+            GeneralAPI(
+                    bot,
+                    emoji_service,
+                    guild_service,
+                    member_service,
+                    channel_service,
+                    message_service,
+                    role_service,
+                    uow
+            )
+    )

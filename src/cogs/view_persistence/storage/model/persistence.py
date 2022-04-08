@@ -20,7 +20,9 @@ class Persistence:
             if persistent_view.__name__ == self.view:
                 return persistent_view
 
-        raise RuntimeError(f"Could not locate class {self.view} among {', '.join([persistent_view.__name__ for persistent_view in persistent_views])}")
+        raise RuntimeError(
+                f"Could not locate class {self.view} among {', '.join([persistent_view.__name__ for persistent_view in persistent_views])}"
+        )
 
     async def get_view(self, bot: Kiyomi) -> PersistentView:
         return await self.view_class.deserialize_persistence(bot, self)

@@ -58,7 +58,10 @@ class BadArgument(CommandError):
 
         return None
 
-    def find_command_by_argument_autocomplete_context(self, ctx: AutocompleteContext) -> Optional[tuple[str, Union[str, None]]]:
+    def find_command_by_argument_autocomplete_context(
+            self,
+            ctx: AutocompleteContext
+    ) -> Optional[tuple[str, Union[str, None]]]:
         for key, value in ctx.options.items():
             if value == self.argument:
                 return key, value

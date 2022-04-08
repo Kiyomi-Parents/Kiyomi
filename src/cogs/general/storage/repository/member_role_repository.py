@@ -15,7 +15,12 @@ class MemberRoleRepository(BaseRepository[MemberRole]):
         return self.session.query(MemberRole) \
             .all()
 
-    def get_by_guild_id_and_member_id_and_role_id(self, guild_id: int, member_id: int, role_id: int) -> Optional[MemberRole]:
+    def get_by_guild_id_and_member_id_and_role_id(
+            self,
+            guild_id: int,
+            member_id: int,
+            role_id: int
+    ) -> Optional[MemberRole]:
         return self.session.query(MemberRole) \
             .filter(MemberRole.guild_id == guild_id) \
             .filter(MemberRole.member_id == member_id) \

@@ -13,7 +13,12 @@ from .storage import Setting
 
 class Settings(SettingsCog):
 
-    def __init__(self, bot: Kiyomi, setting_service: SettingService, settings_autocomplete_service: SettingAutocompleteService):
+    def __init__(
+            self,
+            bot: Kiyomi,
+            setting_service: SettingService,
+            settings_autocomplete_service: SettingAutocompleteService
+    ):
         super().__init__(bot, setting_service, settings_autocomplete_service)
 
         # Register events
@@ -25,8 +30,8 @@ class Settings(SettingsCog):
             self.setting_service.register_settings(settings)
 
     settings = SlashCommandGroup(
-        "setting",
-        "Various settings"
+            "setting",
+            "Various settings"
     )
 
     # Workaround
@@ -38,18 +43,18 @@ class Settings(SettingsCog):
 
     @settings.command(name="set")
     async def settings_set(
-        self,
-        ctx: discord.ApplicationContext,
-        setting: Option(
-            str,
-            "Setting name",
-            autocomplete=get_settings
-        ),
-        value: Option(
-            str,
-            "Setting value",
-            autocomplete=get_setting_values
-        )
+            self,
+            ctx: discord.ApplicationContext,
+            setting: Option(
+                    str,
+                    "Setting name",
+                    autocomplete=get_settings
+            ),
+            value: Option(
+                    str,
+                    "Setting value",
+                    autocomplete=get_setting_values
+            )
     ):
         """Set setting value"""
 

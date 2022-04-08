@@ -69,4 +69,3 @@ class UserAchievementService(AchievementService):
             choices.append(OptionChoice(group, group))
 
         return choices
-

@@ -41,7 +41,11 @@ class BaseView(discord.ui.View, ABC):
                 return get_embed
         # TODO: error embed
 
-    async def update(self, interaction: discord.Interaction, button_clicked: Optional[discord.ui.Button] = None) -> discord.Message:
+    async def update(
+            self,
+            interaction: discord.Interaction,
+            button_clicked: Optional[discord.ui.Button] = None
+    ) -> discord.Message:
         if self.message is None:
             self.message = interaction.message
 
@@ -75,9 +79,9 @@ class BaseView(discord.ui.View, ABC):
                 await child.after_init()
 
     async def send(
-        self,
-        ctx: Optional[Context] = None,
-        target: Optional[discord.abc.Messageable] = None
+            self,
+            ctx: Optional[Context] = None,
+            target: Optional[discord.abc.Messageable] = None
     ) -> discord.Message:
         if ctx is not None and not isinstance(ctx, Context):
             raise TypeError(f"expected Context not {ctx.__class__!r}")
@@ -101,9 +105,9 @@ class BaseView(discord.ui.View, ABC):
         return self.message
 
     async def respond(
-        self,
-        interaction: discord.Interaction,
-        target: Optional[discord.abc.Messageable] = None
+            self,
+            interaction: discord.Interaction,
+            target: Optional[discord.abc.Messageable] = None
     ) -> Union[discord.Message, discord.WebhookMessage]:
         if not isinstance(interaction, discord.Interaction):
             raise TypeError(f"expected Interaction not {interaction.__class__!r}")

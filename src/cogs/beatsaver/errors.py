@@ -23,4 +23,3 @@ class BeatmapHashNotFound(BeatmapNotFound):
 
     def __str__(self):
         return f"Could not find a beatmap using hash {self.beatmap_hash}"
-

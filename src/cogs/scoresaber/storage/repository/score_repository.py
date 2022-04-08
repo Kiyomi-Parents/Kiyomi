@@ -73,9 +73,9 @@ class ScoreRepository(BaseRepository[Score]):
 
     def exists_by_score_id_and_time_set(self, score_id: int, time_set: datetime) -> bool:
         return self.session.query(Score) \
-            .filter(Score.score_id == score_id) \
-            .filter(Score.time_set == time_set) \
-            .first() is not None
+                   .filter(Score.score_id == score_id) \
+                   .filter(Score.time_set == time_set) \
+                   .first() is not None
 
     def get_player_scores_sorted_by_pp(self, player_id: str) -> List[Score]:
         return self.session.query(Score) \

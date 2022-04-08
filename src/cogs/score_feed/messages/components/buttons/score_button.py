@@ -17,10 +17,10 @@ class ScoreButton(ScoreFeedComponent, discord.ui.Button):
 
         ScoreFeedComponent.__init__(self, bot, parent)
         discord.ui.Button.__init__(
-            self,
-            custom_id=f"score:button:score:{score.id}",
-            label="Score details",
-            style=discord.enums.ButtonStyle.primary,
+                self,
+                custom_id=f"score:button:score:{score.id}",
+                label="Score details",
+                style=discord.enums.ButtonStyle.primary,
         )
 
     async def get_embed(self) -> Embed:

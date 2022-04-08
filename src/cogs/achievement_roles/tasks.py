@@ -26,5 +26,3 @@ class Tasks(BaseTasks):
 
         for guild_member in guild_members:
             await self.member_service.update_member_roles(guild_member)
-
-

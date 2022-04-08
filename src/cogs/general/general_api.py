@@ -17,17 +17,25 @@ from .storage.model.role import Role
 
 class GeneralAPI(GeneralCog):
     def __init__(
-        self,
-        bot: Kiyomi,
-        emoji_service: EmojiService,
-        guild_service: GuildService,
-        member_service: MemberService,
-        channel_service: ChannelService,
-        message_service: MessageService,
-        role_service: RoleService,
-        uow: UnitOfWork
+            self,
+            bot: Kiyomi,
+            emoji_service: EmojiService,
+            guild_service: GuildService,
+            member_service: MemberService,
+            channel_service: ChannelService,
+            message_service: MessageService,
+            role_service: RoleService,
+            uow: UnitOfWork
     ):
-        super().__init__(bot, emoji_service, guild_service, member_service, channel_service, message_service, role_service)
+        super().__init__(
+                bot,
+                emoji_service,
+                guild_service,
+                member_service,
+                channel_service,
+                message_service,
+                role_service
+        )
 
         self.uow = uow
 
@@ -61,7 +69,7 @@ class GeneralAPI(GeneralCog):
     async def remove_role_from_member(self, guild_id: int, member_id: int, role_id: int, reason: str) -> None:
         await self.role_service.remove_role_from_member(guild_id, member_id, role_id, reason)
 
-    async def get_role(self, guild_id: int, role_id:int) -> Optional[Role]:
+    async def get_role(self, guild_id: int, role_id: int) -> Optional[Role]:
         try:
             return await self.role_service.get_discord_role(guild_id, role_id)
         except RoleNotFoundException:

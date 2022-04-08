@@ -12,11 +12,13 @@ class BaseCog(commands.Cog):
         self.bot = bot
 
     async def cog_before_invoke(self, ctx: ApplicationContext):
-        Logger.log(self.qualified_name,
-                   f"{colored(ctx.interaction.user.name, 'blue')} executed command "
-                   f"{colored('/' + ctx.command.qualified_name, 'blue')} in "
-                   f"{colored(ctx.interaction.channel.name, 'blue')} at "
-                   f"{colored(ctx.interaction.guild.name, 'blue')}")
+        Logger.log(
+                self.qualified_name,
+                f"{colored(ctx.interaction.user.name, 'blue')} executed command "
+                f"{colored('/' + ctx.command.qualified_name, 'blue')} in "
+                f"{colored(ctx.interaction.channel.name, 'blue')} at "
+                f"{colored(ctx.interaction.guild.name, 'blue')}"
+        )
 
         await ctx.trigger_typing()
 

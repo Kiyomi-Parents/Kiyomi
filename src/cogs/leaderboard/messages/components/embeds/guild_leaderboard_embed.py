@@ -12,7 +12,13 @@ from src.kiyomi import Kiyomi
 
 
 class GuildLeaderboardEmbed(LeaderboardEmbed):
-    def __init__(self, bot: Kiyomi, guild_name: str, beatmap_difficulty: BeatmapVersionDifficulty, leaderboard: List[Score]):
+    def __init__(
+            self,
+            bot: Kiyomi,
+            guild_name: str,
+            beatmap_difficulty: BeatmapVersionDifficulty,
+            leaderboard: List[Score]
+    ):
         super().__init__(bot)
 
         self.guild_name = guild_name

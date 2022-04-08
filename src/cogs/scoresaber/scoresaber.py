@@ -24,12 +24,12 @@ class ScoreSaber(ScoreSaberCog, name="Score Saber"):
     # TODO: Fix command concurrency. We should probably somehow do the import later?
     @player.command(name="add")
     async def player_add(
-        self,
-        ctx: discord.ApplicationContext,
-        profile: Option(
-                ScoreSaberPlayerIdConverter,
-                "Score Saber profile URL"
-        )
+            self,
+            ctx: discord.ApplicationContext,
+            profile: Option(
+                    ScoreSaberPlayerIdConverter,
+                    "Score Saber profile URL"
+            )
     ):
         """Link yourself to your ScoreSaber profile."""
         self.bot.events.emit("register_member", ctx.author)
@@ -42,7 +42,10 @@ class ScoreSaber(ScoreSaberCog, name="Score Saber"):
                 profile
         )
 
-        await ctx.respond(content=f"Successfully linked **{guild_player.player.name}** ScoreSaber profile!", ephemeral=True)
+        await ctx.respond(
+                content=f"Successfully linked **{guild_player.player.name}** ScoreSaber profile!",
+                ephemeral=True
+        )
 
     @player.command(name="remove")
     async def player_remove(self, ctx: discord.ApplicationContext):
@@ -104,21 +107,21 @@ class ScoreSaber(ScoreSaberCog, name="Score Saber"):
 
     @slash_command(name="manual-add", **permissions.is_bot_owner_and_admin_guild())
     async def manual_add_player(
-        self,
-        ctx: discord.ApplicationContext,
-        member_id: Option(
-                int,
-                "Discord member ID"
-        ),
-        player_id: Option(
-                str,
-                "Score Saber player ID"
-        ),
-        guild_id: Option(
-                int,
-                "Discord guild ID",
-                required=False
-        )
+            self,
+            ctx: discord.ApplicationContext,
+            member_id: Option(
+                    int,
+                    "Discord member ID"
+            ),
+            player_id: Option(
+                    str,
+                    "Score Saber player ID"
+            ),
+            guild_id: Option(
+                    int,
+                    "Discord guild ID",
+                    required=False
+            )
     ):
         """Add a Score Saber profile manually"""
 
@@ -142,21 +145,21 @@ class ScoreSaber(ScoreSaberCog, name="Score Saber"):
 
     @slash_command(name="manual-remove", **permissions.is_bot_owner_and_admin_guild())
     async def manual_remove_player(
-        self,
-        ctx: discord.ApplicationContext,
-        member_id: Option(
-                int,
-                "Discord member ID"
-        ),
-        player_id: Option(
-                str,
-                "Score Saber player ID"
-        ),
-        guild_id: Option(
-                int,
-                "Discord guild ID",
-                required=False
-        )
+            self,
+            ctx: discord.ApplicationContext,
+            member_id: Option(
+                    int,
+                    "Discord member ID"
+            ),
+            player_id: Option(
+                    str,
+                    "Score Saber player ID"
+            ),
+            guild_id: Option(
+                    int,
+                    "Discord guild ID",
+                    required=False
+            )
     ):
         """Remove a Score Saber profile manually"""
         if guild_id is None:
@@ -177,7 +180,10 @@ class ScoreSaber(ScoreSaberCog, name="Score Saber"):
     async def manual_remove_player_error(self, ctx: discord.ApplicationContext, error: Exception):
         if isinstance(error, ApplicationCommandInvokeError):
             if isinstance(error.original, MemberPlayerNotFoundInGuildException):
-                return await error.original.handle(ctx, f"{error.original.member_id} doesn't have a Score Saber profile with ID {error.original.player_id} linked in guild {error.original.guild_id}.")
+                return await error.original.handle(
+                        ctx,
+                        f"{error.original.member_id} doesn't have a Score Saber profile with ID {error.original.player_id} linked in guild {error.original.guild_id}."
+                )
 
     @user_command(name="Refresh Score Saber Profile", **permissions.is_bot_owner())
     async def refresh(self, ctx: ApplicationContext, member: discord.Member):
@@ -192,4 +198,3 @@ class ScoreSaber(ScoreSaberCog, name="Score Saber"):
         if isinstance(error, ApplicationCommandInvokeError):
             if isinstance(error.original, ScoreSaberCogException):
                 return await error.original.handle(ctx)
-

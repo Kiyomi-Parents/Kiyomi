@@ -6,10 +6,9 @@ from .messages.embeds.player_achievements import PlayerAchievementsEmbed
 
 
 class Achievements(AchievementCog):
-
     achievements = SlashCommandGroup(
-        "achievements",
-        "Achievement commands"
+            "achievements",
+            "Achievement commands"
     )
 
     @achievements.command(name="all")
@@ -38,13 +37,14 @@ class Achievements(AchievementCog):
         return await self.user_achievement_service.get_all_groups(ctx)
 
     @achievements.command(name="group")
-    async def achievements_group(self,
-        ctx: discord.ApplicationContext,
-        group: Option(
-            str,
-            "Choose an achievement group",
-            autocomplete=get_all_groups
-        )
+    async def achievements_group(
+            self,
+            ctx: discord.ApplicationContext,
+            group: Option(
+                    str,
+                    "Choose an achievement group",
+                    autocomplete=get_all_groups
+            )
     ):
         """Show all uncompleted achievements"""
         achievements = self.user_achievement_service.get_group_achievements(group, ctx.author.id)

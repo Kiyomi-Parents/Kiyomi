@@ -13,17 +13,21 @@ from ..storage.model.beatmap import Beatmap
 class BeatmapAutocompleteService(BeatSaverService):
 
     def __init__(
-        self,
-        bot: Kiyomi,
-        uow: UnitOfWork,
-        beatsaver: pybeatsaver.BeatSaverAPI,
-        beatmap_service: BeatmapService
+            self,
+            bot: Kiyomi,
+            uow: UnitOfWork,
+            beatsaver: pybeatsaver.BeatSaverAPI,
+            beatmap_service: BeatmapService
     ):
         super().__init__(bot, uow, beatsaver)
 
         self.beatmap_service = beatmap_service
 
-    async def get_beatmap_difficulties_by_key(self, beatmap: Beatmap, characteristic: pybeatsaver.ECharacteristic) -> List[OptionChoice]:
+    async def get_beatmap_difficulties_by_key(
+            self,
+            beatmap: Beatmap,
+            characteristic: pybeatsaver.ECharacteristic
+    ) -> List[OptionChoice]:
         beatmap_difficulties = []
 
         for beatmap_difficulty in beatmap.difficulties:

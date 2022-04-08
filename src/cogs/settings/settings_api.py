@@ -8,7 +8,13 @@ from .storage.uow import UnitOfWork
 
 class SettingsAPI(SettingsCog):
 
-    def __init__(self, bot: Kiyomi, setting_service: SettingService, settings_autocomplete_service: SettingAutocompleteService, uow: UnitOfWork):
+    def __init__(
+            self,
+            bot: Kiyomi,
+            setting_service: SettingService,
+            settings_autocomplete_service: SettingAutocompleteService,
+            uow: UnitOfWork
+    ):
         super().__init__(bot, setting_service, settings_autocomplete_service)
 
         self.uow = uow

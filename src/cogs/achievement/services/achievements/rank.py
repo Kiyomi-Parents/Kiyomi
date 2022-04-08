@@ -30,7 +30,7 @@ class Rank(AchievementGenerator):
         def condition() -> bool:
             if member is None:
                 return False
-            
+
             scoresaber = self.bot.get_cog_api(ScoreSaberAPI)
             guild_players = scoresaber.get_guild_players_by_member_id(member.id)
 

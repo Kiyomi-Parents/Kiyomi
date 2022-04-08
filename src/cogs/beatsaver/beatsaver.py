@@ -17,7 +17,12 @@ from src.cogs.scoresaber.storage.model.leaderboard import Leaderboard
 
 
 class BeatSaver(BeatSaverCog, name="Beat Saver"):
-    def __init__(self, bot: Kiyomi, beatmap_service: BeatmapService, beatmap_autocomplete_service: BeatmapAutocompleteService):
+    def __init__(
+            self,
+            bot: Kiyomi,
+            beatmap_service: BeatmapService,
+            beatmap_autocomplete_service: BeatmapAutocompleteService
+    ):
         super().__init__(bot, beatmap_service, beatmap_autocomplete_service)
 
         # Register events
@@ -57,12 +62,12 @@ class BeatSaver(BeatSaverCog, name="Beat Saver"):
 
     @slash_command()
     async def map(
-        self,
-        ctx: discord.ApplicationContext,
-        key: Option(
-                BeatmapConverter,
-                "Beatmap key (25f)"
-        )
+            self,
+            ctx: discord.ApplicationContext,
+            key: Option(
+                    BeatmapConverter,
+                    "Beatmap key (25f)"
+            )
     ):
         """Displays song info."""
 

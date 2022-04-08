@@ -8,16 +8,24 @@ from src.kiyomi import Kiyomi, permissions
 
 class General(GeneralCog):
     def __init__(
-        self,
-        bot: Kiyomi,
-        emoji_service: EmojiService,
-        guild_service: GuildService,
-        member_service: MemberService,
-        channel_service: ChannelService,
-        message_service: MessageService,
-        role_service: RoleService
+            self,
+            bot: Kiyomi,
+            emoji_service: EmojiService,
+            guild_service: GuildService,
+            member_service: MemberService,
+            channel_service: ChannelService,
+            message_service: MessageService,
+            role_service: RoleService
     ):
-        super().__init__(bot, emoji_service, guild_service, member_service, channel_service, message_service, role_service)
+        super().__init__(
+                bot,
+                emoji_service,
+                guild_service,
+                member_service,
+                channel_service,
+                message_service,
+                role_service
+        )
 
         # Register events
         self.events()
@@ -40,7 +48,10 @@ class General(GeneralCog):
     @commands.slash_command()
     async def invite(self, ctx):
         """Get the invite link for the bot"""
-        await ctx.respond("https://discord.com/api/oauth2/authorize?client_id=834048194085650462&permissions=139855260736&scope=bot%20applications.commands", ephemeral=True)
+        await ctx.respond(
+                "https://discord.com/api/oauth2/authorize?client_id=834048194085650462&permissions=139855260736&scope=bot%20applications.commands",
+                ephemeral=True
+        )
 
     @commands.slash_command()
     async def hello(self, ctx):

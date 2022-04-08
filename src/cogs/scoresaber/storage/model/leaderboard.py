@@ -36,10 +36,10 @@ class Leaderboard(Base):
     difficulty = Column(Enum(pyscoresaber.BeatmapDifficulty))
 
     beatmap_version = relationship(
-        "BeatmapVersion",
-        primaryjoin='BeatmapVersion.hash == Leaderboard.song_hash',
-        foreign_keys=[song_hash],
-        uselist=False
+            "BeatmapVersion",
+            primaryjoin='BeatmapVersion.hash == Leaderboard.song_hash',
+            foreign_keys=[song_hash],
+            uselist=False
     )
 
     def __init__(self, leaderboard: pyscoresaber.LeaderboardInfo):
