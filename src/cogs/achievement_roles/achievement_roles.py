@@ -22,7 +22,7 @@ class AchievementRoles(AchievementRolesCog, name="Achievement Roles"):
     def events(self):
         @self.bot.events.on("on_new_player")
         async def register_member(guild_member: GuildMember):
-            await self.member_service.update_member_roles(guild_member)
+            await self.member_service.update_member_roles(guild_member.guild_id, guild_member.member_id)
 
         @self.bot.events.on("on_remove_player")
         async def unregister_member(guild_member: GuildMember):
