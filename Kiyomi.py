@@ -28,6 +28,7 @@ if __name__ == "__main__":
 
     intents = discord.Intents.default()
     intents.members = True
+    intents.guilds = True
     intents.message_content = True
 
     bot = Kiyomi(command_prefix="!", intents=intents, db=database)

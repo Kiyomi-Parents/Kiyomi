@@ -1,4 +1,5 @@
 import discord.member
+from discord import Role
 from discord.ext import commands
 
 from .general_cog import GeneralCog
@@ -44,6 +45,14 @@ class General(GeneralCog):
     @commands.Cog.listener()
     async def on_guild_join(self, guild: discord.Guild):
         await self.guild_service.register_guild(guild.id)
+
+    @commands.Cog.listener()
+    async def on_member_update(self, before: discord.Member, after: discord.Member):
+        self.role_service.on_member_update(before, after)
+
+    @commands.Cog.listener()
+    async def on_guild_role_delete(self, role: Role):
+        self.role_service.on_role_delete(role)
 
     @commands.slash_command()
     async def invite(self, ctx):

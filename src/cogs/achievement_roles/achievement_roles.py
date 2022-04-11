@@ -6,6 +6,8 @@ from .services.member_achievement_role_service import MemberAchievementRoleServi
 from .achievement_roles_cog import AchievementRolesCog
 from src.cogs.general.storage.model.guild_member import GuildMember
 from src.kiyomi import Kiyomi
+from ..general.storage.model.member_role import MemberRole
+from ..general.storage.model.role import Role
 from ..settings.storage import AbstractSetting
 
 
@@ -35,6 +37,14 @@ class AchievementRoles(AchievementRolesCog, name="Achievement Roles"):
 
             if setting.name in cog_settings:
                 await self.member_service.update_guild_roles(setting.guild_id)
+
+        @self.bot.events.on("on_member_role_removed")
+        async def member_role_removed(member_role: MemberRole):
+            await self.member_service.update_member_roles(member_role.guild_id, member_role.member_id)
+
+        @self.bot.events.on("on_guild_role_removed")
+        async def guild_role_removed(role: Role):
+            await self.member_service.update_guild_roles(role.guild_id)
 
     @commands.Cog.listener()
     async def on_ready(self):

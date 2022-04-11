@@ -15,7 +15,7 @@ class GuildMemberRepository(BaseRepository[GuildMember]):
         return self.session.query(GuildMember) \
             .all()
 
-    def get_all_by_guild_id(self, guild_id: int) -> Optional[List[GuildMember]]:
+    def get_all_by_guild_id(self, guild_id: int) -> List[GuildMember]:
         return self.session.query(GuildMember) \
             .filter(GuildMember.guild_id == guild_id) \
             .all()

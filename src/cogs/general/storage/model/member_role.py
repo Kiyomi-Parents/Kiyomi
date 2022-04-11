@@ -11,7 +11,7 @@ class MemberRole(Base):
 
     guild_id = Column(BigInteger, ForeignKey("guild.id"))
     member_id = Column(BigInteger, ForeignKey("member.id"))
-    role_id = Column(BigInteger, ForeignKey("role.id"))
+    role_id = Column(BigInteger, ForeignKey("role.id", ondelete="CASCADE"))
 
     guild = relationship("Guild")
     member = relationship("Member", back_populates="roles")

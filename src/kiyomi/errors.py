@@ -2,9 +2,14 @@ from typing import Optional, Dict, Union
 
 from discord import ApplicationContext, AutocompleteContext
 
+from src.log import Logger
+
 
 class KiyomiException(Exception):
     is_handled: bool = False
+
+    def _log(self):
+        Logger.error(self.__class__.__name__, str(self))
 
     async def handle(self, ctx: ApplicationContext, message: Optional[str] = None, **kwargs):
         if self.is_handled:
@@ -12,6 +17,8 @@ class KiyomiException(Exception):
 
         if message is None:
             message = str(self)
+
+        self._log()
 
         await ctx.respond(message, ephemeral=True, **kwargs)
 
