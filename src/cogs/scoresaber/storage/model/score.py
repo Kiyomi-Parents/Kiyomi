@@ -79,7 +79,10 @@ class Score(Base):
         max_score = self.leaderboard.max_score
 
         if not max_score and self.beatmap_version is not None:
-            max_score = self.leaderboard.beatmap_difficulty.max_score
+            beatmap_difficulty = self.leaderboard.beatmap_difficulty
+            
+            if beatmap_difficulty is not None:
+                max_score = beatmap_difficulty.max_score
 
         if max_score:
             return round(self.base_score / max_score * 100, 2)

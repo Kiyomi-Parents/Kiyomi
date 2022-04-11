@@ -100,10 +100,10 @@ class Leaderboard(Base):
             return None
 
         for beatmap_difficulty in self.beatmap_version.difficulties:
-            if beatmap_difficulty.scoresaber_characteristic is not self.leaderboard.game_mode:
+            if beatmap_difficulty.scoresaber_characteristic is not self.game_mode:
                 continue
 
-            if beatmap_difficulty.scoresaber_difficulty is not self.leaderboard.difficulty:
+            if beatmap_difficulty.scoresaber_difficulty is not self.difficulty:
                 continue
 
             return beatmap_difficulty

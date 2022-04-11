@@ -29,6 +29,9 @@ class ScoreSaberAPI(ScoreSaberCog):
     def get_players(self) -> Optional[List[Player]]:
         return self.uow.players.get_all()
 
+    def get_guild_player(self, guild_id: int, member_id: int) -> Optional[GuildPlayer]:
+        return self.uow.guild_players.get_by_guild_id_and_member_id(guild_id, member_id)
+
     def get_guild_players_by_guild(self, guild_id: int) -> Optional[List[GuildPlayer]]:
         return self.uow.guild_players.get_all_by_guild_id(guild_id)
 
