@@ -54,6 +54,7 @@ if __name__ == "__main__":
     bot.load_extension(name="src.cogs.view_persistence")
     bot.load_extension(name="src.cogs.emoji_echo")
     bot.load_extension(name="src.cogs.fancy_presence")
+    bot.load_extension(name="src.cogs.scoresaber_stats")
 
     # database.drop_tables()
     # database.create_tables()
