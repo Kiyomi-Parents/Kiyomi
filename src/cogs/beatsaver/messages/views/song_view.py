@@ -13,7 +13,6 @@ from ..components.buttons.map_details_button import MapDetailsButton
 from ..components.buttons.map_preview_button import MapPreviewButton
 from ..components.selects.map_detail_characteristic_select import MapDetailCharacteristicSelect
 from ..components.selects.map_detail_difficulty_select import MapDetailDifficultySelect
-from ...storage.model.beatmap_version_difficulty import BeatmapVersionDifficulty
 
 
 # Add NPS graph button
@@ -49,31 +48,18 @@ class SongView(PersistentView):
     def beatmap_characteristic(self, beatmap_characteristic: pybeatsaver.ECharacteristic):
         self._beatmap_characteristic = beatmap_characteristic
 
-    @property
-    def beatmap_version_difficulty(self) -> Optional[BeatmapVersionDifficulty]:
-        for beatmap_difficulty in self.beatmap.latest_version.difficulties:
-            if beatmap_difficulty.characteristic is not self.beatmap_characteristic:
-                continue
-
-            if beatmap_difficulty.difficulty is not self.beatmap_difficulty:
-                continue
-
-            return beatmap_difficulty
-
-        return None
-
     def update_buttons(self):
         self.add_item(MapDetailCharacteristicSelect(self.bot, self, self.beatmap))
         self.add_item(MapDetailDifficultySelect(self.bot, self, self.beatmap))
+
         self.add_item(MapDetailsButton(self.bot, self, self.beatmap))
 
-        leaderboard = self.bot.get_cog("LeaderboardAPI")
-        guild_leaderboard_button = leaderboard.get_guild_leaderboard_button(
+        leaderboard_ui = self.bot.get_cog("LeaderboardUI")
+        self.add_item(leaderboard_ui.button_guild_leaderboard(
                 self.bot,
                 self,
                 self.beatmap.latest_version.hash
-        )
-        self.add_item(guild_leaderboard_button)
+        ))
 
         self.add_item(MapPreviewButton(self.bot, self, self.beatmap))
 

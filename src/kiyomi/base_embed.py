@@ -3,7 +3,7 @@ from discord import Embed
 from src.kiyomi import Kiyomi
 
 
-class ScoreFeedEmbed(Embed):
+class BaseEmbed(Embed):
     def __init__(self, bot: Kiyomi):
         super().__init__()
 

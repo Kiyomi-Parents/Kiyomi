@@ -67,29 +67,11 @@ class BeatmapVersionDifficulty(Base):
 
     @property
     def scoresaber_characteristic(self) -> pyscoresaber.GameMode:
-        characteristics = {
-            pybeatsaver.ECharacteristic.STANDARD: pyscoresaber.GameMode.STANDARD,
-            pybeatsaver.ECharacteristic.ONE_SABER: pyscoresaber.GameMode.ONE_SABER,
-            pybeatsaver.ECharacteristic.NO_ARROWS: pyscoresaber.GameMode.NO_ARROWS,
-            pybeatsaver.ECharacteristic.DEGREE_90: pyscoresaber.GameMode.DEGREE_90,
-            pybeatsaver.ECharacteristic.DEGREE_360: pyscoresaber.GameMode.DEGREE_360,
-            pybeatsaver.ECharacteristic.LIGHTSHOW: pyscoresaber.GameMode.LIGHTSHOW,
-            pybeatsaver.ECharacteristic.LAWLESS: pyscoresaber.GameMode.LAWLESS,
-        }
-
-        return characteristics[self.characteristic]
+        return BeatSaverUtils.to_scoresaber_game_mode(self.characteristic)
 
     @property
     def scoresaber_difficulty(self) -> pyscoresaber.BeatmapDifficulty:
-        difficulties = {
-            pybeatsaver.EDifficulty.EASY: pyscoresaber.BeatmapDifficulty.EASY,
-            pybeatsaver.EDifficulty.NORMAL: pyscoresaber.BeatmapDifficulty.NORMAL,
-            pybeatsaver.EDifficulty.HARD: pyscoresaber.BeatmapDifficulty.HARD,
-            pybeatsaver.EDifficulty.EXPERT: pyscoresaber.BeatmapDifficulty.EXPERT,
-            pybeatsaver.EDifficulty.EXPERT_PLUS: pyscoresaber.BeatmapDifficulty.EXPERT_PLUS,
-        }
-
-        return difficulties[self.difficulty]
+        return BeatSaverUtils.to_scoresaber_difficulty(self.difficulty)
 
     @property
     def characteristic_text(self) -> str:

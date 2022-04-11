@@ -1,7 +1,7 @@
 from typing import Optional
 
 from src.cogs.general.storage.model.guild import Guild
-from src.cogs.score_feed.messages.components.embeds.score_embed import ScoreEmbed
+from src.cogs.scoresaber.messages.components.embeds.score_embed import ScoreEmbed
 from src.cogs.scoresaber.storage.model.score import Score
 from src.kiyomi import Kiyomi
 

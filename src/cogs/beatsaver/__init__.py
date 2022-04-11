@@ -3,6 +3,7 @@ import pybeatsaver
 from src.kiyomi import Kiyomi
 from .beatsaver import BeatSaver
 from .beatsaver_api import BeatSaverAPI
+from .beatsaver_ui import BeatSaverUI
 from .services import BeatmapService, BeatmapAutocompleteService
 from .storage import UnitOfWork
 
@@ -16,3 +17,4 @@ def setup(bot: Kiyomi):
 
     bot.add_cog(BeatSaver(bot, beatmap_service, beatmap_autocomplete_service))
     bot.add_cog(BeatSaverAPI(bot, beatmap_service, beatmap_autocomplete_service, uow))
+    bot.add_cog(BeatSaverUI(bot, beatmap_service, beatmap_autocomplete_service))

@@ -3,6 +3,7 @@ import pyscoresaber
 from src.kiyomi import Kiyomi
 from .scoresaber import ScoreSaber
 from .scoresaber_api import ScoreSaberAPI
+from .scoresaber_ui import ScoreSaberUI
 from .services import PlayerService, ScoreService
 from .storage import UnitOfWork
 from .tasks import Tasks
@@ -23,3 +24,4 @@ def setup(bot: Kiyomi):
 
     bot.add_cog(ScoreSaber(bot, player_service, score_service))
     bot.add_cog(ScoreSaberAPI(bot, player_service, score_service, uow))
+    bot.add_cog(ScoreSaberUI(bot, player_service, score_service))

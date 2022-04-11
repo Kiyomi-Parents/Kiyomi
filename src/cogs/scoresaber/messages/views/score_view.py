@@ -1,18 +1,18 @@
 from typing import Optional
 
+import pybeatsaver
 from discord import Guild
 
-from src.cogs.beatsaver.storage.model.beatmap_version_difficulty import BeatmapVersionDifficulty
-from src.cogs.scoresaber import ScoreSaberAPI
-from ..components.buttons.beatsaver_button import BeatSaverButton
+from ...scoresaber_api import ScoreSaberAPI
 from ..components.buttons.score_button import ScoreButton
-from src.cogs.scoresaber.storage.model.score import Score
+from ...scoresaber_utils import ScoreSaberUtils
+from ...storage.model.score import Score
 from src.cogs.view_persistence.storage.model.persistence import Persistence
 from src.cogs.view_persistence.storage.model.persistent_view import PersistentView
 from src.kiyomi import Kiyomi
 
 
-class ScoreNotificationView(PersistentView):
+class ScoreView(PersistentView):
 
     def __init__(self, bot: Kiyomi, guild: Guild, score: Score, previous_score: Optional[Score]):
         self.score = score
@@ -21,24 +21,30 @@ class ScoreNotificationView(PersistentView):
         super().__init__(bot, guild)
 
     @property
-    def beatmap_version_difficulty(self) -> Optional[BeatmapVersionDifficulty]:
-        return self.score.beatmap_difficulty
+    def beatmap_difficulty(self) -> Optional[pybeatsaver.EDifficulty]:
+        return ScoreSaberUtils.to_beatsaver_difficulty(self.score.leaderboard.difficulty)
+
+    @property
+    def beatmap_characteristic(self) -> Optional[pybeatsaver.ECharacteristic]:
+        return ScoreSaberUtils.to_beatsaver_characteristic(self.score.leaderboard.game_mode)
 
     def update_buttons(self):
         self.add_item(ScoreButton(self.bot, self, self.score, self.previous_score))
 
-        leaderboard = self.bot.get_cog("LeaderboardAPI")
-        guild_leaderboard_button = leaderboard.get_guild_leaderboard_button(
-                self.bot,
-                self,
-                self.score.leaderboard.song_hash
-        )
-        self.add_item(guild_leaderboard_button)
+        if self.score.leaderboard is not None:
+            leaderboard_ui = self.bot.get_cog("LeaderboardUI")
+            self.add_item(
+                    leaderboard_ui.button_guild_leaderboard(
+                            self.bot,
+                            self,
+                            self.score.leaderboard.song_hash
+                    )
+            )
 
         if self.score.beatmap is not None:
-            self.add_item(BeatSaverButton(self.bot, self, self.score.beatmap.id))
-
-        # TODO: Add beatmap preview button
+            beatsaver_ui = self.bot.get_cog("BeatSaverUI")
+            self.add_item(beatsaver_ui.button_beat_saver(self.bot, self, self.score.beatmap.id))
+            self.add_item(beatsaver_ui.button_map_preview(self.bot, self, self.score.beatmap))
 
     async def serialize_persistence(self) -> Persistence:
         if self.previous_score is not None:
@@ -46,7 +52,7 @@ class ScoreNotificationView(PersistentView):
                     self.guild.id,
                     self.message.channel.id,
                     self.message.id,
-                    ScoreNotificationView.__name__,
+                    ScoreView.__name__,
                     str(self.score.id),
                     str(self.previous_score.id)
             )
@@ -55,7 +61,7 @@ class ScoreNotificationView(PersistentView):
                 self.guild.id,
                 self.message.channel.id,
                 self.message.id,
-                ScoreNotificationView.__name__,
+                ScoreView.__name__,
                 str(self.score.id)
         )
 
@@ -71,4 +77,4 @@ class ScoreNotificationView(PersistentView):
             if previous_score_id is not None:
                 previous_score = scoresaber.get_score_by_id(previous_score_id)
 
-        return ScoreNotificationView(bot, guild, score, previous_score)
+        return ScoreView(bot, guild, score, previous_score)

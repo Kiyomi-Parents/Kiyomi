@@ -3,8 +3,7 @@ from typing import List, Optional
 import pybeatsaver
 
 from src.cogs.beatsaver import BeatSaverAPI
-from src.cogs.beatsaver.storage.model.beatmap import Beatmap
-from src.cogs.beatsaver.storage.model.beatmap_version_difficulty import BeatmapVersionDifficulty
+from src.cogs.beatsaver.beatsaver_utils import BeatSaverUtils
 from src.cogs.leaderboard.services.leaderboard_service import LeaderboardService
 from src.cogs.scoresaber import ScoreSaberAPI
 from src.cogs.scoresaber.storage.model.player import Player
@@ -22,53 +21,31 @@ class ScoreLeaderboardService(LeaderboardService):
     ) -> List[Score]:
         beatsaver = self.bot.get_cog_api(BeatSaverAPI)
 
-        beatmap_difficulty = await beatsaver.get_beatmap_difficulty_by_beatmap_key(
-                beatmap_key,
-                characteristic,
-                difficulty
-        )
+        beatmap_hash = await beatsaver.get_beatmap_hash_by_key(beatmap_key)
 
-        if beatmap_difficulty is None:
+        if beatmap_hash is None:
             return []
 
         return await self.get_beatmap_score_leaderboard(
                 guild_id,
-                beatmap_difficulty.beatmap_version.hash,
-                beatmap_difficulty
-        )
-
-    async def get_beatmap_score_leaderboard_by_beatmap(
-            self,
-            guild_id: int,
-            beatmap: Beatmap,
-            characteristic: pybeatsaver.ECharacteristic,
-            difficulty: pybeatsaver.EDifficulty
-    ) -> List[Score]:
-        beatsaver = self.bot.get_cog_api(BeatSaverAPI)
-
-        beatmap_difficulty = beatsaver.get_beatmap_difficulty_by_beatmap(
-                beatmap,
+                beatmap_hash,
                 characteristic,
                 difficulty
         )
-
-        if beatmap_difficulty is None:
-            return []
-
-        return await self.get_beatmap_score_leaderboard(guild_id, beatmap.latest_version.hash, beatmap_difficulty)
 
     async def get_beatmap_score_leaderboard(
             self,
             guild_id: int,
             beatmap_hash: str,
-            beatmap_difficulty: BeatmapVersionDifficulty
+            characteristic: pybeatsaver.ECharacteristic,
+            difficulty: pybeatsaver.EDifficulty
     ) -> List[Score]:
         scoresaber = self.bot.get_cog_api(ScoreSaberAPI)
 
-        leaderboard = scoresaber.uow.leaderboards.get_by_song_hash(
+        leaderboard = scoresaber.get_leaderboard(
                 beatmap_hash,
-                beatmap_difficulty.characteristic,
-                beatmap_difficulty.difficulty
+                BeatSaverUtils.to_scoresaber_game_mode(characteristic),
+                BeatSaverUtils.to_scoresaber_difficulty(difficulty)
         )
 
         if leaderboard is None:

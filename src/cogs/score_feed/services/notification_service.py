@@ -1,11 +1,10 @@
-from src.cogs.scoresaber import ScoreSaberAPI
+from src.cogs.scoresaber import ScoreSaberAPI, ScoreSaberUI
 from src.cogs.settings import SettingsAPI
 from src.kiyomi import Kiyomi
 from src.log import Logger
 from .score_feed_service import ScoreFeedService
 from .sent_score_service import SentScoreService
 from ..storage.unit_of_work import UnitOfWork
-from ..messages.views.ScoreNotificationView import ScoreNotificationView
 from ..storage.model.sent_score import SentScore
 from src.cogs.general.storage.model.guild import Guild
 from ...scoresaber.storage.model.player import Player
@@ -53,7 +52,8 @@ class NotificationService(ScoreFeedService):
         for score in scores:
             previous_score = scoresaber.get_previous_score(score)
 
-            song_view = ScoreNotificationView(self.bot, discord_guild, score, previous_score)
-            await song_view.send(target=channel)
+            scoresaber_ui = self.bot.get_cog_api(ScoreSaberUI)
+            score_view = scoresaber_ui.view_score(self.bot, discord_guild, score, previous_score)
+            await score_view.send(target=channel)
 
             self.uow.sent_score_repo.add(SentScore(score.id, guild.id))

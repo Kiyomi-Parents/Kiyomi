@@ -38,45 +38,23 @@ class BeatSaverAPI(BeatSaverCog):
             Logger.log(self.__class__.__name__, error)
             return None
 
-    async def get_beatmap_difficulty_by_beatmap_key(
+    async def get_beatmap_hash_by_key(self, beatmap_key: str) -> Optional[str]:
+        return await self.beatmap_service.get_beatmap_hash_by_key(beatmap_key)
+
+    async def get_beatmap_difficulty_by_key(
             self,
             beatmap_key: str,
             characteristic: pybeatsaver.ECharacteristic,
             difficulty: pybeatsaver.EDifficulty
     ) -> Optional[BeatmapVersionDifficulty]:
-        beatmap = await self.get_beatmap_by_key(beatmap_key)
+        beatmap_hash = await self.beatmap_service.get_beatmap_hash_by_key(beatmap_key)
 
-        if beatmap is None:
-            return None
+        return await self.beatmap_service.get_beatmap_difficulty(beatmap_hash, characteristic, difficulty)
 
-        return self.get_beatmap_difficulty_by_beatmap(beatmap, characteristic, difficulty)
-
-    async def get_beatmap_difficulty_by_beatmap_hash(
+    async def get_beatmap_difficulty_by_hash(
             self,
             beatmap_hash: str,
             characteristic: pybeatsaver.ECharacteristic,
             difficulty: pybeatsaver.EDifficulty
     ) -> Optional[BeatmapVersionDifficulty]:
-        beatmap = await self.get_beatmap_by_hash(beatmap_hash)
-
-        if beatmap is None:
-            return None
-
-        return self.get_beatmap_difficulty_by_beatmap(beatmap, characteristic, difficulty)
-
-    @staticmethod
-    def get_beatmap_difficulty_by_beatmap(
-            beatmap: Beatmap,
-            characteristic: pybeatsaver.ECharacteristic,
-            difficulty: pybeatsaver.EDifficulty
-    ) -> Optional[BeatmapVersionDifficulty]:
-        for beatmap_difficulty in beatmap.latest_version.difficulties:
-            if beatmap_difficulty.characteristic is not characteristic:
-                continue
-
-            if beatmap_difficulty.difficulty is not difficulty:
-                continue
-
-            return beatmap_difficulty
-
-        return None
+        return await self.beatmap_service.get_beatmap_difficulty(beatmap_hash, characteristic, difficulty)

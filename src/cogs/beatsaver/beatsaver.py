@@ -1,19 +1,20 @@
-from typing import List
+from typing import List, TYPE_CHECKING
 
 import discord
-from discord import slash_command, Option, ApplicationCommandInvokeError
+from discord import slash_command, ApplicationCommandInvokeError, Option
 from discord.ext import commands
 
 from src.kiyomi import Kiyomi
 from src.log import Logger
-from .converters.beatmap_converter import BeatmapConverter
-from .services import BeatmapAutocompleteService
+from .converters.beatmap_by_key_converter import BeatmapByKeyConverter
+from .services import BeatmapAutocompleteService, BeatmapService
 from .beatsaver_cog import BeatSaverCog
 from .errors import BeatmapNotFound, BeatSaverCogException
 from .messages.views.song_view import SongView
-from .services import BeatmapService
 from src.cogs.settings.storage.model.emoji_setting import EmojiSetting
-from src.cogs.scoresaber.storage.model.leaderboard import Leaderboard
+
+if TYPE_CHECKING:
+    from src.cogs.scoresaber.storage.model.leaderboard import Leaderboard
 
 
 class BeatSaver(BeatSaverCog, name="Beat Saver"):
@@ -31,7 +32,7 @@ class BeatSaver(BeatSaverCog, name="Beat Saver"):
     def events(self):
 
         @self.bot.events.on("on_new_leaderboards")
-        async def attach_song_to_score(leaderboards: List[Leaderboard]):
+        async def attach_song_to_score(leaderboards: List["Leaderboard"]):
             song_hashes = [leaderboard.song_hash for leaderboard in leaderboards]
 
             try:
@@ -64,14 +65,16 @@ class BeatSaver(BeatSaverCog, name="Beat Saver"):
     async def map(
             self,
             ctx: discord.ApplicationContext,
-            key: Option(
-                    BeatmapConverter,
-                    "Beatmap key (25f)"
+            beatmap: Option(
+                    BeatmapByKeyConverter,
+                    name="key",
+                    description="Beatmap key (25f)",
+                    required=True
             )
     ):
         """Displays song info."""
 
-        song_view = SongView(self.bot, ctx.interaction.guild, key)
+        song_view = SongView(self.bot, ctx.interaction.guild, beatmap)
 
         await song_view.respond(ctx.interaction)
 

@@ -22,7 +22,7 @@ class MapDetailDifficultySelect(BeatSaverComponent, discord.ui.Select):
                 options=self.get_options(),
         )
 
-        self.options: Optional[List[discord.SelectOption]] = None
+        self.options: List[discord.SelectOption] = []
 
     async def after_init(self):
         self.options = await self.get_options_async()

@@ -1,9 +1,16 @@
+from __future__ import annotations
+
+from typing import Optional, TYPE_CHECKING
+
 import pyscoresaber
 from pyscoresaber import BeatmapDifficulty
 from sqlalchemy import Column, String, Integer, DateTime, Boolean, Enum, Float
 from sqlalchemy.orm import relationship
 
 from src.kiyomi.database import Base
+
+if TYPE_CHECKING:
+    from src.cogs.beatsaver.storage.model.beatmap_version_difficulty import BeatmapVersionDifficulty
 
 
 class Leaderboard(Base):
@@ -86,6 +93,22 @@ class Leaderboard(Base):
         }
 
         return difficulties[self.difficulty]
+
+    @property
+    def beatmap_difficulty(self) -> Optional["BeatmapVersionDifficulty"]:
+        if self.beatmap_version is None:
+            return None
+
+        for beatmap_difficulty in self.beatmap_version.difficulties:
+            if beatmap_difficulty.scoresaber_characteristic is not self.leaderboard.game_mode:
+                continue
+
+            if beatmap_difficulty.scoresaber_difficulty is not self.leaderboard.difficulty:
+                continue
+
+            return beatmap_difficulty
+
+        return None
 
     def __str__(self):
         return f"Leaderboard {self.song_name} ({self.id})"

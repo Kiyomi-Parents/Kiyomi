@@ -1,14 +1,19 @@
+from typing import Generic, TypeVar
+
 import discord
 
-from src.cogs.score_feed.messages.components.score_feed_component import ScoreFeedComponent
 from src.kiyomi import Kiyomi
+from src.kiyomi.base_component import BaseComponent
+from src.kiyomi.base_view import BaseView
+
+T = TypeVar("T", bound=BaseView)
 
 
-class BeatSaverButton(ScoreFeedComponent, discord.ui.Button):
+class BeatSaverButton(BaseComponent[T], discord.ui.Button, Generic[T]):
     def __init__(self, bot: Kiyomi, parent, beatmap_id: str):
         self.beatmap_id = beatmap_id
 
-        ScoreFeedComponent.__init__(self, bot, parent)
+        BaseComponent.__init__(self, bot, parent)
         discord.ui.Button.__init__(
                 self,
                 label="Beat Saver",

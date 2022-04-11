@@ -2,6 +2,7 @@ import math
 from typing import Optional
 
 import pybeatsaver
+import pyscoresaber
 from discord import Emoji
 
 from src.cogs.settings import SettingsAPI
@@ -91,3 +92,29 @@ class BeatSaverUtils:
             emoji = settings.get(bot.default_guild, name)
 
         return emoji
+
+    @staticmethod
+    def to_scoresaber_game_mode(characteristic: pybeatsaver.ECharacteristic) -> pyscoresaber.GameMode:
+        characteristics = {
+            pybeatsaver.ECharacteristic.STANDARD: pyscoresaber.GameMode.STANDARD,
+            pybeatsaver.ECharacteristic.ONE_SABER: pyscoresaber.GameMode.ONE_SABER,
+            pybeatsaver.ECharacteristic.NO_ARROWS: pyscoresaber.GameMode.NO_ARROWS,
+            pybeatsaver.ECharacteristic.DEGREE_90: pyscoresaber.GameMode.DEGREE_90,
+            pybeatsaver.ECharacteristic.DEGREE_360: pyscoresaber.GameMode.DEGREE_360,
+            pybeatsaver.ECharacteristic.LIGHTSHOW: pyscoresaber.GameMode.LIGHTSHOW,
+            pybeatsaver.ECharacteristic.LAWLESS: pyscoresaber.GameMode.LAWLESS,
+        }
+
+        return characteristics[characteristic]
+
+    @staticmethod
+    def to_scoresaber_difficulty(difficulty: pybeatsaver.EDifficulty) -> pyscoresaber.BeatmapDifficulty:
+        difficulties = {
+            pybeatsaver.EDifficulty.EASY: pyscoresaber.BeatmapDifficulty.EASY,
+            pybeatsaver.EDifficulty.NORMAL: pyscoresaber.BeatmapDifficulty.NORMAL,
+            pybeatsaver.EDifficulty.HARD: pyscoresaber.BeatmapDifficulty.HARD,
+            pybeatsaver.EDifficulty.EXPERT: pyscoresaber.BeatmapDifficulty.EXPERT,
+            pybeatsaver.EDifficulty.EXPERT_PLUS: pyscoresaber.BeatmapDifficulty.EXPERT_PLUS,
+        }
+
+        return difficulties[difficulty]

@@ -2,10 +2,12 @@ import discord
 from discord import SlashCommandGroup, slash_command, ApplicationCommandInvokeError, Option, ApplicationContext, \
     user_command
 from discord.ext import commands
+from discord.ext.commands import MemberConverter
 
 from src.cogs.general import GeneralAPI
 from .converters.score_saber_player_id_converter import ScoreSaberPlayerIdConverter
 from .errors import MemberPlayerNotFoundInGuildException, ScoreSaberCogException
+from .messages.views.score_view import ScoreView
 from .scoresaber_cog import ScoreSaberCog
 from src.kiyomi import permissions
 
@@ -21,7 +23,6 @@ class ScoreSaber(ScoreSaberCog, name="Score Saber"):
             "Link ScoreSaber profile to Discord member."
     )
 
-    # TODO: Fix command concurrency. We should probably somehow do the import later?
     @player.command(name="add")
     async def player_add(
             self,
@@ -72,38 +73,54 @@ class ScoreSaber(ScoreSaberCog, name="Score Saber"):
             if isinstance(error.original, MemberPlayerNotFoundInGuildException):
                 return await error.original.handle(ctx, f"**{ctx.author.name}** doesn't have a PP")
 
-    # @slash_command(name="recent")
-    # @Security.owner_or_permissions()
-    # async def recent_scores(self, ctx: discord.ApplicationContext, discord_member: discord.Member = None, count: int = 1):
-    #     """Displays your most recent scores"""
-    #     if discord_member is None:
-    #         discord_member = ctx.author
-    #
-    #     guild_player = await self.player_service.get_player_by_guild_id_and_guild_id(ctx.guild.id, discord_member.id)
-    #
-    #     if guild_player is None:
-    #         await ctx.respond("Player not found!")
-    #         return
-    #
-    #     if count <= 0:
-    #         await ctx.respond("Score count needs to be positive!")
-    #         return
-    #
-    #     try:
-    #         scores = self.score_service.get_recent_scores(guild_player.player.id, count)
-    #
-    #         if scores is None:
-    #             await ctx.respond("No scores found!")
-    #             return
-    #
-    #         for score in scores:
-    #             pass
-    #             # TODO: FIX.
-    #             # score_embed = Message.get_score_embed(guild_player.player, score)
-    #             # await ctx.respond(embed=score_embed)
-    #
-    #     except IndexError as e:
-    #         await ctx.respond("Song argument too large")
+    @slash_command(name="recent")
+    async def recent_scores(
+            self,
+            ctx: discord.ApplicationContext,
+            discord_member: Option(
+                    MemberConverter,
+                    name="user",
+                    description="Discord user",
+                    required=False
+            ),
+            count: Option(
+                    int,
+                    "Amount of scores to post",
+                    min_value=1,
+                    max_value=3,
+                    default=1,
+                    required=False
+            )
+    ):
+        """Displays your most recent scores"""
+        if discord_member is None:
+            discord_member = ctx.author
+
+        guild_player = await self.player_service.get_guild_player(ctx.guild.id, discord_member.id)
+
+        if guild_player is None:
+            await ctx.respond("Player not found!")
+            return
+
+        if count <= 0:
+            await ctx.respond("Score count needs to be positive!")
+            return
+
+        try:
+            scores = self.score_service.get_recent_scores(guild_player.player.id, count)
+
+            if scores is None or len(scores) == 0:
+                await ctx.respond("No scores found!")
+                return
+
+            for score in scores:
+                previous_score = self.score_service.get_previous_score(score)
+
+                score_view = ScoreView(self.bot, ctx.interaction.guild, score, previous_score)
+                await score_view.respond(ctx.interaction)
+
+        except IndexError as e:
+            await ctx.respond("Song argument too large")
 
     @slash_command(name="manual-add", **permissions.is_bot_owner_and_admin_guild())
     async def manual_add_player(

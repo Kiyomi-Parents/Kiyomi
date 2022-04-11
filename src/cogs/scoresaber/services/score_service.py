@@ -14,6 +14,9 @@ class ScoreService(ScoreSaberService):
     def get_recent_scores(self, player_id: str, limit: int) -> List[Score]:
         return self.uow.scores.get_player_recent_scores(player_id, limit)
 
+    def get_previous_score(self, score: Score) -> Score:
+        return self.uow.scores.get_previous_score(score)
+
     async def update_player_scores(self, player: Player):
         new_player_scores = await self.get_missing_recent_scores(player)
         Logger.log(player, f"Got {len(new_player_scores)} new recent scores from Score Saber")

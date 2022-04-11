@@ -3,12 +3,12 @@ from typing import Optional
 from discord import Colour
 
 from src.cogs.general.storage.model.guild import Guild
-from src.cogs.score_feed.messages.components.embeds.score_feed_embed import ScoreFeedEmbed
 from src.cogs.scoresaber.storage.model.score import Score
 from src.kiyomi import Kiyomi
+from src.kiyomi.base_embed import BaseEmbed
 
 
-class ScoreEmbed(ScoreFeedEmbed):
+class ScoreEmbed(BaseEmbed):
     def __init__(self, bot: Kiyomi, guild: Guild, score: Score):
         super().__init__(bot)
 

@@ -20,7 +20,7 @@ class PersistentView(BaseView, ABC):
 
     @staticmethod
     @abstractmethod
-    async def deserialize_persistence(bot: Kiyomi, persistence: "Persistence"):
+    async def deserialize_persistence(bot: Kiyomi, persistence: "Persistence") -> PersistentView:
         pass
 
     async def send(

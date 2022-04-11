@@ -1,21 +1,24 @@
-from typing import Optional
+from typing import Optional, Generic, TypeVar
 
 import discord
 from discord import Embed
 
-from src.cogs.score_feed.messages.components.embeds.improvement_score_embed import ImprovementScoreEmbed
-from src.cogs.score_feed.messages.components.embeds.score_embed import ScoreEmbed
-from src.cogs.score_feed.messages.components.score_feed_component import ScoreFeedComponent
+from src.cogs.scoresaber.messages.components.embeds.improvement_score_embed import ImprovementScoreEmbed
+from src.cogs.scoresaber.messages.components.embeds.score_embed import ScoreEmbed
 from src.cogs.scoresaber.storage.model.score import Score
 from src.kiyomi import Kiyomi
+from src.kiyomi.base_component import BaseComponent
+from src.kiyomi.base_view import BaseView
+
+T = TypeVar("T", bound=BaseView)
 
 
-class ScoreButton(ScoreFeedComponent, discord.ui.Button):
-    def __init__(self, bot: Kiyomi, parent, score: Score, previous_score: Optional[Score]):
+class ScoreButton(BaseComponent[T], discord.ui.Button, Generic[T]):
+    def __init__(self, bot: Kiyomi, parent: T, score: Score, previous_score: Optional[Score]):
         self.score = score
         self.previous_score = previous_score
 
-        ScoreFeedComponent.__init__(self, bot, parent)
+        BaseComponent.__init__(self, bot, parent)
         discord.ui.Button.__init__(
                 self,
                 custom_id=f"score:button:score:{score.id}",

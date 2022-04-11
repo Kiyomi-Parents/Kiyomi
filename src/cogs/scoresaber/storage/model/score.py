@@ -1,14 +1,17 @@
-from typing import Optional
+from __future__ import annotations
+
+from typing import Optional, TYPE_CHECKING
 
 import pyscoresaber
 from dateutil import tz
 from sqlalchemy import Column, String, Integer, ForeignKey, DateTime, Float, Boolean
 from sqlalchemy.orm import relationship
 
-from src.cogs.beatsaver.storage.model.beatmap import Beatmap
-from src.cogs.beatsaver.storage.model.beatmap_version import BeatmapVersion
-from src.cogs.beatsaver.storage.model.beatmap_version_difficulty import BeatmapVersionDifficulty
 from src.kiyomi.database import Base
+
+if TYPE_CHECKING:
+    from src.cogs.beatsaver.storage.model.beatmap import Beatmap
+    from src.cogs.beatsaver.storage.model.beatmap_version import BeatmapVersion
 
 
 class Score(Base):
@@ -97,22 +100,6 @@ class Score(Base):
             return None
 
         return self.beatmap_version.beatmap
-
-    @property
-    def beatmap_difficulty(self) -> Optional[BeatmapVersionDifficulty]:
-        if self.beatmap_version is None:
-            return None
-
-        for beatmap_difficulty in self.beatmap_version.difficulties:
-            if beatmap_difficulty.scoresaber_characteristic is not self.leaderboard.game_mode:
-                continue
-
-            if beatmap_difficulty.scoresaber_difficulty is not self.leaderboard.difficulty:
-                continue
-
-            return beatmap_difficulty
-
-        return None
 
     @property
     def get_hmd_name(self):

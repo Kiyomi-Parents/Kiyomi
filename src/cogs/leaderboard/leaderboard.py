@@ -5,11 +5,11 @@ from discord import slash_command, Option, OptionChoice
 
 from src.kiyomi import Kiyomi
 from .leaderboard_cog import LeaderboardCog
-from .messages.components.embeds.guild_leaderboard_embed import GuildLeaderboardEmbed
+from .messages.views.guild_leaderboard_view import GuildLeaderboardView
 from .services import PlayerLeaderboardService, ScoreLeaderboardService
 from ..beatsaver import BeatSaverAPI
 from ..beatsaver.converters.beatmap_characteristic_converter import BeatmapCharacteristicConverter
-from ..beatsaver.converters.beatmap_converter import BeatmapConverter
+from ..beatsaver.converters.beatmap_by_key_converter import BeatmapByKeyConverter
 from ..beatsaver.converters.beatmap_difficulty_converter import BeatmapDifficultyConverter
 from src.kiyomi.errors import BadArgument
 
@@ -33,7 +33,7 @@ class Leaderboard(LeaderboardCog):
         beatsaver = self.bot.get_cog_api(BeatSaverAPI)
 
         try:
-            beatmap = await BeatmapConverter().convert(ctx, ctx.options["key"])
+            beatmap = await BeatmapByKeyConverter().convert(ctx, ctx.options["key"])
             beatmap_characteristic = await BeatmapCharacteristicConverter().convert(ctx, ctx.options["game_mode"])
         except BadArgument:
             return []
@@ -47,7 +47,7 @@ class Leaderboard(LeaderboardCog):
         beatsaver = self.bot.get_cog_api(BeatSaverAPI)
 
         try:
-            beatmap = await BeatmapConverter().convert(ctx, ctx.options["key"])
+            beatmap = await BeatmapByKeyConverter().convert(ctx, ctx.options["key"])
         except BadArgument:
             return []
 
@@ -57,30 +57,24 @@ class Leaderboard(LeaderboardCog):
     async def leaderboard(
             self,
             ctx: discord.ApplicationContext,
-            key: Option(
-                    BeatmapConverter,
-                    "Beatmap key (25f)"
+            beatmap: Option(
+                    BeatmapByKeyConverter,
+                    name="key",
+                    description="Beatmap key (25f)"
             ),
-            game_mode: Option(
+            characteristic: Option(
                     BeatmapCharacteristicConverter,
-                    "Beatmap game mode",
+                    name="game_mode",
+                    description="Beatmap game mode",
                     autocomplete=get_beatmap_characteristics
             ),
             difficulty: Option(
                     BeatmapDifficultyConverter,
-                    "Beatmap difficulty",
+                    description="Beatmap difficulty",
                     autocomplete=get_beatmap_difficulties
             )
     ):
         """Displays songs guild leaderboard."""
-        beatsaver = self.bot.get_cog_api(BeatSaverAPI)
+        guild_leaderboard_view = GuildLeaderboardView(self.bot, ctx.interaction.guild, beatmap, characteristic, difficulty)
 
-        beatmap_difficulty = beatsaver.get_beatmap_difficulty_by_beatmap(key, game_mode, difficulty)
-        leaderboard = await self.score_leaderboard_service.get_beatmap_score_leaderboard(
-                ctx.guild.id,
-                beatmap_difficulty
-        )
-
-        # TODO: Make this into a view with characteristic and difficulty selector
-        guild_leaderboard_embed = GuildLeaderboardEmbed(self.bot, ctx.guild.name, beatmap_difficulty, leaderboard)
-        await ctx.respond(embed=guild_leaderboard_embed)
+        await guild_leaderboard_view.respond(ctx.interaction)
