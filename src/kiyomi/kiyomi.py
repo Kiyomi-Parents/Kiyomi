@@ -5,10 +5,11 @@ from discord import ApplicationContext, DiscordException, ApplicationCommandInvo
 from pyee import AsyncIOEventEmitter
 
 from src.cogs.errors import NoPrivateMessagesException
+from .error import CogException, KiyomiException, BadArgument
+from .error.error_resolver import ErrorResolver
 from .utils import Utils
 from .database import Database
 from src.log import Logger
-from .errors import BadArgument, CogException, KiyomiException
 
 TCog = TypeVar('TCog')
 
@@ -17,6 +18,7 @@ class Kiyomi(Bot):
     running_tests = False
     events = AsyncIOEventEmitter()
     default_guild: Optional[int] = None
+    error_resolver = ErrorResolver()
 
     def __init__(self, *args, db: Database, **kwargs):
         super().__init__(*args, **kwargs)

@@ -11,7 +11,7 @@ from ..beatsaver import BeatSaverAPI
 from ..beatsaver.converters.beatmap_characteristic_converter import BeatmapCharacteristicConverter
 from ..beatsaver.converters.beatmap_by_key_converter import BeatmapByKeyConverter
 from ..beatsaver.converters.beatmap_difficulty_converter import BeatmapDifficultyConverter
-from src.kiyomi.errors import BadArgument
+from src.kiyomi.error import BadArgument
 
 
 class Leaderboard(LeaderboardCog):

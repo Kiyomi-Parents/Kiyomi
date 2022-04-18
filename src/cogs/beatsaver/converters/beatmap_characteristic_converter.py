@@ -2,7 +2,7 @@ import pybeatsaver
 from discord.ext import commands
 
 from src.kiyomi.base_converter import BaseConverter
-from src.kiyomi.errors import BadArgument
+from src.kiyomi.error import BadArgument
 
 
 class BeatmapCharacteristicConverter(BaseConverter):

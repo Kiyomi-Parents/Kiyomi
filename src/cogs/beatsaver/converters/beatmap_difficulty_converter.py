@@ -2,7 +2,7 @@ import pybeatsaver
 from discord.ext import commands
 from discord.ext.commands import Context
 
-from src.kiyomi.errors import BadArgument
+from src.kiyomi.error import BadArgument
 
 
 class BeatmapDifficultyConverter(commands.Converter):

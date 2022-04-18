@@ -1,7 +1,7 @@
 from typing import List, TYPE_CHECKING
 
 import discord
-from discord import slash_command, ApplicationCommandInvokeError, Option
+from discord import slash_command, Option
 from discord.ext import commands
 
 from src.kiyomi import Kiyomi
@@ -9,7 +9,7 @@ from src.log import Logger
 from .converters.beatmap_by_key_converter import BeatmapByKeyConverter
 from .services import BeatmapAutocompleteService, BeatmapService
 from .beatsaver_cog import BeatSaverCog
-from .errors import BeatmapNotFound, BeatSaverCogException
+from .errors import BeatmapNotFound
 from .messages.views.song_view import SongView
 from src.cogs.settings.storage.model.emoji_setting import EmojiSetting
 
@@ -77,9 +77,3 @@ class BeatSaver(BeatSaverCog, name="Beat Saver"):
         song_view = SongView(self.bot, ctx.interaction.guild, beatmap)
 
         await song_view.respond(ctx.interaction)
-
-    @map.error
-    async def map_error(self, ctx: discord.ApplicationContext, error: Exception):
-        if isinstance(error, ApplicationCommandInvokeError):
-            if isinstance(error.original, BeatSaverCogException):
-                return await error.original.handle(ctx)

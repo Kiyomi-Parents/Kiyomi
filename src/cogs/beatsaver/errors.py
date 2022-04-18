@@ -1,4 +1,4 @@
-from src.kiyomi.errors import CogException
+from src.kiyomi.error import CogException
 
 
 class BeatSaverCogException(CogException):

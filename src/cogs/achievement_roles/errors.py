@@ -1,5 +1,5 @@
 from src.cogs.achievement.services.achievements import Achievement
-from src.kiyomi.errors import CogException
+from src.kiyomi.error import CogException
 
 
 class AchievementRolesCogException(CogException):

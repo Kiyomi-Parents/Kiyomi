@@ -1,6 +1,6 @@
 from typing import Optional
 
-from src.kiyomi.errors import CogException
+from src.kiyomi.error import CogException
 
 
 class EmojiEchoCogException(CogException):
