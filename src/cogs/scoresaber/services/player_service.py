@@ -143,3 +143,6 @@ class PlayerService(ScoreSaberService):
 
     async def get_all_players(self) -> List[Player]:
         return self.uow.players.get_all()
+
+    async def player_exists(self, player_id: str) -> bool:
+        return self.uow.players.exists(player_id)

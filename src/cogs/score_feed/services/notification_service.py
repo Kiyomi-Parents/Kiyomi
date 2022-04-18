@@ -33,9 +33,9 @@ class NotificationService(ScoreFeedService):
         scoresaber = self.bot.get_cog_api(ScoreSaberAPI)
         settings = self.bot.get_cog_api(SettingsAPI)
 
-        channel = settings.get(guild.id, "score_feed_channel_id")
+        channel_id = settings.get(guild.id, "score_feed_channel_id")
 
-        if channel is None:
+        if channel_id is None:
             Logger.log(guild, "Recent scores channel not found, skipping!")
             return
 
@@ -54,6 +54,6 @@ class NotificationService(ScoreFeedService):
 
             scoresaber_ui = self.bot.get_cog_api(ScoreSaberUI)
             score_view = scoresaber_ui.view_score(self.bot, discord_guild, score, previous_score)
-            await score_view.send(target=channel)
+            await score_view.send(target=channel_id)
 
             self.uow.sent_score_repo.add(SentScore(score.id, guild.id))

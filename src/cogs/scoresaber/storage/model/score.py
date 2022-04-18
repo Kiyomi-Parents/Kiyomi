@@ -69,6 +69,9 @@ class Score(Base):
 
         self.leaderboard_id = player_score.leaderboard.id
 
+        if player_score.score.leaderboard_player_info is not None:
+            self.player_id = player_score.score.leaderboard_player_info.id
+
     @property
     def leaderboard_url(self):
         page = (self.rank - 1) // 12 + 1
