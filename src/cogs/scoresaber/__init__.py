@@ -1,6 +1,7 @@
 import pyscoresaber
 
 from src.kiyomi import Kiyomi
+from .arg_resolvers.player_id_resolver import PlayerIdResolver
 from .scoresaber import ScoreSaber
 from .scoresaber_api import ScoreSaberAPI
 from .scoresaber_ui import ScoreSaberUI
@@ -12,6 +13,8 @@ from .tasks import Tasks
 def setup(bot: Kiyomi):
     scoresaber_api_client = pyscoresaber.ScoreSaberAPI(bot.loop)
     uow = UnitOfWork(bot.database.session)
+
+    bot.error_resolver.add(PlayerIdResolver(uow))
 
     score_service = ScoreService(bot, uow, scoresaber_api_client)
     player_service = PlayerService(bot, uow, scoresaber_api_client, score_service)

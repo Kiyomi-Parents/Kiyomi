@@ -1,5 +1,6 @@
 from .database import *
 from .utils import *
+from .error import *
 
 from .base_cog import BaseCog
 from .base_service import BaseService

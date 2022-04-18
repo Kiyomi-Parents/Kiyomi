@@ -13,8 +13,8 @@ class MemberUsingDifferentPlayerAlreadyException(ScoreSaberCogException):
         self.player_id = player_id
 
     def __str__(self):
-        return (f"You are linked as {self.player_id} in another guild!\n"
-                f"You can't have different Score Saber profiles in different guilds!")
+        return ("You are linked as %player_id% in another guild!\n"
+                "You can't have different Score Saber profiles in different guilds!")
 
 
 class PlayerRegisteredInGuildAlreadyException(ScoreSaberCogException):
@@ -23,7 +23,7 @@ class PlayerRegisteredInGuildAlreadyException(ScoreSaberCogException):
         self.player_id = player_id
 
     def __str__(self):
-        return f"Player {self.player_id} has already been registered in this guild!"
+        return f"Player %player_id% has already been registered in this guild!"
 
 
 class MemberHasPlayerAlreadyRegisteredInGuildException(ScoreSaberCogException):
@@ -33,7 +33,7 @@ class MemberHasPlayerAlreadyRegisteredInGuildException(ScoreSaberCogException):
         self.player_id = player_id
 
     def __str__(self):
-        return f"You have already added yourself as {self.player_id}!"
+        return f"You have already added yourself as %player_id%!"
 
 
 class MemberPlayerNotFoundInGuildException(ScoreSaberCogException):
@@ -51,4 +51,4 @@ class PlayerNotFoundException(ScoreSaberCogException):
         self.player_id = player_id
 
     def __str__(self):
-        return f"Couldn't find Score Saber profile with ID {self.player_id}!"
+        return f"Couldn't find Score Saber profile with ID %player_id%!"

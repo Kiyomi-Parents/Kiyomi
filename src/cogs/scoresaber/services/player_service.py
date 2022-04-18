@@ -31,7 +31,7 @@ class PlayerService(ScoreSaberService):
         if guild_players is not None:
             for guild_player in guild_players:
                 if guild_player.player_id != player_id:
-                    raise MemberUsingDifferentPlayerAlreadyException(member_id, player_id)
+                    raise MemberUsingDifferentPlayerAlreadyException(member_id, guild_player.player_id)
 
     async def check_player_registered_guild(self, guild_id: int, player_id: str):
         """Check if the player has already been registered in the guild by someone else"""

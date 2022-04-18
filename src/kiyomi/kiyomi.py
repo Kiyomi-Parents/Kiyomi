@@ -1,11 +1,12 @@
 import traceback
-from typing import TypeVar, Optional, Type, cast, List
+from typing import TypeVar, Optional, Type, cast
 
 from discord import ApplicationContext, DiscordException, ApplicationCommandInvokeError, Bot
 from pyee import AsyncIOEventEmitter
 
 from src.cogs.errors import NoPrivateMessagesException
-from .error import ErrorArgResolver, CogException, KiyomiException, BadArgument
+from .error import CogException, KiyomiException, BadArgument
+from .error.error_resolver import ErrorResolver
 from .utils import Utils
 from .database import Database
 from src.log import Logger
@@ -17,7 +18,7 @@ class Kiyomi(Bot):
     running_tests = False
     events = AsyncIOEventEmitter()
     default_guild: Optional[int] = None
-    resolvers: List[ErrorArgResolver] = []
+    error_resolver = ErrorResolver()
 
     def __init__(self, *args, db: Database, **kwargs):
         super().__init__(*args, **kwargs)

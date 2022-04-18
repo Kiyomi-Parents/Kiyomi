@@ -1,10 +1,13 @@
-from typing import Optional, Dict, Union, TypeVar, Generic
+from __future__ import annotations
+
+from typing import Optional, Dict, Union, TypeVar, Generic, TYPE_CHECKING
 
 from discord import ApplicationContext, AutocompleteContext
 
-from src.kiyomi import BaseCog
 from src.log import Logger
 
+if TYPE_CHECKING:
+    pass
 
 class KiyomiException(Exception):
     is_handled: bool = False
@@ -25,7 +28,7 @@ class KiyomiException(Exception):
         self.is_handled = True
 
 
-TCog = TypeVar("TCog", bound=BaseCog)
+TCog = TypeVar("TCog", bound="BaseCog")
 
 
 class CogException(KiyomiException, Generic[TCog]):
@@ -34,9 +37,9 @@ class CogException(KiyomiException, Generic[TCog]):
             return
 
         cog: TCog = options.pop("cog")
-        message: str = options.pop("message") if options["message"] else str(self)
+        message: str = options.pop("message") if "message" in options.keys() else str(self)
 
-        cog.bot.
+        message = await cog.bot.error_resolver.resolve_message(self, message)
 
         self._log()
 

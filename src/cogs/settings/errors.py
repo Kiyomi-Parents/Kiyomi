@@ -1,5 +1,5 @@
 from .storage.model.enums.setting_type import SettingType
-from src.kiyomi.errors import CogException
+from src.kiyomi.error import CogException
 
 
 class SettingsCogException(CogException):
