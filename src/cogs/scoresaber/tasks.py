@@ -1,3 +1,4 @@
+import pyscoresaber
 from discord.ext import tasks
 
 from src.kiyomi import Kiyomi, BaseTasks
@@ -38,3 +39,13 @@ class Tasks(BaseTasks):
 
         for player in players:
             await self.score_service.update_player_scores(player)
+
+    @Utils.discord_ready
+    async def init_live_score_feed(self):
+        Logger.log("Score Saber Websocket", "Started listening to live score feed!")
+        async for item in self.score_service.scoresaber.websocket():
+            if isinstance(item, pyscoresaber.PlayerScore):
+                player_score = item
+
+                if await self.player_service.player_exists(player_score.score.leaderboard_player_info.id):
+                    await self.score_service.on_new_live_score_feed_score(player_score)

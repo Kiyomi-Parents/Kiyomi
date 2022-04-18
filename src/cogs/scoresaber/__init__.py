@@ -18,6 +18,9 @@ def setup(bot: Kiyomi):
 
     scoresaber_tasks = Tasks(bot, player_service, score_service)
 
+    # Start listening to websocket
+    bot.loop.create_task(scoresaber_tasks.init_live_score_feed())
+
     if not bot.running_tests:
         scoresaber_tasks.update_players.start()
         scoresaber_tasks.update_players_scores.start()

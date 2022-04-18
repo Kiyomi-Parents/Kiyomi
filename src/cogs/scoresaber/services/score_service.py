@@ -17,6 +17,21 @@ class ScoreService(ScoreSaberService):
     def get_previous_score(self, score: Score) -> Score:
         return self.uow.scores.get_previous_score(score)
 
+    async def on_new_live_score_feed_score(self, player_score: pyscoresaber.PlayerScore):
+        if not await self.is_player_score_new(player_score):
+            return
+
+        Logger.log(f"{player_score.score.leaderboard_player_info.name}", f"Got new score from Score Saber websocket")
+
+        if not self.uow.leaderboards.exists(player_score.leaderboard.id):
+            new_leaderboard = self.uow.leaderboards.add(Leaderboard(player_score.leaderboard))
+            self.bot.events.emit("on_new_leaderboards", [new_leaderboard])
+
+        new_score = self.uow.scores.add(Score(player_score))
+        self.bot.events.emit("on_new_scores", [new_score])
+
+        self.bot.events.emit("on_new_score_live", new_score)
+
     async def update_player_scores(self, player: Player):
         new_player_scores = await self.get_missing_recent_scores(player)
         Logger.log(player, f"Got {len(new_player_scores)} new recent scores from Score Saber")
@@ -70,10 +85,7 @@ class ScoreService(ScoreSaberService):
                 before_page_add_count = len(new_player_scores)
 
                 for player_score in player_scores:
-                    if self.uow.scores.exists_by_score_id_and_time_set(
-                            player_score.score.id,
-                            player_score.score.time_set
-                    ):
+                    if await self.is_player_score_new(player_score):
                         return new_player_scores
                     else:
                         new_player_scores.append(player_score)
@@ -86,3 +98,9 @@ class ScoreService(ScoreSaberService):
             Logger.log(player, f"Got HTTP code {error.status} when trying to access {error.url}")
 
         return new_player_scores
+
+    async def is_player_score_new(self, player_score: pyscoresaber.PlayerScore) -> bool:
+        return self.uow.scores.exists_by_score_id_and_time_set(
+                player_score.score.id,
+                player_score.score.time_set
+        )

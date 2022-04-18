@@ -7,6 +7,7 @@ from src.kiyomi import Kiyomi, permissions
 from .score_feed_cog import ScoreFeedCog
 from .services import SentScoreService, NotificationService
 from src.cogs.scoresaber.storage.model.guild_player import GuildPlayer
+from src.cogs.scoresaber.storage.model.score import Score
 
 
 class ScoreFeed(ScoreFeedCog, name="Score Feed"):
@@ -20,6 +21,11 @@ class ScoreFeed(ScoreFeedCog, name="Score Feed"):
         @self.bot.events.on("on_new_player")
         async def mark_scores_sent(guild_player: GuildPlayer):
             self.sent_score_service.mark_player_scores_sent(guild_player.player, guild_player.guild)
+
+        @self.bot.events.on("on_new_score_live")
+        async def send_notifications_for_score(score: Score):
+            for guild in score.player.guilds:
+                await self.notification_service.send_notification(guild, score.player)
 
     @commands.Cog.listener()
     async def on_ready(self):
