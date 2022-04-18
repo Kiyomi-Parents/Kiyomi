@@ -2,7 +2,7 @@ from discord import ApplicationContext, ApplicationCommandInvokeError
 from discord.ext import commands
 from termcolor import colored
 
-from .errors import KiyomiException
+from .error import KiyomiException, CogException
 from .kiyomi import Kiyomi
 from src.log import Logger
 
@@ -22,8 +22,13 @@ class BaseCog(commands.Cog):
 
         await ctx.trigger_typing()
 
-    async def cog_command_error(self, ctx: ApplicationContext, error: Exception):
-        if isinstance(error, ApplicationCommandInvokeError):
-            if isinstance(error.original, KiyomiException):
-                if error.original.is_handled:
+    async def cog_command_error(self, ctx: ApplicationContext, exception: Exception):
+        if isinstance(exception, ApplicationCommandInvokeError):
+            error = exception.original
+
+            if isinstance(error, KiyomiException):
+                if error.is_handled:
                     return
+
+            if isinstance(error, CogException):
+                return await error.handle(ctx)

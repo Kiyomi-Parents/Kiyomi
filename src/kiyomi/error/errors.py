@@ -1,7 +1,8 @@
-from typing import Optional, Dict, Union
+from typing import Optional, Dict, Union, TypeVar, Generic
 
 from discord import ApplicationContext, AutocompleteContext
 
+from src.kiyomi import BaseCog
 from src.log import Logger
 
 
@@ -11,22 +12,37 @@ class KiyomiException(Exception):
     def _log(self):
         Logger.error(self.__class__.__name__, str(self))
 
-    async def handle(self, ctx: ApplicationContext, message: Optional[str] = None, **kwargs):
+    async def handle(self, ctx: ApplicationContext, **options):
         if self.is_handled:
             return
 
-        if message is None:
-            message = str(self)
+        message = options.pop("message") if options["message"] else str(self)
 
         self._log()
 
-        await ctx.respond(message, ephemeral=True, **kwargs)
+        await ctx.respond(message, ephemeral=True, **options)
 
         self.is_handled = True
 
 
-class CogException(KiyomiException):
-    pass
+TCog = TypeVar("TCog", bound=BaseCog)
+
+
+class CogException(KiyomiException, Generic[TCog]):
+    async def handle(self, ctx: ApplicationContext, **options):
+        if self.is_handled:
+            return
+
+        cog: TCog = options.pop("cog")
+        message: str = options.pop("message") if options["message"] else str(self)
+
+        cog.bot.
+
+        self._log()
+
+        await ctx.respond(message, ephemeral=True, **options)
+
+        self.is_handled = True
 
 
 class CommandError(KiyomiException):

@@ -6,7 +6,7 @@ from discord.ext.commands import MemberConverter
 
 from src.cogs.general import GeneralAPI
 from .converters.score_saber_player_id_converter import ScoreSaberPlayerIdConverter
-from .errors import MemberPlayerNotFoundInGuildException, ScoreSaberCogException
+from .errors import MemberPlayerNotFoundInGuildException
 from .messages.views.score_view import ScoreView
 from .scoresaber_cog import ScoreSaberCog
 from src.kiyomi import permissions
@@ -194,12 +194,14 @@ class ScoreSaber(ScoreSaberCog, name="Score Saber"):
         )
 
     @manual_remove_player.error
-    async def manual_remove_player_error(self, ctx: discord.ApplicationContext, error: Exception):
-        if isinstance(error, ApplicationCommandInvokeError):
-            if isinstance(error.original, MemberPlayerNotFoundInGuildException):
-                return await error.original.handle(
+    async def manual_remove_player_error(self, ctx: discord.ApplicationContext, exception: Exception):
+        if isinstance(exception, ApplicationCommandInvokeError):
+            error = exception.original
+
+            if isinstance(error, MemberPlayerNotFoundInGuildException):
+                return await error.handle(
                         ctx,
-                        f"{error.original.member_id} doesn't have a Score Saber profile with ID {error.original.player_id} linked in guild {error.original.guild_id}."
+                        f"{error.member_id} doesn't have a Score Saber profile with ID {error.player_id} linked in guild {error.guild_id}."
                 )
 
     @user_command(name="Refresh Score Saber Profile", **permissions.is_bot_owner())
@@ -210,8 +212,3 @@ class ScoreSaber(ScoreSaberCog, name="Score Saber"):
         await self.score_service.update_player_scores(guild_player.player)
 
         await ctx.respond(f"Updated {member.name}'s Score Saber profile ({guild_player.player.name})", ephemeral=True)
-
-    async def cog_command_error(self, ctx: ApplicationContext, error: Exception):
-        if isinstance(error, ApplicationCommandInvokeError):
-            if isinstance(error.original, ScoreSaberCogException):
-                return await error.original.handle(ctx)

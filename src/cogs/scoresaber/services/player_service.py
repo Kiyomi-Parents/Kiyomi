@@ -31,21 +31,14 @@ class PlayerService(ScoreSaberService):
         if guild_players is not None:
             for guild_player in guild_players:
                 if guild_player.player_id != player_id:
-                    raise MemberUsingDifferentPlayerAlreadyException(
-                            member=guild_player.member,
-                            player=guild_player.player
-                    )
+                    raise MemberUsingDifferentPlayerAlreadyException(member_id, player_id)
 
     async def check_player_registered_guild(self, guild_id: int, player_id: str):
         """Check if the player has already been registered in the guild by someone else"""
         guild_player = self.uow.guild_players.get_by_guild_id_and_player_id(guild_id, player_id)
 
         if guild_player is not None:
-            raise PlayerRegisteredInGuildAlreadyException(
-                    guild=guild_player.guild,
-                    member=guild_player.member,
-                    player=guild_player.player
-            )
+            raise PlayerRegisteredInGuildAlreadyException(guild_id, player_id)
 
     async def check_member_registered_player_guild(self, guild_id: int, member_id: int, player_id: str):
         """Check if the member has already registered as a player in guild"""
@@ -56,11 +49,7 @@ class PlayerService(ScoreSaberService):
         )
 
         if guild_player is not None:
-            raise MemberHasPlayerAlreadyRegisteredInGuildException(
-                    guild=guild_player.guild,
-                    member=guild_player.member,
-                    player=guild_player.player
-            )
+            raise MemberHasPlayerAlreadyRegisteredInGuildException(guild_id, member_id, player_id)
 
     async def add_player_with_checks(self, guild_id: int, member_id: int, player_id: str) -> GuildPlayer:
         await self.check_member_player_parity(member_id, player_id)
@@ -78,7 +67,7 @@ class PlayerService(ScoreSaberService):
 
                 return self.uow.players.add(Player(new_player))
             except pyscoresaber.NotFoundException as error:
-                raise PlayerNotFoundException(player_id=player_id) from error
+                raise PlayerNotFoundException(player_id) from error
 
         return player
 
@@ -86,7 +75,7 @@ class PlayerService(ScoreSaberService):
         guild_player = self.uow.guild_players.get_by_guild_id_and_member_id(guild_id, member_id)
 
         if guild_player is None:
-            raise MemberPlayerNotFoundInGuildException(guild_id=guild_id, member_id=member_id)
+            raise MemberPlayerNotFoundInGuildException(guild_id, member_id)
 
         return await self.remove_player(guild_id, member_id, guild_player.player_id)
 
@@ -114,7 +103,7 @@ class PlayerService(ScoreSaberService):
         )
 
         if guild_player is None:
-            raise MemberPlayerNotFoundInGuildException(guild_id=guild_id, member_id=member_id, player_id=player_id)
+            raise MemberPlayerNotFoundInGuildException(guild_id, member_id, player_id)
 
         self.uow.guild_players.remove(guild_player)
         self.uow.save_changes()
