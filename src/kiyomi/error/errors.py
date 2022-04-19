@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Optional, Dict, Union, TypeVar, Generic, TYPE_CHECKING
 
-from discord import ApplicationContext, AutocompleteContext
+from discord import ApplicationContext, AutocompleteContext, Embed, Color
 
 from src.log import Logger
 
@@ -23,7 +23,12 @@ class KiyomiException(Exception):
         if message is None:
             message = str(self)
 
-        await ctx.respond(message, ephemeral=True, **options)
+        # TODO: Make this better :)
+        embed = Embed()
+        embed.colour = Color.from_rgb(255, 0, 0)
+        embed.description = message
+
+        await ctx.respond(embed=embed, ephemeral=True, **options)
 
     async def handle(self, **options):
         if self.is_handled:

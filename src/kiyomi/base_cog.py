@@ -31,4 +31,4 @@ class BaseCog(commands.Cog):
                     return
 
             if isinstance(error, CogException):
-                return await error.handle(ctx, cog=self)
+                return await error.handle(ctx=ctx, cog=self)
