@@ -7,6 +7,10 @@ TReturn = TypeVar("TReturn")
 
 class ErrorArgResolver(Generic[TArg, TReturn]):
     @abstractmethod
+    async def resolve_detailed(self, argument: TArg) -> TReturn:
+        pass
+
+    @abstractmethod
     async def resolve(self, argument: TArg) -> TReturn:
         pass
 

@@ -1,3 +1,4 @@
+from .arg_resolvers import *
 from .general import General
 from .general_api import GeneralAPI
 from .services import EmojiService, GuildService, MemberService, RoleService, ChannelService, MessageService
@@ -7,6 +8,13 @@ from ...kiyomi import Kiyomi
 
 def setup(bot: Kiyomi):
     uow = UnitOfWork(bot.database.session)
+
+    bot.error_resolver.add(ChannelIdResolver(uow))
+    bot.error_resolver.add(EmojiIdResolver(uow))
+    bot.error_resolver.add(GuildIdResolver(uow))
+    bot.error_resolver.add(MemberIdResolver(uow))
+    bot.error_resolver.add(MessageIdResolver(uow))
+    bot.error_resolver.add(RoleIdResolver(uow))
 
     emoji_service = EmojiService(bot, uow)
     guild_service = GuildService(bot, uow)

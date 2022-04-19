@@ -201,7 +201,8 @@ class ScoreSaber(ScoreSaberCog, name="Score Saber"):
             if isinstance(error, MemberPlayerNotFoundInGuildException):
                 return await error.handle(
                         ctx,
-                        f"{error.member_id} doesn't have a Score Saber profile with ID {error.player_id} linked in guild {error.guild_id}."
+                        message=f"%member_id% doesn't have a Score Saber profile %player_id% " \
+                                "linked in guild %guild_id%."
                 )
 
     @user_command(name="Refresh Score Saber Profile", **permissions.is_bot_owner())

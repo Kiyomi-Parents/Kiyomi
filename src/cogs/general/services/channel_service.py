@@ -6,7 +6,7 @@ from discord.abc import GuildChannel, PrivateChannel
 from .guild_service import GuildService
 from ..errors import ChannelNotFoundException
 from ..storage.model.channel import Channel
-from ..storage.uow import UnitOfWork
+from ..storage.unit_of_work import UnitOfWork
 from .general_service import GeneralService
 from src.kiyomi import Kiyomi
 

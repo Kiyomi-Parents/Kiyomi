@@ -9,20 +9,22 @@ from src.log import Logger
 if TYPE_CHECKING:
     pass
 
+
 class KiyomiException(Exception):
     is_handled: bool = False
 
-    def _log(self):
-        Logger.error(self.__class__.__name__, str(self))
+    def _log(self, message: Optional[str] = None):
+        if message is None:
+            message = str(self)
+
+        Logger.error(self.__class__.__name__, message)
 
     async def handle(self, ctx: ApplicationContext, **options):
         if self.is_handled:
             return
 
-        message = options.pop("message") if options["message"] else str(self)
-
-        self._log()
-
+        message = options.pop("message") if "message" in options.keys() else str(self)
+        self._log(message)
         await ctx.respond(message, ephemeral=True, **options)
 
         self.is_handled = True
@@ -37,13 +39,18 @@ class CogException(KiyomiException, Generic[TCog]):
             return
 
         cog: TCog = options.pop("cog")
+
+        if cog is None:
+            Logger.warn(f"{self.__class__.__name__}", "cog parameter not included! Please include for better messages!")
+            return await super().handle(ctx, **options)
+
         message: str = options.pop("message") if "message" in options.keys() else str(self)
 
-        message = await cog.bot.error_resolver.resolve_message(self, message)
+        message_detailed = await cog.bot.error_resolver.resolve_message(self, message)
+        self._log(message_detailed)
 
-        self._log()
-
-        await ctx.respond(message, ephemeral=True, **options)
+        message_simple = await cog.bot.error_resolver.resolve_message(self, message)
+        await ctx.respond(message_simple, ephemeral=True, **options)
 
         self.is_handled = True
 
