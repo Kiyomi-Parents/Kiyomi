@@ -111,16 +111,22 @@ class Score(Base):
     def get_hmd_name(self):
         if self.hmd == 0:
             return "Unknown"
-        elif self.hmd == 64:
-            return "Valve Index"
-        elif self.hmd == 2:
-            return "HTC Vive"
-        elif self.hmd == 32:
-            return "Oculus Quest"
-        elif self.hmd == 16:
-            return "Oculus Rift S"
         elif self.hmd == 1:
             return "Oculus Rift CV1"
+        elif self.hmd == 2:
+            return "HTC Vive"
+        elif self.hmd == 4:
+            return "HTC Vive Pro"
+        elif self.hmd == 8:
+            return "Windows Mixed Reality"
+        elif self.hmd == 16:
+            return "Oculus Rift S"
+        elif self.hmd == 32:
+            return "Oculus Quest"
+        elif self.hmd == 64:
+            return "Valve Index"
+        elif self.hmd == 128:
+            return "HTC Vive Cosmos"
 
         return "Unknown"
 
