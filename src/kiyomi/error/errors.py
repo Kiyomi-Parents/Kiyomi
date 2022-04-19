@@ -19,13 +19,23 @@ class KiyomiException(Exception):
 
         Logger.error(self.__class__.__name__, message)
 
-    async def handle(self, ctx: ApplicationContext, **options):
+    async def _respond(self, ctx: ApplicationContext, message: Optional[str] = None, **options):
+        if message is None:
+            message = str(self)
+
+        await ctx.respond(message, ephemeral=True, **options)
+
+    async def handle(self, **options):
         if self.is_handled:
             return
 
         message = options.pop("message") if "message" in options.keys() else str(self)
         self._log(message)
-        await ctx.respond(message, ephemeral=True, **options)
+
+        ctx: Optional[ApplicationContext] = options.pop("ctx")
+
+        if ctx is not None:
+            await self._respond(ctx, message, **options)
 
         self.is_handled = True
 
@@ -34,7 +44,8 @@ TCog = TypeVar("TCog", bound="BaseCog")
 
 
 class CogException(KiyomiException, Generic[TCog]):
-    async def handle(self, ctx: ApplicationContext, **options):
+
+    async def handle(self, **options):
         if self.is_handled:
             return
 
@@ -42,15 +53,18 @@ class CogException(KiyomiException, Generic[TCog]):
 
         if cog is None:
             Logger.warn(f"{self.__class__.__name__}", "cog parameter not included! Please include for better messages!")
-            return await super().handle(ctx, **options)
+            return await super().handle(**options)
 
         message: str = options.pop("message") if "message" in options.keys() else str(self)
 
         message_detailed = await cog.bot.error_resolver.resolve_message(self, message)
         self._log(message_detailed)
 
-        message_simple = await cog.bot.error_resolver.resolve_message(self, message)
-        await ctx.respond(message_simple, ephemeral=True, **options)
+        ctx: Optional[ApplicationContext] = options.pop("ctx")
+
+        if ctx is not None:
+            message_simple = await cog.bot.error_resolver.resolve_message(self, message)
+            await self._respond(ctx, message_simple, **options)
 
         self.is_handled = True
 

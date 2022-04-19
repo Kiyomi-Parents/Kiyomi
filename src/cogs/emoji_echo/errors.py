@@ -12,7 +12,7 @@ class NotFound(EmojiEchoCogException):
         self.emoji_id = emoji_id
 
     def __str__(self):
-        return f"Could not find emoji with ID {self.emoji_id}"
+        return f"Could not find emoji with ID %emoji_id%"
 
 
 class AlreadyEnabled(EmojiEchoCogException):

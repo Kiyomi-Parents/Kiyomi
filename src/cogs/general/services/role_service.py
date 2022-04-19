@@ -78,7 +78,6 @@ class RoleService(GeneralService):
         try:
             discord_role = await self.get_discord_role(guild_id, role_id)
         except RoleNotFound as error:
-            # TODO: Make sure this cascades when deleted
             role = self.uow.roles.get_by_id(role_id)
 
             if role is not None:
@@ -91,7 +90,6 @@ class RoleService(GeneralService):
         except DiscordException as error:
             raise FailedToDeleteRole(guild_id, role_id, reason) from error
         finally:
-            # TODO: Make sure this cascades when deleted
             role = self.uow.roles.get_by_id(role_id)
 
             if role is not None:

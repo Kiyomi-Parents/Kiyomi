@@ -27,7 +27,7 @@ class RoleNotFound(RoleException):
         self.role_id = role_id
 
     def __str__(self):
-        return f"Could not find Role with ID {self.role_id} in Guild {self.guild_id}"
+        return f"Could not find Role %role_id% in Guild %guild_id%"
 
 
 class FailedToCreateRole(RoleException):
@@ -37,7 +37,7 @@ class FailedToCreateRole(RoleException):
         self.reason = reason
 
     def __str__(self):
-        return f"Failed to create Role {self.role_name} in Guild {self.guild_id} ({self.reason})"
+        return f"Failed to create Role {self.role_name} in Guild %guild_id% ({self.reason})"
 
 
 class FailedToDeleteRole(RoleException):
@@ -47,7 +47,7 @@ class FailedToDeleteRole(RoleException):
         self.reason = reason
 
     def __str__(self):
-        return f"Failed to remove Role {self.role_id} from Guild {self.guild_id} ({self.reason})"
+        return f"Failed to remove Role %role_id% from Guild %guild_id% ({self.reason})"
 
 
 class FailedToAddToUser(RoleException):
@@ -58,7 +58,7 @@ class FailedToAddToUser(RoleException):
         self.reason = reason
 
     def __str__(self):
-        return f"Failed to add Role {self.role_id} to User {self.member_id} in Guild {self.guild_id} ({self.reason})"
+        return f"Failed to add Role %role_id% to User %member_id% in Guild %guild_id% ({self.reason})"
 
 
 class FailedToRemoveFromUser(RoleException):
@@ -69,7 +69,7 @@ class FailedToRemoveFromUser(RoleException):
         self.reason = reason
 
     def __str__(self):
-        return f"Failed to remove Role {self.role_id} from User {self.member_id} in Guild {self.guild_id} " \
+        return f"Failed to remove Role %role_id% from User %member_id% in Guild %guild_id% " \
                f"({self.reason})"
 
 

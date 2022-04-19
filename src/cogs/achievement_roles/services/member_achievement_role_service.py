@@ -11,7 +11,7 @@ from ..storage.model.achievement_role_member import AchievementRoleMember
 from src.cogs.achievement import AchievementsAPI
 from src.cogs.achievement.services.achievements import Achievement
 from src.cogs.settings import SettingsAPI
-from ...general.errors import FailedToCreateRole, FailedToRemoveFromUser, RoleNotFound, FailedToAddToUser
+from src.cogs.general.errors import FailedToCreateRole, FailedToRemoveFromUser, RoleNotFound, FailedToAddToUser
 
 
 class MemberAchievementRoleService(AchievementRolesService):
@@ -64,8 +64,10 @@ class MemberAchievementRoleService(AchievementRolesService):
 
         # Check if member already has the achievement role
         if await self.member_has_role(guild_id, member_id, achievement_role):
-            Logger.log("AchievementRoles", f"Member {member_id} already has role {achievement_role} in Guild {guild_id}. "
-                                           f"SKIPPING!")
+            Logger.log(
+                    "AchievementRoles", f"Member {member_id} already has role {achievement_role} in Guild {guild_id}. "
+                                        f"SKIPPING!"
+            )
             return
 
         # Remove all other achievement roles from the member
@@ -87,7 +89,7 @@ class MemberAchievementRoleService(AchievementRolesService):
 
             self.uow.achievement_role_members.add(AchievementRoleMember(guild_id, member_id, achievement_role.id))
         except FailedToAddToUser as error:
-            Logger.log("Achievement Roles", str(error))
+            await error.handle()
 
     async def remove_member_role(
             self,
@@ -105,7 +107,7 @@ class MemberAchievementRoleService(AchievementRolesService):
                     "Auto removed by Achievement Roles"
             )
         except FailedToRemoveFromUser as error:
-            Logger.error("Achievement Roles", str(error))
+            await error.handle()
         finally:
             self.uow.achievement_role_members.remove(achievement_role_member)
 
@@ -149,11 +151,11 @@ class MemberAchievementRoleService(AchievementRolesService):
         try:
             await general.get_role(achievement_role.guild_id, achievement_role.role_id)
             return True
-        except RoleNotFound:
-            Logger.error(
-                    "Achievement Roles", f"[{achievement_role.group}] Role {achievement_role.identifier} "
-                                         f"({achievement_role.role_id}) "
-                                         f"doesn't exist on Guild {achievement_role.guild_id}"
+        except RoleNotFound as error:
+            await error.handle(
+                    message=f"[{achievement_role.group}] Role {achievement_role.identifier} "
+                            f"({achievement_role.role_id}) "
+                            f"doesn't exist on Guild {achievement_role.guild_id}"
             )
 
         return False
