@@ -1,0 +1,2 @@
+from .beatmap_key_resolver import BeatmapKeyResolver
+from .beatmap_hash_resolver import BeatmapHashResolver
