@@ -7,6 +7,7 @@ import discord
 import timeago
 from discord.ext import tasks
 
+from src.kiyomi.timer import Timer
 from src.log import Logger
 
 TClass = TypeVar('TClass')
@@ -108,3 +109,28 @@ class Utils:
 
         with open(f"./tmp/{file_name}", "rb") as file:
             return discord.File(file, filename=file_name)
+
+    @staticmethod
+    def debounce(wait_time):
+        """
+        Decorator that will debounce a function so that it is called after wait_time seconds
+        If it is called multiple times, will wait for the last call to be debounced and run only this one.
+        """
+
+        def decorator(function):
+            async def debounced(*args, **kwargs):
+                async def call_function():
+                    debounced._timer = None
+                    return await function(*args, **kwargs)
+
+                # if we already have a call to the function currently waiting to be executed, reset the timer
+                if debounced._timer is not None:
+                    debounced._timer.cancel()
+
+                # after wait_time, call the function provided to the decorator with its arguments
+                debounced._timer = Timer(wait_time, call_function)
+
+            debounced._timer = None
+            return debounced
+
+        return decorator
