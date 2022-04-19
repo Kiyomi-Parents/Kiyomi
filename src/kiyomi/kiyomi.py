@@ -37,7 +37,7 @@ class Kiyomi(Bot):
         return True
 
     async def on_application_command_error(self, context: ApplicationContext, exception: DiscordException) -> None:
-        Logger.log("Global Exception", f"Got error {type(exception)}: {exception}")
+        Logger.error("Global Exception", f"Got error {type(exception)}: {exception}")
 
         if isinstance(exception, ApplicationCommandInvokeError):
             if isinstance(exception.original, CogException):

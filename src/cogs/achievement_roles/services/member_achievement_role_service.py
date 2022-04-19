@@ -89,7 +89,7 @@ class MemberAchievementRoleService(AchievementRolesService):
 
             self.uow.achievement_role_members.add(AchievementRoleMember(guild_id, member_id, achievement_role.id))
         except FailedToAddToUser as error:
-            await error.handle()
+            await error.handle(bot=self.bot)
 
     async def remove_member_role(
             self,
@@ -107,7 +107,7 @@ class MemberAchievementRoleService(AchievementRolesService):
                     "Auto removed by Achievement Roles"
             )
         except FailedToRemoveFromUser as error:
-            await error.handle()
+            await error.handle(bot=self.bot)
         finally:
             self.uow.achievement_role_members.remove(achievement_role_member)
 
@@ -153,9 +153,10 @@ class MemberAchievementRoleService(AchievementRolesService):
             return True
         except RoleNotFound as error:
             await error.handle(
+                    bot=self.bot,
                     message=f"[{achievement_role.group}] Role {achievement_role.identifier} "
-                            f"({achievement_role.role_id}) "
-                            f"doesn't exist on Guild {achievement_role.guild_id}"
+                            f"(%role_id%) "
+                            f"doesn't exist on Guild %guild_id%"
             )
 
         return False

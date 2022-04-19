@@ -1,16 +1,18 @@
 from __future__ import annotations
 
 import re
+from re import Pattern
 from typing import List, Optional, TYPE_CHECKING
 
 from src.log import Logger
 
 if TYPE_CHECKING:
-    from src.kiyomi.error import CogException, ErrorArgResolver
+    from src.kiyomi.error import CogException, ErrorArgResolver, KiyomiException
 
 
 class ErrorResolver:
     _resolvers: List["ErrorArgResolver"] = []
+    _arg_pattern: Pattern = re.compile(r"%(\S+)%")
 
     def add(self, resolver: "ErrorArgResolver"):
         self._resolvers.append(resolver)
@@ -39,15 +41,29 @@ class ErrorResolver:
             detailed: Optional[bool] = False
     ) -> str:
         message = message if message is not None else str(exception)
+        matches = re.findall(self._arg_pattern, message)
 
-        pattern = re.compile(r"%(.+)%")
-        matches = re.findall(pattern, message)
-
-        for match in matches:
-            arg_name = match
-
+        for arg_name in matches:
             resolved_arg = await self.resolve_arg(arg_name, getattr(exception, arg_name), detailed)
+            message = re.sub(self._arg_pattern, resolved_arg, message, 1)
 
-            message = re.sub(pattern, resolved_arg, message)
+        return message
+
+    @staticmethod
+    def resolve_message_simple(
+            exception: "KiyomiException",
+            message: Optional[str] = None,
+            detailed: Optional[bool] = False
+    ) -> str:
+        message = message if message is not None else str(exception)
+        matches = re.findall(ErrorResolver._arg_pattern, message)
+
+        for arg_name in matches:
+            arg_value = getattr(exception, arg_name)
+
+            if not detailed:
+                arg_value = f"**{arg_value}**"
+
+            message = re.sub(ErrorResolver._arg_pattern, arg_value, message, 1)
 
         return message

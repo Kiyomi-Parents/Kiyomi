@@ -1,13 +1,15 @@
 from __future__ import annotations
 
-from typing import Optional, Dict, Union, TypeVar, Generic, TYPE_CHECKING
+from typing import Optional, Dict, Union, TYPE_CHECKING
 
-from discord import ApplicationContext, AutocompleteContext, Embed, Color
+from discord import ApplicationContext, AutocompleteContext
 
+from src.kiyomi.error.error_embed import ErrorEmbed
+from src.kiyomi.error.error_resolver import ErrorResolver
 from src.log import Logger
 
 if TYPE_CHECKING:
-    pass
+    from src.kiyomi.kiyomi import Kiyomi
 
 
 class KiyomiException(Exception):
@@ -23,52 +25,49 @@ class KiyomiException(Exception):
         if message is None:
             message = str(self)
 
-        # TODO: Make this better :)
-        embed = Embed()
-        embed.colour = Color.from_rgb(255, 0, 0)
-        embed.description = message
+        error_embed = ErrorEmbed(message)
 
-        await ctx.respond(embed=embed, ephemeral=True, **options)
+        await ctx.respond(embed=error_embed, ephemeral=True, **options)
 
     async def handle(self, **options):
         if self.is_handled:
             return
 
         message = options.pop("message") if "message" in options.keys() else str(self)
-        self._log(message)
 
-        ctx: Optional[ApplicationContext] = options.pop("ctx")
+        message_detailed = ErrorResolver.resolve_message_simple(self, message, True)
+        self._log(message_detailed)
+
+        ctx: Optional[ApplicationContext] = options.pop("ctx") if "ctx" in options.keys() else None
 
         if ctx is not None:
-            await self._respond(ctx, message, **options)
+            message_simple = ErrorResolver.resolve_message_simple(self, message, True)
+            await self._respond(ctx, message_simple, **options)
 
         self.is_handled = True
 
 
-TCog = TypeVar("TCog", bound="BaseCog")
-
-
-class CogException(KiyomiException, Generic[TCog]):
+class CogException(KiyomiException):
 
     async def handle(self, **options):
         if self.is_handled:
             return
 
-        cog: TCog = options.pop("cog")
+        bot: Optional["Kiyomi"] = options.pop("bot") if "bot" in options.keys() else None
 
-        if cog is None:
-            Logger.warn(f"{self.__class__.__name__}", "cog parameter not included! Please include for better messages!")
+        if bot is None:
+            Logger.warn(f"{self.__class__.__name__}", "bot parameter not included! Please include for better messages!")
             return await super().handle(**options)
 
         message: str = options.pop("message") if "message" in options.keys() else str(self)
 
-        message_detailed = await cog.bot.error_resolver.resolve_message(self, message)
+        message_detailed = await bot.error_resolver.resolve_message(self, message, True)
         self._log(message_detailed)
 
-        ctx: Optional[ApplicationContext] = options.pop("ctx")
+        ctx: Optional[ApplicationContext] = options.pop("ctx") if "ctx" in options.keys() else None
 
         if ctx is not None:
-            message_simple = await cog.bot.error_resolver.resolve_message(self, message)
+            message_simple = await bot.error_resolver.resolve_message(self, message, False)
             await self._respond(ctx, message_simple, **options)
 
         self.is_handled = True
