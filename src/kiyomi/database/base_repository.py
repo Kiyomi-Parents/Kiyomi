@@ -1,8 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import TypeVar, Generic, Optional, List
 
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import Query
+from sqlalchemy.orm import Query, Session
 
 from src.log import Logger
 from .database import Base
@@ -12,7 +11,7 @@ T = TypeVar('T', bound=Base)
 
 
 class BaseRepository(ABC, Generic[T]):
-    def __init__(self, session: AsyncSession):
+    def __init__(self, session: Session):
         self.session = session
 
     @abstractmethod
@@ -29,10 +28,11 @@ class BaseRepository(ABC, Generic[T]):
     def exists(self, entry_id: int) -> bool:
         return self.get_by_id(entry_id) is not None
 
-    def add(self, entry: T) -> T:
-        self.session.add(entry)
-        self.commit_changes()
-        self.session.refresh(entry)
+    async def add(self, entry: T) -> T:
+        async with self.session.begin():
+            self.session.add(entry)
+            self.commit_changes()
+            self.session.refresh(entry)
 
         Logger.log(entry, "Added")
 
