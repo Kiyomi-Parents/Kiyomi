@@ -1,6 +1,7 @@
 from discord.ext import commands
 
 from . import MessageViewService, UnitOfWork
+from .errors import MissingPersistentViewClass
 from .storage.model.persistence import Persistence
 from .view_persistence_cog import ViewPersistenceCog
 from src.kiyomi import Kiyomi
@@ -27,6 +28,10 @@ class ViewPersistenceAPI(ViewPersistenceCog):
         persistences = await self.message_view_service.get_persistent_views()
 
         for persistence in persistences:
-            self.bot.add_view(view=await persistence.get_view(self.bot), message_id=persistence.message_id)
+            try:
+                view = await persistence.get_view(self.bot)
+                self.bot.add_view(view=view, message_id=persistence.message_id)
+            except MissingPersistentViewClass as error:
+                await error.handle()
 
         Logger.log("View Persistence", f"Loaded {len(persistences)} persistent views")

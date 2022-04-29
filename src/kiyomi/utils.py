@@ -1,7 +1,7 @@
 import asyncio
 from datetime import datetime
 from functools import wraps
-from typing import TypeVar, Type, List
+from typing import TypeVar, Type, List, Any
 
 import discord
 import timeago
@@ -107,8 +107,7 @@ class Utils:
         with open(f"./tmp/{file_name}", "w") as file:
             file.write(text)
 
-        with open(f"./tmp/{file_name}", "rb") as file:
-            return discord.File(file, filename=file_name)
+        return discord.File(fp=f"./tmp/{file_name}", filename=file_name)
 
     @staticmethod
     def debounce(wait_time):
@@ -134,3 +133,10 @@ class Utils:
             return debounced
 
         return decorator
+
+    @staticmethod
+    def limit_list(items: List[Any], limit: int) -> List[Any]:
+        if len(items) > limit:
+            return items[:limit]
+
+        return items

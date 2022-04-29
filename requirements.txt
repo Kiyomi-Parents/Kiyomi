@@ -11,4 +11,4 @@ pyscoresaber~=1.0.5
 asyncio~=3.4.3
 pymysql~=1.0.2
 pyee~=9.0.4
-py-cord~=2.0.0b7
+git+https://github.com/Rapptz/discord.py@master#egg=discord.py

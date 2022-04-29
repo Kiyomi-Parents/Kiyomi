@@ -1,7 +1,8 @@
-from typing import Optional
+from typing import Optional, List
 
 import discord
-from discord import OptionChoice, Permissions
+from discord import Permissions, Interaction
+from discord.app_commands import Choice
 
 from src.kiyomi import Kiyomi
 from .abstract_bot_setting import AbstractBotSetting
@@ -77,14 +78,14 @@ class EmojiSetting(AbstractBotSetting[discord.Emoji]):
 
         return value in [str(emoji.id) for emoji in await guild.fetch_emojis()]
 
-    async def get_autocomplete(self, ctx: discord.AutocompleteContext):
+    async def get_autocomplete(self, ctx: Interaction, current: str) -> List[Choice]:
         emojis = []
 
-        if not self.has_permission(ctx.interaction.user):
+        if not self.has_permission(ctx.user):
             return emojis
 
-        for emoji in await ctx.interaction.guild.fetch_emojis():
-            if ctx.value.lower() not in emoji.name.lower():
+        for emoji in await ctx.guild.fetch_emojis():
+            if current.lower() not in emoji.name.lower():
                 continue
 
             label = f"{emoji.name}"
@@ -92,6 +93,6 @@ class EmojiSetting(AbstractBotSetting[discord.Emoji]):
             if self.value is not None and self.value.id == emoji.id:
                 label += ' (current)'
 
-            emojis.append(OptionChoice(label, str(emoji.id)))
+            emojis.append(Choice(name=label, value=str(emoji.id)))
 
         return emojis

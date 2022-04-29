@@ -1,10 +1,10 @@
 from typing import List
 
-import discord
-from discord import SlashCommandGroup, Option, OptionChoice, ApplicationCommandInvokeError
+from discord import app_commands, Interaction
+from discord.app_commands import Choice
 
-from src.kiyomi import Kiyomi
-from .errors import SettingsCogException, PermissionDenied
+from src.kiyomi import Kiyomi, Utils
+from .errors import PermissionDenied
 from .services import SettingService
 from .services.settings_autocomplete_service import SettingAutocompleteService
 from .settings_cog import SettingsCog
@@ -29,47 +29,41 @@ class Settings(SettingsCog):
         async def register_setting(settings: List[Setting]):
             self.setting_service.register_settings(settings)
 
-    settings = SlashCommandGroup(
-            "setting",
-            "Various settings"
+    settings = app_commands.Group(
+            name="setting",
+            description="Various settings",
+            guild_only=True
     )
 
-    # Workaround
-    async def get_settings(self, ctx: discord.AutocompleteContext) -> List[OptionChoice]:
-        return self.settings_autocomplete_service.get_settings(ctx)
-
-    async def get_setting_values(self, ctx: discord.AutocompleteContext) -> List[OptionChoice]:
-        return await self.settings_autocomplete_service.get_setting_values(ctx)
-
     @settings.command(name="set")
+    @app_commands.describe(setting="Setting name", value="Setting value")
     async def settings_set(
             self,
-            ctx: discord.ApplicationContext,
-            setting: Option(
-                    str,
-                    "Setting name",
-                    autocomplete=get_settings
-            ),
-            value: Option(
-                    str,
-                    "Setting value",
-                    autocomplete=get_setting_values
-            )
+            ctx: Interaction,
+            setting: str,
+            value: str
     ):
         """Set setting value"""
 
-        if not self.setting_service.has_permission(setting, ctx.interaction.user):
+        if not self.setting_service.has_permission(setting, ctx.user):
             raise PermissionDenied(setting)
 
-        await self.setting_service.validate_setting_value(ctx.interaction.guild.id, setting, value)
+        await self.setting_service.validate_setting_value(ctx.guild_id, setting, value)
 
-        abstract_setting = self.setting_service.set(ctx.interaction.guild.id, setting, value)
-        setting_value = self.setting_service.get_value(ctx.interaction.guild.id, setting)
+        abstract_setting = self.setting_service.set(ctx.guild_id, setting, value)
+        setting_value = self.setting_service.get_value(ctx.guild_id, setting)
 
-        await ctx.respond(f"{abstract_setting.name_human} is now set to: {setting_value}", ephemeral=True)
+        await ctx.response.send_message(f"{abstract_setting.name_human} is now set to: {setting_value}", ephemeral=True)
 
-    @settings_set.error
-    async def settings_set_error(self, ctx: discord.ApplicationContext, error: Exception):
-        if isinstance(error, ApplicationCommandInvokeError):
-            if isinstance(error.original, SettingsCogException):
-                return await error.original.handle(ctx)
+    # Workaround
+    @settings_set.autocomplete("setting")
+    async def settings_autocomplete(self, ctx: Interaction, current: str) -> List[Choice[str]]:
+        choices = self.settings_autocomplete_service.get_settings(ctx, current)
+
+        return Utils.limit_list(choices, 25)
+
+    @settings_set.autocomplete("value")
+    async def get_setting_values(self, ctx: Interaction, current: str) -> List[Choice[str]]:
+        choices = await self.settings_autocomplete_service.get_setting_values(ctx, current)
+
+        return Utils.limit_list(choices, 25)

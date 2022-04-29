@@ -1,8 +1,8 @@
 import distutils.util
-from typing import Optional
+from typing import Optional, List
 
-import discord
-from discord import OptionChoice, Permissions
+from discord import Permissions, Interaction
+from discord.app_commands import Choice
 
 from .abstract_regular_setting import AbstractRegularSetting
 from .enums.setting_type import SettingType
@@ -72,11 +72,11 @@ class ToggleSetting(AbstractRegularSetting[bool]):
 
         return False
 
-    async def get_autocomplete(self, ctx: discord.AutocompleteContext):
-        if not self.has_permission(ctx.interaction.user):
+    async def get_autocomplete(self, ctx: Interaction, current: str) -> List[Choice]:
+        if not self.has_permission(ctx.user):
             return []
 
         return [
-            OptionChoice(f"Enabled{' (current)' if self.value else ''}", "True"),
-            OptionChoice(f"Disabled{' (current)' if not self.value else ''}", "False")
+            Choice(name=f"Enabled{' (current)' if self.value else ''}", value="True"),
+            Choice(name=f"Disabled{' (current)' if not self.value else ''}", value="False")
         ]

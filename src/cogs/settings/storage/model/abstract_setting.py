@@ -1,8 +1,8 @@
 from abc import ABC
-from typing import TypeVar, Generic, Optional
+from typing import TypeVar, Generic, Optional, List
 
-import discord
-from discord import OptionChoice, Permissions, Member
+from discord import Permissions, Member, Interaction
+from discord.app_commands import Choice
 
 from .enums.setting_type import SettingType
 from .setting import Setting
@@ -54,13 +54,13 @@ class AbstractSetting(ABC, Generic[T]):
 
         return True
 
-    async def get_autocomplete(self, ctx: discord.AutocompleteContext):
-        if not self.has_permission(ctx.interaction.user):
+    async def get_autocomplete(self, ctx: Interaction, current: str) -> List[Choice]:
+        if not self.has_permission(ctx.user):
             return []
 
         if self.setting.value is None:
             return []
 
         return [
-            OptionChoice(f"{self.setting.value} (current)", self.setting.value)
+            Choice(name=f"{self.setting.value} (current)", value=self.setting.value)
         ]

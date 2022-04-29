@@ -6,7 +6,7 @@ from .storage import UnitOfWork
 from ...kiyomi import Kiyomi
 
 
-def setup(bot: Kiyomi):
+async def setup(bot: Kiyomi):
     uow = UnitOfWork(bot.database.session)
 
     bot.error_resolver.add(ChannelIdResolver(uow))
@@ -23,7 +23,7 @@ def setup(bot: Kiyomi):
     message_service = MessageService(bot, uow, guild_service, channel_service)
     role_service = RoleService(bot, uow, guild_service, member_service)
 
-    bot.add_cog(
+    await bot.add_cog(
             General(
                     bot,
                     emoji_service,
@@ -34,7 +34,7 @@ def setup(bot: Kiyomi):
                     role_service
             )
     )
-    bot.add_cog(
+    await bot.add_cog(
             GeneralAPI(
                     bot,
                     emoji_service,

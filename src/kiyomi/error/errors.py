@@ -2,17 +2,20 @@ from __future__ import annotations
 
 from typing import Optional, Dict, Union, TYPE_CHECKING
 
-from discord import ApplicationContext, AutocompleteContext
+from discord import Interaction, DiscordException
+from discord.app_commands import AppCommandError
+from discord.ext.commands import Context
 
 from src.kiyomi.error.error_embed import ErrorEmbed
 from src.kiyomi.error.error_resolver import ErrorResolver
+from src.kiyomi.error.error_utils import send_exception
 from src.log import Logger
 
 if TYPE_CHECKING:
     from src.kiyomi.kiyomi import Kiyomi
 
 
-class KiyomiException(Exception):
+class KiyomiException(DiscordException):
     is_handled: bool = False
 
     def _log(self, message: Optional[str] = None):
@@ -21,13 +24,13 @@ class KiyomiException(Exception):
 
         Logger.error(self.__class__.__name__, message)
 
-    async def _respond(self, ctx: ApplicationContext, message: Optional[str] = None, **options):
+    async def _respond(self, ctx: Union[Context["Kiyomi"], Interaction], message: Optional[str] = None, **options):
         if message is None:
             message = str(self)
 
         error_embed = ErrorEmbed(message)
 
-        await ctx.respond(embed=error_embed, ephemeral=True, **options)
+        await send_exception(ctx, embed=error_embed, ephemeral=True, **options)
 
     async def handle(self, **options):
         if self.is_handled:
@@ -38,7 +41,7 @@ class KiyomiException(Exception):
         message_detailed = ErrorResolver.resolve_message_simple(self, message, True)
         self._log(message_detailed)
 
-        ctx: Optional[ApplicationContext] = options.pop("ctx") if "ctx" in options.keys() else None
+        ctx: Optional[Union[Context["Kiyomi"], Interaction]] = options.pop("ctx") if "ctx" in options.keys() else None
 
         if ctx is not None:
             message_simple = ErrorResolver.resolve_message_simple(self, message, True)
@@ -64,7 +67,7 @@ class CogException(KiyomiException):
         message_detailed = await bot.error_resolver.resolve_message(self, message, True)
         self._log(message_detailed)
 
-        ctx: Optional[ApplicationContext] = options.pop("ctx") if "ctx" in options.keys() else None
+        ctx: Optional[Union[Context["Kiyomi"], Interaction]] = options.pop("ctx") if "ctx" in options.keys() else None
 
         if ctx is not None:
             message_simple = await bot.error_resolver.resolve_message(self, message, False)
@@ -73,12 +76,12 @@ class CogException(KiyomiException):
         self.is_handled = True
 
 
-class CommandError(KiyomiException):
+class CommandError(CogException, AppCommandError):
     pass
 
 
 class BadArgument(CommandError):
-    def __init__(self, ctx: ApplicationContext, argument: str) -> None:
+    def __init__(self, ctx: Interaction, argument: str) -> None:
         self.ctx = ctx
         self.argument = argument
 
@@ -93,28 +96,36 @@ class BadArgument(CommandError):
             return f"Bad argument {argument_name}: **{self.argument}**"
 
     def find_command_argument_name(self) -> Optional[str]:
-        if isinstance(self.ctx, ApplicationContext):
+        if isinstance(self.ctx, Interaction):
             selected_option = self.find_command_by_argument_application_context(self.ctx)
             return selected_option.get("name")
-        elif isinstance(self.ctx, AutocompleteContext):
+        elif isinstance(self.ctx, Interaction):
             selected_option = self.find_command_by_argument_autocomplete_context(self.ctx)
             return selected_option[0]
 
         return None
 
-    def find_command_by_argument_application_context(self, ctx: ApplicationContext) -> Optional[Dict]:
-        for selected_option in ctx.selected_options:
-            if selected_option.get("value") == self.argument:
-                return selected_option
+    def find_command_by_argument_application_context(self, ctx: Interaction) -> Optional[Dict]:
+        if self.argument in ctx.namespace:
+            return ctx.namespace[self.argument]
 
         return None
 
     def find_command_by_argument_autocomplete_context(
             self,
-            ctx: AutocompleteContext
+            ctx: Interaction
     ) -> Optional[tuple[str, Union[str, None]]]:
-        for key, value in ctx.options.items():
+        for key, value in ctx.namespace():
             if value == self.argument:
                 return key, value
 
         return None
+
+
+class CheckFailure(CommandError):
+    pass
+
+
+class OwnerOnlyCommand(CheckFailure):
+    def __str__(self):
+        return f"This command can only be used by the bot owners!"

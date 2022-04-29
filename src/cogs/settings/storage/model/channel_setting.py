@@ -1,7 +1,8 @@
-from typing import Optional
+from typing import Optional, List
 
 import discord.abc
-from discord import OptionChoice, Permissions
+from discord import Permissions, Interaction
+from discord.app_commands import Choice
 
 from src.kiyomi import Kiyomi
 from .abstract_bot_setting import AbstractBotSetting
@@ -77,17 +78,17 @@ class ChannelSetting(AbstractBotSetting[discord.abc.GuildChannel]):
 
         return value in [str(channel.id) for channel in await guild.fetch_channels()]
 
-    async def get_autocomplete(self, ctx: discord.AutocompleteContext):
+    async def get_autocomplete(self, ctx: Interaction, current: str) -> List[Choice]:
         text_channels = []
 
-        if not self.has_permission(ctx.interaction.user):
+        if not self.has_permission(ctx.user):
             return text_channels
 
-        for channel in await ctx.interaction.guild.fetch_channels():
+        for channel in await ctx.guild.fetch_channels():
             if not isinstance(channel, discord.TextChannel):
                 continue
 
-            if ctx.value.lower() not in channel.name.lower():
+            if current.lower() not in channel.name.lower():
                 continue
 
             label = f"#{channel.name}"
@@ -95,6 +96,6 @@ class ChannelSetting(AbstractBotSetting[discord.abc.GuildChannel]):
             if self.value is not None and self.value.id == channel.id:
                 label += ' (current)'
 
-            text_channels.append(OptionChoice(label, str(channel.id)))
+            text_channels.append(Choice(name=label, value=str(channel.id)))
 
         return text_channels

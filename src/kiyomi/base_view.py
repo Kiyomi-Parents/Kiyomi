@@ -1,9 +1,10 @@
 from abc import ABC, abstractmethod
-from typing import Optional, Union, Callable, Awaitable
+from typing import Optional, Union, Callable, Awaitable, Any
 
 import discord
-from discord import Embed, Guild
+from discord import Embed, Guild, Interaction
 from discord.ext.commands import Context
+from discord.ui import Item
 
 from .kiyomi import Kiyomi
 
@@ -21,14 +22,17 @@ class BaseView(discord.ui.View, ABC):
 
         self.update_buttons()
 
-    async def get_current_embed(self) -> Embed:
+    async def get_current_embed(self) -> Optional[Embed]:
         if self.embed is None:
             default_embed = self.default_embed()
 
             if default_embed is not None:
                 return await default_embed()
 
-        return await self.embed()
+        if self.embed is not None:
+            return await self.embed()
+
+        return None
 
     def default_embed(self) -> Optional[Callable[[], Awaitable[Embed]]]:
         for child in self.children:
@@ -144,3 +148,7 @@ class BaseView(discord.ui.View, ABC):
                 self.message = await msg.original_message()
 
         return self.message
+
+    # TODO: Add error handling for views
+    async def on_error(self, interaction: Interaction, error: Exception, item: Item[Any]) -> None:
+        await super(BaseView, self).on_error(interaction, error, item)

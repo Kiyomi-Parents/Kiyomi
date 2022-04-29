@@ -29,3 +29,6 @@ class GuildService(GeneralService):
             guild = self.uow.guilds.add(Guild(guild_id, discord_guild.name))
 
         return guild
+
+    async def unregister_guild(self, guild_id: int):
+        self.uow.guilds.remove_by_id(guild_id)
