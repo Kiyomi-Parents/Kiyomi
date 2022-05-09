@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Optional, Dict, Union, TYPE_CHECKING
+from typing import Optional, Union, TYPE_CHECKING
 
 from discord import Interaction, DiscordException
 from discord.app_commands import AppCommandError
@@ -97,17 +97,9 @@ class BadArgument(CommandError):
 
     def find_command_argument_name(self) -> Optional[str]:
         if isinstance(self.ctx, Interaction):
-            selected_option = self.find_command_by_argument_application_context(self.ctx)
-            return selected_option.get("name")
-        elif isinstance(self.ctx, Interaction):
             selected_option = self.find_command_by_argument_autocomplete_context(self.ctx)
-            return selected_option[0]
-
-        return None
-
-    def find_command_by_argument_application_context(self, ctx: Interaction) -> Optional[Dict]:
-        if self.argument in ctx.namespace:
-            return ctx.namespace[self.argument]
+            if selected_option is not None:
+                return selected_option[0]
 
         return None
 
@@ -115,8 +107,8 @@ class BadArgument(CommandError):
             self,
             ctx: Interaction
     ) -> Optional[tuple[str, Union[str, None]]]:
-        for key, value in ctx.namespace():
-            if value == self.argument:
+        for key, value in ctx.namespace:
+            if value == self.argument or (value.isspace() and self.argument is None):
                 return key, value
 
         return None
