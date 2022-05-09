@@ -6,7 +6,7 @@ from discord.ext import commands
 
 from src.kiyomi import Kiyomi
 from src.log import Logger
-from .services import BeatmapAutocompleteService, BeatmapService
+from .services import BeatmapService
 from .beatsaver_cog import BeatSaverCog
 from .errors import BeatmapNotFound
 from .messages.views.song_view import SongView
@@ -23,9 +23,8 @@ class BeatSaver(BeatSaverCog, name="Beat Saver"):
             self,
             bot: Kiyomi,
             beatmap_service: BeatmapService,
-            beatmap_autocomplete_service: BeatmapAutocompleteService
     ):
-        super().__init__(bot, beatmap_service, beatmap_autocomplete_service)
+        super().__init__(bot, beatmap_service)
 
         # Register events
         self.events()

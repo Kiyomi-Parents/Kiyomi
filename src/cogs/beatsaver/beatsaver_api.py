@@ -4,7 +4,7 @@ import pybeatsaver
 
 from src.kiyomi import Kiyomi
 from src.log import Logger
-from .services import BeatmapAutocompleteService, BeatmapService
+from .services import BeatmapService
 from .beatsaver_cog import BeatSaverCog
 from .errors import BeatmapNotFound
 from .storage import UnitOfWork
@@ -17,10 +17,9 @@ class BeatSaverAPI(BeatSaverCog):
             self,
             bot: Kiyomi,
             beatmap_service: BeatmapService,
-            beatmap_autocomplete_service: BeatmapAutocompleteService,
             uow: UnitOfWork
     ):
-        super().__init__(bot, beatmap_service, beatmap_autocomplete_service)
+        super().__init__(bot, beatmap_service)
 
         self.uow = uow
 

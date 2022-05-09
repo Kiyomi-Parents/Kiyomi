@@ -5,7 +5,7 @@ from .arg_resolvers import *
 from .beatsaver import BeatSaver
 from .beatsaver_api import BeatSaverAPI
 from .beatsaver_ui import BeatSaverUI
-from .services import BeatmapService, BeatmapAutocompleteService
+from .services import BeatmapService
 from .storage import UnitOfWork
 
 
@@ -17,8 +17,7 @@ async def setup(bot: Kiyomi):
     bot.error_resolver.add(BeatmapKeyResolver(uow))
 
     beatmap_service = BeatmapService(bot, uow, beatsaver_api_client)
-    beatmap_autocomplete_service = BeatmapAutocompleteService(bot, uow, beatsaver_api_client, beatmap_service)
 
-    await bot.add_cog(BeatSaver(bot, beatmap_service, beatmap_autocomplete_service))
-    await bot.add_cog(BeatSaverAPI(bot, beatmap_service, beatmap_autocomplete_service, uow))
-    await bot.add_cog(BeatSaverUI(bot, beatmap_service, beatmap_autocomplete_service))
+    await bot.add_cog(BeatSaver(bot, beatmap_service))
+    await bot.add_cog(BeatSaverAPI(bot, beatmap_service, uow))
+    await bot.add_cog(BeatSaverUI(bot, beatmap_service))

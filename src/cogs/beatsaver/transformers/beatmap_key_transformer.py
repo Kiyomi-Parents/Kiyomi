@@ -1,4 +1,4 @@
-from typing import Union, List
+from typing import Union, List, Optional
 
 from discord import Interaction
 from discord.app_commands import Transformer, Choice
@@ -10,7 +10,7 @@ from ..storage.model.beatmap import Beatmap
 
 class BeatmapKeyTransformer(Transformer):
     @classmethod
-    async def transform(cls, interaction: Interaction, value: str) -> Beatmap:
+    async def transform(cls, interaction: Interaction, value: str) -> Optional[Beatmap]:
         return await cls.get_beatmap_by_key(interaction, value)
 
     @classmethod
@@ -27,7 +27,10 @@ class BeatmapKeyTransformer(Transformer):
         return []
 
     @staticmethod
-    async def get_beatmap_by_key(interaction: Interaction, key: str) -> Beatmap:
+    async def get_beatmap_by_key(interaction: Interaction, key: str) -> Optional[Beatmap]:
+        if not key:
+            return None
+
         ctx = await Context.from_interaction(interaction)
 
         beatsaver = ctx.bot.get_cog_api(BeatSaverAPI)
