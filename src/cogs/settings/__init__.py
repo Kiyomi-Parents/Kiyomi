@@ -1,5 +1,5 @@
 from src.kiyomi import Kiyomi
-from .services import SettingService, SettingAutocompleteService
+from .services import SettingService
 from .settings import Settings
 from .settings_api import SettingsAPI
 from .storage import UnitOfWork
@@ -9,7 +9,6 @@ async def setup(bot: Kiyomi):
     uow = UnitOfWork(bot.database.session)
 
     setting_service = SettingService(bot, uow)
-    settings_autocomplete_service = SettingAutocompleteService(bot, uow, setting_service)
 
-    await bot.add_cog(Settings(bot, setting_service, settings_autocomplete_service))
-    await bot.add_cog(SettingsAPI(bot, setting_service, settings_autocomplete_service, uow))
+    await bot.add_cog(Settings(bot, setting_service))
+    await bot.add_cog(SettingsAPI(bot, setting_service, uow))

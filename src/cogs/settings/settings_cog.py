@@ -1,5 +1,5 @@
 from src.kiyomi import BaseCog, Kiyomi
-from .services import SettingService, SettingAutocompleteService
+from .services import SettingService
 
 
 class SettingsCog(BaseCog):
@@ -7,9 +7,7 @@ class SettingsCog(BaseCog):
             self,
             bot: Kiyomi,
             setting_service: SettingService,
-            settings_autocomplete_service: SettingAutocompleteService
     ):
         super().__init__(bot)
 
         self.setting_service = setting_service
-        self.settings_autocomplete_service = settings_autocomplete_service

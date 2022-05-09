@@ -1,7 +1,7 @@
 from typing import Optional
 
 from src.kiyomi import Kiyomi
-from .services import SettingService, SettingAutocompleteService
+from .services import SettingService
 from .settings_cog import SettingsCog
 from .storage import AbstractSetting
 from .storage.uow import UnitOfWork
@@ -13,10 +13,9 @@ class SettingsAPI(SettingsCog):
             self,
             bot: Kiyomi,
             setting_service: SettingService,
-            settings_autocomplete_service: SettingAutocompleteService,
             uow: UnitOfWork
     ):
-        super().__init__(bot, setting_service, settings_autocomplete_service)
+        super().__init__(bot, setting_service)
 
         self.uow = uow
 

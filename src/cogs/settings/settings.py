@@ -1,14 +1,14 @@
 from typing import List
 
 from discord import app_commands, Interaction
-from discord.app_commands import Choice
+from discord.app_commands import Transform
 
-from src.kiyomi import Kiyomi, Utils
-from .errors import PermissionDenied
+from src.kiyomi import Kiyomi
 from .services import SettingService
-from .services.settings_autocomplete_service import SettingAutocompleteService
 from .settings_cog import SettingsCog
 from .storage import Setting
+from .transformers.setting_name_transformer import SettingNameTransformer
+from .transformers.setting_value_transformer import SettingValueTransformer
 
 
 class Settings(SettingsCog):
@@ -16,10 +16,9 @@ class Settings(SettingsCog):
     def __init__(
             self,
             bot: Kiyomi,
-            setting_service: SettingService,
-            settings_autocomplete_service: SettingAutocompleteService
+            setting_service: SettingService
     ):
-        super().__init__(bot, setting_service, settings_autocomplete_service)
+        super().__init__(bot, setting_service)
 
         # Register events
         self.events()
@@ -36,33 +35,18 @@ class Settings(SettingsCog):
     )
 
     @settings.command(name="set")
-    @app_commands.describe(setting="Setting name", value="Setting value")
+    @app_commands.describe(
+            setting="Setting name",
+            value="Setting value"
+    )
     async def settings_set(
             self,
             ctx: Interaction,
-            setting: str,
-            value: str
+            setting: Transform[str, SettingNameTransformer],
+            value: Transform[str, SettingValueTransformer],
     ):
         """Set setting value"""
-
-        if not self.setting_service.has_permission(setting, ctx.user):
-            raise PermissionDenied(setting)
-
-        await self.setting_service.validate_setting_value(ctx.guild_id, setting, value)
-
         abstract_setting = self.setting_service.set(ctx.guild_id, setting, value)
         setting_value = self.setting_service.get_value(ctx.guild_id, setting)
 
         await ctx.response.send_message(f"{abstract_setting.name_human} is now set to: {setting_value}", ephemeral=True)
-
-    @settings_set.autocomplete("setting")
-    async def settings_autocomplete(self, ctx: Interaction, current: str) -> List[Choice[str]]:
-        choices = self.settings_autocomplete_service.get_settings(ctx, current)
-
-        return Utils.limit_list(choices, 25)
-
-    @settings_set.autocomplete("value")
-    async def get_setting_values(self, ctx: Interaction, current: str) -> List[Choice[str]]:
-        choices = await self.settings_autocomplete_service.get_setting_values(ctx, current)
-
-        return Utils.limit_list(choices, 25)
