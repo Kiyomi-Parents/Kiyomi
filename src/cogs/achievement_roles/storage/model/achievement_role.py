@@ -9,13 +9,17 @@ class AchievementRole(Base):
     __tablename__ = "achievement_role"
 
     id = Column(Integer, primary_key=True)
-    guild_id = Column(BigInteger, ForeignKey("guild.id", ondelete="CASCADE"))
-    role_id = Column(BigInteger, ForeignKey("role.id", ondelete="CASCADE"))
 
     group = Column(String(128))
     identifier = Column(String(128))
 
-    members = relationship("AchievementRoleMember", back_populates="achievement_role")
+    members = relationship("AchievementRoleMember", back_populates="achievement_role", cascade="all, delete")
+
+    guild_id = Column(BigInteger, ForeignKey("guild.id", ondelete="CASCADE"))
+    guild = relationship("Guild")
+
+    role_id = Column(BigInteger, ForeignKey("role.id", ondelete="CASCADE"))
+    role = relationship("Role", cascade="all, delete")
 
     def __init__(self, guild_id: int, role_id: int, group: str, identifier: str):
         self.guild_id = guild_id

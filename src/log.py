@@ -39,3 +39,21 @@ class Logger:
 
         print(final_msg)
         Logger.log_file(final_msg)
+
+    @staticmethod
+    def error(tag: str, msg: str):
+        timestamp = Logger.get_timestamp()
+        tag_with_color = colored(f"[{tag}]", "red")
+        final_msg = f"{timestamp} | {tag_with_color} {msg}"
+
+        print(final_msg)
+        Logger.log_file(final_msg)
+
+    @staticmethod
+    def warn(tag: str, msg: str):
+        timestamp = Logger.get_timestamp()
+        tag_with_color = colored(f"[{tag}]", "yellow")
+        final_msg = f"{timestamp} | {tag_with_color} {msg}"
+
+        print(final_msg)
+        Logger.log_file(final_msg)

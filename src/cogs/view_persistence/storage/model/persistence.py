@@ -1,7 +1,8 @@
-from typing import Type
+from typing import Type, Optional, List
 
 from .persistent_view import PersistentView
 from src.kiyomi import Utils, Kiyomi
+from ...errors import MissingPersistentViewClass
 
 
 class Persistence:
@@ -10,7 +11,7 @@ class Persistence:
         self.message_id = message_id
         self.channel_id = channel_id
         self.view = view
-        self.view_parameters = list(view_parameters)
+        self._view_parameters = [item for item in list(view_parameters) if item is not None]
 
     @property
     def view_class(self) -> Type[PersistentView]:
@@ -20,10 +21,19 @@ class Persistence:
             if persistent_view.__name__ == self.view:
                 return persistent_view
 
-        raise RuntimeError(f"Could not locate class {self.view} among {', '.join([persistent_view.__name__ for persistent_view in persistent_views])}")
+        raise MissingPersistentViewClass(self.view, persistent_views)
 
     async def get_view(self, bot: Kiyomi) -> PersistentView:
         return await self.view_class.deserialize_persistence(bot, self)
 
+    def get_params(self) -> List[Optional[str]]:
+        return self._view_parameters
+
+    def get_param(self, index: int) -> Optional[str]:
+        if len(self._view_parameters) <= index or index < 0:
+            return None
+
+        return self._view_parameters[index]
+
     def __str__(self):
-        return f"Persistence {self.view}({','.join(self.view_parameters)}) ({self.message_id})"
+        return f"Persistence {self.view}({','.join(self._view_parameters)}) ({self.message_id})"

@@ -1,9 +1,10 @@
 import discord
-from discord.ext.commands import MemberNotFound
+from discord import NotFound
 
 from src.kiyomi import Kiyomi
 from .general_service import GeneralService
 from .guild_service import GuildService
+from ..errors import MemberNotFoundException
 from ..storage import UnitOfWork
 from ..storage.model.guild_member import GuildMember
 from ..storage.model.member import Member
@@ -20,10 +21,20 @@ class MemberService(GeneralService):
         discord_member = discord_guild.get_member(member_id)
 
         if discord_member is None:
-            discord_member = await discord_guild.fetch_member(member_id)
+            try:
+                discord_member = await discord_guild.fetch_member(member_id)
+            except NotFound:
+                guild_member = self.uow.guild_members.get_by_guild_id_and_member_id(guild_id, member_id)
+
+                if guild_member is not None:
+                    self.uow.guild_members.remove(guild_member)
+
+                raise MemberNotFoundException(
+                        f"Could not find member with id {member_id} in guild {discord_guild.name}"
+                )
 
         if discord_member is None:
-            raise MemberNotFound(f"Could not find member with id {member_id} in guild {discord_guild.name}")
+            raise MemberNotFoundException(f"Could not find member with id {member_id} in guild {discord_guild.name}")
 
         return discord_member
 
@@ -37,8 +48,14 @@ class MemberService(GeneralService):
                 self.uow.members.update(Member(member.id, discord_member.name))
                 self.uow.save_changes()  # TODO: Figure out if this is a good place for this
 
-    def register_guild_member(self, discord_member: discord.Member):
-        guild_member = self.uow.guild_members.get_by_guild_id_and_member_id(discord_member.guild.id, discord_member.id)
+    def register_guild_member(self, guild_id: int, member_id: int):
+        guild_member = self.uow.guild_members.get_by_guild_id_and_member_id(guild_id, member_id)
 
         if guild_member is None:
-            self.uow.members.add(GuildMember(discord_member.guild.id, discord_member.id))
+            self.uow.members.add(GuildMember(guild_id, member_id))
+
+    def unregister_guild_member(self, guild_id: int, member_id: int):
+        guild_member = self.uow.guild_members.get_by_guild_id_and_member_id(guild_id, member_id)
+
+        if guild_member is not None:
+            self.uow.members.remove(guild_member)

@@ -1,5 +1,7 @@
 from typing import Optional
 
+from discord import Permissions
+
 from .abstract_regular_setting import AbstractRegularSetting
 from .enums.setting_type import SettingType
 from .setting import Setting
@@ -10,11 +12,20 @@ class TextSetting(AbstractRegularSetting[str]):
     setting_type = SettingType.STRING
 
     @staticmethod
-    def create(name_human: str, name: str, default_value: Optional[str]):
+    def create(
+            name_human: str,
+            name: str,
+            permissions: Optional[Permissions] = None,
+            default_value: Optional[str] = None
+    ):
         if default_value is not None:
             default_value = TextSetting.from_type(default_value)
 
-        return TextSetting(name_human, Setting(None, SettingType.STRING, name, default_value))
+        return TextSetting(
+                name_human,
+                Setting(None, SettingType.STRING, name, default_value),
+                permissions
+        )
 
     @property
     def value(self) -> str:
@@ -39,8 +50,16 @@ class TextSetting(AbstractRegularSetting[str]):
         return value
 
     @staticmethod
-    def get_from_setting(name_human: str, setting: Setting):
+    def get_from_setting(
+            name_human: str,
+            setting: Setting,
+            permissions: Optional[Permissions] = None
+    ):
         if setting.setting_type is not SettingType.STRING:
             raise InvalidSettingType(setting.setting_type, SettingType.STRING)
 
-        return TextSetting(name_human, setting)
+        return TextSetting(name_human, setting, permissions)
+
+    @staticmethod
+    async def is_valid(value: str) -> bool:
+        return isinstance(value, str)

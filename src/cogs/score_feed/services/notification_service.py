@@ -1,14 +1,21 @@
-from src.cogs.scoresaber import ScoreSaberAPI
+from src.cogs.scoresaber import ScoreSaberAPI, ScoreSaberUI
 from src.cogs.settings import SettingsAPI
+from src.kiyomi import Kiyomi
 from src.log import Logger
 from .score_feed_service import ScoreFeedService
-from ..messages.views.ScoreNotificationView import ScoreNotificationView
+from .sent_score_service import SentScoreService
+from ..storage.unit_of_work import UnitOfWork
 from ..storage.model.sent_score import SentScore
 from src.cogs.general.storage.model.guild import Guild
 from ...scoresaber.storage.model.player import Player
 
 
 class NotificationService(ScoreFeedService):
+
+    def __init__(self, bot: Kiyomi, uow: UnitOfWork, sent_score_service: SentScoreService):
+        super().__init__(bot, uow)
+
+        self.sent_score_service = sent_score_service
 
     async def send_notifications(self, guild_id: int):
         scoresaber = self.bot.get_cog_api(ScoreSaberAPI)
@@ -26,10 +33,15 @@ class NotificationService(ScoreFeedService):
         scoresaber = self.bot.get_cog_api(ScoreSaberAPI)
         settings = self.bot.get_cog_api(SettingsAPI)
 
-        channel = settings.get(guild.id, "score_feed_channel_id")
+        channel_id = settings.get(guild.id, "score_feed_channel_id")
 
-        if channel is None:
+        if channel_id is None:
             Logger.log(guild, "Recent scores channel not found, skipping!")
+            return
+
+        if not self.sent_score_service.should_send_scores(guild, player):
+            Logger.log(guild, "Decided not to send scores. (Spam prevention)")
+            self.sent_score_service.mark_player_scores_sent(player, guild)
             return
 
         discord_guild = self.bot.get_guild(guild.id)
@@ -40,7 +52,8 @@ class NotificationService(ScoreFeedService):
         for score in scores:
             previous_score = scoresaber.get_previous_score(score)
 
-            song_view = ScoreNotificationView(self.bot, discord_guild, score, previous_score)
-            await song_view.send(target=channel)
+            scoresaber_ui = self.bot.get_cog_api(ScoreSaberUI)
+            score_view = scoresaber_ui.view_score(self.bot, discord_guild, score, previous_score)
+            await score_view.send(target=channel_id)
 
             self.uow.sent_score_repo.add(SentScore(score.id, guild.id))

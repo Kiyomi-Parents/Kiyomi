@@ -1,12 +1,12 @@
 from typing import List, Union
 
-from discord import Thread
+from discord import Thread, NotFound
 from discord.abc import GuildChannel, PrivateChannel
 
 from .guild_service import GuildService
 from ..errors import ChannelNotFoundException
 from ..storage.model.channel import Channel
-from ..storage.uow import UnitOfWork
+from ..storage.unit_of_work import UnitOfWork
 from .general_service import GeneralService
 from src.kiyomi import Kiyomi
 
@@ -21,7 +21,10 @@ class ChannelService(GeneralService):
         discord_channel = self.bot.get_channel(channel_id)
 
         if discord_channel is None:
-            discord_channel = await self.bot.fetch_channel(channel_id)
+            try:
+                discord_channel = await self.bot.fetch_channel(channel_id)
+            except NotFound:
+                raise ChannelNotFoundException(f"Could not find channel with id {channel_id}")
 
         if discord_channel is None:
             raise ChannelNotFoundException(f"Could not find channel with id {channel_id}")

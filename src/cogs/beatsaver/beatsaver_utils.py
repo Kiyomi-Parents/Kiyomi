@@ -2,7 +2,8 @@ import math
 from typing import Optional
 
 import pybeatsaver
-from discord import Emoji, Guild
+import pyscoresaber
+from discord import Emoji
 
 from src.cogs.settings import SettingsAPI
 from src.kiyomi import Kiyomi
@@ -26,47 +27,78 @@ class BeatSaverUtils:
 
         return math.floor(max_score)
 
-    # TODO: Make smuggle sticks guild default for emojis
     @staticmethod
-    async def difficulty_to_emoji(bot: Kiyomi, guild: Optional[Guild], difficulty: pybeatsaver.EDifficulty) -> Optional[Emoji]:
-        if guild is None:
-            return None
-
-        settings = bot.get_cog_api(SettingsAPI)
+    async def difficulty_to_emoji(
+            bot: Kiyomi,
+            guild_id: Optional[int],
+            difficulty: pybeatsaver.EDifficulty
+    ) -> Optional[Emoji]:
+        setting_name = None
 
         if difficulty == pybeatsaver.EDifficulty.EASY:
-            return settings.get(guild.id, "easy_difficulty_emoji")
+            setting_name = "easy_difficulty_emoji"
         elif difficulty == pybeatsaver.EDifficulty.NORMAL:
-            return settings.get(guild.id, "normal_difficulty_emoji")
+            setting_name = "normal_difficulty_emoji"
         elif difficulty == pybeatsaver.EDifficulty.HARD:
-            return settings.get(guild.id, "hard_difficulty_emoji")
+            setting_name = "hard_difficulty_emoji"
         elif difficulty == pybeatsaver.EDifficulty.EXPERT:
-            return settings.get(guild.id, "expert_difficulty_emoji")
+            setting_name = "expert_difficulty_emoji"
         elif difficulty == pybeatsaver.EDifficulty.EXPERT_PLUS:
-            return settings.get(guild.id, "expert_plus_difficulty_emoji")
+            setting_name = "expert_plus_difficulty_emoji"
 
-        return None
+        settings: "SettingsAPI" = bot.get_cog("SettingsAPI")
+
+        return await settings.get_override_or_default(guild_id, setting_name)
 
     @staticmethod
-    async def characteristic_to_emoji(bot: Kiyomi, guild: Optional[Guild], characteristic: pybeatsaver.ECharacteristic) -> Optional[Emoji]:
-        if guild is None:
-            return None
-
-        settings = bot.get_cog_api(SettingsAPI)
+    async def characteristic_to_emoji(
+            bot: Kiyomi,
+            guild_id: Optional[int],
+            characteristic: pybeatsaver.ECharacteristic
+    ) -> Optional[Emoji]:
+        setting_name = None
 
         if characteristic == pybeatsaver.ECharacteristic.STANDARD:
-            return settings.get(guild.id, "standard_game_mode_emoji")
+            setting_name = "standard_game_mode_emoji"
         elif characteristic == pybeatsaver.ECharacteristic.ONE_SABER:
-            return settings.get(guild.id, "one_saber_game_mode_emoji")
+            setting_name = "one_saber_game_mode_emoji"
         elif characteristic == pybeatsaver.ECharacteristic.NO_ARROWS:
-            return settings.get(guild.id, "no_arrows_game_mode_emoji")
+            setting_name = "no_arrows_game_mode_emoji"
         elif characteristic == pybeatsaver.ECharacteristic.DEGREE_90:
-            return settings.get(guild.id, "90_degree_game_mode_emoji")
+            setting_name = "90_degree_game_mode_emoji"
         elif characteristic == pybeatsaver.ECharacteristic.DEGREE_360:
-            return settings.get(guild.id, "360_degree_game_mode_emoji")
+            setting_name = "360_degree_game_mode_emoji"
         elif characteristic == pybeatsaver.ECharacteristic.LIGHTSHOW:
-            return settings.get(guild.id, "lightshow_game_mode_emoji")
+            setting_name = "lightshow_game_mode_emoji"
         elif characteristic == pybeatsaver.ECharacteristic.LAWLESS:
-            return settings.get(guild.id, "lawless_game_mode_emoji")
+            setting_name = "lawless_game_mode_emoji"
 
-        return None
+        settings: "SettingsAPI" = bot.get_cog("SettingsAPI")
+
+        return await settings.get_override_or_default(guild_id, setting_name)
+
+    @staticmethod
+    def to_scoresaber_game_mode(characteristic: pybeatsaver.ECharacteristic) -> pyscoresaber.GameMode:
+        characteristics = {
+            pybeatsaver.ECharacteristic.STANDARD: pyscoresaber.GameMode.STANDARD,
+            pybeatsaver.ECharacteristic.ONE_SABER: pyscoresaber.GameMode.ONE_SABER,
+            pybeatsaver.ECharacteristic.NO_ARROWS: pyscoresaber.GameMode.NO_ARROWS,
+            pybeatsaver.ECharacteristic.DEGREE_90: pyscoresaber.GameMode.DEGREE_90,
+            pybeatsaver.ECharacteristic.DEGREE_360: pyscoresaber.GameMode.DEGREE_360,
+            pybeatsaver.ECharacteristic.LIGHTSHOW: pyscoresaber.GameMode.LIGHTSHOW,
+            pybeatsaver.ECharacteristic.LAWLESS: pyscoresaber.GameMode.LAWLESS,
+        }
+
+        return characteristics[characteristic]
+
+    @staticmethod
+    def to_scoresaber_difficulty(difficulty: pybeatsaver.EDifficulty) -> pyscoresaber.BeatmapDifficulty:
+        difficulties = {
+            pybeatsaver.EDifficulty.EASY: pyscoresaber.BeatmapDifficulty.EASY,
+            pybeatsaver.EDifficulty.NORMAL: pyscoresaber.BeatmapDifficulty.NORMAL,
+            pybeatsaver.EDifficulty.HARD: pyscoresaber.BeatmapDifficulty.HARD,
+            pybeatsaver.EDifficulty.EXPERT: pyscoresaber.BeatmapDifficulty.EXPERT,
+            pybeatsaver.EDifficulty.EXPERT_PLUS: pyscoresaber.BeatmapDifficulty.EXPERT_PLUS,
+        }
+
+        return difficulties[difficulty]

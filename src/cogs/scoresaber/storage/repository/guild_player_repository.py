@@ -38,7 +38,12 @@ class GuildPlayerRepository(BaseRepository[GuildPlayer]):
             .filter(GuildPlayer.member_id == member_id) \
             .first()
 
-    def get_by_guild_id_and_member_id_and_player_id(self, guild_id: int, member_id: int, player_id: str) -> Optional[GuildPlayer]:
+    def get_by_guild_id_and_member_id_and_player_id(
+            self,
+            guild_id: int,
+            member_id: int,
+            player_id: str
+    ) -> Optional[GuildPlayer]:
         return self.session.query(GuildPlayer) \
             .filter(GuildPlayer.guild_id == guild_id) \
             .filter(GuildPlayer.member_id == member_id) \
@@ -47,5 +52,4 @@ class GuildPlayerRepository(BaseRepository[GuildPlayer]):
                 joinedload(GuildPlayer.guild),
                 joinedload(GuildPlayer.member),
                 joinedload(GuildPlayer.player)
-            ) \
-            .first()
+            ).first()

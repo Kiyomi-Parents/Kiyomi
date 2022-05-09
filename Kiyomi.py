@@ -1,4 +1,7 @@
+import asyncio
 import os
+import platform
+from asyncio import AbstractEventLoop
 
 import discord
 from dotenv import load_dotenv
@@ -6,42 +9,65 @@ from dotenv import load_dotenv
 from src.kiyomi import Kiyomi, Database
 from src.log import Logger
 
-if __name__ == "__main__":
+
+async def startup(loop: AbstractEventLoop):
+    Logger.log_init()
+
     load_dotenv()
-    TOKEN = os.getenv("DISCORD_TOKEN")
-    DATABASE_IP = os.getenv("DATABASE_IP")
-    DATABASE_USER = os.getenv("DATABASE_USER")
-    DATABASE_PW = os.getenv("DATABASE_PW")
-    DATABASE_NAME = os.getenv("DATABASE_NAME")
+    discord_token = os.getenv("DISCORD_TOKEN")
+    database_ip = os.getenv("DATABASE_IP")
+    database_user = os.getenv("DATABASE_USER")
+    database_password = os.getenv("DATABASE_PW")
+    database_name = os.getenv("DATABASE_NAME")
 
     # Init database
     database = Database(
             f"mariadb+asyncmy://{DATABASE_USER}:{DATABASE_PW}@{DATABASE_IP}/{DATABASE_NAME}?charset=utf8mb4"
     )
 
-    intents = discord.Intents.default()
-    intents.members = True
-    intents.message_content = True
-
-    bot = Kiyomi(command_prefix="!", intents=intents, db=database)
-
-    bot.debug_guilds = os.getenv("DEBUG_GUILDS").split(",")
-
-    Logger.log_init()
-
-    bot.load_extension(name="src.cogs.general")
-    bot.load_extension(name="src.cogs.settings")
-    bot.load_extension(name="src.cogs.scoresaber")
-    bot.load_extension(name="src.cogs.beatsaver")
-    bot.load_extension(name="src.cogs.score_feed")
-    bot.load_extension(name="src.cogs.leaderboard")
-    bot.load_extension(name="src.cogs.achievement")
-    bot.load_extension(name="src.cogs.achievement_roles")
-    bot.load_extension(name="src.cogs.view_persistence")
-    bot.load_extension(name="src.cogs.emoji_echo")
-
-    # await database.drop_tables()
-    # await database.create_tables()
+    # database.drop_tables()
+    # database.create_tables()
     # database.create_schema_image()
 
-    bot.run(TOKEN)
+    async with Kiyomi(command_prefix="!", db=database, loop=loop) as bot:
+        default_guild = os.getenv("DEFAULT_GUILD")
+        if default_guild is not None:
+            bot.default_guild = discord.Object(id=int(default_guild))
+
+        debug_guilds = os.getenv("DEBUG_GUILDS")
+        if debug_guilds is not None:
+            bot.debug_guilds = [discord.Object(id=int(guild_id)) for guild_id in debug_guilds.split(",") if guild_id]
+
+        # Base Cogs
+        await bot.load_extension(name="src.cogs.view_persistence")
+
+        # General Function Cogs
+        await bot.load_extension(name="src.cogs.general")
+        await bot.load_extension(name="src.cogs.settings")
+        await bot.load_extension(name="src.cogs.fancy_presence")
+
+        # Function Cogs
+
+        await bot.load_extension(name="src.cogs.scoresaber")
+        await bot.load_extension(name="src.cogs.beatsaver")
+        await bot.load_extension(name="src.cogs.leaderboard")
+        await bot.load_extension(name="src.cogs.score_feed")
+        await bot.load_extension(name="src.cogs.achievement")
+        await bot.load_extension(name="src.cogs.achievement_roles")
+        await bot.load_extension(name="src.cogs.emoji_echo")
+
+        await bot.start(token=discord_token)
+
+
+if __name__ == "__main__":
+    loop = None
+
+    if platform.system() == 'Windows':
+        asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+        loop = asyncio.ProactorEventLoop()
+        asyncio.set_event_loop(loop)
+
+    try:
+        asyncio.run(startup(loop=loop))
+    except KeyboardInterrupt:
+        pass

@@ -6,13 +6,28 @@ from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
 from src.kiyomi.database import Base
-import src.cogs.settings
-import src.cogs.scoresaber
-import src.cogs.beatsaver
-import src.cogs.score_feed
-import src.cogs.leaderboard
-import src.cogs.achievements
+# noinspection PyUnresolvedReferences
+import src.cogs.achievement
+# noinspection PyUnresolvedReferences
 import src.cogs.achievement_roles
+# noinspection PyUnresolvedReferences
+import src.cogs.beatsaver
+# noinspection PyUnresolvedReferences
+import src.cogs.emoji_echo
+# noinspection PyUnresolvedReferences
+import src.cogs.fancy_presence
+# noinspection PyUnresolvedReferences
+import src.cogs.general
+# noinspection PyUnresolvedReferences
+import src.cogs.leaderboard
+# noinspection PyUnresolvedReferences
+import src.cogs.score_feed
+# noinspection PyUnresolvedReferences
+import src.cogs.scoresaber
+# noinspection PyUnresolvedReferences
+import src.cogs.settings
+# noinspection PyUnresolvedReferences
+import src.cogs.view_persistence
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -55,10 +70,11 @@ def run_migrations_offline():
     """
     url = config.get_main_option("sqlalchemy.url")
     context.configure(
-        url=url,
-        target_metadata=target_metadata,
-        literal_binds=True,
-        dialect_opts={"paramstyle": "named"},
+            url=url,
+            target_metadata=target_metadata,
+            literal_binds=True,
+            dialect_opts={"paramstyle": "named"},
+            compare_type=True
     )
 
     with context.begin_transaction():
@@ -73,14 +89,16 @@ def run_migrations_online():
 
     """
     connectable = engine_from_config(
-        config.get_section(config.config_ini_section),
-        prefix="sqlalchemy.",
-        poolclass=pool.NullPool,
+            config.get_section(config.config_ini_section),
+            prefix="sqlalchemy.",
+            poolclass=pool.NullPool,
     )
 
     with connectable.connect() as connection:
         context.configure(
-            connection=connection, target_metadata=target_metadata
+                connection=connection,
+                target_metadata=target_metadata,
+                compare_type=True
         )
 
         with context.begin_transaction():

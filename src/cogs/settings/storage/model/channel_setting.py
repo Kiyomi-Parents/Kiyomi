@@ -1,7 +1,8 @@
-from typing import Optional
+from typing import Optional, List
 
 import discord.abc
-from discord import OptionChoice
+from discord import Permissions, Interaction
+from discord.app_commands import Choice
 
 from src.kiyomi import Kiyomi
 from .abstract_bot_setting import AbstractBotSetting
@@ -14,11 +15,25 @@ class ChannelSetting(AbstractBotSetting[discord.abc.GuildChannel]):
     setting_type = SettingType.CHANNEL
 
     @staticmethod
-    def create(bot: discord.Bot, name_human: str, name: str, default_value: Optional[discord.abc.GuildChannel]):
+    def create(
+            bot: Kiyomi,
+            name_human: str,
+            name: str,
+            permissions: Optional[Permissions] = None,
+            default_value: Optional[discord.abc.GuildChannel] = None
+    ):
+        if permissions is None:
+            permissions = Permissions(manage_channels=True)
+
         if default_value is not None:
             default_value = ChannelSetting.from_type(default_value)
 
-        return ChannelSetting(bot, name_human, Setting(None, SettingType.CHANNEL, name, default_value))
+        return ChannelSetting(
+                bot,
+                name_human,
+                Setting(None, SettingType.CHANNEL, name, default_value),
+                permissions
+        )
 
     @property
     def value(self) -> discord.abc.GuildChannel:
@@ -43,20 +58,37 @@ class ChannelSetting(AbstractBotSetting[discord.abc.GuildChannel]):
         return str(value.id)
 
     @staticmethod
-    def get_from_setting(bot: Kiyomi, name_human: str, setting: Setting):
+    def get_from_setting(
+            bot: Kiyomi,
+            name_human: str,
+            setting: Setting,
+            permissions: Optional[Permissions] = None
+    ):
         if setting.setting_type is not SettingType.CHANNEL:
             raise InvalidSettingType(setting.setting_type, SettingType.CHANNEL)
 
-        return ChannelSetting(bot, name_human, setting)
+        return ChannelSetting(bot, name_human, setting, permissions)
 
-    async def get_autocomplete(self, ctx: discord.AutocompleteContext):
+    @staticmethod
+    async def is_valid(bot: Kiyomi, guild_id: int, value: str) -> bool:
+        guild = bot.get_guild(guild_id)
+
+        if guild is None:
+            return False
+
+        return value in [str(channel.id) for channel in await guild.fetch_channels()]
+
+    async def get_autocomplete(self, ctx: Interaction, current: str) -> List[Choice]:
         text_channels = []
 
-        for channel in await ctx.interaction.guild.fetch_channels():
+        if not self.has_permission(ctx.user):
+            return text_channels
+
+        for channel in await ctx.guild.fetch_channels():
             if not isinstance(channel, discord.TextChannel):
                 continue
 
-            if ctx.value.lower() not in channel.name.lower():
+            if current.lower() not in channel.name.lower():
                 continue
 
             label = f"#{channel.name}"
@@ -64,6 +96,6 @@ class ChannelSetting(AbstractBotSetting[discord.abc.GuildChannel]):
             if self.value is not None and self.value.id == channel.id:
                 label += ' (current)'
 
-            text_channels.append(OptionChoice(label, str(channel.id)))
+            text_channels.append(Choice(name=label, value=str(channel.id)))
 
         return text_channels

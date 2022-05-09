@@ -18,7 +18,7 @@ class Beatmap(Base):
     id = Column(String(128), primary_key=True, autoincrement=False)
     name = Column(String(256))
     description = Column(Text)
-    uploaded = Column(DateTime)
+    uploaded = Column(DateTime(timezone=True))
     automapper = Column(Boolean)
     ranked = Column(Boolean)
     qualified = Column(Boolean)

@@ -1,7 +1,7 @@
 from typing import List
 
 from .guild_service import GuildService
-from ..storage.uow import UnitOfWork
+from ..storage.unit_of_work import UnitOfWork
 from .channel_service import ChannelService
 from .general_service import GeneralService
 from ..storage.model.message import Message

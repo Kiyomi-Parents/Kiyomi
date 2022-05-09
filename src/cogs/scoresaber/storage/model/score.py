@@ -1,14 +1,17 @@
-from typing import Optional
+from __future__ import annotations
+
+from typing import Optional, TYPE_CHECKING
 
 import pyscoresaber
 from dateutil import tz
 from sqlalchemy import Column, String, Integer, ForeignKey, DateTime, Float, Boolean
 from sqlalchemy.orm import relationship
 
-from src.cogs.beatsaver.storage.model.beatmap import Beatmap
-from src.cogs.beatsaver.storage.model.beatmap_version import BeatmapVersion
-from src.cogs.beatsaver.storage.model.beatmap_version_difficulty import BeatmapVersionDifficulty
 from src.kiyomi.database import Base
+
+if TYPE_CHECKING:
+    from src.cogs.beatsaver.storage.model.beatmap import Beatmap
+    from src.cogs.beatsaver.storage.model.beatmap_version import BeatmapVersion
 
 
 class Score(Base):
@@ -32,7 +35,7 @@ class Score(Base):
     full_combo = Column(Boolean)
     hmd = Column(Integer)
     has_replay = Column(Boolean)
-    time_set = Column(DateTime)
+    time_set = Column(DateTime(timezone=True))
 
     leaderboard_id = Column(Integer, ForeignKey("leaderboard.id", ondelete="CASCADE"))
     leaderboard = relationship(
@@ -66,6 +69,9 @@ class Score(Base):
 
         self.leaderboard_id = player_score.leaderboard.id
 
+        if player_score.score.leaderboard_player_info is not None:
+            self.player_id = player_score.score.leaderboard_player_info.id
+
     @property
     def leaderboard_url(self):
         page = (self.rank - 1) // 12 + 1
@@ -76,7 +82,10 @@ class Score(Base):
         max_score = self.leaderboard.max_score
 
         if not max_score and self.beatmap_version is not None:
-            max_score = self.beatmap_difficulty.max_score
+            beatmap_difficulty = self.leaderboard.beatmap_difficulty
+            
+            if beatmap_difficulty is not None:
+                max_score = beatmap_difficulty.max_score
 
         if max_score:
             return round(self.base_score / max_score * 100, 2)
@@ -99,41 +108,31 @@ class Score(Base):
         return self.beatmap_version.beatmap
 
     @property
-    def beatmap_difficulty(self) -> Optional[BeatmapVersionDifficulty]:
-        if self.beatmap_version is None:
-            return None
-
-        for beatmap_difficulty in self.beatmap_version.difficulties:
-            if beatmap_difficulty.scoresaber_characteristic is not self.leaderboard.game_mode:
-                continue
-
-            if beatmap_difficulty.scoresaber_difficulty is not self.leaderboard.difficulty:
-                continue
-
-            return beatmap_difficulty
-
-        return None
-
-    @property
     def get_hmd_name(self):
         if self.hmd == 0:
             return "Unknown"
-        elif self.hmd == 64:
-            return "Valve Index"
-        elif self.hmd == 2:
-            return "HTC Vive"
-        elif self.hmd == 32:
-            return "Oculus Quest"
-        elif self.hmd == 16:
-            return "Oculus Rift S"
         elif self.hmd == 1:
             return "Oculus Rift CV1"
+        elif self.hmd == 2:
+            return "HTC Vive"
+        elif self.hmd == 4:
+            return "HTC Vive Pro"
+        elif self.hmd == 8:
+            return "Windows Mixed Reality"
+        elif self.hmd == 16:
+            return "Oculus Rift S"
+        elif self.hmd == 32:
+            return "Oculus Quest"
+        elif self.hmd == 64:
+            return "Valve Index"
+        elif self.hmd == 128:
+            return "HTC Vive Cosmos"
 
         return "Unknown"
 
     @property
     def get_date(self):
-        return self.time_set.astimezone(tz.tzlocal())
+        return self.time_set.replace(tzinfo=tz.UTC)
 
     def __str__(self):
         return f"Score {self.score_id} ({self.id})"

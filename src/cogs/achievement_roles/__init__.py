@@ -5,7 +5,7 @@ from .storage import UnitOfWork
 from .tasks import Tasks
 
 
-def setup(bot: Kiyomi):
+async def setup(bot: Kiyomi):
     uow = UnitOfWork(bot.database.session)
 
     member_service = MemberAchievementRoleService(bot, uow)
@@ -15,4 +15,4 @@ def setup(bot: Kiyomi):
     if not bot.running_tests:
         achievement_role_tasks.update_member_roles.start()
 
-    bot.add_cog(AchievementRoles(bot, member_service))
+    await bot.add_cog(AchievementRoles(bot, member_service))

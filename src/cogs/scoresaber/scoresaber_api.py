@@ -1,5 +1,7 @@
 from typing import Optional, List
 
+import pyscoresaber
+
 from src.kiyomi import Kiyomi
 from .scoresaber_cog import ScoreSaberCog
 from .scoresaber_utils import ScoreSaberUtils
@@ -27,14 +29,22 @@ class ScoreSaberAPI(ScoreSaberCog):
     def get_players(self) -> Optional[List[Player]]:
         return self.uow.players.get_all()
 
+    def get_guild_player(self, guild_id: int, member_id: int) -> Optional[GuildPlayer]:
+        return self.uow.guild_players.get_by_guild_id_and_member_id(guild_id, member_id)
+
     def get_guild_players_by_guild(self, guild_id: int) -> Optional[List[GuildPlayer]]:
         return self.uow.guild_players.get_all_by_guild_id(guild_id)
 
     def get_previous_score(self, score: Score) -> Optional[Score]:
-        return self.uow.scores.get_previous_score(score)
+        return self.score_service.get_previous_score(score)
 
-    def get_leaderboard_by_song_hash(self, song_hash: str) -> Optional[Leaderboard]:
-        return self.uow.leaderboards.get_by_song_hash(song_hash)
+    def get_leaderboard(
+            self,
+            song_hash: str,
+            song_game_mode: pyscoresaber.GameMode,
+            song_difficulty: pyscoresaber.BeatmapDifficulty
+    ) -> Optional[Leaderboard]:
+        return self.uow.leaderboards.get_by_song_hash(song_hash, song_game_mode, song_difficulty)
 
     def get_score_by_player_id_and_leaderboard_id(self, player_id: str, leaderboard_id: int) -> Optional[List[Score]]:
         return self.uow.scores.get_by_player_id_and_leaderboard_id(player_id, leaderboard_id)

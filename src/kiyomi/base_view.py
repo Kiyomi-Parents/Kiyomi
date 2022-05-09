@@ -1,9 +1,10 @@
 from abc import ABC, abstractmethod
-from typing import Optional, Union, Callable, Awaitable
+from typing import Optional, Union, Callable, Awaitable, Any
 
 import discord
-from discord import Embed, Guild
+from discord import Embed, Guild, Interaction
 from discord.ext.commands import Context
+from discord.ui import Item
 
 from .kiyomi import Kiyomi
 
@@ -21,14 +22,17 @@ class BaseView(discord.ui.View, ABC):
 
         self.update_buttons()
 
-    async def get_current_embed(self) -> Embed:
+    async def get_current_embed(self) -> Optional[Embed]:
         if self.embed is None:
             default_embed = self.default_embed()
 
             if default_embed is not None:
                 return await default_embed()
 
-        return await self.embed()
+        if self.embed is not None:
+            return await self.embed()
+
+        return None
 
     def default_embed(self) -> Optional[Callable[[], Awaitable[Embed]]]:
         for child in self.children:
@@ -41,7 +45,11 @@ class BaseView(discord.ui.View, ABC):
                 return get_embed
         # TODO: error embed
 
-    async def update(self, interaction: discord.Interaction, button_clicked: Optional[discord.ui.Button] = None) -> discord.Message:
+    async def update(
+            self,
+            interaction: discord.Interaction,
+            button_clicked: Optional[discord.ui.Button] = None
+    ) -> discord.Message:
         if self.message is None:
             self.message = interaction.message
 
@@ -75,9 +83,9 @@ class BaseView(discord.ui.View, ABC):
                 await child.after_init()
 
     async def send(
-        self,
-        ctx: Optional[Context] = None,
-        target: Optional[discord.abc.Messageable] = None
+            self,
+            ctx: Optional[Context] = None,
+            target: Optional[discord.abc.Messageable] = None
     ) -> discord.Message:
         if ctx is not None and not isinstance(ctx, Context):
             raise TypeError(f"expected Context not {ctx.__class__!r}")
@@ -101,10 +109,10 @@ class BaseView(discord.ui.View, ABC):
         return self.message
 
     async def respond(
-        self,
-        interaction: discord.Interaction,
-        target: Optional[discord.abc.Messageable] = None
-    ) -> Union[discord.Message, discord.WebhookMessage]:
+            self,
+            interaction: discord.Interaction,
+            target: Optional[discord.abc.Messageable] = None
+    ) -> Union[discord.Message, discord.InteractionMessage, discord.WebhookMessage]:
         if not isinstance(interaction, discord.Interaction):
             raise TypeError(f"expected Interaction not {interaction.__class__!r}")
 
@@ -127,10 +135,12 @@ class BaseView(discord.ui.View, ABC):
                 # convert from WebhookMessage to Message reference to bypass 15min webhook token timeout
                 msg = await msg.channel.fetch_message(msg.id)
             else:
-                msg = await interaction.response.send_message(
+                await interaction.response.send_message(
                         embed=await self.get_current_embed(),
                         view=self
                 )
+
+                msg = await interaction.original_message()
 
             if isinstance(msg, discord.WebhookMessage):
                 self.message = await msg.channel.fetch_message(msg.id)
@@ -140,3 +150,7 @@ class BaseView(discord.ui.View, ABC):
                 self.message = await msg.original_message()
 
         return self.message
+
+    # TODO: Add error handling for views
+    async def on_error(self, interaction: Interaction, error: Exception, item: Item[Any]) -> None:
+        await super(BaseView, self).on_error(interaction, error, item)

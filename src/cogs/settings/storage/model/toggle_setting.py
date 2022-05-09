@@ -1,8 +1,8 @@
 import distutils.util
-from typing import Optional
+from typing import Optional, List
 
-import discord
-from discord import OptionChoice
+from discord import Permissions, Interaction
+from discord.app_commands import Choice
 
 from .abstract_regular_setting import AbstractRegularSetting
 from .enums.setting_type import SettingType
@@ -14,11 +14,20 @@ class ToggleSetting(AbstractRegularSetting[bool]):
     setting_type = SettingType.BOOLEAN
 
     @staticmethod
-    def create(name_human: str, name: str, default_value: Optional[bool]):
+    def create(
+            name_human: str,
+            name: str,
+            permissions: Optional[Permissions] = None,
+            default_value: Optional[bool] = None
+    ):
         if default_value is not None:
             default_value = ToggleSetting.from_type(default_value)
 
-        return ToggleSetting(name_human, Setting(None, SettingType.BOOLEAN, name, default_value))
+        return ToggleSetting(
+                name_human,
+                Setting(None, SettingType.BOOLEAN, name, default_value),
+                permissions
+        )
 
     @property
     def value(self) -> bool:
@@ -43,15 +52,31 @@ class ToggleSetting(AbstractRegularSetting[bool]):
         return str(value)
 
     @staticmethod
-    def get_from_setting(name_human: str, setting: Setting):
+    def get_from_setting(
+            name_human: str,
+            setting: Setting,
+            permissions: Optional[Permissions] = None
+    ):
         if setting.setting_type is not SettingType.BOOLEAN:
             raise InvalidSettingType(setting.setting_type, SettingType.BOOLEAN)
 
-        return ToggleSetting(name_human, setting)
+        return ToggleSetting(name_human, setting, permissions)
 
-    async def get_autocomplete(self, ctx: discord.AutocompleteContext):
+    @staticmethod
+    async def is_valid(value: str) -> bool:
+        if value.lower() == "true":
+            return True
+
+        if value.lower() == "false":
+            return True
+
+        return False
+
+    async def get_autocomplete(self, ctx: Interaction, current: str) -> List[Choice]:
+        if not self.has_permission(ctx.user):
+            return []
+
         return [
-            OptionChoice(f"Enabled{' (current)' if self.value else ''}", "True"),
-            OptionChoice(f"Disabled{' (current)' if not self.value else ''}", "False")
+            Choice(name=f"Enabled{' (current)' if self.value else ''}", value="True"),
+            Choice(name=f"Disabled{' (current)' if not self.value else ''}", value="False")
         ]
-

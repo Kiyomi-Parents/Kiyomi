@@ -53,6 +53,12 @@ class BaseRepository(ABC, Generic[T]):
 
         Logger.log(entry, "Removed")
 
+    def remove_by_id(self, entry_id: int):
+        self.query_by_id(entry_id).delete()
+        self.commit_changes()
+
+        Logger.log(entry_id, "Removed")
+
     def update(self, new_entry: T):
         old_entry = self.get_by_id(new_entry.id)
 

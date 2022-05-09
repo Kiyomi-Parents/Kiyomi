@@ -1,20 +1,25 @@
-from typing import Optional, List
+from typing import List
 
 import pyscoresaber
 
 from src.kiyomi import Kiyomi
 from src.log import Logger
 from .score_service import ScoreSaberService, ScoreService
-from ..errors import MemberUsingDifferentPlayerAlreadyException, \
-    PlayerRegisteredInGuildAlreadyException, MemberHasPlayerAlreadyRegisteredInGuildException, PlayerNotFoundException, \
-    MemberPlayerNotFoundInGuildException
+from ..errors import MemberUsingDifferentPlayerAlreadyException, PlayerRegisteredInGuildAlreadyException, \
+    MemberHasPlayerAlreadyRegisteredInGuildException, PlayerNotFoundException, MemberPlayerNotFoundInGuildException
 from ..storage import UnitOfWork
 from ..storage.model.guild_player import GuildPlayer
 from ..storage.model.player import Player
 
 
 class PlayerService(ScoreSaberService):
-    def __init__(self, bot: Kiyomi, uow: UnitOfWork, scoresaber: pyscoresaber.ScoreSaberAPI, score_service: ScoreService):
+    def __init__(
+            self,
+            bot: Kiyomi,
+            uow: UnitOfWork,
+            scoresaber: pyscoresaber.ScoreSaberAPI,
+            score_service: ScoreService
+    ):
         super().__init__(bot, uow, scoresaber)
 
         self.score_service = score_service
@@ -26,21 +31,25 @@ class PlayerService(ScoreSaberService):
         if guild_players is not None:
             for guild_player in guild_players:
                 if guild_player.player_id != player_id:
-                    raise MemberUsingDifferentPlayerAlreadyException(member=guild_player.member, player=guild_player.player)
+                    raise MemberUsingDifferentPlayerAlreadyException(member_id, guild_player.player_id)
 
     async def check_player_registered_guild(self, guild_id: int, player_id: str):
         """Check if the player has already been registered in the guild by someone else"""
         guild_player = self.uow.guild_players.get_by_guild_id_and_player_id(guild_id, player_id)
 
         if guild_player is not None:
-            raise PlayerRegisteredInGuildAlreadyException(guild=guild_player.guild, member=guild_player.member, player=guild_player.player)
+            raise PlayerRegisteredInGuildAlreadyException(guild_id, player_id)
 
     async def check_member_registered_player_guild(self, guild_id: int, member_id: int, player_id: str):
         """Check if the member has already registered as a player in guild"""
-        guild_player = self.uow.guild_players.get_by_guild_id_and_member_id_and_player_id(guild_id, member_id, player_id)
+        guild_player = self.uow.guild_players.get_by_guild_id_and_member_id_and_player_id(
+                guild_id,
+                member_id,
+                player_id
+        )
 
         if guild_player is not None:
-            raise MemberHasPlayerAlreadyRegisteredInGuildException(guild=guild_player.guild, member=guild_player.member, player=guild_player.player)
+            raise MemberHasPlayerAlreadyRegisteredInGuildException(guild_id, member_id, player_id)
 
     async def add_player_with_checks(self, guild_id: int, member_id: int, player_id: str) -> GuildPlayer:
         await self.check_member_player_parity(member_id, player_id)
@@ -58,7 +67,7 @@ class PlayerService(ScoreSaberService):
 
                 return self.uow.players.add(Player(new_player))
             except pyscoresaber.NotFoundException as error:
-                raise PlayerNotFoundException(player_id=player_id) from error
+                raise PlayerNotFoundException(player_id) from error
 
         return player
 
@@ -66,7 +75,7 @@ class PlayerService(ScoreSaberService):
         guild_player = self.uow.guild_players.get_by_guild_id_and_member_id(guild_id, member_id)
 
         if guild_player is None:
-            raise MemberPlayerNotFoundInGuildException(guild_id=guild_id, member_id=member_id)
+            raise MemberPlayerNotFoundInGuildException(guild_id, member_id)
 
         return await self.remove_player(guild_id, member_id, guild_player.player_id)
 
@@ -76,19 +85,25 @@ class PlayerService(ScoreSaberService):
         self.uow.guild_players.add(GuildPlayer(guild_id, member_id, player_id))
         self.uow.save_changes()
 
-        await self.score_service.update_player_scores(player)
-
-        guild_player = self.uow.guild_players.get_by_guild_id_and_member_id_and_player_id(guild_id, member_id, player_id)
+        guild_player = self.uow.guild_players.get_by_guild_id_and_member_id_and_player_id(
+                guild_id,
+                member_id,
+                player_id
+        )
 
         self.bot.events.emit("on_new_player", guild_player)
 
         return guild_player
 
     async def remove_player(self, guild_id: int, member_id: int, player_id: str) -> GuildPlayer:
-        guild_player = self.uow.guild_players.get_by_guild_id_and_member_id_and_player_id(guild_id, member_id, player_id)
+        guild_player = self.uow.guild_players.get_by_guild_id_and_member_id_and_player_id(
+                guild_id,
+                member_id,
+                player_id
+        )
 
         if guild_player is None:
-            raise MemberPlayerNotFoundInGuildException(guild_id=guild_id, member_id=member_id, player_id=player_id)
+            raise MemberPlayerNotFoundInGuildException(guild_id, member_id, player_id)
 
         self.uow.guild_players.remove(guild_player)
         self.uow.save_changes()
@@ -97,8 +112,13 @@ class PlayerService(ScoreSaberService):
 
         return guild_player
 
-    async def get_player_by_guild_id_and_guild_id(self, guild_id: int, member_id: int) -> Optional[GuildPlayer]:
-        return self.uow.guild_players.get_by_guild_id_and_member_id(guild_id, member_id)
+    async def get_guild_player(self, guild_id: int, member_id: int) -> GuildPlayer:
+        guild_player = self.uow.guild_players.get_by_guild_id_and_member_id(guild_id, member_id)
+
+        if guild_player is None:
+            raise MemberPlayerNotFoundInGuildException(guild_id, member_id)
+
+        return guild_player
 
     async def update_player(self, player: Player):
         try:
@@ -112,3 +132,6 @@ class PlayerService(ScoreSaberService):
 
     async def get_all_players(self) -> List[Player]:
         return self.uow.players.get_all()
+
+    async def player_exists(self, player_id: str) -> bool:
+        return self.uow.players.exists(player_id)

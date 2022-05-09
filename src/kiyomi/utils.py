@@ -1,16 +1,17 @@
 import asyncio
-import random
 from datetime import datetime
 from functools import wraps
-from typing import TypeVar, Type, List
+from typing import TypeVar, Type, List, Any
 
 import discord
 import timeago
 from discord.ext import tasks
 
+from src.kiyomi.timer import Timer
 from src.log import Logger
 
 TClass = TypeVar('TClass')
+
 
 class Utils:
     @staticmethod
@@ -58,7 +59,7 @@ class Utils:
                     setattr(old_class, var, getattr(new_class, var))
 
     @staticmethod
-    def class_inheritors(cls: Type[TClass]) -> List[TClass]:
+    def class_inheritors(cls: Type[TClass]) -> List[Type[TClass]]:
         subclasses = set()
         work = [cls]
 
@@ -70,32 +71,6 @@ class Utils:
                     work.append(child)
 
         return list(subclasses)
-
-    @staticmethod
-    def update_tasks_list(func):
-        async def update_status(bot):
-            if bot.running_tasks:
-                await bot.change_presence(activity=discord.Game(" | ".join(bot.running_tasks)))
-            else:
-                activity_index = random.randint(0, len(bot.activity_list) - 1)
-                await bot.change_presence(activity=discord.Game(bot.activity_list[activity_index]))
-
-        @wraps(func)
-        async def wrapper(self, *args, **kwargs):
-            if func.__doc__ not in self.bot.running_tasks:
-                self.bot.running_tasks.append(func.__doc__)
-
-            await update_status(self.bot)
-
-            result = await func(self, *args, **kwargs)
-
-            if func.__doc__ in self.bot.running_tasks:
-                self.bot.running_tasks.pop(self.bot.running_tasks.index(func.__doc__))
-                await update_status(self.bot)
-
-            return result
-
-        return wrapper
 
     @staticmethod
     def combine_decorators(*decs):
@@ -132,5 +107,36 @@ class Utils:
         with open(f"./tmp/{file_name}", "w") as file:
             file.write(text)
 
-        with open(f"./tmp/{file_name}", "rb") as file:
-            return discord.File(file, filename=file_name)
+        return discord.File(fp=f"./tmp/{file_name}", filename=file_name)
+
+    @staticmethod
+    def debounce(wait_time):
+        """
+        Decorator that will debounce a function so that it is called after wait_time seconds
+        If it is called multiple times, will wait for the last call to be debounced and run only this one.
+        """
+
+        def decorator(function):
+            async def debounced(*args, **kwargs):
+                async def call_function():
+                    debounced._timer = None
+                    return await function(*args, **kwargs)
+
+                # if we already have a call to the function currently waiting to be executed, reset the timer
+                if debounced._timer is not None:
+                    debounced._timer.cancel()
+
+                # after wait_time, call the function provided to the decorator with its arguments
+                debounced._timer = Timer(wait_time, call_function)
+
+            debounced._timer = None
+            return debounced
+
+        return decorator
+
+    @staticmethod
+    def limit_list(items: List[Any], limit: int) -> List[Any]:
+        if len(items) > limit:
+            return items[:limit]
+
+        return items

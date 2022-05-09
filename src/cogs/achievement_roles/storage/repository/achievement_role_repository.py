@@ -21,7 +21,12 @@ class AchievementRoleRepository(BaseRepository[AchievementRole]):
             .filter(AchievementRole.group == group) \
             .all()
 
-    def get_by_guild_id_and_group_and_identifier(self, guild_id: int, group: str, identifier: str) -> Optional[AchievementRole]:
+    def get_by_guild_id_and_group_and_identifier(
+            self,
+            guild_id: int,
+            group: str,
+            identifier: str
+    ) -> Optional[AchievementRole]:
         return self.session.query(AchievementRole) \
             .filter(AchievementRole.guild_id == guild_id) \
             .filter(AchievementRole.group == group) \

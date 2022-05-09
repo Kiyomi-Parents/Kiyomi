@@ -5,15 +5,15 @@ from .storage import UnitOfWork
 from .tasks import Tasks
 
 
-def setup(bot: Kiyomi):
+async def setup(bot: Kiyomi):
     uow = UnitOfWork(bot.database.session)
 
-    notification_service = NotificationService(bot, uow)
     sent_score_service = SentScoreService(bot, uow)
+    notification_service = NotificationService(bot, uow, sent_score_service)
 
     score_feed_tasks = Tasks(bot, notification_service)
 
     if not bot.running_tests:
         score_feed_tasks.send_notifications.start()
 
-    bot.add_cog(ScoreFeed(bot, notification_service, sent_score_service))
+    await bot.add_cog(ScoreFeed(bot, notification_service, sent_score_service))

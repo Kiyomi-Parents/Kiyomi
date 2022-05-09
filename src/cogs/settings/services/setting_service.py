@@ -1,9 +1,11 @@
 from typing import Optional, List
 
+from discord import Member
+
 from src.kiyomi import Kiyomi, Utils
 from .settings_service import SettingsService
 from ..errors import FailedToCreateSetting, \
-    FailedToFindSetting, FailedToConvertSetting
+    FailedToFindSetting, FailedToConvertSetting, InvalidSettingValue
 from ..storage import Setting, SettingType, AbstractSetting, \
     UnitOfWork
 from ..storage.model.abstract_bot_setting import AbstractBotSetting
@@ -26,8 +28,11 @@ class SettingService(SettingsService):
         return setting_type.value(value)
 
     def wrap_setting(self, name_human: str, setting: Setting) -> AbstractSetting:
-        setting_classes = Utils.class_inheritors(AbstractRegularSetting)
-        setting_classes += Utils.class_inheritors(AbstractBotSetting)
+        abstract_setting_classes = Utils.class_inheritors(AbstractSetting)
+        setting_classes = []
+
+        for abstract_setting_class in abstract_setting_classes:
+            setting_classes += Utils.class_inheritors(abstract_setting_class)
 
         for setting_class in setting_classes:
             if issubclass(setting_class, AbstractSetting):
@@ -38,6 +43,21 @@ class SettingService(SettingsService):
                         return setting_class.get_from_setting(self.bot, name_human, setting)
 
         raise FailedToConvertSetting(setting.setting_type)
+
+    def has_permission(self, name: str, member: Member) -> bool:
+        registered_setting = self.find_registered_setting(name)
+
+        return registered_setting.has_permission(member)
+
+    async def validate_setting_value(self, guild_id: int, name: str, value: Optional[str]):
+        registered_setting = self.find_registered_setting(name)
+
+        if isinstance(registered_setting, AbstractBotSetting):
+            if not await registered_setting.is_valid(self.bot, guild_id, value):
+                raise InvalidSettingValue(name, registered_setting.setting_type, value)
+        elif isinstance(registered_setting, AbstractRegularSetting):
+            if not await registered_setting.is_valid(value):
+                raise InvalidSettingValue(name, registered_setting.setting_type, value)
 
     def find_registered_setting(self, name: str) -> AbstractSetting:
         for reg_setting in self.registered_settings:
@@ -56,7 +76,12 @@ class SettingService(SettingsService):
             new_setting = None
 
             if isinstance(registered_setting, AbstractBotSetting):
-                new_setting = registered_setting.create(self.bot, registered_setting.name_human, name, registered_setting.value)
+                new_setting = registered_setting.create(
+                        self.bot,
+                        registered_setting.name_human,
+                        name,
+                        registered_setting.value
+                )
             elif isinstance(registered_setting, AbstractRegularSetting):
                 new_setting = registered_setting.create(registered_setting.name_human, name, registered_setting.value)
 
@@ -94,5 +119,3 @@ class SettingService(SettingsService):
 
     def register_settings(self, settings: List[Setting]) -> None:
         self.registered_settings += settings
-
-

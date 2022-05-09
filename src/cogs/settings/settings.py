@@ -1,21 +1,24 @@
 from typing import List
 
-import discord
-from discord import SlashCommandGroup, Option, OptionChoice, ApplicationCommandInvokeError
-from discord.commands import permissions
+from discord import app_commands, Interaction
+from discord.app_commands import Transform
 
 from src.kiyomi import Kiyomi
-from .errors import SettingsCogException
 from .services import SettingService
-from .services.settings_autocomplete_service import SettingAutocompleteService
 from .settings_cog import SettingsCog
 from .storage import Setting
+from .transformers.setting_name_transformer import SettingNameTransformer
+from .transformers.setting_value_transformer import SettingValueTransformer
 
 
 class Settings(SettingsCog):
 
-    def __init__(self, bot: Kiyomi, setting_service: SettingService, settings_autocomplete_service: SettingAutocompleteService):
-        super().__init__(bot, setting_service, settings_autocomplete_service)
+    def __init__(
+            self,
+            bot: Kiyomi,
+            setting_service: SettingService
+    ):
+        super().__init__(bot, setting_service)
 
         # Register events
         self.events()
@@ -25,44 +28,25 @@ class Settings(SettingsCog):
         async def register_setting(settings: List[Setting]):
             self.setting_service.register_settings(settings)
 
-    settings = SlashCommandGroup(
-        "setting",
-        "Various settings"
+    settings = app_commands.Group(
+            name="setting",
+            description="Various settings",
+            guild_only=True
     )
 
-    # Workaround
-    async def get_settings(self, ctx: discord.AutocompleteContext) -> List[OptionChoice]:
-        return self.settings_autocomplete_service.get_settings(ctx)
-
-    async def get_setting_values(self, ctx: discord.AutocompleteContext) -> List[OptionChoice]:
-        return await self.settings_autocomplete_service.get_setting_values(ctx)
-
-    @settings.command(name="set", default_permission=False)
-    @permissions.is_owner()
+    @settings.command(name="set")
+    @app_commands.describe(
+            setting="Setting name",
+            value="Setting value"
+    )
     async def settings_set(
-        self,
-        ctx: discord.ApplicationContext,
-        setting: Option(
-            str,
-            "Setting name",
-            autocomplete=get_settings
-        ),
-        value: Option(
-            str,
-            "Setting value",
-            autocomplete=get_setting_values
-        )
+            self,
+            ctx: Interaction,
+            setting: Transform[str, SettingNameTransformer],
+            value: Transform[str, SettingValueTransformer],
     ):
         """Set setting value"""
+        abstract_setting = self.setting_service.set(ctx.guild_id, setting, value)
+        setting_value = self.setting_service.get_value(ctx.guild_id, setting)
 
-        abstract_setting = self.setting_service.set(ctx.interaction.guild.id, setting, value)
-        setting_value = self.setting_service.get_value(ctx.interaction.guild.id, setting)
-
-        await ctx.respond(f"{abstract_setting.name_human} is now set to: {setting_value}")
-
-    @settings_set.error
-    async def settings_set_error(self, ctx: discord.ApplicationContext, error: Exception):
-        if isinstance(error, ApplicationCommandInvokeError):
-            if isinstance(error.original, SettingsCogException):
-                await ctx.respond(str(error.original))
-                return
+        await ctx.response.send_message(f"{abstract_setting.name_human} is now set to: {setting_value}", ephemeral=True)

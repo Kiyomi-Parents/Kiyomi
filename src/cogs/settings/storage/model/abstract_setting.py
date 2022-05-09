@@ -1,8 +1,8 @@
 from abc import ABC
-from typing import TypeVar, Generic
+from typing import TypeVar, Generic, Optional, List
 
-import discord
-from discord import OptionChoice
+from discord import Permissions, Member, Interaction
+from discord.app_commands import Choice
 
 from .enums.setting_type import SettingType
 from .setting import Setting
@@ -13,10 +13,17 @@ T = TypeVar('T')
 class AbstractSetting(ABC, Generic[T]):
     setting_type: SettingType
     setting: Setting
+    permissions: Optional[Permissions] = None
 
-    def __init__(self, name_human: str, setting: Setting):
+    def __init__(
+            self,
+            name_human: str,
+            setting: Setting,
+            permissions: Optional[Permissions] = None
+    ):
         self.setting = setting
         self.name_human = name_human
+        self.permissions = permissions
 
     def set(self, value: str) -> None:
         self.setting.value = value
@@ -41,10 +48,19 @@ class AbstractSetting(ABC, Generic[T]):
     def guild_id(self) -> int:
         return self.setting.guild_id
 
-    async def get_autocomplete(self, ctx: discord.AutocompleteContext):
+    def has_permission(self, member: Member) -> bool:
+        if self.permissions is not None:
+            return member.guild_permissions.is_superset(self.permissions)
+
+        return True
+
+    async def get_autocomplete(self, ctx: Interaction, current: str) -> List[Choice]:
+        if not self.has_permission(ctx.user):
+            return []
+
         if self.setting.value is None:
             return []
 
         return [
-            OptionChoice(f"{self.setting.value} (current)", self.setting.value)
+            Choice(name=f"{self.setting.value} (current)", value=self.setting.value)
         ]
