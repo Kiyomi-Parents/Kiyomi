@@ -10,7 +10,7 @@ from .storage import UnitOfWork
 from .tasks import Tasks
 
 
-def setup(bot: Kiyomi):
+async def setup(bot: Kiyomi):
     scoresaber_api_client = pyscoresaber.ScoreSaberAPI(bot.loop)
     uow = UnitOfWork(bot.database.session)
 
@@ -28,6 +28,6 @@ def setup(bot: Kiyomi):
         scoresaber_tasks.update_players.start()
         scoresaber_tasks.update_players_scores.start()
 
-    bot.add_cog(ScoreSaber(bot, player_service, score_service))
-    bot.add_cog(ScoreSaberAPI(bot, player_service, score_service, uow))
-    bot.add_cog(ScoreSaberUI(bot, player_service, score_service))
+    await bot.add_cog(ScoreSaber(bot, player_service, score_service))
+    await bot.add_cog(ScoreSaberAPI(bot, player_service, score_service, uow))
+    await bot.add_cog(ScoreSaberUI(bot, player_service, score_service))

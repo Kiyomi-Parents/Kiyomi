@@ -1,17 +1,30 @@
+from typing import Optional
+
 import discord
-from discord import app_commands, Interaction
-from discord.app_commands import Transform
+from discord import app_commands, Interaction, AppCommandType
+from discord.app_commands import Transform, CommandInvokeError
 from discord.ext import commands
 
 from src.cogs.general import GeneralAPI
+from .services import PlayerService, ScoreService
 from .errors import MemberPlayerNotFoundInGuildException
 from .messages.views.score_view import ScoreView
 from .scoresaber_cog import ScoreSaberCog
-from src.kiyomi import permissions
+from src.kiyomi import permissions, Kiyomi
 from .transformers.scoresaber_player_id_transformer import ScoreSaberPlayerIdTransformer
 
 
 class ScoreSaber(ScoreSaberCog, name="Score Saber"):
+    def __init__(self, bot: Kiyomi, player_service: PlayerService, score_service: ScoreService):
+        super().__init__(bot, player_service, score_service)
+
+        ctx_menu = app_commands.ContextMenu(
+                name="Refresh Score Saber Profile",
+                callback=self.refresh,
+                type=AppCommandType.user
+        )
+
+        self.bot.tree.add_command(ctx_menu)
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -73,65 +86,55 @@ class ScoreSaber(ScoreSaberCog, name="Score Saber"):
     async def recent_scores(
             self,
             ctx: Interaction,
-            member: discord.Member,
-            count: Option(
-                    int,
-                    "Amount of scores to post",
-                    min_value=1,
-                    max_value=3,
-                    default=1,
-                    required=False
-            )
+            member: Optional[discord.Member],
+            count: Optional[int]
     ):
         """Displays your most recent scores"""
-        if discord_member is None:
-            discord_member = ctx.user
+        if member is None:
+            member = ctx.user
 
-        guild_player = await self.player_service.get_guild_player(ctx.guild.id, discord_member.id)
+        guild_player = await self.player_service.get_guild_player(ctx.guild.id, member.id)
 
-        if guild_player is None:
-            await ctx.response.send_message("Player not found!")
+        if 0 >= count >= 3:
+            await ctx.response.send_message("Score count has to be between 0 and 3")
             return
 
-        if count <= 0:
-            await ctx.response.send_message("Score count needs to be positive!")
+        scores = self.score_service.get_recent_scores(guild_player.player.id, count)
+
+        if scores is None or len(scores) == 0:
+            await ctx.response.send_message("No scores found!")
             return
 
-        try:
-            scores = self.score_service.get_recent_scores(guild_player.player.id, count)
+        for score in scores:
+            previous_score = self.score_service.get_previous_score(score)
 
-            if scores is None or len(scores) == 0:
-                await ctx.response.send_message("No scores found!")
-                return
+            score_view = ScoreView(self.bot, ctx.guild, score, previous_score)
+            await score_view.respond(ctx)
 
-            for score in scores:
-                previous_score = self.score_service.get_previous_score(score)
+    @recent_scores.error
+    async def recent_scores_error(self, ctx: Interaction, error: Exception):
+        if isinstance(error, CommandInvokeError):
+            error = error.original
 
-                score_view = ScoreView(self.bot, ctx.interaction.guild, score, previous_score)
-                await score_view.respond(ctx.interaction)
-
-        except IndexError as e:
-            await ctx.response.send_message("Song argument too large")
+        if isinstance(error, MemberPlayerNotFoundInGuildException):
+            return await error.handle(
+                    ctx=ctx,
+                    message=f"%member_id% doesn't have a Score Saber profile linked"
+            )
 
     @app_commands.command(name="manual-add")
-
+    @app_commands.describe(
+            member_id="Discord member ID",
+            player_id="Score Saber player ID",
+            guild_id="Discord guild ID"
+    )
     @permissions.is_bot_owner_and_admin_guild()
     async def manual_add_player(
             self,
             ctx: Interaction,
-            member_id: Option(
-                    int,
-                    "Discord member ID"
-            ),
-            player_id: Option(
-                    str,
-                    "Score Saber player ID"
-            ),
-            guild_id: Option(
-                    int,
-                    "Discord guild ID",
-                    required=False
-            )
+            member_id: int,
+            player_id: str,
+            guild_id: Optional[int]
     ):
         """Add a Score Saber profile manually"""
 
@@ -142,7 +145,7 @@ class ScoreSaber(ScoreSaberCog, name="Score Saber"):
             await ctx.response.send_message(f"Please specify a member!", ephemeral=True)
             return
 
-        general = self.uow.bot.get_cog_api(GeneralAPI)
+        general = self.bot.get_cog_api(GeneralAPI)
         member = await general.get_discord_member(guild_id, member_id)
         self.bot.events.emit("register_member", member)
 
@@ -153,23 +156,19 @@ class ScoreSaber(ScoreSaberCog, name="Score Saber"):
                 ephemeral=True
         )
 
-    @slash_command(name="manual-remove", **permissions.is_bot_owner_and_admin_guild())
+    @app_commands.command(name="manual-remove")
+    @app_commands.describe(
+            member_id="Discord member ID",
+            player_id="Score Saber player ID",
+            guild_id="Discord guild ID"
+    )
+    @permissions.is_bot_owner_and_admin_guild()
     async def manual_remove_player(
             self,
             ctx: Interaction,
-            member_id: Option(
-                    int,
-                    "Discord member ID"
-            ),
-            player_id: Option(
-                    str,
-                    "Score Saber player ID"
-            ),
-            guild_id: Option(
-                    int,
-                    "Discord guild ID",
-                    required=False
-            )
+            member_id: int,
+            player_id: str,
+            guild_id: Optional[int]
     ):
         """Remove a Score Saber profile manually"""
         if guild_id is None:
@@ -187,22 +186,25 @@ class ScoreSaber(ScoreSaberCog, name="Score Saber"):
         )
 
     @manual_remove_player.error
-    async def manual_remove_player_error(self, ctx: Interaction, exception: Exception):
-        if isinstance(exception, ApplicationCommandInvokeError):
-            error = exception.original
+    async def manual_remove_player_error(self, ctx: Interaction, error: Exception):
+        if isinstance(error, CommandInvokeError):
+            error = error.original
 
-            if isinstance(error, MemberPlayerNotFoundInGuildException):
-                return await error.handle(
-                        ctx,
-                        message=f"%member_id% doesn't have a Score Saber profile %player_id% " \
-                                "linked in guild %guild_id%."
-                )
+        if isinstance(error, MemberPlayerNotFoundInGuildException):
+            return await error.handle(
+                    ctx=ctx,
+                    message=f"%member_id% doesn't have a Score Saber profile %player_id% linked in guild %guild_id%."
+            )
 
-    @user_command(name="Refresh Score Saber Profile", **permissions.is_bot_owner())
+    # @app_commands.context_menu(name="Refresh Score Saber Profile")
+    @permissions.is_bot_owner()
     async def refresh(self, ctx: Interaction, member: discord.Member):
         guild_player = await self.player_service.get_guild_player(ctx.guild_id, member.id)
 
         await self.player_service.update_player(guild_player.player)
         await self.score_service.update_player_scores(guild_player.player)
 
-        await ctx.response.send_message(f"Updated {member.name}'s Score Saber profile ({guild_player.player.name})", ephemeral=True)
+        await ctx.response.send_message(
+                f"Updated {member.name}'s Score Saber profile ({guild_player.player.name})",
+                ephemeral=True
+        )
