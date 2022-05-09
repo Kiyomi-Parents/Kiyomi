@@ -4,7 +4,6 @@ import pybeatsaver
 from discord import Interaction
 from discord.app_commands import Transformer, Choice
 
-from ..errors import BeatmapNotFound
 from .beatmap_characteristic_transformer import BeatmapCharacteristicTransformer
 from .beatmap_key_transformer import BeatmapKeyTransformer
 from src.kiyomi import BadArgument
@@ -24,9 +23,8 @@ class BeatmapDifficultyTransformer(Transformer):
             interaction: Interaction,
             value: Union[int, float, str]
     ) -> List[Choice[Union[int, float, str]]]:
-        try:
-            beatmap = await BeatmapKeyTransformer.transform(interaction, interaction.namespace.key)
-        except BeatmapNotFound:
+        beatmap = await BeatmapKeyTransformer.transform(interaction, interaction.namespace.key)
+        if beatmap is None:
             return []
 
         try:
