@@ -1,17 +1,18 @@
 from typing import List, TYPE_CHECKING
 
-import discord
-from discord import slash_command, Option
+from discord import app_commands, Interaction
+from discord.app_commands import Transform
 from discord.ext import commands
 
 from src.kiyomi import Kiyomi
 from src.log import Logger
-from .converters.beatmap_by_key_converter import BeatmapByKeyConverter
 from .services import BeatmapAutocompleteService, BeatmapService
 from .beatsaver_cog import BeatSaverCog
 from .errors import BeatmapNotFound
 from .messages.views.song_view import SongView
 from src.cogs.settings.storage.model.emoji_setting import EmojiSetting
+from .storage.model.beatmap import Beatmap
+from .transformers.beatmap_key_transformer import BeatmapKeyTransformer
 
 if TYPE_CHECKING:
     from src.cogs.scoresaber.storage.model.leaderboard import Leaderboard
@@ -61,19 +62,16 @@ class BeatSaver(BeatSaverCog, name="Beat Saver"):
 
         self.bot.events.emit("setting_register", settings)
 
-    @slash_command()
+    @app_commands.command()
+    @app_commands.rename(beatmap="key")
+    @app_commands.describe(beatmap="Beatmap key (25f)")
     async def map(
             self,
-            ctx: discord.ApplicationContext,
-            beatmap: Option(
-                    BeatmapByKeyConverter,
-                    name="key",
-                    description="Beatmap key (25f)",
-                    required=True
-            )
+            ctx: Interaction,
+            beatmap: Transform[Beatmap, BeatmapKeyTransformer]
     ):
         """Displays song info."""
 
-        song_view = SongView(self.bot, ctx.interaction.guild, beatmap)
+        song_view = SongView(self.bot, ctx.guild, beatmap)
 
-        await song_view.respond(ctx.interaction)
+        await song_view.respond(ctx)

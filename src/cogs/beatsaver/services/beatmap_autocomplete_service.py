@@ -1,7 +1,7 @@
 from typing import List
 
 import pybeatsaver
-from discord import OptionChoice
+from discord.app_commands import Choice
 
 from .beatsaver_service import BeatSaverService
 from ..storage import UnitOfWork
@@ -27,7 +27,7 @@ class BeatmapAutocompleteService(BeatSaverService):
             self,
             beatmap: Beatmap,
             characteristic: pybeatsaver.ECharacteristic
-    ) -> List[OptionChoice]:
+    ) -> List[Choice[str]]:
         beatmap_difficulties = []
 
         for beatmap_difficulty in beatmap.difficulties:
@@ -35,12 +35,12 @@ class BeatmapAutocompleteService(BeatSaverService):
                 continue
 
             beatmap_difficulties.append(
-                    OptionChoice(beatmap_difficulty.difficulty_text, beatmap_difficulty.difficulty.serialize)
+                    Choice(name=beatmap_difficulty.difficulty_text, value=beatmap_difficulty.difficulty.serialize)
             )
 
         return beatmap_difficulties
 
-    async def get_beatmap_characteristics_by_key(self, beatmap: Beatmap) -> List[OptionChoice]:
+    async def get_beatmap_characteristics_by_key(self, beatmap: Beatmap) -> List[Choice[str]]:
         beatmap_characteristics = []
         characteristics = []
 
@@ -49,7 +49,7 @@ class BeatmapAutocompleteService(BeatSaverService):
                 continue
 
             beatmap_characteristics.append(
-                    OptionChoice(beatmap_difficulty.characteristic_text, beatmap_difficulty.characteristic.serialize)
+                    Choice(name=beatmap_difficulty.characteristic_text, value=beatmap_difficulty.characteristic.serialize)
             )
             characteristics.append(beatmap_difficulty.characteristic)
 
