@@ -112,7 +112,7 @@ class BaseView(discord.ui.View, ABC):
             self,
             interaction: discord.Interaction,
             target: Optional[discord.abc.Messageable] = None
-    ) -> Union[discord.Message, discord.WebhookMessage]:
+    ) -> Union[discord.Message, discord.InteractionMessage, discord.WebhookMessage]:
         if not isinstance(interaction, discord.Interaction):
             raise TypeError(f"expected Interaction not {interaction.__class__!r}")
 
@@ -135,10 +135,12 @@ class BaseView(discord.ui.View, ABC):
                 # convert from WebhookMessage to Message reference to bypass 15min webhook token timeout
                 msg = await msg.channel.fetch_message(msg.id)
             else:
-                msg = await interaction.response.send_message(
+                await interaction.response.send_message(
                         embed=await self.get_current_embed(),
                         view=self
                 )
+
+                msg = await interaction.original_message()
 
             if isinstance(msg, discord.WebhookMessage):
                 self.message = await msg.channel.fetch_message(msg.id)

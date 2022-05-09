@@ -70,6 +70,6 @@ class SongView(PersistentView):
     async def deserialize_persistence(bot: Kiyomi, persistence: Persistence) -> BaseView:
         guild = bot.get_guild(persistence.guild_id)
         beatsaver = bot.get_cog_api(BeatSaverAPI)
-        beatmap = await beatsaver.get_beatmap_by_key(persistence.view_parameters[0])
+        beatmap = await beatsaver.get_beatmap_by_key(persistence.get_param(0))
 
         return SongView(bot, guild, beatmap)

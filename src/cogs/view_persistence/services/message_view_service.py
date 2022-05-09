@@ -18,7 +18,7 @@ class MessageViewService(ViewPersistenceService):
 
         await general.register_message(persistence.guild_id, persistence.channel_id, persistence.message_id)
 
-        self.uow.message_views.add(MessageView(persistence.message_id, persistence.view, persistence.view_parameters))
+        self.uow.message_views.add(MessageView(persistence.message_id, persistence.view, persistence.get_params()))
 
         self.uow.save_changes()
 
