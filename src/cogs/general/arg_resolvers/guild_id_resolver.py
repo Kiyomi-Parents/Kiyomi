@@ -7,7 +7,7 @@ class GuildIdResolver(ErrorArgResolver[str, str]):
         self.uow = uow
 
     async def resolve_detailed(self, argument: str) -> str:
-        guild = self.uow.guilds.get_by_id(argument)
+        guild = await self.uow.guilds.get_by_id(argument)
 
         if guild is None:
             return f"{argument} (Not in DB)"
@@ -15,7 +15,7 @@ class GuildIdResolver(ErrorArgResolver[str, str]):
         return f"{guild}"
 
     async def resolve(self, argument: str) -> str:
-        guild = self.uow.guilds.get_by_id(argument)
+        guild = await self.uow.guilds.get_by_id(argument)
 
         if guild is None:
             return f"{argument}"

@@ -7,7 +7,7 @@ class MessageIdResolver(ErrorArgResolver[int, str]):
         self.uow = uow
 
     async def resolve_detailed(self, argument: int) -> str:
-        message = self.uow.messages.get_by_id(argument)
+        message = await self.uow.messages.get_by_id(argument)
 
         if message is None:
             return f"{argument} (Not in DB)"
@@ -15,7 +15,7 @@ class MessageIdResolver(ErrorArgResolver[int, str]):
         return f"{message}"
 
     async def resolve(self, argument: int) -> str:
-        message = self.uow.messages.get_by_id(argument)
+        message = await self.uow.messages.get_by_id(argument)
 
         if message is None:
             return f"{argument}"

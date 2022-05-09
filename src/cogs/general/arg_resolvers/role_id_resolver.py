@@ -7,7 +7,7 @@ class RoleIdResolver(ErrorArgResolver[int, str]):
         self.uow = uow
 
     async def resolve_detailed(self, argument: int) -> str:
-        role = self.uow.roles.get_by_id(argument)
+        role = await self.uow.roles.get_by_id(argument)
 
         if role is None:
             return f"{argument} (Not in DB)"
@@ -15,7 +15,7 @@ class RoleIdResolver(ErrorArgResolver[int, str]):
         return f"{role}"
 
     async def resolve(self, argument: int) -> str:
-        role = self.uow.roles.get_by_id(argument)
+        role = await self.uow.roles.get_by_id(argument)
 
         if role is None:
             return f"{argument}"

@@ -7,7 +7,7 @@ class EmojiIdResolver(ErrorArgResolver[int, str]):
         self.uow = uow
 
     async def resolve_detailed(self, argument: int) -> str:
-        emoji = self.uow.emojis.get_by_id(argument)
+        emoji = await self.uow.emojis.get_by_id(argument)
 
         if emoji is None:
             return f"{argument} (Not in DB)"
@@ -15,7 +15,7 @@ class EmojiIdResolver(ErrorArgResolver[int, str]):
         return f"{emoji}"
 
     async def resolve(self, argument: int) -> str:
-        emoji = self.uow.emojis.get_by_id(argument)
+        emoji = await self.uow.emojis.get_by_id(argument)
 
         if emoji is None:
             return f"{argument}"
