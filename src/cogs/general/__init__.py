@@ -7,8 +7,7 @@ from ...kiyomi import Kiyomi
 
 
 async def setup(bot: Kiyomi):
-    async with bot.database.get_session() as session:
-        uow = UnitOfWork(session)
+    uow = UnitOfWork(await bot.database.get_session())
 
     bot.error_resolver.add(ChannelIdResolver(uow))
     bot.error_resolver.add(EmojiIdResolver(uow))
@@ -17,8 +16,8 @@ async def setup(bot: Kiyomi):
     bot.error_resolver.add(MessageIdResolver(uow))
     bot.error_resolver.add(RoleIdResolver(uow))
 
-    emoji_service = EmojiService(bot, uow)
     guild_service = GuildService(bot, uow)
+    emoji_service = EmojiService(bot, uow, guild_service)
     member_service = MemberService(bot, uow, guild_service)
     channel_service = ChannelService(bot, uow, guild_service)
     message_service = MessageService(bot, uow, guild_service, channel_service)

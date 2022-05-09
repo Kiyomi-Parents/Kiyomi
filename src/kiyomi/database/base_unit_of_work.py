@@ -1,12 +1,37 @@
-from sqlalchemy.orm import Session
+from typing import TypeVar
+
+from sqlalchemy.ext.asyncio import AsyncSession
+
+T = TypeVar('T')
 
 
 class BaseUnitOfWork:
-    _session: Session
+    _session: AsyncSession
 
-    def __init__(self, session: Session):
+    def __init__(self, session: AsyncSession):
         self._session = session
 
+    async def __aenter__(self):
+        return await self._session.begin()
+
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
+        if exc_type is None:
+            await self.commit()
+        else:
+            await self.rollback()
+
+    async def refresh(self, entry: T):
+        return await self._session.refresh(entry)
+
+    async def commit(self):
+        await self._session.commit()
+
+    async def rollback(self):
+        await self._session.rollback()
+
     async def save_changes(self):
-        async with self._session.begin():
+        try:
             await self._session.commit()
+        except Exception as error:
+            await self._session.rollback()
+            raise error

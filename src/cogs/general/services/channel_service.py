@@ -32,18 +32,14 @@ class ChannelService(GeneralService):
         return discord_channel
 
     async def register_channel(self, guild_id: int, channel_id: int) -> Channel:
-        channel = self.uow.channels.get_by_id(channel_id)
-
-        if channel is None:
+        async with self.uow:
             await self.guild_service.register_guild(guild_id)
+
             discord_channel = await self.get_discord_channel(channel_id)
-
-            channel = self.uow.channels.add(Channel(guild_id, channel_id, discord_channel.name))
-            self.uow.save_changes()
-
-        return channel
+            return await self.uow.channels.upsert(Channel(guild_id, channel_id, discord_channel.name))
 
     async def get_channels_in_guild(self, guild_id: int) -> List[Channel]:
-        guild = self.uow.guilds.get_by_id(guild_id)
+        async with self.uow:
+            guild = await self.uow.channels.get_all_by_guild_id(guild_id)
 
-        return guild.channels
+            return guild.channels

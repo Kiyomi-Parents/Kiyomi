@@ -16,7 +16,7 @@ class Database:
 
     async def init(self):
         self._engine = create_async_engine(self._connection, echo=False, pool_pre_ping=True, pool_recycle=3600)
-        self._session_maker = sessionmaker(self._engine, expire_on_commit=False, class_=AsyncSession)
+        self._session_maker = sessionmaker(self._engine, class_=AsyncSession, expire_on_commit=False)
 
     async def get_session(self) -> AsyncSession:
         return self._session_maker()

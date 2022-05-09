@@ -1,74 +1,85 @@
-from abc import ABC, abstractmethod
-from typing import TypeVar, Generic, Optional, List
+from abc import abstractmethod, ABCMeta
+from typing import TypeVar, Generic, Optional, List, Type
 
-from sqlalchemy.orm import Query, Session
+from sqlalchemy import select, exists, delete, update
+from sqlalchemy.engine import Result
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.sql import Executable
 
 from src.log import Logger
 from .database import Base
 from ..utils import Utils
 
-T = TypeVar('T', bound=Base)
+ENTITY = TypeVar('ENTITY', bound=Base)
 
 
-class BaseRepository(ABC, Generic[T]):
-    def __init__(self, session: Session):
-        self.session = session
+class BaseRepository(Generic[ENTITY], metaclass=ABCMeta):
+    def __init__(self, session: AsyncSession):
+        self._session = session
 
+    @property
     @abstractmethod
-    def query_by_id(self, entry_id: int) -> Query:
-        pass
+    def _table(self) -> Type[ENTITY]:
+        ...
 
-    def get_by_id(self, entry_id: int) -> Optional[T]:
-        return self.query_by_id(entry_id).first()
+    async def _execute_scalars(self, stmt: Executable) -> Result:
+        result = await self._session.execute(stmt)
+        return result.scalars()
 
-    @abstractmethod
-    def get_all(self) -> Optional[List[T]]:
-        pass
+    async def get_by_id(self, entity_id: int) -> Optional[ENTITY]:
+        stmt = select(self._table).where(self._table.id == entity_id)
+        result = await self._execute_scalars(stmt)
+        return result.first()
 
-    def exists(self, entry_id: int) -> bool:
-        return self.get_by_id(entry_id) is not None
+    async def get_all(self) -> List[ENTITY]:
+        stmt = select(self._table)
+        result = await self._execute_scalars(stmt)
+        return result.all()
 
-    async def add(self, entry: T) -> T:
-        async with self.session.begin():
-            self.session.add(entry)
-            self.commit_changes()
-            self.session.refresh(entry)
+    async def exists(self, entity_id: int) -> bool:
+        stmt = select(self._table).where(self._table.id == entity_id)
+        stmt = exists(stmt).select()
+        result = await self._execute_scalars(stmt)
+        return result.one()
 
-        Logger.log(entry, "Added")
+    async def add(self, entity: ENTITY) -> ENTITY:
+        self._session.add(entity)
 
-        return entry
+        Logger.log(entity, "Added")
+        return entity
 
-    def add_all(self, entries: List[T]):
-        self.session.add_all(entries)
-        self.commit_changes()
+    async def add_all(self, entities: List[ENTITY]) -> List[ENTITY]:
+        self._session.add_all(entities)
 
-        for entry in entries:
-            self.session.refresh(entry)
+        Logger.log(type(entities[0]).__name__, f"Added {len(entities)} new entries")
+        return entities
 
-        Logger.log(type(entries[0]).__name__, f"Added {len(entries)} new entries")
+    async def remove(self, entity: ENTITY) -> ENTITY:
+        await self._session.delete(entity)
 
-    def remove(self, entry: T):
-        self.session.delete(entry)
-        self.commit_changes()
+        Logger.log(entity, "Removed")
+        return entity
 
-        Logger.log(entry, "Removed")
+    async def remove_by_id(self, entity_id: int) -> Optional[ENTITY]:
+        entity = await self.get_by_id(entity_id)
+        stmt = delete(self._table).where(self._table.id == entity_id)
+        await self._session.execute(stmt)
 
-    def remove_by_id(self, entry_id: int):
-        self.query_by_id(entry_id).delete()
-        self.commit_changes()
+        Logger.log(entity_id, "Removed")
+        return entity
 
-        Logger.log(entry_id, "Removed")
+    async def upsert(self, entity: ENTITY) -> ENTITY:
+        if await self.exists(entity.id):
+            return await self.update(entity)
 
-    def update(self, new_entry: T):
-        old_entry = self.get_by_id(new_entry.id)
+        return await self.add(entity)
 
-        Utils.update_class(old_entry, new_entry)
+    async def update(self, entity: ENTITY) -> ENTITY:
+        stmt = update(self._table) \
+            .where(self._table.id == entity.id) \
+            .values(Utils.get_class_fields(entity))
 
-        Logger.log(old_entry, "Updated")
+        await self._session.execute(stmt)
 
-    def commit_changes(self):
-        try:
-            self.session.commit()
-        except Exception as error:
-            self.session.rollback()
-            raise error
+        Logger.log(entity, "Updated")
+        return entity

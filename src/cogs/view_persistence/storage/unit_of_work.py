@@ -1,6 +1,7 @@
+from sqlalchemy.orm import Session
+
 from .repository.message_view_repository import MessageViewRepository
 from src.kiyomi import BaseUnitOfWork
-from src.kiyomi.database.database import Session
 
 
 class UnitOfWork(BaseUnitOfWork):

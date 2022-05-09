@@ -1,27 +1,26 @@
-from typing import Optional, List
+from typing import Optional, List, Type
 
-from sqlalchemy.orm import Query
+from sqlalchemy import select, delete
 
 from ..model.guild_member import GuildMember
 from src.kiyomi.database import BaseRepository
 
 
 class GuildMemberRepository(BaseRepository[GuildMember]):
-    def query_by_id(self, entry_id: int) -> Query:
-        return self.session.query(GuildMember) \
-            .filter(GuildMember.id == entry_id)
+    @property
+    def _table(self) -> Type[GuildMember]:
+        return GuildMember
 
-    def get_all(self) -> Optional[List[GuildMember]]:
-        return self.session.query(GuildMember) \
-            .all()
+    async def get_all_by_guild_id(self, guild_id: int) -> List[GuildMember]:
+        stmt = select(self._table).where(self._table.guild_id == guild_id)
+        result = await self._execute_scalars(stmt)
+        return result.all()
 
-    def get_all_by_guild_id(self, guild_id: int) -> List[GuildMember]:
-        return self.session.query(GuildMember) \
-            .filter(GuildMember.guild_id == guild_id) \
-            .all()
+    async def get_by_guild_id_and_member_id(self, guild_id: int, member_id: int) -> Optional[GuildMember]:
+        stmt = select(self._table).where(self._table.guild_id == guild_id).where(self._table.member_id == member_id)
+        result = await self._execute_scalars(stmt)
+        return result.first()
 
-    def get_by_guild_id_and_member_id(self, guild_id: int, member_id: int) -> Optional[GuildMember]:
-        return self.session.query(GuildMember) \
-            .filter(GuildMember.guild_id == guild_id) \
-            .filter(GuildMember.member_id == member_id) \
-            .first()
+    async def delete_by_guild_id_and_member_id(self, guild_id: int, member_id: int):
+        stmt = delete(self._table).where(self._table.guild_id == guild_id).where(self._table.member_id == member_id)
+        await self._session.execute(stmt)

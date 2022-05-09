@@ -1,32 +1,31 @@
-from typing import Optional, List
+from typing import Optional, List, Type
 
-from sqlalchemy.orm import Query
+from sqlalchemy import select, delete
 
 from ..model.emoji import Emoji
 from src.kiyomi.database import BaseRepository
 
 
 class EmojiRepository(BaseRepository[Emoji]):
-    def query_by_id(self, entry_id: int) -> Query:
-        return self.session.query(Emoji) \
-            .filter(Emoji.id == entry_id)
+    @property
+    def _table(self) -> Type[Emoji]:
+        return Emoji
 
-    def get_all(self) -> Optional[List[Emoji]]:
-        return self.session.query(Emoji) \
-            .all()
+    async def get_by_name(self, emoji_name: str) -> Optional[Emoji]:
+        stmt = select(self._table).where(self._table.name == emoji_name)
+        result = await self._execute_scalars(stmt)
+        return result.first()
 
-    def get_by_name(self, emoji_name: str) -> Optional[Emoji]:
-        return self.session.query(Emoji) \
-            .filter(Emoji.name == emoji_name) \
-            .first()
+    async def get_by_guild_id(self, guild_id: int) -> List[Emoji]:
+        stmt = select(self._table).where(self._table.guild_id == guild_id)
+        result = await self._execute_scalars(stmt)
+        return result.all()
 
-    def get_by_guild_id(self, guild_id: int) -> List[Emoji]:
-        return self.session.query(Emoji) \
-            .filter(Emoji.guild_id == guild_id) \
-            .all()
+    async def get_by_guild_id_and_id(self, guild_id: int, emoji_id: int) -> Optional[Emoji]:
+        stmt = select(self._table).where(self._table.guild_id == guild_id).where(self._table.id == emoji_id)
+        result = await self._execute_scalars(stmt)
+        return result.first()
 
-    def get_by_guild_id_and_id(self, guild_id: int, emoji_id: int):
-        return self.session.query(Emoji) \
-            .filter(Emoji.guild_id == guild_id) \
-            .filter(Emoji.id == emoji_id) \
-            .first()
+    async def delete_by_guild_id_and_id(self, guild_id: int, emoji_id: int):
+        stmt = delete(self._table).where(self._table.guild_id == guild_id).where(self._table.id == emoji_id)
+        await self._session.execute(stmt)

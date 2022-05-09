@@ -36,13 +36,12 @@ class General(GeneralCog):
     def events(self):
         @self.bot.events.on("register_member")
         async def register_member(member: discord.Member):
-            self.member_service.register_member(member)
-            self.member_service.register_guild_member(member.guild.id, member.id)
+            await self.member_service.register_member(member.guild.id, member.id)
+            await self.member_service.register_guild_member(member.guild.id, member.id)
 
     @commands.Cog.listener()
     async def on_ready(self):
-        for guild in self.bot.guilds:
-            await self.guild_service.register_guild(guild.id)
+        await self.guild_service.register_guilds(self.bot.guilds)
 
         settings = [
             # TODO: Add bot owner permissions
@@ -60,16 +59,20 @@ class General(GeneralCog):
         await self.guild_service.unregister_guild(guild.id)
 
     @commands.Cog.listener()
+    async def on_guild_update(self, before: discord.Guild, after: discord.Guild):
+        await self.guild_service.register_guild(after.id)
+
+    @commands.Cog.listener()
     async def on_member_remove(self, member: discord.Member):
         await self.member_service.unregister_guild_member(member.guild.id, member.id)
 
     @commands.Cog.listener()
     async def on_member_update(self, before: discord.Member, after: discord.Member):
-        self.role_service.on_member_update(before, after)
+        await self.role_service.on_member_update(before, after)
 
     @commands.Cog.listener()
     async def on_guild_role_delete(self, role: Role):
-        self.role_service.on_role_delete(role)
+        await self.role_service.on_role_delete(role)
 
     @app_commands.command()
     async def invite(self, ctx: Interaction):

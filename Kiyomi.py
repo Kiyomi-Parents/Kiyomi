@@ -22,12 +22,13 @@ async def startup(loop: AbstractEventLoop):
 
     # Init database
     database = Database(
-            f"mariadb+asyncmy://{DATABASE_USER}:{DATABASE_PW}@{DATABASE_IP}/{DATABASE_NAME}?charset=utf8mb4"
+            f"mariadb+asyncmy://{database_user}:{database_password}@{database_ip}/{database_name}?charset=utf8mb4"
     )
 
-    # database.drop_tables()
-    # database.create_tables()
-    # database.create_schema_image()
+    await database.init()
+
+    await database.drop_tables()
+    await database.create_tables()
 
     async with Kiyomi(command_prefix="!", db=database, loop=loop) as bot:
         default_guild = os.getenv("DEFAULT_GUILD")
@@ -39,22 +40,22 @@ async def startup(loop: AbstractEventLoop):
             bot.debug_guilds = [discord.Object(id=int(guild_id)) for guild_id in debug_guilds.split(",") if guild_id]
 
         # Base Cogs
-        await bot.load_extension(name="src.cogs.view_persistence")
+        # await bot.load_extension(name="src.cogs.view_persistence")
 
         # General Function Cogs
         await bot.load_extension(name="src.cogs.general")
-        await bot.load_extension(name="src.cogs.settings")
-        await bot.load_extension(name="src.cogs.fancy_presence")
+        # await bot.load_extension(name="src.cogs.settings")
+        # await bot.load_extension(name="src.cogs.fancy_presence")
 
         # Function Cogs
 
-        await bot.load_extension(name="src.cogs.scoresaber")
-        await bot.load_extension(name="src.cogs.beatsaver")
-        await bot.load_extension(name="src.cogs.leaderboard")
-        await bot.load_extension(name="src.cogs.score_feed")
-        await bot.load_extension(name="src.cogs.achievement")
-        await bot.load_extension(name="src.cogs.achievement_roles")
-        await bot.load_extension(name="src.cogs.emoji_echo")
+        # await bot.load_extension(name="src.cogs.scoresaber")
+        # await bot.load_extension(name="src.cogs.beatsaver")
+        # await bot.load_extension(name="src.cogs.leaderboard")
+        # await bot.load_extension(name="src.cogs.score_feed")
+        # await bot.load_extension(name="src.cogs.achievement")
+        # await bot.load_extension(name="src.cogs.achievement_roles")
+        # await bot.load_extension(name="src.cogs.emoji_echo")
 
         await bot.start(token=discord_token)
 

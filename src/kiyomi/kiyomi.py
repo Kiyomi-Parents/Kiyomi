@@ -120,7 +120,6 @@ class Kiyomi(Bot):
             else:
                 return await error.handle(ctx=context.interaction)
 
-    def get_cog_api(self, cog_type: Type[TCog]) -> TCog:
         await handle_global_error(self, error, ctx=context)
 
     def get_cog(self, name: str, /) -> TCog:
