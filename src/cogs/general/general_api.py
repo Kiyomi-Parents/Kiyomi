@@ -41,22 +41,26 @@ class GeneralAPI(GeneralCog):
 
     async def get_guild(self, guild_id: int) -> Optional[Guild]:
         async with self.uow:
-            return self.uow.guilds.get_by_id(guild_id)
+            return await self.uow.guilds.get_by_id(guild_id)
 
     async def get_guilds(self) -> Optional[List[Guild]]:
-        return self.uow.guilds.get_all()
+        async with self.uow:
+            return await self.uow.guilds.get_all()
 
     async def get_member(self, member_id: int) -> Optional[Member]:
-        return self.uow.members.get_by_id(member_id)
+        async with self.uow:
+            return await self.uow.members.get_by_id(member_id)
 
     async def get_discord_member(self, guild_id: int, member_id: int) -> Optional[discord.Member]:
         return await self.member_service.get_discord_member(guild_id, member_id)
 
-    def get_all_guild_members(self) -> Optional[List[GuildMember]]:
-        return self.uow.guild_members.get_all()
+    async def get_all_guild_members(self) -> Optional[List[GuildMember]]:
+        async with self.uow:
+            return await self.uow.guild_members.get_all()
 
-    def get_members_in_guild(self, guild_id: int) -> List[GuildMember]:
-        return self.uow.guild_members.get_all_by_guild_id(guild_id)
+    async def get_members_in_guild(self, guild_id: int) -> List[GuildMember]:
+        async with self.uow:
+            return await self.uow.guild_members.get_all_by_guild_id(guild_id)
 
     async def create_role(self, guild_id: int, name: str, colour: Colour, hoist: bool, reason: str) -> Role:
         return await self.role_service.create_role(guild_id, name, colour, hoist, reason)
@@ -91,7 +95,9 @@ class GeneralAPI(GeneralCog):
     async def unregister_emoji(self, guild_id: int, emoji_id: int):
         await self.emoji_service.unregister_emoji(guild_id, emoji_id)
 
-    def get_emoji(self, emoji_name: str) -> Optional[Emoji]:
+    async def get_emoji(self, emoji_name: str) -> Optional[Emoji]:
         emoji_name = emoji_name.replace(":", "")
-        emoji = self.bot.get_emoji(self.uow.emojis.get_by_name(emoji_name).id)
-        return emoji
+
+        async with self.uow:
+            emoji = await self.uow.emojis.get_by_name(emoji_name)
+            return self.bot.get_emoji(emoji.id)
