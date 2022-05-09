@@ -4,9 +4,9 @@ import pybeatsaver
 from discord import Interaction
 from discord.app_commands import Transformer, Choice
 
-from src.cogs.beatsaver.errors import BeatmapNotFound
-from src.cogs.beatsaver.transformers.beatmap_characteristic_transformer import BeatmapCharacteristicTransformer
-from src.cogs.beatsaver.transformers.beatmap_key_transformer import BeatmapKeyTransformer
+from ..errors import BeatmapNotFound
+from .beatmap_characteristic_transformer import BeatmapCharacteristicTransformer
+from .beatmap_key_transformer import BeatmapKeyTransformer
 from src.kiyomi import BadArgument
 
 

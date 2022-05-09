@@ -4,7 +4,8 @@ import pybeatsaver
 from discord import Interaction
 from discord.app_commands import Transformer, Choice
 
-from src.cogs.beatsaver.transformers.beatmap_key_transformer import BeatmapKeyTransformer
+from ..errors import BeatmapNotFound
+from .beatmap_key_transformer import BeatmapKeyTransformer
 from src.kiyomi import BadArgument
 
 
@@ -22,7 +23,10 @@ class BeatmapCharacteristicTransformer(Transformer):
             interaction: Interaction,
             value: Union[int, float, str]
     ) -> List[Choice[Union[int, float, str]]]:
-        beatmap = await BeatmapKeyTransformer.transform(interaction, interaction.namespace.key)
+        try:
+            beatmap = await BeatmapKeyTransformer.transform(interaction, interaction.namespace.key)
+        except BeatmapNotFound:
+            return []
 
         beatmap_characteristics = []
         characteristics = []
