@@ -1,7 +1,7 @@
 from typing import List
 
-import discord
-from discord import OptionChoice
+from discord import Interaction
+from discord.app_commands import Choice
 
 from .achievement_service import AchievementService
 from .achievements import Achievement
@@ -62,10 +62,11 @@ class UserAchievementService(AchievementService):
 
         return best_achievement
 
-    async def get_all_groups(self, ctx: discord.AutocompleteContext) -> List[OptionChoice]:
+    async def get_all_groups(self, ctx: Interaction, current: str) -> List[Choice[str]]:
         choices = []
 
         for group in self.registry_service.get_generators():
-            choices.append(OptionChoice(group, group))
+            if current.lower() in group.lower():
+                choices.append(Choice(name=group, value=group))
 
         return choices

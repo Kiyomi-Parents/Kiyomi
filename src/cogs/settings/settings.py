@@ -55,7 +55,6 @@ class Settings(SettingsCog):
 
         await ctx.response.send_message(f"{abstract_setting.name_human} is now set to: {setting_value}", ephemeral=True)
 
-    # Workaround
     @settings_set.autocomplete("setting")
     async def settings_autocomplete(self, ctx: Interaction, current: str) -> List[Choice[str]]:
         choices = self.settings_autocomplete_service.get_settings(ctx, current)
