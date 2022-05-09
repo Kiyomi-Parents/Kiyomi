@@ -1,5 +1,5 @@
 import re
-from typing import Union, List, Any, Optional
+from typing import Union, List, Optional
 
 from discord import Interaction
 from discord.app_commands import Transformer, Choice
@@ -23,7 +23,7 @@ class ScoreSaberPlayerIdTransformer(Transformer):
             interaction: Interaction,
             value: Union[int, float, str]
     ) -> List[Choice[Union[int, float, str]]]:
-        pass
+        return []  # There really shouldn't be an autocomplete for this
 
     @staticmethod
     def scoresaber_id_from_url(url: str) -> Optional[str]:
