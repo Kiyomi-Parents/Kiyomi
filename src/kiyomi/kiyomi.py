@@ -1,5 +1,3 @@
-import traceback
-from typing import TypeVar, Type, cast
 from typing import TypeVar, Optional, Type, cast, List
 
 import discord
