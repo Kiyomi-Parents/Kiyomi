@@ -74,7 +74,16 @@ class GuildLeaderboardView(PersistentView):
         beatsaver = bot.get_cog_api(BeatSaverAPI)
         beatmap = await beatsaver.get_beatmap_by_key(persistence.get_param(0))
 
-        characteristic = pybeatsaver.ECharacteristic.deserialize(persistence.get_param(1))
-        difficulty = pybeatsaver.EDifficulty.deserialize(persistence.get_param(2))
+        characteristic_param = persistence.get_param(1)
+        if characteristic_param is not None:
+            characteristic = pybeatsaver.ECharacteristic.deserialize(characteristic_param)
+        else:
+            characteristic = None
+
+        difficulty_param = persistence.get_param(2)
+        if difficulty_param is not None:
+            difficulty = pybeatsaver.EDifficulty.deserialize(difficulty_param)
+        else:
+            difficulty = None
 
         return GuildLeaderboardView(bot, guild, beatmap, characteristic, difficulty)
