@@ -18,13 +18,12 @@ class ScoreSaber(ScoreSaberCog, name="Score Saber"):
     def __init__(self, bot: Kiyomi, player_service: PlayerService, score_service: ScoreService):
         super().__init__(bot, player_service, score_service)
 
-        ctx_menu = app_commands.ContextMenu(
+        # Workaround until @app_commands.context_menu() supports self in function parameters
+        self.bot.tree.add_command(app_commands.ContextMenu(
                 name="Refresh Score Saber Profile",
                 callback=self.refresh,
                 type=AppCommandType.user
-        )
-
-        self.bot.tree.add_command(ctx_menu)
+        ))
 
     @commands.Cog.listener()
     async def on_ready(self):
