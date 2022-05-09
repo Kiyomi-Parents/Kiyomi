@@ -6,6 +6,7 @@ from discord.app_commands import Transformer, Choice
 from discord.ext.commands import Context, EmojiConverter
 
 from src.cogs.emoji_echo.emoji_echo_api import EmojiEchoAPI
+from src.kiyomi import Utils
 
 
 class AvailableEmojiTransformer(Transformer):
@@ -26,10 +27,13 @@ class AvailableEmojiTransformer(Transformer):
         enabled_emojis = echo_emojis.get_enabled_emojis(interaction.guild_id)
         emojis = []
 
-        for emoji in enabled_emojis:
-            if emoji.name.startswith(value.lower()):
+        for emoji in ctx.interaction.guild.emojis:
+            if value.isspace() or not emoji.name.startswith(value.lower()):
+                continue
+
+            if emoji.id in [enabled_emoji.emoji_id for enabled_emoji in enabled_emojis]:
                 continue
 
             emojis.append(Choice(name=emoji.name, value=str(emoji.id)))
 
-        return emojis
+        return Utils.limit_list(emojis, 25)
