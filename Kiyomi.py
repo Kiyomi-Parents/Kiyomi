@@ -40,7 +40,7 @@ async def startup(loop: AbstractEventLoop):
             bot.debug_guilds = [discord.Object(id=int(guild_id)) for guild_id in debug_guilds.split(",") if guild_id]
 
         # Base Cogs
-        # await bot.load_extension(name="src.cogs.view_persistence")
+        await bot.load_extension(name="src.cogs.view_persistence")
 
         # General Function Cogs
         await bot.load_extension(name="src.cogs.general")

@@ -39,7 +39,4 @@ class ChannelService(GeneralService):
             return await self.uow.channels.upsert(Channel(guild_id, channel_id, discord_channel.name))
 
     async def get_channels_in_guild(self, guild_id: int) -> List[Channel]:
-        async with self.uow:
-            guild = await self.uow.channels.get_all_by_guild_id(guild_id)
-
-            return guild.channels
+        return await self.uow.channels.get_all_by_guild_id(guild_id)

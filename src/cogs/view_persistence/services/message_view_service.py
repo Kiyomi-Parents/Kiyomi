@@ -16,11 +16,11 @@ class MessageViewService(ViewPersistenceService):
     async def add_persistent_view(self, persistence: Persistence):
         general: "GeneralAPI" = self.bot.get_cog("GeneralAPI")
 
-        await general.register_message(persistence.guild_id, persistence.channel_id, persistence.message_id)
-
-        self.uow.message_views.add(MessageView(persistence.message_id, persistence.view, persistence.get_params()))
-
-        self.uow.save_changes()
+        async with self.uow:
+            await general.register_message(persistence.guild_id, persistence.channel_id, persistence.message_id)
+            await self.uow.message_views.add(
+                    MessageView(persistence.message_id, persistence.view, persistence.get_params())
+            )
 
         Logger.log("View Persistence", f"Persisted view {persistence}")
 
@@ -31,7 +31,7 @@ class MessageViewService(ViewPersistenceService):
 
         persistences = []
         for message in messages:
-            message_view = self.uow.message_views.get_by_message_id(message.id)
+            message_view = await self.uow.message_views.get_by_message_id(message.id)
 
             if message_view is not None:
                 persistences.append(
@@ -60,7 +60,7 @@ class MessageViewService(ViewPersistenceService):
     async def get_persistent_views(self) -> List[Persistence]:
         general: "GeneralAPI" = self.bot.get_cog("GeneralAPI")
 
-        guilds = general.get_guilds()
+        guilds = await general.get_guilds()
 
         persistences = []
         for guild in guilds:

@@ -5,7 +5,7 @@ from .view_persistance_api import ViewPersistenceAPI
 
 
 async def setup(bot: Kiyomi):
-    uow = UnitOfWork(bot.database.session)
+    uow = UnitOfWork(await bot.database.get_session())
 
     message_view_service = MessageViewService(bot, uow)
 

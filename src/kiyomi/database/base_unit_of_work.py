@@ -12,13 +12,16 @@ class BaseUnitOfWork:
         self._session = session
 
     async def __aenter__(self):
-        return await self._session.begin()
+        return self
+        # return await self._session.begin()
 
     async def __aexit__(self, exc_type, exc_val, exc_tb):
         if exc_type is None:
             await self.commit()
         else:
             await self.rollback()
+
+        await self._session.close()
 
     async def refresh(self, entry: T):
         return await self._session.refresh(entry)
