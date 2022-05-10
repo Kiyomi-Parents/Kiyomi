@@ -33,7 +33,7 @@ class SettingValueTransformer(Transformer):
         setting_name = await SettingNameTransformer.transform(interaction, interaction.namespace.setting)
 
         try:
-            setting = settings_api.setting_service.get(interaction.guild_id, setting_name)
+            setting = await settings_api.setting_service.get(interaction.guild_id, setting_name)
         except SettingsCogException:
             return []
 

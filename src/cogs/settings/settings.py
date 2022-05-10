@@ -46,7 +46,7 @@ class Settings(SettingsCog):
             value: Transform[str, SettingValueTransformer],
     ):
         """Set setting value"""
-        abstract_setting = self.setting_service.set(ctx.guild_id, setting, value)
-        setting_value = self.setting_service.get_value(ctx.guild_id, setting)
+        abstract_setting = await self.setting_service.set(ctx.guild_id, setting, value)
+        setting_value = await self.setting_service.get_value(ctx.guild_id, setting)
 
         await ctx.response.send_message(f"{abstract_setting.name_human} is now set to: {setting_value}", ephemeral=True)

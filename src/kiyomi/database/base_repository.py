@@ -1,5 +1,5 @@
 from abc import abstractmethod, ABCMeta
-from typing import TypeVar, Generic, Optional, List, Type
+from typing import TypeVar, Generic, Optional, List, Type, Dict
 
 from sqlalchemy import select, exists, delete, update
 from sqlalchemy.engine import Result
@@ -26,15 +26,21 @@ class BaseRepository(Generic[ENTITY], metaclass=ABCMeta):
         result = await self._session.execute(stmt)
         return result.scalars()
 
-    async def get_by_id(self, entity_id: int) -> Optional[ENTITY]:
-        stmt = select(self._table).where(self._table.id == entity_id)
+    async def _first(self, stmt: Executable) -> Optional[ENTITY]:
         result = await self._execute_scalars(stmt)
         return result.first()
 
-    async def get_all(self) -> List[ENTITY]:
-        stmt = select(self._table)
+    async def _all(self, stmt: Executable) -> List[ENTITY]:
         result = await self._execute_scalars(stmt)
         return result.all()
+
+    async def get_by_id(self, entity_id: int) -> Optional[ENTITY]:
+        stmt = select(self._table).where(self._table.id == entity_id)
+        return await self._first(stmt)
+
+    async def get_all(self) -> List[ENTITY]:
+        stmt = select(self._table)
+        return await self._all(stmt)
 
     async def exists(self, entity_id: int) -> bool:
         stmt = select(self._table).where(self._table.id == entity_id)
@@ -65,21 +71,25 @@ class BaseRepository(Generic[ENTITY], metaclass=ABCMeta):
         stmt = delete(self._table).where(self._table.id == entity_id)
         await self._session.execute(stmt)
 
-        Logger.log(entity_id, "Removed")
+        Logger.log(entity, "Removed")
         return entity
 
     async def upsert(self, entity: ENTITY) -> ENTITY:
         if await self.exists(entity.id):
-            return await self.update(entity)
+            return await self.update_entity(entity)
 
         return await self.add(entity)
 
-    async def update(self, entity: ENTITY) -> ENTITY:
+    async def update(self, entity_id: int, values: Dict[str, any]) -> ENTITY:
+        entity = await self.get_by_id(entity_id)
         stmt = update(self._table) \
-            .where(self._table.id == entity.id) \
-            .values(Utils.get_class_fields(entity))
+            .where(self._table.id == entity_id) \
+            .values(values)
 
         await self._session.execute(stmt)
 
         Logger.log(entity, "Updated")
         return entity
+
+    async def update_entity(self, entity: ENTITY) -> ENTITY:
+        return await self.update(entity.id, Utils.get_class_fields(entity))
