@@ -12,7 +12,10 @@ from .tasks import Tasks
 
 async def setup(bot: Kiyomi):
     scoresaber_api_client = pyscoresaber.ScoreSaberAPI(bot.loop)
-    uow = UnitOfWork(bot.database.session)
+    await scoresaber_api_client.start()
+    await scoresaber_api_client.ws_start()
+
+    uow = UnitOfWork(await bot.database.get_session())
 
     bot.error_resolver.add(PlayerIdResolver(uow))
 

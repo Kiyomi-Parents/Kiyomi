@@ -9,7 +9,3 @@ class ScoreSaberService(BaseService[UnitOfWork]):
         super().__init__(bot, uow)
 
         self.scoresaber: pyscoresaber.ScoreSaberAPI = scoresaber
-
-    async def start_scoresaber_api_client(self):
-        await self.scoresaber.start()
-        await self.scoresaber.ws_start()

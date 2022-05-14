@@ -49,7 +49,7 @@ async def startup(loop: AbstractEventLoop):
 
         # Function Cogs
 
-        # await bot.load_extension(name="src.cogs.scoresaber")
+        await bot.load_extension(name="src.cogs.scoresaber")
         # await bot.load_extension(name="src.cogs.beatsaver")
         # await bot.load_extension(name="src.cogs.leaderboard")
         # await bot.load_extension(name="src.cogs.score_feed")

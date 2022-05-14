@@ -1,55 +1,61 @@
-from typing import Optional, List
+from typing import Optional, List, Type
 
-from sqlalchemy.orm import Query, joinedload
+from sqlalchemy import select, delete
+from sqlalchemy.orm import joinedload
 
 from src.kiyomi.database import BaseRepository
+from src.log import Logger
 from ..model.guild_player import GuildPlayer
 
 
 class GuildPlayerRepository(BaseRepository[GuildPlayer]):
 
-    def query_by_id(self, entry_id: int) -> Query:
-        return self.session.query(GuildPlayer) \
-            .filter(GuildPlayer.id == entry_id)
+    @property
+    def _table(self) -> Type[GuildPlayer]:
+        return GuildPlayer
 
-    def get_all(self) -> Optional[List[GuildPlayer]]:
-        return self.session.query(GuildPlayer) \
-            .all()
+    async def get_all_by_guild_id(self, guild_id: int) -> List[GuildPlayer]:
+        stmt = select(self._table).where(self._table.guild_id == guild_id)
+        return await self._all(stmt)
 
-    def get_all_by_guild_id(self, guild_id: int) -> Optional[List[GuildPlayer]]:
-        return self.session.query(GuildPlayer) \
-            .filter(GuildPlayer.guild_id == guild_id) \
-            .all()
+    async def get_all_by_member_id(self, member_id: int) -> List[GuildPlayer]:
+        stmt = select(self._table).where(self._table.member_id == member_id)
+        return await self._all(stmt)
 
-    def get_all_by_member_id(self, member_id: int) -> Optional[List[GuildPlayer]]:
-        return self.session.query(GuildPlayer) \
-            .filter(GuildPlayer.member_id == member_id) \
-            .all()
+    async def get_by_guild_id_and_player_id(self, guild_id: int, player_id: str) -> Optional[GuildPlayer]:
+        stmt = select(self._table).where(self._table.guild_id == guild_id).where(self._table.player_id == player_id)
+        return await self._first(stmt)
 
-    def get_by_guild_id_and_player_id(self, guild_id: int, player_id: str) -> Optional[GuildPlayer]:
-        return self.session.query(GuildPlayer) \
-            .filter(GuildPlayer.guild_id == guild_id) \
-            .filter(GuildPlayer.player_id == player_id) \
-            .first()
+    async def get_by_guild_id_and_member_id(self, guild_id: int, member_id: int) -> Optional[GuildPlayer]:
+        stmt = select(self._table).where(self._table.guild_id == guild_id).where(self._table.member_id == member_id)
+        return await self._first(stmt)
 
-    def get_by_guild_id_and_member_id(self, guild_id: int, member_id: int) -> Optional[GuildPlayer]:
-        return self.session.query(GuildPlayer) \
-            .filter(GuildPlayer.guild_id == guild_id) \
-            .filter(GuildPlayer.member_id == member_id) \
-            .first()
-
-    def get_by_guild_id_and_member_id_and_player_id(
+    async def get_by_guild_id_and_member_id_and_player_id(
             self,
             guild_id: int,
             member_id: int,
             player_id: str
     ) -> Optional[GuildPlayer]:
-        return self.session.query(GuildPlayer) \
-            .filter(GuildPlayer.guild_id == guild_id) \
-            .filter(GuildPlayer.member_id == member_id) \
-            .filter(GuildPlayer.player_id == player_id) \
+        stmt = select(self._table) \
+            .where(self._table.guild_id == guild_id) \
+            .where(self._table.member_id == member_id) \
+            .where(self._table.player_id == player_id) \
             .options(
                 joinedload(GuildPlayer.guild),
                 joinedload(GuildPlayer.member),
                 joinedload(GuildPlayer.player)
-            ).first()
+            )
+        return await self._first(stmt)
+
+    async def remove_by_guild_id_and_member_id_and_player_id(
+            self,
+            guild_id: int,
+            member_id: int,
+            player_id: str
+    ) -> Optional[GuildPlayer]:
+        entity = await self.get_by_guild_id_and_member_id_and_player_id(guild_id, member_id, player_id)
+        stmt = delete(self._table).where(self._table.id == entity.id)
+        await self._session.execute(stmt)
+
+        Logger.log(entity, "Removed")
+        return entity

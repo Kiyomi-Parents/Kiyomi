@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from .repository.guild_player_repository import GuildPlayerRepository
 from .repository.leaderboard_repository import LeaderboardRepository
@@ -9,7 +9,7 @@ from src.kiyomi.database import BaseUnitOfWork
 
 class UnitOfWork(BaseUnitOfWork):
 
-    def __init__(self, session: Session):
+    def __init__(self, session: AsyncSession):
         super().__init__(session)
 
         self.players = PlayerRepository(session)
