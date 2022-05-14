@@ -45,7 +45,7 @@ async def startup(loop: AbstractEventLoop):
         # General Function Cogs
         await bot.load_extension(name="src.cogs.general")
         await bot.load_extension(name="src.cogs.settings")
-        # await bot.load_extension(name="src.cogs.fancy_presence")
+        await bot.load_extension(name="src.cogs.fancy_presence")
 
         # Function Cogs
 
