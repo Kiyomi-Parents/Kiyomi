@@ -18,5 +18,5 @@ class EmojiEchoAPI(EmojiEchoCog):
 
         self.uow = uow
 
-    def get_enabled_emojis(self, guild_id: int) -> List[EchoEmoji]:
-        return self.uow.echo_emojis.get_by_guild_id(guild_id)
+    async def get_enabled_emojis(self, guild_id: int) -> List[EchoEmoji]:
+        return await self.uow.echo_emojis.get_by_guild_id(guild_id)

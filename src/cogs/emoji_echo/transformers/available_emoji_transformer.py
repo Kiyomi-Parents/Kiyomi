@@ -24,7 +24,7 @@ class AvailableEmojiTransformer(Transformer):
         ctx = await Context.from_interaction(interaction)
         echo_emojis = ctx.bot.get_cog_api(EmojiEchoAPI)
 
-        enabled_emojis = echo_emojis.get_enabled_emojis(interaction.guild_id)
+        enabled_emojis = await echo_emojis.get_enabled_emojis(interaction.guild_id)
         emojis = []
 
         for emoji in ctx.interaction.guild.emojis:

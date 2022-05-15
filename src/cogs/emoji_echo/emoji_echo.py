@@ -46,7 +46,7 @@ class EmojiEcho(EmojiEchoCog):
         settings = self.bot.get_cog_api(SettingsAPI)
 
         if settings.get(msg.guild.id, "repost_emoji"):
-            emoji = self.emoji_service.get_emoji_from_message(msg.guild.id, msg.content)
+            emoji = await self.emoji_service.get_emoji_from_message(msg.guild.id, msg.content)
 
             if emoji is not None:
                 await msg.channel.send(emoji)
