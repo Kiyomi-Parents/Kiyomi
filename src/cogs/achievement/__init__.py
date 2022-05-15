@@ -7,7 +7,7 @@ from .storage.unit_of_work import UnitOfWork
 
 
 async def setup(bot: Kiyomi):
-    uow = UnitOfWork(bot.database.session)
+    uow = UnitOfWork(await bot.database.get_session())
 
     registry_service = RegistryService(bot, uow)
     user_achievement_service = UserAchievementService(bot, uow, registry_service)

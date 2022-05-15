@@ -27,12 +27,12 @@ class PP(AchievementGenerator):
         return f"{index * 1000} PP"
 
     def get_achievement_condition(self, index: int, member: Member) -> Condition:
-        def condition() -> bool:
+        async def condition() -> bool:
             if member is None:
                 return False
 
             scoresaber = self.bot.get_cog("ScoreSaberAPI")
-            guild_players = scoresaber.get_guild_players_by_member_id(member.id)
+            guild_players = await scoresaber.get_guild_players_by_member_id(member.id)
 
             for guild_player in guild_players:
                 player_pp_index = guild_player.player.pp // 1000

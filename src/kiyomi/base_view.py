@@ -2,10 +2,11 @@ from abc import ABC, abstractmethod
 from typing import Optional, Union, Callable, Awaitable, Any
 
 import discord
-from discord import Embed, Guild, Interaction
+from discord import Guild, Interaction
 from discord.ext.commands import Context
 from discord.ui import Item
 
+from .base_embed import BaseEmbed
 from .kiyomi import Kiyomi
 
 
@@ -17,24 +18,28 @@ class BaseView(discord.ui.View, ABC):
         self.bot = bot
         self.guild = guild
 
-        self.embed: Optional[Callable[[], Awaitable[Embed]]] = None
+        self.embed: Optional[Callable[[], Awaitable[BaseEmbed]]] = None
         self.message: Union[discord.Message, discord.WebhookMessage, None] = None
 
         self.update_buttons()
 
-    async def get_current_embed(self) -> Optional[Embed]:
+    async def get_current_embed(self) -> Optional[BaseEmbed]:
         if self.embed is None:
             default_embed = self.default_embed()
 
             if default_embed is not None:
-                return await default_embed()
+                embed = await default_embed()
+                await embed.after_init()
+                return embed
 
         if self.embed is not None:
-            return await self.embed()
+            embed = await self.embed()
+            await embed.after_init()
+            return embed
 
         return None
 
-    def default_embed(self) -> Optional[Callable[[], Awaitable[Embed]]]:
+    def default_embed(self) -> Optional[Callable[[], Awaitable[BaseEmbed]]]:
         for child in self.children:
             get_embed = getattr(child, "get_embed", None)
 

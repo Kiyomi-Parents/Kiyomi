@@ -33,14 +33,14 @@ class BaseRepository(Generic[ENTITY], metaclass=ABCMeta):
 
     async def _all(self, stmt: Executable) -> List[ENTITY]:
         result = await self._execute_scalars(stmt)
-        return result.all()
+        return result.unique().all()
 
     async def get_by_id(self, entity_id: int) -> Optional[ENTITY]:
         stmt = select(self._table).where(self._table.id == entity_id)
         return await self._first(stmt)
 
     async def get_all(self) -> List[ENTITY]:
-        stmt = select(self._table)\
+        stmt = select(self._table) \
             .options(joinedload('*'))
         return await self._all(stmt)
 
