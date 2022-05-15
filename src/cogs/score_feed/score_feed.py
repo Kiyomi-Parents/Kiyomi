@@ -20,7 +20,7 @@ class ScoreFeed(ScoreFeedCog, name="Score Feed"):
     def events(self):
         @self.bot.events.on("on_new_player")
         async def mark_scores_sent(guild_player: GuildPlayer):
-            self.sent_score_service.mark_player_scores_sent(guild_player.player, guild_player.guild)
+            await self.sent_score_service.mark_player_scores_sent(guild_player.player, guild_player.guild)
 
         @self.bot.events.on("on_new_score_live")
         async def send_notifications_for_score(score: Score):
@@ -56,18 +56,18 @@ class ScoreFeed(ScoreFeedCog, name="Score Feed"):
         scoresaber = self.bot.get_cog_api(ScoreSaberAPI)
 
         if player_id is None:
-            players = scoresaber.get_players()
+            players = await scoresaber.get_players()
 
             for player in players:
-                self.sent_score_service.mark_all_player_scores_sent(player)
+                await self.sent_score_service.mark_all_player_scores_sent(player)
 
             await ctx.response.send_message(f"Marked scores as sent for {len(players)} players", ephemeral=True)
             return
 
-        player = scoresaber.get_player(player_id)
+        player = await scoresaber.get_player(player_id)
 
         if player is None:
             await ctx.response.send_message(f"Could not find player with id {player_id}", ephemeral=True)
             return
 
-        self.sent_score_service.mark_all_player_scores_sent(player)
+        await self.sent_score_service.mark_all_player_scores_sent(player)

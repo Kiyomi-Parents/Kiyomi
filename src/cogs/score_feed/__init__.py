@@ -6,7 +6,7 @@ from .tasks import Tasks
 
 
 async def setup(bot: Kiyomi):
-    uow = UnitOfWork(bot.database.session)
+    uow = UnitOfWork(await bot.database.get_session())
 
     sent_score_service = SentScoreService(bot, uow)
     notification_service = NotificationService(bot, uow, sent_score_service)

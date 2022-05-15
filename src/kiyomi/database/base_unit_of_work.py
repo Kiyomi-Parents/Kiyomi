@@ -21,7 +21,7 @@ class BaseUnitOfWork:
         else:
             await self.rollback()
 
-        await self._session.close()
+        # await self._session.close()
 
     async def refresh(self, entry: T):
         return await self._session.refresh(entry)

@@ -4,6 +4,7 @@ from typing import TypeVar, Generic, Optional, List, Type, Dict
 from sqlalchemy import select, exists, delete, update
 from sqlalchemy.engine import Result
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import joinedload
 from sqlalchemy.sql import Executable
 
 from src.log import Logger
@@ -39,7 +40,8 @@ class BaseRepository(Generic[ENTITY], metaclass=ABCMeta):
         return await self._first(stmt)
 
     async def get_all(self) -> List[ENTITY]:
-        stmt = select(self._table)
+        stmt = select(self._table)\
+            .options(joinedload('*'))
         return await self._all(stmt)
 
     async def exists(self, entity_id: int) -> bool:
