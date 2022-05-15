@@ -8,7 +8,7 @@ from .storage.unit_of_work import UnitOfWork
 
 
 async def setup(bot: Kiyomi):
-    uow = UnitOfWork(bot.database.session)
+    uow = UnitOfWork(await bot.database.get_session())
 
     player_leaderboard_service = PlayerLeaderboardService(bot, uow)
     score_leaderboard_service = ScoreLeaderboardService(bot, uow)

@@ -42,7 +42,7 @@ class ScoreLeaderboardService(LeaderboardService):
     ) -> List[Score]:
         scoresaber = self.bot.get_cog_api(ScoreSaberAPI)
 
-        leaderboard = scoresaber.get_leaderboard(
+        leaderboard = await scoresaber.get_leaderboard(
                 beatmap_hash,
                 BeatSaverUtils.to_scoresaber_game_mode(characteristic),
                 BeatSaverUtils.to_scoresaber_difficulty(difficulty)
@@ -51,17 +51,20 @@ class ScoreLeaderboardService(LeaderboardService):
         if leaderboard is None:
             return []
 
-        guild_players = scoresaber.get_guild_players_by_guild(guild_id)
+        guild_players = await scoresaber.get_guild_players_by_guild(guild_id)
 
-        return self._get_score_leaderboard([guild_player.player for guild_player in guild_players], leaderboard.id)
+        return await self._get_score_leaderboard(
+                [guild_player.player for guild_player in guild_players],
+                leaderboard.id
+        )
 
-    def _get_score_leaderboard(self, players: List[Player], leaderboard_id: int) -> List[Score]:
+    async def _get_score_leaderboard(self, players: List[Player], leaderboard_id: int) -> List[Score]:
         scoresaber = self.bot.get_cog_api(ScoreSaberAPI)
 
         score_leaderboard = []
 
         for player in players:
-            scores = scoresaber.get_score_by_player_id_and_leaderboard_id(player.id, leaderboard_id)
+            scores = await scoresaber.get_score_by_player_id_and_leaderboard_id(player.id, leaderboard_id)
             best_score = self.get_best_score(scores)
 
             if best_score is not None:
@@ -86,12 +89,12 @@ class ScoreLeaderboardService(LeaderboardService):
 
         return best_score
 
-    def get_player_top_scores_leaderboard(self, player_id: str) -> List[Score]:
+    async def get_player_top_scores_leaderboard(self, player_id: str) -> List[Score]:
         from src.cogs.scoresaber import ScoreSaberAPI
 
         scoresaber = self.bot.get_cog_api(ScoreSaberAPI)
 
-        scores = scoresaber.get_player_scores_sorted_by_pp(player_id)
+        scores = await scoresaber.get_player_scores_sorted_by_pp(player_id)
         unique_scores = []
 
         for score in scores:

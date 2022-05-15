@@ -35,5 +35,5 @@ class LeaderboardAPI(LeaderboardCog):
                 difficulty
         )
 
-    def get_player_top_scores_leaderboard(self, player_id: str) -> List[Score]:
-        return self.score_leaderboard_service.get_player_top_scores_leaderboard(player_id)
+    async def get_player_top_scores_leaderboard(self, player_id: str) -> List[Score]:
+        return await self.score_leaderboard_service.get_player_top_scores_leaderboard(player_id)
