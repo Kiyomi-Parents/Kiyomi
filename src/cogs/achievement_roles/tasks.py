@@ -22,7 +22,7 @@ class Tasks(BaseTasks):
         """Updating roles"""
         general = self.bot.get_cog_api(GeneralAPI)
 
-        guild_members = general.get_all_guild_members()
+        guild_members = await general.get_all_guild_members()
 
         for guild_member in guild_members:
             await self.member_service.update_member_roles(guild_member.guild_id, guild_member.member_id)
