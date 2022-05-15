@@ -27,9 +27,6 @@ async def startup(loop: AbstractEventLoop):
 
     await database.init()
 
-    await database.drop_tables()
-    await database.create_tables()
-
     async with Kiyomi(command_prefix="!", db=database, loop=loop) as bot:
         default_guild = os.getenv("DEFAULT_GUILD")
         if default_guild is not None:
@@ -50,12 +47,15 @@ async def startup(loop: AbstractEventLoop):
         # Function Cogs
 
         await bot.load_extension(name="src.cogs.scoresaber")
-        # await bot.load_extension(name="src.cogs.beatsaver")
+        await bot.load_extension(name="src.cogs.beatsaver")
         # await bot.load_extension(name="src.cogs.leaderboard")
         # await bot.load_extension(name="src.cogs.score_feed")
         # await bot.load_extension(name="src.cogs.achievement")
         # await bot.load_extension(name="src.cogs.achievement_roles")
         # await bot.load_extension(name="src.cogs.emoji_echo")
+
+        # await database.drop_tables()
+        # await database.create_tables()
 
         await bot.start(token=discord_token)
 

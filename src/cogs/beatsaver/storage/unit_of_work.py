@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from .repository.beatmap_repository import BeatmapRepository
 from .repository.beatmap_version_difficulty_repository import BeatmapVersionDifficultyRepository
@@ -7,7 +7,7 @@ from src.kiyomi.database import BaseUnitOfWork
 
 
 class UnitOfWork(BaseUnitOfWork):
-    def __init__(self, session: Session):
+    def __init__(self, session: AsyncSession):
         super().__init__(session)
 
         self.beatmaps = BeatmapRepository(session)

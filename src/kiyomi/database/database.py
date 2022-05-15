@@ -4,7 +4,7 @@ from sqlalchemy.orm import sessionmaker
 
 from src.log import Logger
 
-Base = declarative_base()
+Base: declarative_base = declarative_base()
 
 
 class Database:
