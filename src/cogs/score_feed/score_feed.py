@@ -1,4 +1,4 @@
-from discord import slash_command
+from discord import app_commands, Interaction
 from discord.ext import commands
 
 from src.cogs.scoresaber import ScoreSaberAPI
@@ -7,6 +7,7 @@ from src.kiyomi import Kiyomi, permissions
 from .score_feed_cog import ScoreFeedCog
 from .services import SentScoreService, NotificationService
 from src.cogs.scoresaber.storage.model.guild_player import GuildPlayer
+from src.cogs.scoresaber.storage.model.score import Score
 
 
 class ScoreFeed(ScoreFeedCog, name="Score Feed"):
@@ -19,7 +20,12 @@ class ScoreFeed(ScoreFeedCog, name="Score Feed"):
     def events(self):
         @self.bot.events.on("on_new_player")
         async def mark_scores_sent(guild_player: GuildPlayer):
-            self.sent_score_service.mark_player_scores_sent(guild_player.player, guild_player.guild)
+            await self.sent_score_service.mark_player_scores_sent(guild_player.player, guild_player.guild)
+
+        @self.bot.events.on("on_new_score_live")
+        async def send_notifications_for_score(score: Score):
+            for guild in score.player.guilds:
+                await self.notification_service.send_notification(guild, score.player)
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -29,31 +35,39 @@ class ScoreFeed(ScoreFeedCog, name="Score Feed"):
 
         self.bot.events.emit("setting_register", settings)
 
-    @slash_command(**permissions.is_bot_owner_and_admin_guild())
-    async def send_notifications(self, ctx):
+    score_feed = app_commands.Group(
+            name="score_feed",
+            description="Score feed related commands",
+            guild_ids=permissions.admin_guild_list()
+    )
+
+    @app_commands.command()
+    @permissions.is_bot_owner()
+    async def send_notifications(self, ctx: Interaction):
         """Send recent score notifications."""
         await self.notification_service.send_notifications(ctx.guild.id)
 
-        await ctx.respond("Doing the thing...", ephemeral=True)
+        await ctx.response.send_message("Doing the thing...", ephemeral=True)
 
-    @slash_command(**permissions.is_bot_owner_and_admin_guild())
-    async def mark_sent(self, ctx, player_id: str = None):
+    @app_commands.command()
+    @permissions.is_bot_owner()
+    async def mark_sent(self, ctx: Interaction, player_id: str = None):
         """Mark all scores send for player."""
         scoresaber = self.bot.get_cog_api(ScoreSaberAPI)
 
         if player_id is None:
-            players = scoresaber.get_players()
+            players = await scoresaber.get_players()
 
             for player in players:
-                self.sent_score_service.mark_all_player_scores_sent(player)
+                await self.sent_score_service.mark_all_player_scores_sent(player)
 
-            await ctx.respond(f"Marked scores as sent for {len(players)} players", ephemeral=True)
+            await ctx.response.send_message(f"Marked scores as sent for {len(players)} players", ephemeral=True)
             return
 
-        player = scoresaber.get_player(player_id)
+        player = await scoresaber.get_player(player_id)
 
         if player is None:
-            await ctx.respond(f"Could not find player with id {player_id}", ephemeral=True)
+            await ctx.response.send_message(f"Could not find player with id {player_id}", ephemeral=True)
             return
 
-        self.sent_score_service.mark_all_player_scores_sent(player)
+        await self.sent_score_service.mark_all_player_scores_sent(player)

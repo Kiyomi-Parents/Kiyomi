@@ -1,2 +1,1 @@
 from .beatmap_service import BeatmapService
-from .beatmap_autocomplete_service import BeatmapAutocompleteService

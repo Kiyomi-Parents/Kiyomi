@@ -13,10 +13,10 @@ class IntegerSetting(AbstractRegularSetting[int]):
 
     @staticmethod
     def create(
-        name_human: str,
-        name: str,
-        permissions: Optional[Permissions] = None,
-        default_value: Optional[int] = None
+            name_human: str,
+            name: str,
+            permissions: Optional[Permissions] = None,
+            default_value: Optional[int] = None
     ):
         if default_value is not None:
             default_value = IntegerSetting.from_type(default_value)
@@ -51,11 +51,15 @@ class IntegerSetting(AbstractRegularSetting[int]):
 
     @staticmethod
     def get_from_setting(
-        name_human: str,
-        setting: Setting,
-        permissions: Optional[Permissions] = None
+            name_human: str,
+            setting: Setting,
+            permissions: Optional[Permissions] = None
     ):
         if setting.setting_type is not SettingType.INT:
             raise InvalidSettingType(setting.setting_type, SettingType.INT)
 
         return IntegerSetting(name_human, setting, permissions)
+
+    @staticmethod
+    async def is_valid(value: str) -> bool:
+        return value.isdigit()

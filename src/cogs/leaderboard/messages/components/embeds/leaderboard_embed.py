@@ -8,5 +8,3 @@ class LeaderboardEmbed(Embed):
         super().__init__()
 
         self.bot = bot
-
-    

@@ -2,6 +2,7 @@ import math
 from typing import Optional
 
 import pybeatsaver
+import pyscoresaber
 from discord import Emoji
 
 from src.cogs.settings import SettingsAPI
@@ -27,7 +28,11 @@ class BeatSaverUtils:
         return math.floor(max_score)
 
     @staticmethod
-    async def difficulty_to_emoji(bot: Kiyomi, guild_id: Optional[int], difficulty: pybeatsaver.EDifficulty) -> Optional[Emoji]:
+    async def difficulty_to_emoji(
+            bot: Kiyomi,
+            guild_id: Optional[int],
+            difficulty: pybeatsaver.EDifficulty
+    ) -> Optional[Emoji]:
         setting_name = None
 
         if difficulty == pybeatsaver.EDifficulty.EASY:
@@ -41,10 +46,16 @@ class BeatSaverUtils:
         elif difficulty == pybeatsaver.EDifficulty.EXPERT_PLUS:
             setting_name = "expert_plus_difficulty_emoji"
 
-        return await BeatSaverUtils.get_setting_emoji(bot, guild_id, setting_name)
+        settings: "SettingsAPI" = bot.get_cog("SettingsAPI")
+
+        return await settings.get_override_or_default(guild_id, setting_name)
 
     @staticmethod
-    async def characteristic_to_emoji(bot: Kiyomi, guild_id: Optional[int], characteristic: pybeatsaver.ECharacteristic) -> Optional[Emoji]:
+    async def characteristic_to_emoji(
+            bot: Kiyomi,
+            guild_id: Optional[int],
+            characteristic: pybeatsaver.ECharacteristic
+    ) -> Optional[Emoji]:
         setting_name = None
 
         if characteristic == pybeatsaver.ECharacteristic.STANDARD:
@@ -62,24 +73,32 @@ class BeatSaverUtils:
         elif characteristic == pybeatsaver.ECharacteristic.LAWLESS:
             setting_name = "lawless_game_mode_emoji"
 
-        return await BeatSaverUtils.get_setting_emoji(bot, guild_id, setting_name)
+        settings: "SettingsAPI" = bot.get_cog("SettingsAPI")
+
+        return await settings.get_override_or_default(guild_id, setting_name)
 
     @staticmethod
-    async def get_setting_emoji(bot: Kiyomi, guild_id: Optional[int], name: Optional[str]) -> Optional[Emoji]:
-        if name is None:
-            return None
+    def to_scoresaber_game_mode(characteristic: pybeatsaver.ECharacteristic) -> pyscoresaber.GameMode:
+        characteristics = {
+            pybeatsaver.ECharacteristic.STANDARD: pyscoresaber.GameMode.STANDARD,
+            pybeatsaver.ECharacteristic.ONE_SABER: pyscoresaber.GameMode.ONE_SABER,
+            pybeatsaver.ECharacteristic.NO_ARROWS: pyscoresaber.GameMode.NO_ARROWS,
+            pybeatsaver.ECharacteristic.DEGREE_90: pyscoresaber.GameMode.DEGREE_90,
+            pybeatsaver.ECharacteristic.DEGREE_360: pyscoresaber.GameMode.DEGREE_360,
+            pybeatsaver.ECharacteristic.LIGHTSHOW: pyscoresaber.GameMode.LIGHTSHOW,
+            pybeatsaver.ECharacteristic.LAWLESS: pyscoresaber.GameMode.LAWLESS,
+        }
 
-        settings = bot.get_cog_api(SettingsAPI)
+        return characteristics[characteristic]
 
-        if guild_id is None:
-            guild_id = bot.default_guild
+    @staticmethod
+    def to_scoresaber_difficulty(difficulty: pybeatsaver.EDifficulty) -> pyscoresaber.BeatmapDifficulty:
+        difficulties = {
+            pybeatsaver.EDifficulty.EASY: pyscoresaber.BeatmapDifficulty.EASY,
+            pybeatsaver.EDifficulty.NORMAL: pyscoresaber.BeatmapDifficulty.NORMAL,
+            pybeatsaver.EDifficulty.HARD: pyscoresaber.BeatmapDifficulty.HARD,
+            pybeatsaver.EDifficulty.EXPERT: pyscoresaber.BeatmapDifficulty.EXPERT,
+            pybeatsaver.EDifficulty.EXPERT_PLUS: pyscoresaber.BeatmapDifficulty.EXPERT_PLUS,
+        }
 
-        if guild_id is None:
-            return None
-
-        emoji = settings.get(guild_id, name)
-
-        if emoji is None and guild_id is not bot.default_guild:
-            emoji = settings.get(bot.default_guild, name)
-
-        return emoji
+        return difficulties[difficulty]

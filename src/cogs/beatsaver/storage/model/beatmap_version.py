@@ -15,7 +15,7 @@ class BeatmapVersion(Base):
 
     key = Column(String(128))
     state = Column(String(128))
-    created_at = Column(DateTime)
+    created_at = Column(DateTime(timezone=True))
     sage_score = Column(Integer)
     download_url = Column(String(256))
     cover_url = Column(String(256))

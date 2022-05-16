@@ -3,6 +3,7 @@ from typing import List, Optional
 import discord
 from discord import BaseActivity
 
+from src.kiyomi import Utils
 from src.log import Logger
 from .fancy_presence_service import FancyPresenceService
 from ..storage.model.presence import Presence
@@ -25,10 +26,8 @@ class PresenceService(FancyPresenceService):
 
         return self.get_activity(presence)
 
-    # Maybe needs a debouncer?
+    @Utils.debounce(1)
     async def update_status(self):
-        activity = None
-
         if self.static_presence is not None:
             activity = self.get_activity(self.static_presence)
         elif self.running_tasks:
@@ -60,4 +59,3 @@ class PresenceService(FancyPresenceService):
         self.static_presence = None
 
         await self.update_status()
-

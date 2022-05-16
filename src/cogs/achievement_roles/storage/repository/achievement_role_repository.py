@@ -1,29 +1,28 @@
-from typing import Optional, List
+from typing import Optional, List, Type
 
-from sqlalchemy.orm import Query
+from sqlalchemy import select
 
 from src.kiyomi.database import BaseRepository
 from ..model.achievement_role import AchievementRole
 
 
 class AchievementRoleRepository(BaseRepository[AchievementRole]):
-    def query_by_id(self, entry_id: int) -> Query:
-        return self.session.query(AchievementRole) \
-            .filter(AchievementRole.id == entry_id)
+    @property
+    def _table(self) -> Type[AchievementRole]:
+        return AchievementRole
 
-    def get_all(self) -> Optional[List[AchievementRole]]:
-        return self.session.query(AchievementRole) \
-            .all()
+    async def get_all_by_guild_id_and_group(self, guild_id: int, group: str) -> List[AchievementRole]:
+        stmt = select(self._table).where(self._table.guild_id == guild_id).where(self._table.group == group)
+        return await self._all(stmt)
 
-    def get_all_by_guild_id_and_group(self, guild_id: int, group: str) -> Optional[List[AchievementRole]]:
-        return self.session.query(AchievementRole) \
-            .filter(AchievementRole.guild_id == guild_id) \
-            .filter(AchievementRole.group == group) \
-            .all()
-
-    def get_by_guild_id_and_group_and_identifier(self, guild_id: int, group: str, identifier: str) -> Optional[AchievementRole]:
-        return self.session.query(AchievementRole) \
-            .filter(AchievementRole.guild_id == guild_id) \
-            .filter(AchievementRole.group == group) \
-            .filter(AchievementRole.identifier == identifier) \
-            .first()
+    async def get_by_guild_id_and_group_and_identifier(
+            self,
+            guild_id: int,
+            group: str,
+            identifier: str
+    ) -> Optional[AchievementRole]:
+        stmt = select(self._table) \
+            .where(self._table.guild_id == guild_id) \
+            .where(self._table.group == group) \
+            .where(self._table.identifier == identifier)
+        return await self._first(stmt)

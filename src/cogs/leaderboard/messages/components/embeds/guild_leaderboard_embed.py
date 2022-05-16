@@ -1,8 +1,7 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List
 
 import timeago
-from dateutil import tz
 from discord import Colour
 from prettytable import PrettyTable
 
@@ -13,7 +12,13 @@ from src.kiyomi import Kiyomi
 
 
 class GuildLeaderboardEmbed(LeaderboardEmbed):
-    def __init__(self, bot: Kiyomi, guild_name: str, beatmap_difficulty: BeatmapVersionDifficulty, leaderboard: List[Score]):
+    def __init__(
+            self,
+            bot: Kiyomi,
+            guild_name: str,
+            beatmap_difficulty: BeatmapVersionDifficulty,
+            leaderboard: List[Score]
+    ):
         super().__init__(bot)
 
         self.guild_name = guild_name
@@ -61,7 +66,7 @@ class GuildLeaderboardEmbed(LeaderboardEmbed):
         for index, score in enumerate(self.leaderboard):
             rank = f"#{index + 1}"
             name = score.player.name
-            date = timeago.format(score.get_date, datetime.now(tz=tz.UTC))
+            date = timeago.format(score.get_date, datetime.now(timezone.utc))
 
             if len(score.modifiers):
                 mods = score.modifiers

@@ -1,6 +1,6 @@
-from typing import Optional, List
+from typing import Optional, List, Type
 
-from sqlalchemy.orm import Query
+from sqlalchemy import select, desc
 
 from ..model.sent_score import SentScore
 from src.cogs.scoresaber.storage.model.score import Score
@@ -8,58 +8,57 @@ from src.kiyomi.database import BaseRepository
 
 
 class SentScoreRepository(BaseRepository[SentScore]):
-    def query_by_id(self, entry_id: int) -> Query:
-        return self.session.query(SentScore) \
-            .filter(SentScore.id == entry_id)
+    @property
+    def _table(self) -> Type[SentScore]:
+        return SentScore
 
-    def get_all(self) -> Optional[List[SentScore]]:
-        return self.session.query(SentScore) \
-            .all()
+    async def get_by_score_id_and_guild_id(self, score_id: int, guild_id: int) -> Optional[SentScore]:
+        stmt = select(self._table) \
+            .where(self._table.score_id == score_id) \
+            .where(self._table.guild_id == guild_id)
+        return await self._first(stmt)
 
-    def get_by_score_id_and_guild_id(self, score_id: int, guild_id: int) -> Optional[SentScore]:
-        return self.session.query(SentScore) \
-            .filter(SentScore.score_id == score_id) \
-            .filter(SentScore.guild_id == guild_id) \
-            .first()
+    async def get_sent_scores_count(self, guild_id: int, player_id: int) -> int:
+        player_score_ids = select(Score.c.id).where(Score.player_id == player_id).subquery()
 
-    def get_sent_scores_count(self, guild_id: int, player_id: int) -> int:
-        player_score_ids = self.session.query(Score.id) \
-            .filter(Score.player_id == player_id) \
-            .subquery()
-
-        return self.session.query(SentScore.score_id) \
-            .filter(SentScore.guild_id == guild_id) \
-            .filter(SentScore.score_id.in_(player_score_ids.select())) \
+        stmt = select(self._table.c.score_id)\
+            .where(self._table.guild_id == guild_id)\
+            .where(self._table.score_id.in_(player_score_ids.select()))\
             .count()
 
-    def get_unsent_scores_count(self, guild_id: int, player_id: int) -> int:
-        player_score_ids = self.session.query(Score.id) \
-            .filter(Score.player_id == player_id) \
+        return await self._first(stmt)
+
+    async def get_unsent_scores_count(self, guild_id: int, player_id: int) -> int:
+        player_score_ids = select(Score.c.id)\
+            .where(Score.player_id == player_id)\
             .subquery()
 
-        sent_score_ids = self.session.query(SentScore.score_id) \
-            .filter(SentScore.guild_id == guild_id) \
-            .filter(SentScore.score_id.in_(player_score_ids.select())) \
+        sent_score_ids = select(self._table.c.score_id)\
+            .where(self._table.guild_id == guild_id)\
+            .where(self._table.score_id.in_(player_score_ids.select()))\
             .subquery()
 
-        return self.session.query(Score) \
-            .filter(Score.player_id == player_id) \
-            .filter(Score.id.not_in(sent_score_ids.select())) \
-            .order_by(Score.time_set.desc()) \
+        stmt = select(Score)\
+            .where(Score.player_id == player_id)\
+            .where(Score.id.not_in(sent_score_ids.select()))\
+            .order_by(desc(Score.time_set))\
             .count()
 
-    def get_unsent_scores(self, guild_id: int, player_id: int) -> Optional[List[Score]]:
-        player_score_ids = self.session.query(Score.id) \
-            .filter(Score.player_id == player_id) \
+        return await self._first(stmt)
+
+    async def get_unsent_scores(self, guild_id: int, player_id: int) -> List[Score]:
+        player_score_ids = select(Score.c.id) \
+            .where(Score.player_id == player_id) \
             .subquery()
 
-        sent_score_ids = self.session.query(SentScore.score_id) \
-            .filter(SentScore.guild_id == guild_id) \
-            .filter(SentScore.score_id.in_(player_score_ids.select())) \
+        sent_score_ids = select(self._table.c.score_id) \
+            .where(self._table.guild_id == guild_id) \
+            .where(self._table.score_id.in_(player_score_ids.select())) \
             .subquery()
 
-        return self.session.query(Score) \
-            .filter(Score.player_id == player_id) \
-            .filter(Score.id.not_in(sent_score_ids.select())) \
-            .order_by(Score.time_set.desc()) \
-            .all()
+        stmt = select(Score) \
+            .where(Score.player_id == player_id) \
+            .where(Score.id.not_in(sent_score_ids.select())) \
+            .order_by(desc(Score.time_set))
+
+        return await self._all(stmt)

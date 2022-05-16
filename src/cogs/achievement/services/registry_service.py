@@ -45,35 +45,34 @@ class RegistryService(AchievementService):
         return achievements
 
     @staticmethod
-    def _filter_achievements(achievement_groups: AchievementGroups, complete: bool) -> AchievementGroups:
+    async def _filter_achievements(achievement_groups: AchievementGroups, complete: bool) -> AchievementGroups:
         filtered = {}
 
         for group, achievements in achievement_groups.items():
             filtered[group] = list()
 
             for achievement in achievements:
-                if achievement.complete == complete:
+                if await achievement.complete == complete:
                     filtered[group].append(achievement)
 
         return filtered
 
-    def get_completed(self, generator_name: str, member: Member) -> AchievementGroups:
+    async def get_completed(self, generator_name: str, member: Member) -> AchievementGroups:
         achievement_groups = self.get_achievements(generator_name, member)
 
-        return self._filter_achievements(achievement_groups, True)
+        return await self._filter_achievements(achievement_groups, True)
 
-    def get_uncompleted(self, generator_name: str, member: Member) -> AchievementGroups:
+    async def get_uncompleted(self, generator_name: str, member: Member) -> AchievementGroups:
         achievement_groups = self.get_achievements(generator_name, member)
 
-        return self._filter_achievements(achievement_groups, False)
+        return await self._filter_achievements(achievement_groups, False)
 
-    def get_all_completed(self, member: Member) -> AchievementGroups:
+    async def get_all_completed(self, member: Member) -> AchievementGroups:
         achievement_groups = self.get_all_achievements(member)
 
-        return self._filter_achievements(achievement_groups, True)
+        return await self._filter_achievements(achievement_groups, True)
 
-    def get_all_uncompleted(self, member: Member) -> AchievementGroups:
+    async def get_all_uncompleted(self, member: Member) -> AchievementGroups:
         achievement_groups = self.get_all_achievements(member)
 
-        return self._filter_achievements(achievement_groups, False)
-
+        return await self._filter_achievements(achievement_groups, False)

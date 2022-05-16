@@ -1,9 +1,16 @@
+from __future__ import annotations
+
+from typing import Optional, TYPE_CHECKING
+
 import pyscoresaber
 from pyscoresaber import BeatmapDifficulty
 from sqlalchemy import Column, String, Integer, DateTime, Boolean, Enum, Float
 from sqlalchemy.orm import relationship
 
 from src.kiyomi.database import Base
+
+if TYPE_CHECKING:
+    from src.cogs.beatsaver.storage.model.beatmap_version_difficulty import BeatmapVersionDifficulty
 
 
 class Leaderboard(Base):
@@ -26,20 +33,20 @@ class Leaderboard(Base):
     daily_plays = Column(Integer)
     cover_image = Column(String(256))
     max_pp = Column(Float)
-    created_date = Column(DateTime)
-    ranked_date = Column(DateTime)
-    qualified_date = Column(DateTime)
-    loved_date = Column(DateTime)
+    created_date = Column(DateTime(timezone=True))
+    ranked_date = Column(DateTime(timezone=True))
+    qualified_date = Column(DateTime(timezone=True))
+    loved_date = Column(DateTime(timezone=True))
 
     difficulty_raw = Column(String(64))
     game_mode = Column(Enum(pyscoresaber.GameMode))
     difficulty = Column(Enum(pyscoresaber.BeatmapDifficulty))
 
     beatmap_version = relationship(
-        "BeatmapVersion",
-        primaryjoin='BeatmapVersion.hash == Leaderboard.song_hash',
-        foreign_keys=[song_hash],
-        uselist=False
+            "BeatmapVersion",
+            primaryjoin='BeatmapVersion.hash == Leaderboard.song_hash',
+            foreign_keys=[song_hash],
+            uselist=False
     )
 
     def __init__(self, leaderboard: pyscoresaber.LeaderboardInfo):
@@ -86,6 +93,22 @@ class Leaderboard(Base):
         }
 
         return difficulties[self.difficulty]
+
+    @property
+    def beatmap_difficulty(self) -> Optional["BeatmapVersionDifficulty"]:
+        if self.beatmap_version is None:
+            return None
+
+        for beatmap_difficulty in self.beatmap_version.difficulties:
+            if beatmap_difficulty.scoresaber_characteristic is not self.game_mode:
+                continue
+
+            if beatmap_difficulty.scoresaber_difficulty is not self.difficulty:
+                continue
+
+            return beatmap_difficulty
+
+        return None
 
     def __str__(self):
         return f"Leaderboard {self.song_name} ({self.id})"

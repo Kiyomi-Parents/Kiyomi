@@ -11,10 +11,10 @@ class MapDetailsButton(BeatSaverComponent, discord.ui.Button):
     def __init__(self, bot: Kiyomi, parent, beatmap: Beatmap):
         BeatSaverComponent.__init__(self, bot, parent, beatmap)
         discord.ui.Button.__init__(
-            self,
-            custom_id=f"map:detail:button:beatmap:{beatmap.id}",
-            label="Map details",
-            style=discord.enums.ButtonStyle.primary,
+                self,
+                custom_id=f"map:detail:button:beatmap:{beatmap.id}",
+                label="Map details",
+                style=discord.enums.ButtonStyle.primary,
         )
 
     async def get_embed(self) -> Embed:
@@ -27,7 +27,13 @@ class MapDetailsButton(BeatSaverComponent, discord.ui.Button):
         if self.parent.beatmap_difficulty is None:
             raise RuntimeError("Parent beatmap_difficulty can not be None")
 
-        return MapDetailsEmbed(self.bot, self.parent.guild, self.beatmap, self.parent.beatmap_characteristic, self.parent.beatmap_difficulty)
+        return MapDetailsEmbed(
+                self.bot,
+                self.parent.guild,
+                self.beatmap,
+                self.parent.beatmap_characteristic,
+                self.parent.beatmap_difficulty
+        )
 
     async def callback(self, interaction: discord.Interaction):
         self.parent.embed = self.get_embed

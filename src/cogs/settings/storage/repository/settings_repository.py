@@ -1,6 +1,6 @@
-from typing import Optional, List
+from typing import Optional, List, Type
 
-from sqlalchemy.orm import Query
+from sqlalchemy import select
 
 from src.kiyomi.database import BaseRepository
 from src.log import Logger
@@ -9,27 +9,20 @@ from ..model import Setting
 
 class SettingsRepository(BaseRepository[Setting]):
 
-    def query_by_id(self, entry_id: int) -> Query:
-        return self.session.query(Setting) \
-            .filter(Setting.id == entry_id)
+    @property
+    def _table(self) -> Type[Setting]:
+        return Setting
 
-    def get_all(self) -> Optional[List[Setting]]:
-        return self.session.query(Setting) \
-            .all()
+    async def get_by_guild_id_and_name(self, guild_id: int, name: str) -> Optional[Setting]:
+        stmt = select(self._table).where(self._table.guild_id == guild_id).where(self._table.name == name)
+        return await self._first(stmt)
 
-    def get_by_guild_id_and_name(self, guild_id: int, name: str) -> Optional[Setting]:
-        return self.session.query(Setting) \
-            .filter(Setting.guild_id == guild_id) \
-            .filter(Setting.name == name) \
-            .first()
+    async def set(self, setting_id: int, value: str) -> Optional[Setting]:
+        setting = await self.update(setting_id, {"value": value})
 
-    def set(self, setting: Setting, value: str):
-        setting.value = value
-
-        self.commit_changes()
         Logger.log(setting, f"Set {setting.name} to {value}")
+        return setting
 
-    def get_by_guild_id(self, guild_id: int) -> Optional[List[Setting]]:
-        return self.session.query(Setting) \
-            .filter(Setting.guild_id == guild_id) \
-            .all()
+    async def get_by_guild_id(self, guild_id: int) -> List[Setting]:
+        stmt = select(self._table).where(self._table.guild_id == guild_id)
+        return await self._all(stmt)

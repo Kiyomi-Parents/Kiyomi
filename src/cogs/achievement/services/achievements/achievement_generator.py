@@ -17,4 +17,3 @@ class AchievementGenerator(ABC):
     @abstractmethod
     def get_achievements(self, member: Member) -> List[Achievement]:
         pass
-

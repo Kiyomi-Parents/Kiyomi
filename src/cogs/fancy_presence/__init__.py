@@ -5,10 +5,10 @@ from .storage.unit_of_work import UnitOfWork
 from src.kiyomi import Kiyomi
 
 
-def setup(bot: Kiyomi):
-    uow = UnitOfWork(bot.database.session)
+async def setup(bot: Kiyomi):
+    uow = UnitOfWork(await bot.database.get_session())
 
     presence_service = PresenceService(bot, uow)
 
-    bot.add_cog(FancyPresence(bot, presence_service))
-    bot.add_cog(FancyPresenceAPI(bot, presence_service))
+    await bot.add_cog(FancyPresence(bot, presence_service))
+    await bot.add_cog(FancyPresenceAPI(bot, presence_service))

@@ -1,23 +1,39 @@
-from typing import Optional, List
+from typing import Optional, Type
 
-from sqlalchemy.orm import Query
+from sqlalchemy import select, delete
 
 from ..model.member_role import MemberRole
 from src.kiyomi.database import BaseRepository
 
 
 class MemberRoleRepository(BaseRepository[MemberRole]):
-    def query_by_id(self, entry_id: int) -> Query:
-        return self.session.query(MemberRole) \
-            .filter(MemberRole.id == entry_id)
+    @property
+    def _table(self) -> Type[MemberRole]:
+        return MemberRole
 
-    def get_all(self) -> Optional[List[MemberRole]]:
-        return self.session.query(MemberRole) \
-            .all()
+    async def get_by_guild_id_and_member_id_and_role_id(
+            self,
+            guild_id: int,
+            member_id: int,
+            role_id: int
+    ) -> Optional[MemberRole]:
+        stmt = select(self._table) \
+            .where(self._table.guild_id == guild_id) \
+            .where(self._table.member_id == member_id) \
+            .where(self._table.role_id == role_id)
+        result = await self._execute_scalars(stmt)
+        return result.first()
 
-    def get_by_guild_id_and_member_id_and_role_id(self, guild_id: int, member_id: int, role_id: int) -> Optional[MemberRole]:
-        return self.session.query(MemberRole) \
-            .filter(MemberRole.guild_id == guild_id) \
-            .filter(MemberRole.member_id == member_id) \
-            .filter(MemberRole.role_id == role_id) \
-            .first()
+    async def delete_by_guild_id_and_member_id_and_role_id(
+            self,
+            guild_id: int,
+            member_id: int,
+            role_id: int
+    ) -> Optional[MemberRole]:
+        entity = await self.get_by_guild_id_and_member_id_and_role_id(guild_id, member_id, role_id)
+        stmt = delete(self._table) \
+            .where(self._table.guild_id == guild_id) \
+            .where(self._table.member_id == member_id) \
+            .where(self._table.role_id == role_id)
+        await self._session.execute(stmt)
+        return entity

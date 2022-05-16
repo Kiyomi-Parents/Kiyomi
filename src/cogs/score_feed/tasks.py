@@ -23,7 +23,7 @@ class Tasks(BaseTasks):
         """Sending notifications"""
         scoresaber = self.bot.get_cog_api(ScoreSaberAPI)
 
-        players = scoresaber.get_players()
+        players = await scoresaber.get_players()
         Logger.log("task", f"Sending notifications for {len(players)} players")
 
         for player in players:

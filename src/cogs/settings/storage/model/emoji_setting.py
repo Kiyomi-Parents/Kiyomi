@@ -1,7 +1,8 @@
-from typing import Optional
+from typing import Optional, List
 
 import discord
-from discord import OptionChoice, Permissions
+from discord import Permissions, Interaction
+from discord.app_commands import Choice
 
 from src.kiyomi import Kiyomi
 from .abstract_bot_setting import AbstractBotSetting
@@ -15,11 +16,11 @@ class EmojiSetting(AbstractBotSetting[discord.Emoji]):
 
     @staticmethod
     def create(
-        bot: Kiyomi,
-        name_human: str,
-        name: str,
-        permissions: Optional[Permissions] = None,
-        default_value: Optional[discord.Emoji] = None
+            bot: Kiyomi,
+            name_human: str,
+            name: str,
+            permissions: Optional[Permissions] = None,
+            default_value: Optional[discord.Emoji] = None
     ):
         if permissions is None:
             permissions = Permissions(manage_emojis=True)
@@ -58,24 +59,33 @@ class EmojiSetting(AbstractBotSetting[discord.Emoji]):
 
     @staticmethod
     def get_from_setting(
-        bot: Kiyomi,
-        name_human: str,
-        setting: Setting,
-        permissions: Optional[Permissions] = None
+            bot: Kiyomi,
+            name_human: str,
+            setting: Setting,
+            permissions: Optional[Permissions] = None
     ):
         if setting.setting_type is not SettingType.EMOJI:
             raise InvalidSettingType(setting.setting_type, SettingType.EMOJI)
 
         return EmojiSetting(bot, name_human, setting, permissions)
 
-    async def get_autocomplete(self, ctx: discord.AutocompleteContext):
+    @staticmethod
+    async def is_valid(bot: Kiyomi, guild_id: int, value: str) -> bool:
+        guild = bot.get_guild(guild_id)
+
+        if guild is None:
+            return False
+
+        return value in [str(emoji.id) for emoji in await guild.fetch_emojis()]
+
+    async def get_autocomplete(self, ctx: Interaction, current: str) -> List[Choice]:
         emojis = []
 
-        if not self.has_permission(ctx.interaction.user):
+        if not self.has_permission(ctx.user):
             return emojis
 
-        for emoji in await ctx.interaction.guild.fetch_emojis():
-            if ctx.value.lower() not in emoji.name.lower():
+        for emoji in await ctx.guild.fetch_emojis():
+            if current.lower() not in emoji.name.lower():
                 continue
 
             label = f"{emoji.name}"
@@ -83,6 +93,6 @@ class EmojiSetting(AbstractBotSetting[discord.Emoji]):
             if self.value is not None and self.value.id == emoji.id:
                 label += ' (current)'
 
-            emojis.append(OptionChoice(label, str(emoji.id)))
+            emojis.append(Choice(name=label, value=str(emoji.id)))
 
         return emojis

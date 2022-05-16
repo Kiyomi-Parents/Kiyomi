@@ -1,7 +1,7 @@
 from typing import List
 
-import discord
-from discord import OptionChoice
+from discord import Interaction
+from discord.app_commands import Choice
 
 from .achievement_service import AchievementService
 from .achievements import Achievement
@@ -17,38 +17,38 @@ class UserAchievementService(AchievementService):
 
         self.registry_service = registry_service
 
-    def get_group_achievements(self, group: str, member_id: int) -> AchievementGroups:
+    async def get_group_achievements(self, group: str, member_id: int) -> AchievementGroups:
         general = self.bot.get_cog_api(GeneralAPI)
-        member = general.get_member(member_id)
+        member = await general.get_member(member_id)
 
         return self.registry_service.get_achievements(group, member)
 
-    def get_group_completed(self, group: str, member_id: int) -> AchievementGroups:
+    async def get_group_completed(self, group: str, member_id: int) -> AchievementGroups:
         general = self.bot.get_cog_api(GeneralAPI)
-        member = general.get_member(member_id)
+        member = await general.get_member(member_id)
 
-        return self.registry_service.get_completed(group, member)
+        return await self.registry_service.get_completed(group, member)
 
-    def get_all_achievements(self, member_id: int) -> AchievementGroups:
+    async def get_all_achievements(self, member_id: int) -> AchievementGroups:
         general = self.bot.get_cog_api(GeneralAPI)
-        member = general.get_member(member_id)
+        member = await general.get_member(member_id)
 
         return self.registry_service.get_all_achievements(member)
 
-    def get_all_completed_achievements(self, member_id: int) -> AchievementGroups:
+    async def get_all_completed_achievements(self, member_id: int) -> AchievementGroups:
         general = self.bot.get_cog_api(GeneralAPI)
-        member = general.get_member(member_id)
+        member = await general.get_member(member_id)
 
-        return self.registry_service.get_all_completed(member)
+        return await self.registry_service.get_all_completed(member)
 
-    def get_all_uncompleted_achievements(self, member_id: int) -> AchievementGroups:
+    async def get_all_uncompleted_achievements(self, member_id: int) -> AchievementGroups:
         general = self.bot.get_cog_api(GeneralAPI)
-        member = general.get_member(member_id)
+        member = await general.get_member(member_id)
 
-        return self.registry_service.get_all_uncompleted(member)
+        return await self.registry_service.get_all_uncompleted(member)
 
-    def get_best_completed_achievement_in_group(self, group: str, member_id: int) -> Achievement:
-        achievement_groups = self.get_group_completed(group, member_id)
+    async def get_best_completed_achievement_in_group(self, group: str, member_id: int) -> Achievement:
+        achievement_groups = await self.get_group_completed(group, member_id)
 
         best_achievement = None
 
@@ -62,11 +62,11 @@ class UserAchievementService(AchievementService):
 
         return best_achievement
 
-    async def get_all_groups(self, ctx: discord.AutocompleteContext) -> List[OptionChoice]:
+    async def get_all_groups(self, ctx: Interaction, current: str) -> List[Choice[str]]:
         choices = []
 
         for group in self.registry_service.get_generators():
-            choices.append(OptionChoice(group, group))
+            if current.lower() in group.lower():
+                choices.append(Choice(name=group, value=group))
 
         return choices
-

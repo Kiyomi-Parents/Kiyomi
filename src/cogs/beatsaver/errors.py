@@ -1,4 +1,4 @@
-from src.kiyomi.errors import CogException
+from src.kiyomi.error import CogException
 
 
 class BeatSaverCogException(CogException):
@@ -14,7 +14,7 @@ class BeatmapKeyNotFound(BeatmapNotFound):
         self.beatmap_key = beatmap_key
 
     def __str__(self):
-        return f"Could not find a beatmap using key {self.beatmap_key}"
+        return f"Could not find a beatmap using key %beatmap_key%"
 
 
 class BeatmapHashNotFound(BeatmapNotFound):
@@ -22,5 +22,4 @@ class BeatmapHashNotFound(BeatmapNotFound):
         self.beatmap_hash = beatmap_hash
 
     def __str__(self):
-        return f"Could not find a beatmap using hash {self.beatmap_hash}"
-
+        return f"Could not find a beatmap using hash %beatmap_hash%"

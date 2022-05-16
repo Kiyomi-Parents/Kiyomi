@@ -20,7 +20,7 @@ class StringList(types.TypeDecorator):
 
         for item in value:
             if not isinstance(item, str):
-                raise RuntimeError(f"Expected object of type str, but got {value.__class__.__name__}")
+                raise RuntimeError(f"Expected object of type str, but got {item.__class__.__name__}")
 
             items.append(item)
 
