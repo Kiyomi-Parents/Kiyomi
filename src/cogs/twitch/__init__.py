@@ -1,0 +1,48 @@
+import os
+
+import twitchio
+from twitchio.ext import eventsub
+
+from .services import MessageService
+from .services.event_service import TwitchEventService
+from .services.twitch_streamer_service import TwitchStreamerService
+from .storage import UnitOfWork
+from .twitch import Twitch
+from ...kiyomi import Kiyomi
+from ...log import Logger
+
+
+async def setup(bot: Kiyomi):
+    uow = UnitOfWork(await bot.database.get_session())
+
+    # load_dotenv()
+    twitch_client_id = os.getenv("TWITCH_CLIENT_ID")
+    twitch_client_secret = os.getenv("TWITCH_CLIENT_SECRET")
+    twitch_access_token = os.getenv("TWITCH_ACCESS_TOKEN")
+    twitch_webhook_secret = os.getenv("TWITCH_WEBHOOK_SECRET")
+    twitch_event_sub_listener_url = os.getenv("TWITCH_EVENT_SUB_LISTENER_URL")
+    twitch_event_sub_listener_port = os.getenv("TWITCH_EVENT_SUB_LISTENER_PORT")
+
+    for env_var in (twitch_client_id, twitch_client_secret, twitch_event_sub_listener_url, twitch_event_sub_listener_port):
+        if env_var is None or len(env_var) == 0:
+            Logger.warn("Twitch", "Config issue, exiting")
+            return
+
+    twitch_client = twitchio.Client(twitch_access_token, client_secret=twitch_client_secret, loop=bot.loop)
+    eventsub_client = eventsub.EventSubClient(twitch_client, twitch_webhook_secret, twitch_event_sub_listener_url)
+
+    bot.loop.create_task(eventsub_client.listen(port=twitch_event_sub_listener_port))
+    bot.loop.create_task(twitch_client.connect())
+
+    twitch_streamer_service = TwitchStreamerService(bot, uow, twitch_client, eventsub_client)
+    twitch_event_service = TwitchEventService(bot, uow, twitch_client, eventsub_client)
+    message_service = MessageService(bot, uow, twitch_client, eventsub_client)
+
+    await bot.add_cog(
+        Twitch(
+            bot,
+            twitch_streamer_service,
+            twitch_event_service,
+            message_service
+        )
+    )

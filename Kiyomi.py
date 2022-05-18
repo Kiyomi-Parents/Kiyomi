@@ -53,6 +53,7 @@ async def startup(loop: AbstractEventLoop):
         await bot.load_extension(name="src.cogs.achievement")
         await bot.load_extension(name="src.cogs.achievement_roles")
         await bot.load_extension(name="src.cogs.emoji_echo")
+        await bot.load_extension(name="src.cogs.twitch")
 
         # await database.drop_tables()
         # await database.create_tables()
