@@ -5,7 +5,6 @@ from .repository.sent_score_repository import SentScoreRepository
 
 
 class UnitOfWork(BaseUnitOfWork):
-
     def __init__(self, session: AsyncSession):
         super().__init__(session)
 

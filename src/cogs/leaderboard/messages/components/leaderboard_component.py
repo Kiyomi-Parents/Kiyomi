@@ -3,7 +3,7 @@ from typing import TypeVar, Generic
 from src.kiyomi import Kiyomi
 from src.kiyomi.base_component import BaseComponent
 
-T = TypeVar('T')
+T = TypeVar("T")
 
 
 class LeaderboardComponent(Generic[T], BaseComponent[T]):

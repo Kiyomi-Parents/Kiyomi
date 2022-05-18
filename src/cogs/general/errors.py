@@ -69,8 +69,7 @@ class FailedToRemoveFromUser(RoleException):
         self.reason = reason
 
     def __str__(self):
-        return f"Failed to remove Role %role_id% from User %member_id% in Guild %guild_id% " \
-               f"({self.reason})"
+        return f"Failed to remove Role %role_id% from User %member_id% in Guild %guild_id% " f"({self.reason})"
 
 
 class EmojiAlreadyExistsException(GeneralCogException):

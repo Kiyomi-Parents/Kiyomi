@@ -10,7 +10,6 @@ from ..storage.model.score import Score
 
 
 class ScoreService(ScoreSaberService):
-
     async def get_recent_scores(self, player_id: str, limit: int) -> List[Score]:
         return await self.uow.scores.get_recent(player_id, limit)
 
@@ -21,7 +20,10 @@ class ScoreService(ScoreSaberService):
         if not await self.is_player_score_new(player_score):
             return
 
-        Logger.log(f"{player_score.score.leaderboard_player_info.name}", f"Got new score from Score Saber websocket")
+        Logger.log(
+            f"{player_score.score.leaderboard_player_info.name}",
+            f"Got new score from Score Saber websocket",
+        )
 
         async with self.uow:
             if not await self.uow.leaderboards.exists(player_score.leaderboard.id):
@@ -42,7 +44,7 @@ class ScoreService(ScoreSaberService):
 
         async with self.uow:
             new_leaderboards = await self.get_new_leaderboards(
-                    [new_player_score.leaderboard for new_player_score in new_player_scores]
+                [new_player_score.leaderboard for new_player_score in new_player_scores]
             )
             if len(new_leaderboards) > 0:
                 await self.uow.leaderboards.add_all(new_leaderboards)
@@ -91,16 +93,16 @@ class ScoreService(ScoreSaberService):
                         new_player_scores.append(player_score)
 
                 Logger.log(
-                        player,
-                        f"Found {len(new_player_scores) - before_page_add_count} new scores from Score Saber"
+                    player,
+                    f"Found {len(new_player_scores) - before_page_add_count} new scores from Score Saber",
                 )
         except pyscoresaber.NotFoundException as error:
-            Logger.log(player, f"Got HTTP code {error.status} when trying to access {error.url}")
+            Logger.log(
+                player,
+                f"Got HTTP code {error.status} when trying to access {error.url}",
+            )
 
         return new_player_scores
 
     async def is_player_score_new(self, player_score: pyscoresaber.PlayerScore) -> bool:
-        return await self.uow.scores.exists_by_score_id_and_time_set(
-                player_score.score.id,
-                player_score.score.time_set
-        )
+        return await self.uow.scores.exists_by_score_id_and_time_set(player_score.score.id, player_score.score.time_set)

@@ -6,7 +6,7 @@ from discord import Permissions, app_commands, Interaction, Client
 
 from src.kiyomi import OwnerOnlyCommand
 
-T = TypeVar('T')
+T = TypeVar("T")
 
 
 def _admin_guilds() -> List[discord.Object]:

@@ -9,10 +9,10 @@ class MapPreviewButton(BeatSaverComponent, discord.ui.Button):
     def __init__(self, bot: Kiyomi, parent, beatmap: Beatmap):
         BeatSaverComponent.__init__(self, bot, parent, beatmap)
         discord.ui.Button.__init__(
-                self,
-                label="Map Preview",
-                style=discord.enums.ButtonStyle.primary,
-                url=self.preview_url
+            self,
+            label="Map Preview",
+            style=discord.enums.ButtonStyle.primary,
+            url=self.preview_url,
         )
 
     @property

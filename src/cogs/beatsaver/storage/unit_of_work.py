@@ -1,7 +1,9 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from .repository.beatmap_repository import BeatmapRepository
-from .repository.beatmap_version_difficulty_repository import BeatmapVersionDifficultyRepository
+from .repository.beatmap_version_difficulty_repository import (
+    BeatmapVersionDifficultyRepository,
+)
 from .repository.beatmap_version_repository import BeatmapVersionRepository
 from src.kiyomi.database import BaseUnitOfWork
 

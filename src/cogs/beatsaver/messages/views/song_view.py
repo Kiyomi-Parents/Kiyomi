@@ -11,13 +11,14 @@ from ...beatsaver_api import BeatSaverAPI
 from ...storage.model.beatmap import Beatmap
 from ..components.buttons.map_details_button import MapDetailsButton
 from ..components.buttons.map_preview_button import MapPreviewButton
-from ..components.selects.map_detail_characteristic_select import MapDetailCharacteristicSelect
+from ..components.selects.map_detail_characteristic_select import (
+    MapDetailCharacteristicSelect,
+)
 from ..components.selects.map_detail_difficulty_select import MapDetailDifficultySelect
 
 
 # Add NPS graph button
 class SongView(PersistentView):
-
     def __init__(self, bot: Kiyomi, guild: Guild, beatmap: Beatmap):
         self.beatmap = beatmap
 
@@ -55,16 +56,18 @@ class SongView(PersistentView):
         self.add_item(MapDetailsButton(self.bot, self, self.beatmap))
 
         leaderboard_ui = self.bot.get_cog("LeaderboardUI")
-        self.add_item(leaderboard_ui.button_guild_leaderboard(
-                self.bot,
-                self,
-                self.beatmap.latest_version.hash
-        ))
+        self.add_item(leaderboard_ui.button_guild_leaderboard(self.bot, self, self.beatmap.latest_version.hash))
 
         self.add_item(MapPreviewButton(self.bot, self, self.beatmap))
 
     async def serialize_persistence(self) -> Persistence:
-        return Persistence(self.guild.id, self.message.channel.id, self.message.id, SongView.__name__, self.beatmap.id)
+        return Persistence(
+            self.guild.id,
+            self.message.channel.id,
+            self.message.id,
+            SongView.__name__,
+            self.beatmap.id,
+        )
 
     @staticmethod
     async def deserialize_persistence(bot: Kiyomi, persistence: Persistence) -> BaseView:

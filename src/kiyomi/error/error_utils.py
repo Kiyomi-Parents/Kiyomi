@@ -12,7 +12,11 @@ if TYPE_CHECKING:
     from src.kiyomi.kiyomi import Kiyomi
 
 
-async def handle_global_error(bot: "Kiyomi", error: Exception, ctx: Optional[Union[Context["Kiyomi"], Interaction]] = None):
+async def handle_global_error(
+    bot: "Kiyomi",
+    error: Exception,
+    ctx: Optional[Union[Context["Kiyomi"], Interaction]] = None,
+):
     print_error_to_console(error)
     await send_owners_dm_with_stacktrace(bot, error)
 
@@ -21,7 +25,7 @@ async def handle_global_error(bot: "Kiyomi", error: Exception, ctx: Optional[Uni
 
 
 def get_formatted_exception(error: Exception):
-    return ''.join(traceback.format_exception(type(error), error, error.__traceback__))
+    return "".join(traceback.format_exception(type(error), error, error.__traceback__))
 
 
 async def send_owners_dm_with_stacktrace(bot: "Kiyomi", error: Exception):

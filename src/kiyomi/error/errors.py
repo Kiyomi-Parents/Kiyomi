@@ -24,7 +24,12 @@ class KiyomiException(DiscordException):
 
         Logger.error(self.__class__.__name__, message)
 
-    async def _respond(self, ctx: Union[Context["Kiyomi"], Interaction], message: Optional[str] = None, **options):
+    async def _respond(
+        self,
+        ctx: Union[Context["Kiyomi"], Interaction],
+        message: Optional[str] = None,
+        **options,
+    ):
         if message is None:
             message = str(self)
 
@@ -51,7 +56,6 @@ class KiyomiException(DiscordException):
 
 
 class CogException(KiyomiException):
-
     async def handle(self, **options):
         if self.is_handled:
             return
@@ -59,7 +63,10 @@ class CogException(KiyomiException):
         bot: Optional["Kiyomi"] = options.pop("bot") if "bot" in options.keys() else None
 
         if bot is None:
-            Logger.warn(f"{self.__class__.__name__}", "bot parameter not included! Please include for better messages!")
+            Logger.warn(
+                f"{self.__class__.__name__}",
+                "bot parameter not included! Please include for better messages!",
+            )
             return await super().handle(**options)
 
         message: str = options.pop("message") if "message" in options.keys() else str(self)
@@ -103,10 +110,7 @@ class BadArgument(CommandError):
 
         return None
 
-    def find_command_by_argument_autocomplete_context(
-            self,
-            ctx: Interaction
-    ) -> Optional[tuple[str, Union[str, None]]]:
+    def find_command_by_argument_autocomplete_context(self, ctx: Interaction) -> Optional[tuple[str, Union[str, None]]]:
         for key, value in ctx.namespace:
             if value == self.argument or (value.isspace() and self.argument is None):
                 return key, value

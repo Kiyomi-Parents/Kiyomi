@@ -4,9 +4,14 @@ import pyscoresaber
 
 from src.kiyomi import Kiyomi
 from .score_service import ScoreSaberService, ScoreService
-from ..errors import MemberUsingDifferentPlayerAlreadyException, PlayerRegisteredInGuildAlreadyException, \
-    MemberHasPlayerAlreadyRegisteredInGuildException, PlayerNotFoundException, MemberPlayerNotFoundInGuildException, \
-    PlayerAlreadyExistsException
+from ..errors import (
+    MemberUsingDifferentPlayerAlreadyException,
+    PlayerRegisteredInGuildAlreadyException,
+    MemberHasPlayerAlreadyRegisteredInGuildException,
+    PlayerNotFoundException,
+    MemberPlayerNotFoundInGuildException,
+    PlayerAlreadyExistsException,
+)
 from ..storage import UnitOfWork
 from ..storage.model.guild_player import GuildPlayer
 from ..storage.model.player import Player
@@ -14,11 +19,11 @@ from ..storage.model.player import Player
 
 class PlayerService(ScoreSaberService):
     def __init__(
-            self,
-            bot: Kiyomi,
-            uow: UnitOfWork,
-            scoresaber: pyscoresaber.ScoreSaberAPI,
-            score_service: ScoreService
+        self,
+        bot: Kiyomi,
+        uow: UnitOfWork,
+        scoresaber: pyscoresaber.ScoreSaberAPI,
+        score_service: ScoreService,
     ):
         super().__init__(bot, uow, scoresaber)
 
@@ -43,9 +48,7 @@ class PlayerService(ScoreSaberService):
     async def check_member_registered_player_guild(self, guild_id: int, member_id: int, player_id: str):
         """Check if the member has already registered as a player in guild"""
         guild_player = await self.uow.guild_players.get_by_guild_id_and_member_id_and_player_id(
-                guild_id,
-                member_id,
-                player_id
+            guild_id, member_id, player_id
         )
 
         if guild_player is not None:
@@ -99,9 +102,7 @@ class PlayerService(ScoreSaberService):
     async def remove_player(self, guild_id: int, member_id: int, player_id: str) -> GuildPlayer:
         async with self.uow:
             guild_player = await self.uow.guild_players.remove_by_guild_id_and_member_id_and_player_id(
-                    guild_id,
-                    member_id,
-                    player_id
+                guild_id, member_id, player_id
             )
             self.bot.events.emit("on_remove_player", guild_player)
 

@@ -26,7 +26,10 @@ class ErrorResolver:
         resolver = self.find_resolver(arg_name)
 
         if resolver is None:
-            Logger.error(self.__class__.__name__, f"Could not find error arg resolver for arg name {arg_name}")
+            Logger.error(
+                self.__class__.__name__,
+                f"Could not find error arg resolver for arg name {arg_name}",
+            )
             return str(arg_value)
 
         if detailed:
@@ -35,10 +38,10 @@ class ErrorResolver:
         return f"**{await resolver.resolve(arg_value)}**"
 
     async def resolve_message(
-            self,
-            exception: "CogException",
-            message: Optional[str] = None,
-            detailed: Optional[bool] = False
+        self,
+        exception: "CogException",
+        message: Optional[str] = None,
+        detailed: Optional[bool] = False,
     ) -> str:
         message = message if message is not None else str(exception)
         matches = re.findall(self._arg_pattern, message)
@@ -51,9 +54,9 @@ class ErrorResolver:
 
     @staticmethod
     def resolve_message_simple(
-            exception: "KiyomiException",
-            message: Optional[str] = None,
-            detailed: Optional[bool] = False
+        exception: "KiyomiException",
+        message: Optional[str] = None,
+        detailed: Optional[bool] = False,
     ) -> str:
         message = message if message is not None else str(exception)
         matches = re.findall(ErrorResolver._arg_pattern, message)

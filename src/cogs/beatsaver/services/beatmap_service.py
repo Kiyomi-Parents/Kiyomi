@@ -9,7 +9,6 @@ from ..storage.model.beatmap_version_difficulty import BeatmapVersionDifficulty
 
 
 class BeatmapService(BeatSaverService):
-
     async def get_missing_beatmaps_by_keys(self, beatmap_keys: List[str]) -> List[Beatmap]:
         beatmaps = []
 
@@ -92,25 +91,20 @@ class BeatmapService(BeatSaverService):
         return beatmap_hash
 
     async def get_beatmap_difficulty(
-            self,
-            beatmap_hash: str,
-            characteristic: pybeatsaver.ECharacteristic,
-            difficulty: pybeatsaver.EDifficulty
+        self,
+        beatmap_hash: str,
+        characteristic: pybeatsaver.ECharacteristic,
+        difficulty: pybeatsaver.EDifficulty,
     ) -> BeatmapVersionDifficulty:
         beatmap_difficulty = await self.uow.beatmap_version_difficulties.get_by_hash_and_characteristic_and_difficulty(
-                beatmap_hash,
-                characteristic,
-                difficulty
+            beatmap_hash, characteristic, difficulty
         )
 
         if beatmap_difficulty is None:
             await self.get_beatmap_by_hash(beatmap_hash)
 
-            beatmap_difficulty = await \
-                self.uow.beatmap_version_difficulties.get_by_hash_and_characteristic_and_difficulty(
-                        beatmap_hash,
-                        characteristic,
-                        difficulty
-                )
+            beatmap_difficulty = await self.uow.beatmap_version_difficulties.get_by_hash_and_characteristic_and_difficulty(
+                beatmap_hash, characteristic, difficulty
+            )
 
         return beatmap_difficulty

@@ -10,7 +10,7 @@ from discord.ext import tasks
 from src.kiyomi.timer import Timer
 from src.log import Logger
 
-TClass = TypeVar('TClass')
+TClass = TypeVar("TClass")
 
 
 class Utils:
@@ -25,7 +25,8 @@ class Utils:
             end_time = datetime.now()
 
             Logger.log(
-                    func.__name__, f"Finished task in {timeago.format(start_time, end_time)}\n"
+                func.__name__,
+                f"Finished task in {timeago.format(start_time, end_time)}\n",
             )
 
             return res
@@ -126,7 +127,14 @@ class Utils:
     @staticmethod
     def tasks_decorator(seconds=0, minutes=0, hours=0, count=None, reconnect=True, loop=None):
         def decorator(func):
-            @tasks.loop(seconds=seconds, minutes=minutes, hours=hours, count=count, reconnect=reconnect, loop=loop)
+            @tasks.loop(
+                seconds=seconds,
+                minutes=minutes,
+                hours=hours,
+                count=count,
+                reconnect=reconnect,
+                loop=loop,
+            )
             @wraps(func)
             async def wrapper(self, *args, **kwargs):
                 return await func(self, *args, **kwargs)

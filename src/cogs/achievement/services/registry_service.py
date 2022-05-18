@@ -25,7 +25,7 @@ class RegistryService(AchievementService):
             if generator.name == generator_name:
                 return generator
 
-        raise AchievementGeneratorNotFound(f"Generator with name \"{generator_name}\" doesn't exist.")
+        raise AchievementGeneratorNotFound(f'Generator with name "{generator_name}" doesn\'t exist.')
 
     def get_generators(self) -> List[str]:
         return [generator.name for generator in self._generators]

@@ -10,7 +10,6 @@ from ..model.guild_player import GuildPlayer
 
 
 class GuildPlayerRepository(BaseRepository[GuildPlayer]):
-
     @property
     def _table(self) -> Type[GuildPlayer]:
         return GuildPlayer
@@ -18,10 +17,10 @@ class GuildPlayerRepository(BaseRepository[GuildPlayer]):
     @staticmethod
     def _eager_load_all(stmt: Executable):
         stmt.options(
-                joinedload(GuildPlayer.guild),
-                joinedload(GuildPlayer.member),
-                joinedload(GuildPlayer.player)
-            )
+            joinedload(GuildPlayer.guild),
+            joinedload(GuildPlayer.member),
+            joinedload(GuildPlayer.player),
+        )
 
     async def get_all_by_guild_id(self, guild_id: int) -> List[GuildPlayer]:
         stmt = select(self._table).where(self._table.guild_id == guild_id)
@@ -39,30 +38,24 @@ class GuildPlayerRepository(BaseRepository[GuildPlayer]):
         return await self._first(stmt)
 
     async def get_by_guild_id_and_member_id(self, guild_id: int, member_id: int) -> Optional[GuildPlayer]:
-        stmt = select(self._table)\
-            .where(self._table.guild_id == guild_id)\
-            .where(self._table.member_id == member_id)
+        stmt = select(self._table).where(self._table.guild_id == guild_id).where(self._table.member_id == member_id)
         self._eager_load_all(stmt)
         return await self._first(stmt)
 
     async def get_by_guild_id_and_member_id_and_player_id(
-            self,
-            guild_id: int,
-            member_id: int,
-            player_id: str
+        self, guild_id: int, member_id: int, player_id: str
     ) -> Optional[GuildPlayer]:
-        stmt = select(self._table) \
-            .where(self._table.guild_id == guild_id) \
-            .where(self._table.member_id == member_id) \
+        stmt = (
+            select(self._table)
+            .where(self._table.guild_id == guild_id)
+            .where(self._table.member_id == member_id)
             .where(self._table.player_id == player_id)
+        )
         self._eager_load_all(stmt)
         return await self._first(stmt)
 
     async def remove_by_guild_id_and_member_id_and_player_id(
-            self,
-            guild_id: int,
-            member_id: int,
-            player_id: str
+        self, guild_id: int, member_id: int, player_id: str
     ) -> Optional[GuildPlayer]:
         entity = await self.get_by_guild_id_and_member_id_and_player_id(guild_id, member_id, player_id)
         stmt = delete(self._table).where(self._table.id == entity.id)

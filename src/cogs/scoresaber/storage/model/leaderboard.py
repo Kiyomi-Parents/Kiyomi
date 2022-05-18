@@ -10,11 +10,14 @@ from sqlalchemy.orm import relationship
 from src.kiyomi.database import Base
 
 if TYPE_CHECKING:
-    from src.cogs.beatsaver.storage.model.beatmap_version_difficulty import BeatmapVersionDifficulty
+    from src.cogs.beatsaver.storage.model.beatmap_version_difficulty import (
+        BeatmapVersionDifficulty,
+    )
 
 
 class Leaderboard(Base):
     """Leaderboard data from ScoreSaber"""
+
     __tablename__ = "leaderboard"
 
     id = Column(Integer, primary_key=True)
@@ -43,10 +46,10 @@ class Leaderboard(Base):
     difficulty = Column(Enum(pyscoresaber.BeatmapDifficulty))
 
     beatmap_version = relationship(
-            "BeatmapVersion",
-            primaryjoin='BeatmapVersion.hash == Leaderboard.song_hash',
-            foreign_keys=[song_hash],
-            uselist=False
+        "BeatmapVersion",
+        primaryjoin="BeatmapVersion.hash == Leaderboard.song_hash",
+        foreign_keys=[song_hash],
+        uselist=False,
     )
 
     def __init__(self, leaderboard: pyscoresaber.LeaderboardInfo):
@@ -89,7 +92,7 @@ class Leaderboard(Base):
             BeatmapDifficulty.NORMAL: "Normal",
             BeatmapDifficulty.HARD: "Hard",
             BeatmapDifficulty.EXPERT: "Expert",
-            BeatmapDifficulty.EXPERT_PLUS: "Expert+"
+            BeatmapDifficulty.EXPERT_PLUS: "Expert+",
         }
 
         return difficulties[self.difficulty]

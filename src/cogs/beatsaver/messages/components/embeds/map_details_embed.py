@@ -11,14 +11,13 @@ from src.kiyomi import Kiyomi
 
 
 class MapDetailsEmbed(BeatSaverEmbed):
-
     def __init__(
-            self,
-            bot: Kiyomi,
-            guild: Guild,
-            beatmap: Beatmap,
-            beatmap_characteristic: pybeatsaver.ECharacteristic,
-            beatmap_difficulty: pybeatsaver.EDifficulty
+        self,
+        bot: Kiyomi,
+        guild: Guild,
+        beatmap: Beatmap,
+        beatmap_characteristic: pybeatsaver.ECharacteristic,
+        beatmap_difficulty: pybeatsaver.EDifficulty,
     ):
         super().__init__(bot)
 
@@ -30,10 +29,14 @@ class MapDetailsEmbed(BeatSaverEmbed):
         self.set_thumbnail(url=beatmap.cover_url)
         self.colour = Colour.random(seed=beatmap.uploader_id)
 
-        self.set_author(name=beatmap.uploader_name, url=beatmap.mapper_url, icon_url=beatmap.uploader_avatar)
+        self.set_author(
+            name=beatmap.uploader_name,
+            url=beatmap.mapper_url,
+            icon_url=beatmap.uploader_avatar,
+        )
         self.set_footer(
-                icon_url="https://share.lucker.xyz/qahu5/FoZozoBE67.png/raw.png",
-                text=f"{self.get_scoresaber_status(difficulty)}"
+            icon_url="https://share.lucker.xyz/qahu5/FoZozoBE67.png/raw.png",
+            text=f"{self.get_scoresaber_status(difficulty)}",
         )
 
         self.title = f"{beatmap.name}"
@@ -74,9 +77,9 @@ class MapDetailsEmbed(BeatSaverEmbed):
         return " ".join(difficulty_texts)
 
     def get_difficulty(
-            self,
-            beatmap_characteristic: pybeatsaver.ECharacteristic,
-            beatmap_difficulty: pybeatsaver.EDifficulty
+        self,
+        beatmap_characteristic: pybeatsaver.ECharacteristic,
+        beatmap_difficulty: pybeatsaver.EDifficulty,
     ) -> BeatmapVersionDifficulty:
         for difficulty in self.beatmap.difficulties:
             if difficulty.characteristic is not beatmap_characteristic:

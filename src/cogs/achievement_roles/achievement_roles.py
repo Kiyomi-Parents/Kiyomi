@@ -12,7 +12,6 @@ from ..settings.storage import AbstractSetting
 
 
 class AchievementRoles(AchievementRolesCog, name="Achievement Roles"):
-
     def __init__(self, bot: Kiyomi, member_service: MemberAchievementRoleService):
         super().__init__(bot, member_service)
 
@@ -30,10 +29,7 @@ class AchievementRoles(AchievementRolesCog, name="Achievement Roles"):
 
         @self.bot.events.on("on_setting_change")
         async def update_roles(setting: AbstractSetting):
-            cog_settings = [
-                "achievement_roles_pp",
-                "achievement_roles_rank"
-            ]
+            cog_settings = ["achievement_roles_pp", "achievement_roles_rank"]
 
             if setting.name in cog_settings:
                 await self.member_service.update_guild_roles(setting.guild_id)
@@ -52,7 +48,7 @@ class AchievementRoles(AchievementRolesCog, name="Achievement Roles"):
 
         settings = [
             ToggleSetting.create("Roles based on PP", "achievement_roles_pp", permissions),
-            ToggleSetting.create("Roles based on rank", "achievement_roles_rank", permissions)
+            ToggleSetting.create("Roles based on rank", "achievement_roles_rank", permissions),
         ]
 
         self.bot.events.emit("setting_register", settings)

@@ -16,6 +16,7 @@ if TYPE_CHECKING:
 
 class Score(Base):
     """Score data from ScoreSaber"""
+
     __tablename__ = "score"
 
     id = Column(Integer, primary_key=True)
@@ -38,17 +39,10 @@ class Score(Base):
     time_set = Column(DateTime(timezone=True))
 
     leaderboard_id = Column(Integer, ForeignKey("leaderboard.id", ondelete="CASCADE"))
-    leaderboard = relationship(
-            "Leaderboard",
-            uselist=False
-    )
+    leaderboard = relationship("Leaderboard", uselist=False)
 
     player_id = Column(String(128), ForeignKey("player.id", ondelete="CASCADE"))
-    player = relationship(
-            "Player",
-            uselist=False,
-            back_populates="scores"
-    )
+    player = relationship("Player", uselist=False, back_populates="scores")
 
     def __init__(self, player_score: pyscoresaber.PlayerScore):
         self.score_id = player_score.score.id
@@ -83,7 +77,7 @@ class Score(Base):
 
         if not max_score and self.beatmap_version is not None:
             beatmap_difficulty = self.leaderboard.beatmap_difficulty
-            
+
             if beatmap_difficulty is not None:
                 max_score = beatmap_difficulty.max_score
 

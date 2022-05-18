@@ -18,36 +18,27 @@ class ScoreSaber(ScoreSaberCog, name="Score Saber"):
         super().__init__(bot, player_service, score_service)
 
         # Workaround until @app_commands.context_menu() supports self in function parameters
-        self.bot.tree.add_command(app_commands.ContextMenu(
+        self.bot.tree.add_command(
+            app_commands.ContextMenu(
                 name="Refresh Score Saber Profile",
                 callback=self.refresh,
-                type=AppCommandType.user
-        ))
+                type=AppCommandType.user,
+            )
+        )
 
-    player = app_commands.Group(
-            name="player",
-            description="Link ScoreSaber profile to Discord member"
-    )
+    player = app_commands.Group(name="player", description="Link ScoreSaber profile to Discord member")
 
     @player.command(name="add")
     @app_commands.describe(profile="Score Saber profile URL")
-    async def player_add(
-            self,
-            ctx: Interaction,
-            profile: Transform[str, ScoreSaberPlayerIdTransformer]
-    ):
+    async def player_add(self, ctx: Interaction, profile: Transform[str, ScoreSaberPlayerIdTransformer]):
         """Link yourself to your ScoreSaber profile."""
         self.bot.events.emit("register_member", ctx.user)
 
-        guild_player = await self.player_service.add_player_with_checks(
-                ctx.guild_id,
-                ctx.user.id,
-                profile
-        )
+        guild_player = await self.player_service.add_player_with_checks(ctx.guild_id, ctx.user.id, profile)
 
         await ctx.response.send_message(
-                f"Successfully linked **{guild_player.player.name}** ScoreSaber profile!",
-                ephemeral=True
+            f"Successfully linked **{guild_player.player.name}** ScoreSaber profile!",
+            ephemeral=True,
         )
 
     @player.command(name="remove")
@@ -77,12 +68,7 @@ class ScoreSaber(ScoreSaberCog, name="Score Saber"):
     @app_commands.command(name="recent")
     @app_commands.rename(member="user")
     @app_commands.describe(member="Discord user", count="Amount of scores to post")
-    async def recent_scores(
-            self,
-            ctx: Interaction,
-            member: Optional[discord.Member],
-            count: Optional[int]
-    ):
+    async def recent_scores(self, ctx: Interaction, member: Optional[discord.Member], count: Optional[int]):
         """Displays your most recent scores"""
         # TODO: Just refactor this entire thing.
         if member is None:
@@ -113,24 +99,18 @@ class ScoreSaber(ScoreSaberCog, name="Score Saber"):
 
         if isinstance(error, MemberPlayerNotFoundInGuildException):
             return await error.handle(
-                    ctx=ctx,
-                    message=f"%member_id% doesn't have a Score Saber profile linked"
+                ctx=ctx,
+                message=f"%member_id% doesn't have a Score Saber profile linked",
             )
 
     @app_commands.command(name="manual-add")
     @app_commands.describe(
-            member_id="Discord member ID",
-            player_id="Score Saber player ID",
-            guild_id="Discord guild ID"
+        member_id="Discord member ID",
+        player_id="Score Saber player ID",
+        guild_id="Discord guild ID",
     )
     @permissions.is_bot_owner_and_admin_guild()
-    async def manual_add_player(
-            self,
-            ctx: Interaction,
-            member_id: int,
-            player_id: str,
-            guild_id: Optional[int]
-    ):
+    async def manual_add_player(self, ctx: Interaction, member_id: int, player_id: str, guild_id: Optional[int]):
         """Add a Score Saber profile manually"""
 
         if guild_id is None:
@@ -147,24 +127,18 @@ class ScoreSaber(ScoreSaberCog, name="Score Saber"):
         guild_player = await self.player_service.register_player(guild_id, member_id, player_id)
 
         await ctx.response.send_message(
-                f"Successfully linked Score Saber profile {guild_player.player.name} to member {guild_player.member.name} in guild {guild_player.guild.name}",
-                ephemeral=True
+            f"Successfully linked Score Saber profile {guild_player.player.name} to member {guild_player.member.name} in guild {guild_player.guild.name}",
+            ephemeral=True,
         )
 
     @app_commands.command(name="manual-remove")
     @app_commands.describe(
-            member_id="Discord member ID",
-            player_id="Score Saber player ID",
-            guild_id="Discord guild ID"
+        member_id="Discord member ID",
+        player_id="Score Saber player ID",
+        guild_id="Discord guild ID",
     )
     @permissions.is_bot_owner_and_admin_guild()
-    async def manual_remove_player(
-            self,
-            ctx: Interaction,
-            member_id: int,
-            player_id: str,
-            guild_id: Optional[int]
-    ):
+    async def manual_remove_player(self, ctx: Interaction, member_id: int, player_id: str, guild_id: Optional[int]):
         """Remove a Score Saber profile manually"""
         if guild_id is None:
             guild_id = ctx.guild_id
@@ -176,8 +150,8 @@ class ScoreSaber(ScoreSaberCog, name="Score Saber"):
         guild_player = await self.player_service.remove_player(guild_id, member_id, player_id)
 
         await ctx.response.send_message(
-                f"Successfully unlinked Score Saber profile {guild_player.player.name} from member {guild_player.member.name} in guild {guild_player.guild.name}!",
-                ephemeral=True
+            f"Successfully unlinked Score Saber profile {guild_player.player.name} from member {guild_player.member.name} in guild {guild_player.guild.name}!",
+            ephemeral=True,
         )
 
     @manual_remove_player.error
@@ -187,8 +161,8 @@ class ScoreSaber(ScoreSaberCog, name="Score Saber"):
 
         if isinstance(error, MemberPlayerNotFoundInGuildException):
             return await error.handle(
-                    ctx=ctx,
-                    message=f"%member_id% doesn't have a Score Saber profile %player_id% linked in guild %guild_id%."
+                ctx=ctx,
+                message=f"%member_id% doesn't have a Score Saber profile %player_id% linked in guild %guild_id%.",
             )
 
     # @app_commands.context_menu(name="Refresh Score Saber Profile")
@@ -200,6 +174,6 @@ class ScoreSaber(ScoreSaberCog, name="Score Saber"):
         await self.score_service.update_player_scores(guild_player.player)
 
         await ctx.response.send_message(
-                f"Updated {member.name}'s Score Saber profile ({guild_player.player.name})",
-                ephemeral=True
+            f"Updated {member.name}'s Score Saber profile ({guild_player.player.name})",
+            ephemeral=True,
         )

@@ -11,7 +11,6 @@ from src.cogs.general import GeneralAPI
 
 
 class EmojiService(EmojiEchoService):
-
     async def enable_emoji(self, guild_id: int, emoji_id: int, emoji_name: str) -> EchoEmoji:
         general = self.bot.get_cog_api(GeneralAPI)
 
@@ -46,7 +45,7 @@ class EmojiService(EmojiEchoService):
         return self.bot.get_emoji(echo_emoji.emoji_id)
 
     async def get_emoji_from_message(self, guild_id: int, msg: str):
-        emoji_text = re.search(r'^<\w*:\w*:(\d*)>$', msg)
+        emoji_text = re.search(r"^<\w*:\w*:(\d*)>$", msg)
 
         if emoji_text is None:
             return None

@@ -3,7 +3,9 @@ from typing import Optional, Generic, TypeVar
 import discord
 from discord import Embed
 
-from src.cogs.scoresaber.messages.components.embeds.improvement_score_embed import ImprovementScoreEmbed
+from src.cogs.scoresaber.messages.components.embeds.improvement_score_embed import (
+    ImprovementScoreEmbed,
+)
 from src.cogs.scoresaber.messages.components.embeds.score_embed import ScoreEmbed
 from src.cogs.scoresaber.storage.model.score import Score
 from src.kiyomi import Kiyomi
@@ -20,10 +22,10 @@ class ScoreButton(BaseComponent[T], discord.ui.Button, Generic[T]):
 
         BaseComponent.__init__(self, bot, parent)
         discord.ui.Button.__init__(
-                self,
-                custom_id=f"score:button:score:{score.id}",
-                label="Score details",
-                style=discord.enums.ButtonStyle.primary,
+            self,
+            custom_id=f"score:button:score:{score.id}",
+            label="Score details",
+            style=discord.enums.ButtonStyle.primary,
         )
 
     async def get_embed(self) -> Embed:

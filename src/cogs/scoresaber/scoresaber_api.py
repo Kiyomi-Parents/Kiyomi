@@ -14,8 +14,13 @@ from .storage.model.score import Score
 
 
 class ScoreSaberAPI(ScoreSaberCog):
-
-    def __init__(self, bot: Kiyomi, player_service: PlayerService, score_service: ScoreService, uow: UnitOfWork):
+    def __init__(
+        self,
+        bot: Kiyomi,
+        player_service: PlayerService,
+        score_service: ScoreService,
+        uow: UnitOfWork,
+    ):
         super().__init__(bot, player_service, score_service)
 
         self.uow = uow
@@ -39,10 +44,10 @@ class ScoreSaberAPI(ScoreSaberCog):
         return await self.score_service.get_previous_score(score)
 
     async def get_leaderboard(
-            self,
-            song_hash: str,
-            song_game_mode: pyscoresaber.GameMode,
-            song_difficulty: pyscoresaber.BeatmapDifficulty
+        self,
+        song_hash: str,
+        song_game_mode: pyscoresaber.GameMode,
+        song_difficulty: pyscoresaber.BeatmapDifficulty,
     ) -> Optional[Leaderboard]:
         return await self.uow.leaderboards.get_by_song_hash(song_hash, song_game_mode, song_difficulty)
 

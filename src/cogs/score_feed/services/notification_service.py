@@ -11,7 +11,6 @@ from ...scoresaber.storage.model.player import Player
 
 
 class NotificationService(ScoreFeedService):
-
     def __init__(self, bot: Kiyomi, uow: UnitOfWork, sent_score_service: SentScoreService):
         super().__init__(bot, uow)
 
@@ -24,7 +23,10 @@ class NotificationService(ScoreFeedService):
         if len(guild_players) == 0:
             return
 
-        Logger.log(guild_players[0].guild, f"Sending notifications for {len(guild_players)} players")
+        Logger.log(
+            guild_players[0].guild,
+            f"Sending notifications for {len(guild_players)} players",
+        )
 
         for guild_player in guild_players:
             await self.send_notification(guild_player.guild, guild_player.player)

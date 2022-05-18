@@ -13,7 +13,6 @@ from src.kiyomi import Kiyomi
 
 
 class ScoreView(PersistentView):
-
     def __init__(self, bot: Kiyomi, guild: Guild, score: Score, previous_score: Optional[Score]):
         self.score = score
         self.previous_score = previous_score
@@ -33,13 +32,7 @@ class ScoreView(PersistentView):
 
         if self.score.leaderboard is not None:
             leaderboard_ui = self.bot.get_cog("LeaderboardUI")
-            self.add_item(
-                    leaderboard_ui.button_guild_leaderboard(
-                            self.bot,
-                            self,
-                            self.score.leaderboard.song_hash
-                    )
-            )
+            self.add_item(leaderboard_ui.button_guild_leaderboard(self.bot, self, self.score.leaderboard.song_hash))
 
         if self.score.beatmap is not None:
             beatsaver_ui = self.bot.get_cog("BeatSaverUI")
@@ -49,20 +42,20 @@ class ScoreView(PersistentView):
     async def serialize_persistence(self) -> Persistence:
         if self.previous_score is not None:
             return Persistence(
-                    self.guild.id,
-                    self.message.channel.id,
-                    self.message.id,
-                    ScoreView.__name__,
-                    str(self.score.id),
-                    str(self.previous_score.id)
-            )
-
-        return Persistence(
                 self.guild.id,
                 self.message.channel.id,
                 self.message.id,
                 ScoreView.__name__,
-                str(self.score.id)
+                str(self.score.id),
+                str(self.previous_score.id),
+            )
+
+        return Persistence(
+            self.guild.id,
+            self.message.channel.id,
+            self.message.id,
+            ScoreView.__name__,
+            str(self.score.id),
         )
 
     @staticmethod

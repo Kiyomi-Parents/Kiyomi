@@ -11,7 +11,12 @@ from src.cogs.scoresaber.storage.model.score import Score
 
 
 class ScoreFeed(ScoreFeedCog, name="Score Feed"):
-    def __init__(self, bot: Kiyomi, notification_service: NotificationService, sent_score_service: SentScoreService):
+    def __init__(
+        self,
+        bot: Kiyomi,
+        notification_service: NotificationService,
+        sent_score_service: SentScoreService,
+    ):
         super().__init__(bot, notification_service, sent_score_service)
 
         # Register events
@@ -29,16 +34,14 @@ class ScoreFeed(ScoreFeedCog, name="Score Feed"):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        settings = [
-            ChannelSetting.create(self.bot, "Score feed channel", "score_feed_channel_id")
-        ]
+        settings = [ChannelSetting.create(self.bot, "Score feed channel", "score_feed_channel_id")]
 
         self.bot.events.emit("setting_register", settings)
 
     score_feed = app_commands.Group(
-            name="score_feed",
-            description="Score feed related commands",
-            guild_ids=permissions.admin_guild_list()
+        name="score_feed",
+        description="Score feed related commands",
+        guild_ids=permissions.admin_guild_list(),
     )
 
     @app_commands.command()
