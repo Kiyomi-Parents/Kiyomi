@@ -29,11 +29,11 @@ async def startup(loop: AbstractEventLoop):
 
     async with Kiyomi(command_prefix="!", db=database, loop=loop) as bot:
         default_guild = os.getenv("DEFAULT_GUILD")
-        if default_guild is not None:
+        if default_guild is not None and len(default_guild) > 0:
             bot.default_guild = discord.Object(id=int(default_guild))
 
         debug_guilds = os.getenv("DEBUG_GUILDS")
-        if debug_guilds is not None:
+        if debug_guilds is not None and len(debug_guilds) > 0:
             bot.debug_guilds = [discord.Object(id=int(guild_id)) for guild_id in debug_guilds.split(",") if guild_id]
 
         # Base Cogs

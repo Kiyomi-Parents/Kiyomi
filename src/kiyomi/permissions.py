@@ -10,7 +10,10 @@ T = TypeVar('T')
 
 
 def _admin_guilds() -> List[discord.Object]:
-    return [discord.Object(id=int(guild_id)) for guild_id in os.getenv("ADMIN_GUILDS").split(",")]
+    admin_guilds = os.getenv("ADMIN_GUILDS")
+    if admin_guilds is not None and len(admin_guilds) > 0:
+        return [discord.Object(id=int(guild_id)) for guild_id in os.getenv("ADMIN_GUILDS").split(",")]
+    return []
 
 
 def admin_guild_list() -> List[int]:
