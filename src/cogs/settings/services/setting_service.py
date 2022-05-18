@@ -95,11 +95,12 @@ class SettingService(SettingsService):
     async def set(self, guild_id: int, name: str, value: Optional[any]) -> AbstractSetting:
         setting = await self.get(guild_id, name)
 
-        if setting.setting.id is None:
-            setting.set(value)
-            setting.setting = await self.uow.settings_repo.add(setting.setting)
-        else:
-            await self.uow.settings_repo.set(setting.setting, value)
+        async with self.uow:
+            if setting.setting.id is None:
+                setting.set(value)
+                setting.setting = await self.uow.settings_repo.add(setting.setting)
+            else:
+                await self.uow.settings_repo.set(setting.setting, value)
 
         self.bot.events.emit("on_setting_change", setting)
 
