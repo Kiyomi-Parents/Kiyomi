@@ -4,7 +4,7 @@ from discord.ext import commands
 from twitchio.ext.eventsub import StreamOnlineData
 
 from . import MessageService
-from .services import TwitchStreamerService, TwitchEventService
+from .services import BroadcasterService, EventService
 from .transformers.twitch_login_transformer import TwitchLoginTransformer
 from .twitch_cog import TwitchCog
 from ..settings.storage import ChannelSetting
@@ -13,9 +13,9 @@ from ...kiyomi import Kiyomi
 
 class Twitch(TwitchCog):
 
-    def __init__(self, bot: Kiyomi, twitch_streamer_service: TwitchStreamerService,
-                 twitch_event_service: TwitchEventService, message_service: MessageService):
-        super().__init__(bot, twitch_streamer_service, twitch_event_service, message_service)
+    def __init__(self, bot: Kiyomi, twitch_broadcaster_service: BroadcasterService,
+                 twitch_event_service: EventService, message_service: MessageService):
+        super().__init__(bot, twitch_broadcaster_service, twitch_event_service, message_service)
         # Register events
         self.events()
 
@@ -28,11 +28,11 @@ class Twitch(TwitchCog):
                 print(event)
                 return
 
-            guild_twitch_streamers = await self.twitch_streamer_service.get_guild_twitch_streamers_by_twitch_streamer_id(str(event.broadcaster.id))
+            guild_twitch_broadcasters = await self.twitch_broadcaster_service.get_guild_twitch_broadcasters_by_broadcaster_id(str(event.broadcaster.id))
 
-            stream = await self.twitch_streamer_service.get_stream(event.broadcaster.id)
+            stream = await self.twitch_broadcaster_service.fetch_stream(event.broadcaster.id)
 
-            await self.message_service.send_broadcast_live_notifications(event, guild_twitch_streamers, stream)
+            await self.message_service.send_broadcast_live_notifications(event, guild_twitch_broadcasters, stream)
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -57,7 +57,7 @@ class Twitch(TwitchCog):
             ctx: Interaction,
             arg: str
     ):
-        user = await self.twitch_streamer_service.get_user(arg)
+        user = await self.twitch_broadcaster_service.fetch_user(arg)
         print(user)
 
     @twitch.command(name="add")
@@ -68,8 +68,8 @@ class Twitch(TwitchCog):
             login: Transform[str, TwitchLoginTransformer]
     ):
         self.bot.events.emit("register_member", ctx.user)
-        guild_twitch_streamer = await self.twitch_streamer_service.register_twitch_streamer(ctx.guild_id, ctx.user.id, login)
-        await self.twitch_event_service.register_subscription(int(guild_twitch_streamer.twitch_streamer_id))  # maybe we should instead refresh all subscriptions here?
+        guild_twitch_streamer = await self.twitch_broadcaster_service.register_twitch_broadcaster(ctx.guild_id, ctx.user.id, login)
+        await self.twitch_event_service.register_subscription(int(guild_twitch_streamer.twitch_broadcaster_id))  # maybe we should instead refresh all subscriptions here?
 
     async def twitch_remove(self):
         pass

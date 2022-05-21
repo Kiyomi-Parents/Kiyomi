@@ -5,9 +5,9 @@ from twitchio import User
 from src.kiyomi.database import Base
 
 
-class TwitchStreamer(Base):
-    """Streamer data from Twitch"""
-    __tablename__ = "twitch_streamer"
+class TwitchBroadcaster(Base):
+    """Broadcaster data from Twitch"""
+    __tablename__ = "twitch_broadcaster"
 
     id = Column(String(128), primary_key=True, autoincrement=False)
     login = Column(String(64))
@@ -15,7 +15,7 @@ class TwitchStreamer(Base):
     profile_image_url = Column(String(256))
     broadcaster_type = Column(String(32))
 
-    guilds = association_proxy("guild_twitch_streamer", "guild")
+    guilds = association_proxy("guild_twitch_broadcaster", "guild")
 
     def __init__(self, user: User):
         self.id = user.id
@@ -25,4 +25,4 @@ class TwitchStreamer(Base):
         self.broadcaster_type = user.broadcaster_type
 
     def __str__(self):
-        return f"TwitchStreamer {self.login} ({self.id})"
+        return f"TwitchBroadcaster {self.login} ({self.id})"

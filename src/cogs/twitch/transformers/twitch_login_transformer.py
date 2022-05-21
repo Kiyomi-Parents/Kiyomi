@@ -4,7 +4,7 @@ from typing import Union, List, Optional
 from discord import Interaction
 from discord.app_commands import Transformer, Choice
 
-from ..errors import TwitchStreamerNotFound
+from ..errors import BroadcasterNotFound
 
 
 class TwitchLoginTransformer(Transformer):
@@ -13,7 +13,7 @@ class TwitchLoginTransformer(Transformer):
         login = cls.twitch_login_from_url(value)
 
         if login is None:
-            raise TwitchStreamerNotFound(value)
+            raise BroadcasterNotFound(value)
 
         return login
 

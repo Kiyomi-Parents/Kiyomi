@@ -4,8 +4,8 @@ import twitchio
 from twitchio.ext import eventsub
 
 from .services import MessageService
-from .services.event_service import TwitchEventService
-from .services.twitch_streamer_service import TwitchStreamerService
+from .services.event_service import EventService
+from .services.twitch_broadcaster_service import BroadcasterService
 from .storage import UnitOfWork
 from .twitch import Twitch
 from ...kiyomi import Kiyomi
@@ -34,14 +34,14 @@ async def setup(bot: Kiyomi):
     bot.loop.create_task(eventsub_client.listen(port=twitch_event_sub_listener_port))
     bot.loop.create_task(twitch_client.connect())
 
-    twitch_streamer_service = TwitchStreamerService(bot, uow, twitch_client, eventsub_client)
-    twitch_event_service = TwitchEventService(bot, uow, twitch_client, eventsub_client)
+    twitch_broadcaster_service = BroadcasterService(bot, uow, twitch_client, eventsub_client)
+    twitch_event_service = EventService(bot, uow, twitch_client, eventsub_client)
     message_service = MessageService(bot, uow, twitch_client, eventsub_client)
 
     await bot.add_cog(
         Twitch(
             bot,
-            twitch_streamer_service,
+            twitch_broadcaster_service,
             twitch_event_service,
             message_service
         )

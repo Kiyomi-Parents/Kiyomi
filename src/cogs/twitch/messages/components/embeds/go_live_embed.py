@@ -3,24 +3,24 @@ import calendar
 from twitchio import Stream
 from twitchio.ext.eventsub import StreamOnlineData
 
-from ....storage.model.guild_twitch_streamer import GuildTwitchStreamer
+from ....storage.model.guild_twitch_broadcaster import GuildTwitchBroadcaster
 from src.kiyomi import Kiyomi
 from .twitch_embed import TwitchEmbed
 
 
 class GoLiveEmbed(TwitchEmbed):
-    def __init__(self, bot: Kiyomi, event: StreamOnlineData, guild_twitch_streamer: GuildTwitchStreamer, stream: Stream):
+    def __init__(self, bot: Kiyomi, event: StreamOnlineData, guild_twitch_broadcaster: GuildTwitchBroadcaster, stream: Stream):
         super().__init__(bot)
 
         self.set_author(
-            name=f"{self.get_name(event.broadcaster.name, guild_twitch_streamer.member.name)} went live on Twitch!",
-            icon_url=guild_twitch_streamer.twitch_streamer.profile_image_url
+            name=f"{self.get_name(event.broadcaster.name, guild_twitch_broadcaster.member.name)} went live on Twitch!",
+            icon_url=guild_twitch_broadcaster.twitch_broadcaster.profile_image_url
         )
 
         unix_timestamp = calendar.timegm(event.started_at.timetuple())
 
         self.title = stream.title
-        self.url = f"https://www.twitch.tv/{guild_twitch_streamer.twitch_streamer.login}"
+        self.url = f"https://www.twitch.tv/{guild_twitch_broadcaster.twitch_broadcaster.login}"
 
         self.description = f"<t:{unix_timestamp}:F>"
 
