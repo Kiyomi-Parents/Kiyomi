@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, ForeignKey, String, BigInteger
-from sqlalchemy.orm import relationship, backref
+from sqlalchemy.orm import relationship
 
 from src.kiyomi.database import Base
 

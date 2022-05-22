@@ -1,6 +1,6 @@
 from sqlalchemy import Column, String
 from sqlalchemy.ext.associationproxy import association_proxy
-from sqlalchemy.orm import relationship, backref
+from sqlalchemy.orm import relationship
 from twitchio import User
 
 from src.kiyomi.database import Base
