@@ -2,7 +2,7 @@ from typing import TypeVar
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-T = TypeVar('T')
+ENTITY = TypeVar('ENTITY')
 
 
 class BaseUnitOfWork:
@@ -23,8 +23,9 @@ class BaseUnitOfWork:
 
         # await self._session.close()
 
-    async def refresh(self, entry: T):
-        return await self._session.refresh(entry)
+    async def refresh(self, entity: ENTITY) -> ENTITY:
+        await self._session.refresh(entity)
+        return entity
 
     async def commit(self):
         await self._session.commit()

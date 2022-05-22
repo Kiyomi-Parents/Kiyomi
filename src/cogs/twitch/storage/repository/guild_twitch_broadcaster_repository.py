@@ -1,10 +1,11 @@
 from typing import Type, List, Optional
 
-from sqlalchemy import select
+from sqlalchemy import select, delete
 from sqlalchemy.orm import selectinload
 from sqlalchemy.sql import Executable
 
 from src.kiyomi.database import BaseRepository
+from src.log import Logger
 from ..model.guild_twitch_broadcaster import GuildTwitchBroadcaster
 
 
@@ -37,3 +38,15 @@ class GuildTwitchBroadcasterRepository(BaseRepository[GuildTwitchBroadcaster]):
         stmt = select(self._table).where(self._table.twitch_broadcaster_id == broadcaster_id)
         stmt = self._eager_load_all(stmt)
         return await self._all(stmt)
+
+    async def remove_by_guild_id_and_member_id(
+            self,
+            guild_id: int,
+            member_id: int
+    ) -> Optional[GuildTwitchBroadcaster]:
+        entity = await self.get_by_guild_id_and_member_id(guild_id, member_id)
+        stmt = delete(self._table).where(self._table.id == entity.id)
+        await self._session.execute(stmt)
+
+        Logger.log(entity, "Removed")
+        return entity

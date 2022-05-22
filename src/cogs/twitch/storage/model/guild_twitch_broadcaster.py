@@ -13,11 +13,12 @@ class GuildTwitchBroadcaster(Base):
     member_id = Column(BigInteger, ForeignKey("member.id"))
     twitch_broadcaster_id = Column(String(128), ForeignKey("twitch_broadcaster.id", ondelete="CASCADE"))
 
-    guild = relationship("Guild")
-    member = relationship("Member")
+    guild = relationship("Guild", lazy="joined")
+    member = relationship("Member", lazy="joined")
     twitch_broadcaster = relationship(
-            "TwitchBroadcaster",
-            backref=backref("twitch_broadcaster")
+        "TwitchBroadcaster",
+        backref=backref("twitch_broadcaster"),
+        lazy="joined"
     )
 
     def __init__(self, guild_id: int, member_id: int, twitch_streamer_id: str):
@@ -26,4 +27,4 @@ class GuildTwitchBroadcaster(Base):
         self.twitch_broadcaster_id = twitch_streamer_id
 
     def __str__(self):
-        return f"Twitch Streamer {self.guild_id} {self.member_id} {self.twitch_broadcaster_id}"
+        return f"GuildTwitchBroadcaster {self.guild_id} {self.member_id} {self.twitch_broadcaster_id}"

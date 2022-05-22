@@ -21,3 +21,7 @@ class BroadcastNotFound(TwitchCogException):
     def __str__(self):
         # TODO: fancy arg resolver
         return f"Couldn't find Twitch Broadcast from user id {self.user_id}!"
+
+
+class GuildTwitchBroadcasterNotFound(TwitchCogException):
+    pass

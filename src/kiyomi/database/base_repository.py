@@ -36,7 +36,8 @@ class BaseRepository(Generic[ENTITY], metaclass=ABCMeta):
         return result.unique().all()
 
     async def get_by_id(self, entity_id: int) -> Optional[ENTITY]:
-        stmt = select(self._table).where(self._table.id == entity_id)
+        stmt = select(self._table).where(self._table.id == entity_id) \
+            .options(joinedload('*'))
         return await self._first(stmt)
 
     async def get_all(self) -> List[ENTITY]:

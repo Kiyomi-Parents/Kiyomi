@@ -1,9 +1,9 @@
 from typing import List
 
-from twitchio import User, ChannelInfo, Stream
+from twitchio import User, ChannelInfo, Stream, HTTPException
 
 from .twitch_service import TwitchService
-from ..errors import BroadcasterNotFound, BroadcastNotFound
+from ..errors import BroadcasterNotFound, BroadcastNotFound, GuildTwitchBroadcasterNotFound
 from ..storage.model.guild_twitch_broadcaster import GuildTwitchBroadcaster
 from ..storage.model.twitch_broadcaster import TwitchBroadcaster
 
@@ -11,7 +11,10 @@ from ..storage.model.twitch_broadcaster import TwitchBroadcaster
 class BroadcasterService(TwitchService):
 
     async def fetch_user(self, login: str) -> User:
-        users: List[User] = await self.twitch_client.fetch_users(names=[login])
+        try:
+            users: List[User] = await self.twitch_client.fetch_users(names=[login])
+        except HTTPException:
+            raise BroadcasterNotFound(login)
 
         if len(users) == 0:
             raise BroadcasterNotFound(login)
@@ -40,7 +43,15 @@ class BroadcasterService(TwitchService):
                 await self.uow.guild_twitch_broadcasters.remove_by_id(broadcaster.id)
 
         async with self.uow:
-            return await self.uow.guild_twitch_broadcasters.add(GuildTwitchBroadcaster(guild_id, member_id, broadcaster_id))
+            entity = await self.uow.guild_twitch_broadcasters.add(GuildTwitchBroadcaster(guild_id, member_id, broadcaster_id))
+        return await self.uow.refresh(entity)
+
+    async def unregister_guild_twitch_broadcaster(self, guild_id: int, member_id: int) -> GuildTwitchBroadcaster:
+        async with self.uow:
+            guild_twitch_broadcaster = await self.uow.guild_twitch_broadcasters.remove_by_guild_id_and_member_id(guild_id, member_id)
+            if guild_twitch_broadcaster is None:
+                raise GuildTwitchBroadcasterNotFound(f"Couldn't find GuildTwitchBroadcaster with guild_id {guild_id}, member_id {member_id}")
+            return guild_twitch_broadcaster
 
     async def get_guild_twitch_broadcasters_by_broadcaster_id(self, broadcaster_id) -> List[GuildTwitchBroadcaster]:
         return await self.uow.guild_twitch_broadcasters.get_all_by_broadcaster_id(broadcaster_id)

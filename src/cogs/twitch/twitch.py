@@ -4,7 +4,7 @@ from discord.ext import commands
 from twitchio.ext.eventsub import StreamOnlineData, StreamOfflineData
 
 from . import MessageService
-from .errors import BroadcastNotFound
+from .errors import BroadcastNotFound, BroadcasterNotFound, GuildTwitchBroadcasterNotFound
 from .services import BroadcasterService, EventService
 from .transformers.twitch_login_transformer import TwitchLoginTransformer
 from .twitch_cog import TwitchCog
@@ -61,9 +61,24 @@ class Twitch(TwitchCog):
             login: Transform[str, TwitchLoginTransformer]
     ):
         self.bot.events.emit("register_member", ctx.user)
-        guild_twitch_streamer = await self.twitch_broadcaster_service.register_twitch_broadcaster(ctx.guild_id, ctx.user.id, login)
+
+        try:
+            guild_twitch_streamer = await self.twitch_broadcaster_service.register_twitch_broadcaster(ctx.guild_id, ctx.user.id, login)
+        except BroadcasterNotFound as e:
+            await ctx.response.send_message(str(e))
+            return
+
         await self.twitch_event_service.register_subscription(int(guild_twitch_streamer.twitch_broadcaster_id))  # maybe we should instead refresh all subscriptions here?
+        await ctx.response.send_message(f"Successfully linked **{guild_twitch_streamer.twitch_broadcaster.login}** ScoreSaber profile!", ephemeral=True)
 
     @twitch.command(name="remove")
     async def twitch_remove(self, ctx: Interaction):
-        pass
+        """Remove the currently linked Twitch account from yourself in this Discord guild."""
+        try:
+            guild_twitch_broadcaster = await self.twitch_broadcaster_service.unregister_guild_twitch_broadcaster(ctx.guild_id, ctx.user.id)
+        except GuildTwitchBroadcasterNotFound:
+            await ctx.response.send_message(f"Failed to unregister, most likely because you are already unregistered.")
+            return
+        await ctx.response.send_message(f"Successfully unlinked {guild_twitch_broadcaster.twitch_broadcaster.login} from {ctx.user.name} in guild {ctx.guild.name}!", ephemeral=True)
+
+        # TODO: maybe figure out a way to delete the corresponding eventsub subscription if this streamer is orphaned?
