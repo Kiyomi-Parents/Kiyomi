@@ -17,7 +17,7 @@ class GuildTwitchBroadcaster(Base):
     member = relationship("Member", lazy="joined")
     twitch_broadcaster = relationship(
         "TwitchBroadcaster",
-        backref=backref("twitch_broadcaster"),
+        back_populates="guild_twitch_broadcasters",
         lazy="joined"
     )
 

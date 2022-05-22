@@ -1,5 +1,6 @@
 from sqlalchemy import Column, String
 from sqlalchemy.ext.associationproxy import association_proxy
+from sqlalchemy.orm import relationship, backref
 from twitchio import User
 
 from src.kiyomi.database import Base
@@ -15,7 +16,12 @@ class TwitchBroadcaster(Base):
     profile_image_url = Column(String(256))
     broadcaster_type = Column(String(32))
 
-    guilds = association_proxy("guild_twitch_broadcaster", "guild")
+    guild_twitch_broadcasters = relationship(
+        "GuildTwitchBroadcaster",
+        back_populates="twitch_broadcaster",
+        lazy="joined"
+        )
+    guilds = association_proxy("guild_twitch_broadcasters", "guild")
 
     def __init__(self, user: User):
         self.id = user.id

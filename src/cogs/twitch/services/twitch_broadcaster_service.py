@@ -51,7 +51,14 @@ class BroadcasterService(TwitchService):
             guild_twitch_broadcaster = await self.uow.guild_twitch_broadcasters.remove_by_guild_id_and_member_id(guild_id, member_id)
             if guild_twitch_broadcaster is None:
                 raise GuildTwitchBroadcasterNotFound(f"Couldn't find GuildTwitchBroadcaster with guild_id {guild_id}, member_id {member_id}")
-            return guild_twitch_broadcaster
+            twitch_broadcaster = guild_twitch_broadcaster.twitch_broadcaster
+
+        await self.uow.refresh(twitch_broadcaster)
+        async with self.uow:
+            if len(twitch_broadcaster.guilds) == 0:
+                await self.uow.twitch_broadcasters.remove(twitch_broadcaster)
+
+        return guild_twitch_broadcaster
 
     async def get_guild_twitch_broadcasters_by_broadcaster_id(self, broadcaster_id) -> List[GuildTwitchBroadcaster]:
         return await self.uow.guild_twitch_broadcasters.get_all_by_broadcaster_id(broadcaster_id)
