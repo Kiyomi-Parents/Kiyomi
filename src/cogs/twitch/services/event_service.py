@@ -16,8 +16,11 @@ class EventService(TwitchService):
 
         @twitch_client.event()
         async def event_eventsub_notification_stream_start(event: NotificationEvent):
-            self.uow.twitch_broadcasts.add(event.data)
             self.bot.events.emit("twitch_broadcast_start", event.data)
+
+        @twitch_client.event()
+        async def event_eventsub_notification_stream_end(event: NotificationEvent):
+            self.bot.events.emit("twitch_broadcast_end", event.data)
 
     async def delete_subscriptions(self):
         # ???????
@@ -32,10 +35,11 @@ class EventService(TwitchService):
 
     async def register_subscription(self, streamer_id: int):
         # TODO: figure out if we need to delete any previous subscriptions to the same streamer
-        try:
-            await self.eventsub_client.subscribe_channel_stream_start(streamer_id)
-        except twitchio.errors.HTTPException as e:
-            Logger.error(f"{e} stream start", e.reason)
+        for subscribe in (self.eventsub_client.subscribe_channel_stream_start, self.eventsub_client.subscribe_channel_stream_end):
+            try:
+                await subscribe(streamer_id)
+            except twitchio.errors.HTTPException as e:
+                Logger.error(str(e), e.reason)
 
     async def registered_broadcasters(self) -> List[TwitchBroadcaster]:
         return await self.uow.twitch_broadcasters.get_all()

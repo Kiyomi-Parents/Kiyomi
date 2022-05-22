@@ -1,7 +1,8 @@
-from typing import List
+from typing import List, Optional
 
+from discord import Message
 from twitchio import Stream
-from twitchio.ext.eventsub import StreamOnlineData
+from twitchio.ext.eventsub import StreamOnlineData, StreamOfflineData
 
 from src.cogs.settings import SettingsAPI
 from src.log import Logger
@@ -11,17 +12,21 @@ from ..storage.model.guild_twitch_broadcaster import GuildTwitchBroadcaster
 
 
 class MessageService(TwitchService):
-    async def send_broadcast_live_notifications(self, event: StreamOnlineData, guild_twitch_broadcasters: List[GuildTwitchBroadcaster], stream: Stream):
+    async def send_broadcast_live_notifications(self, event: StreamOnlineData, guild_twitch_broadcasters: List[GuildTwitchBroadcaster], stream: Optional[Stream]):
         if len(guild_twitch_broadcasters) == 0:
-            print("adfasfds")
             return
 
         Logger.log(f"Twitch Feed", f"{event.broadcaster.name} went live, notifying {len(guild_twitch_broadcasters)} guilds")
 
-        for streamer in guild_twitch_broadcasters:
-            await self.send_broadcast_live_notification(event, streamer, stream)
+        messages = []
 
-    async def send_broadcast_live_notification(self, event: StreamOnlineData, guild_twitch_broadcaster: GuildTwitchBroadcaster, stream: Stream):
+        for streamer in guild_twitch_broadcasters:
+            message = await self.send_broadcast_live_notification(event, streamer, stream)
+            messages.append(message)
+
+        self.uow.twitch_broadcasts.add(event, messages)
+
+    async def send_broadcast_live_notification(self, event: StreamOnlineData, guild_twitch_broadcaster: GuildTwitchBroadcaster, stream: Optional[Stream]) -> Optional[Message]:
         settings = self.bot.get_cog_api(SettingsAPI)
 
         discord_guild = self.bot.get_guild(guild_twitch_broadcaster.guild_id)
@@ -30,6 +35,18 @@ class MessageService(TwitchService):
 
         if channel is None:
             Logger.log(discord_guild, "Twitch feed channel not found, skipping!")
-            return
+            return None
 
-        await channel.send(embed=GoLiveEmbed(self.bot, event, guild_twitch_broadcaster, stream))
+        return await channel.send(embed=GoLiveEmbed(self.bot, event, guild_twitch_broadcaster, stream))
+
+    async def rescind_broadcast_live_notifications(self, event: StreamOfflineData):
+        broadcasts = self.uow.twitch_broadcasts.remove_by_broadcaster_id(event.broadcaster.id)
+        for broadcast in broadcasts:
+            for message in broadcast.messages:
+                embed = message.embeds[0]
+                embed.set_author(
+                    name=embed.author.name + " [STREAM ENDED]",
+                    url=embed.author.url,
+                    icon_url=embed.author.icon_url
+                )
+                await message.edit(embed=embed)

@@ -1,4 +1,5 @@
 import calendar
+from typing import Optional
 
 from twitchio import Stream
 from twitchio.ext.eventsub import StreamOnlineData
@@ -9,7 +10,7 @@ from .twitch_embed import TwitchEmbed
 
 
 class GoLiveEmbed(TwitchEmbed):
-    def __init__(self, bot: Kiyomi, event: StreamOnlineData, guild_twitch_broadcaster: GuildTwitchBroadcaster, stream: Stream):
+    def __init__(self, bot: Kiyomi, event: StreamOnlineData, guild_twitch_broadcaster: GuildTwitchBroadcaster, stream: Optional[Stream]):
         super().__init__(bot)
 
         self.set_author(
@@ -19,14 +20,14 @@ class GoLiveEmbed(TwitchEmbed):
 
         unix_timestamp = calendar.timegm(event.started_at.timetuple())
 
-        self.title = stream.title
         self.url = f"https://www.twitch.tv/{guild_twitch_broadcaster.twitch_broadcaster.login}"
 
         self.description = f"<t:{unix_timestamp}:F>"
 
-        self.set_image(url=stream.thumbnail_url.replace("{width}", "1920").replace("{height}", "1080"))
-
-        self.set_footer(text=f"Playing {stream.game_name} for {stream.viewer_count} viewers!")
+        if stream is not None:
+            self.title = stream.title
+            self.set_image(url=stream.thumbnail_url.replace("{width}", "1920").replace("{height}", "1080"))
+            self.set_footer(text=f"Playing {stream.game_name} for {stream.viewer_count} viewers!")
 
     @staticmethod
     def get_name(twitch_name: str, discord_name: str) -> str:
