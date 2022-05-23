@@ -7,7 +7,6 @@ from .achievement_generator import AchievementGenerator
 
 
 class Rank(AchievementGenerator):
-
     def get_achievements(self, member: Member) -> List[Achievement]:
         achievements = []
 

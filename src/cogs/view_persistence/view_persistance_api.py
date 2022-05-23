@@ -18,7 +18,6 @@ class ViewPersistenceAPI(ViewPersistenceCog):
         self.events()
 
     def events(self):
-
         @self.bot.events.on("on_new_view_sent")
         async def mark_scores_sent(persistence: Persistence):
             await self.message_view_service.add_persistent_view(persistence)

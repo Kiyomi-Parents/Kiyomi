@@ -15,9 +15,7 @@ class BeatmapKeyTransformer(Transformer):
 
     @classmethod
     async def autocomplete(
-            cls,
-            interaction: Interaction,
-            value: Union[int, float, str]
+        cls, interaction: Interaction, value: Union[int, float, str]
     ) -> List[Choice[Union[int, float, str]]]:
         beatmap = await cls.get_beatmap_by_key(interaction, value)
 

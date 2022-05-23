@@ -19,14 +19,14 @@ class ScoreEmbed(BaseEmbed):
         self.colour = Colour.random(seed=score.player.id)
 
         self.set_author(
-                name=f"{score.player.name} ({self.score.get_hmd_name})",
-                url=score.player.profile_url,
-                icon_url=score.player.avatar
+            name=f"{score.player.name} ({self.score.get_hmd_name})",
+            url=score.player.profile_url,
+            icon_url=score.player.avatar,
         )
 
         self.set_footer(
-                icon_url="https://share.lucker.xyz/qahu5/FoZozoBE67.png/raw.png",
-                text=self.get_scoresaber_status
+            icon_url="https://share.lucker.xyz/qahu5/FoZozoBE67.png/raw.png",
+            text=self.get_scoresaber_status,
         )
 
         self.title = f"New • #{score.rank} • {score.leaderboard.song_name_full} • {score.leaderboard.difficulty_name}"

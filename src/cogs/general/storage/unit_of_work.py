@@ -12,7 +12,6 @@ from src.kiyomi.database import BaseUnitOfWork
 
 
 class UnitOfWork(BaseUnitOfWork):
-
     def __init__(self, session: AsyncSession):
         super().__init__(session)
 

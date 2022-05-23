@@ -2,7 +2,7 @@ from typing import TypeVar
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-T = TypeVar('T')
+T = TypeVar("T")
 
 
 class BaseUnitOfWork:

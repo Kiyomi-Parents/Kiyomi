@@ -18,7 +18,9 @@ class ScoreSaberUtils:
         return pp_weight
 
     @staticmethod
-    def to_beatsaver_characteristic(game_mode: pyscoresaber.GameMode) -> pybeatsaver.ECharacteristic:
+    def to_beatsaver_characteristic(
+        game_mode: pyscoresaber.GameMode,
+    ) -> pybeatsaver.ECharacteristic:
         game_modes = {
             pyscoresaber.GameMode.STANDARD: pybeatsaver.ECharacteristic.STANDARD,
             pyscoresaber.GameMode.ONE_SABER: pybeatsaver.ECharacteristic.ONE_SABER,
@@ -32,7 +34,9 @@ class ScoreSaberUtils:
         return game_modes[game_mode]
 
     @staticmethod
-    def to_beatsaver_difficulty(difficulty: pyscoresaber.BeatmapDifficulty) -> pybeatsaver.EDifficulty:
+    def to_beatsaver_difficulty(
+        difficulty: pyscoresaber.BeatmapDifficulty,
+    ) -> pybeatsaver.EDifficulty:
         difficulties = {
             pyscoresaber.BeatmapDifficulty.EASY: pybeatsaver.EDifficulty.EASY,
             pyscoresaber.BeatmapDifficulty.NORMAL: pybeatsaver.EDifficulty.NORMAL,

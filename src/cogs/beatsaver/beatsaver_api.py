@@ -13,12 +13,7 @@ from .storage.model.beatmap_version_difficulty import BeatmapVersionDifficulty
 
 
 class BeatSaverAPI(BeatSaverCog):
-    def __init__(
-            self,
-            bot: Kiyomi,
-            beatmap_service: BeatmapService,
-            uow: UnitOfWork
-    ):
+    def __init__(self, bot: Kiyomi, beatmap_service: BeatmapService, uow: UnitOfWork):
         super().__init__(bot, beatmap_service)
 
         self.uow = uow
@@ -41,19 +36,19 @@ class BeatSaverAPI(BeatSaverCog):
         return await self.beatmap_service.get_beatmap_hash_by_key(beatmap_key)
 
     async def get_beatmap_difficulty_by_key(
-            self,
-            beatmap_key: str,
-            characteristic: pybeatsaver.ECharacteristic,
-            difficulty: pybeatsaver.EDifficulty
+        self,
+        beatmap_key: str,
+        characteristic: pybeatsaver.ECharacteristic,
+        difficulty: pybeatsaver.EDifficulty,
     ) -> Optional[BeatmapVersionDifficulty]:
         beatmap_hash = await self.beatmap_service.get_beatmap_hash_by_key(beatmap_key)
 
         return await self.beatmap_service.get_beatmap_difficulty(beatmap_hash, characteristic, difficulty)
 
     async def get_beatmap_difficulty_by_hash(
-            self,
-            beatmap_hash: str,
-            characteristic: pybeatsaver.ECharacteristic,
-            difficulty: pybeatsaver.EDifficulty
+        self,
+        beatmap_hash: str,
+        characteristic: pybeatsaver.ECharacteristic,
+        difficulty: pybeatsaver.EDifficulty,
     ) -> Optional[BeatmapVersionDifficulty]:
         return await self.beatmap_service.get_beatmap_difficulty(beatmap_hash, characteristic, difficulty)

@@ -17,9 +17,7 @@ class EnabledEmojiTransformer(Transformer):
 
     @classmethod
     async def autocomplete(
-            cls,
-            interaction: Interaction,
-            value: Union[int, float, str]
+        cls, interaction: Interaction, value: Union[int, float, str]
     ) -> List[Choice[Union[int, float, str]]]:
         ctx = await Context.from_interaction(interaction)
         echo_emojis = ctx.bot.get_cog_api(EmojiEchoAPI)
@@ -39,4 +37,3 @@ class EnabledEmojiTransformer(Transformer):
             emojis.append(Choice(name=emoji.name, value=str(emoji.id)))
 
         return Utils.limit_list(emojis, 25)
-

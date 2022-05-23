@@ -12,6 +12,7 @@ from .beatmap_version_difficulty import BeatmapVersionDifficulty
 
 class Beatmap(Base):
     """Song data from BeatSaver"""
+
     __tablename__ = "beatmap"
 
     # BeatSaver info

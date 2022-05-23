@@ -8,6 +8,7 @@ from .beatmap_version_difficulty import BeatmapVersionDifficulty
 
 class BeatmapVersion(Base):
     """Map version data from BeatSaver"""
+
     __tablename__ = "beatmap_version"
 
     hash = Column(String(128), primary_key=True, autoincrement=False)

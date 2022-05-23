@@ -6,7 +6,6 @@ from src.cogs.fancy_presence.storage.model.presence import Presence
 
 
 class PresenceRepository:
-
     @staticmethod
     def _load_file() -> List[Presence]:
         presences = []

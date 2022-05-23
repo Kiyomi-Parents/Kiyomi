@@ -11,13 +11,12 @@ from src.cogs.scoresaber.storage.model.score import Score
 
 
 class ScoreLeaderboardService(LeaderboardService):
-
     async def get_beatmap_score_leaderboard_by_key(
-            self,
-            guild_id: int,
-            beatmap_key: str,
-            characteristic: pybeatsaver.ECharacteristic,
-            difficulty: pybeatsaver.EDifficulty
+        self,
+        guild_id: int,
+        beatmap_key: str,
+        characteristic: pybeatsaver.ECharacteristic,
+        difficulty: pybeatsaver.EDifficulty,
     ) -> List[Score]:
         beatsaver = self.bot.get_cog_api(BeatSaverAPI)
 
@@ -26,26 +25,21 @@ class ScoreLeaderboardService(LeaderboardService):
         if beatmap_hash is None:
             return []
 
-        return await self.get_beatmap_score_leaderboard(
-                guild_id,
-                beatmap_hash,
-                characteristic,
-                difficulty
-        )
+        return await self.get_beatmap_score_leaderboard(guild_id, beatmap_hash, characteristic, difficulty)
 
     async def get_beatmap_score_leaderboard(
-            self,
-            guild_id: int,
-            beatmap_hash: str,
-            characteristic: pybeatsaver.ECharacteristic,
-            difficulty: pybeatsaver.EDifficulty
+        self,
+        guild_id: int,
+        beatmap_hash: str,
+        characteristic: pybeatsaver.ECharacteristic,
+        difficulty: pybeatsaver.EDifficulty,
     ) -> List[Score]:
         scoresaber = self.bot.get_cog_api(ScoreSaberAPI)
 
         leaderboard = await scoresaber.get_leaderboard(
-                beatmap_hash,
-                BeatSaverUtils.to_scoresaber_game_mode(characteristic),
-                BeatSaverUtils.to_scoresaber_difficulty(difficulty)
+            beatmap_hash,
+            BeatSaverUtils.to_scoresaber_game_mode(characteristic),
+            BeatSaverUtils.to_scoresaber_difficulty(difficulty),
         )
 
         if leaderboard is None:
@@ -53,10 +47,7 @@ class ScoreLeaderboardService(LeaderboardService):
 
         guild_players = await scoresaber.get_guild_players_by_guild(guild_id)
 
-        return await self._get_score_leaderboard(
-                [guild_player.player for guild_player in guild_players],
-                leaderboard.id
-        )
+        return await self._get_score_leaderboard([guild_player.player for guild_player in guild_players], leaderboard.id)
 
     async def _get_score_leaderboard(self, players: List[Player], leaderboard_id: int) -> List[Score]:
         scoresaber = self.bot.get_cog_api(ScoreSaberAPI)

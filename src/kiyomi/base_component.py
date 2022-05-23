@@ -3,7 +3,7 @@ from typing import Generic, TypeVar
 from .kiyomi import Kiyomi
 from .base_view import BaseView
 
-T = TypeVar('T', bound=BaseView)
+T = TypeVar("T", bound=BaseView)
 
 
 class BaseComponent(Generic[T]):

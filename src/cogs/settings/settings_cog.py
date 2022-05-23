@@ -4,9 +4,9 @@ from .services import SettingService
 
 class SettingsCog(BaseCog):
     def __init__(
-            self,
-            bot: Kiyomi,
-            setting_service: SettingService,
+        self,
+        bot: Kiyomi,
+        setting_service: SettingService,
     ):
         super().__init__(bot)
 

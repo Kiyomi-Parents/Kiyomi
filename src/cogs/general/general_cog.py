@@ -1,17 +1,24 @@
 from src.kiyomi import BaseCog, Kiyomi
-from .services import EmojiService, GuildService, MemberService, RoleService, ChannelService, MessageService
+from .services import (
+    EmojiService,
+    GuildService,
+    MemberService,
+    RoleService,
+    ChannelService,
+    MessageService,
+)
 
 
 class GeneralCog(BaseCog):
     def __init__(
-            self,
-            bot: Kiyomi,
-            emoji_service: EmojiService,
-            guild_service: GuildService,
-            member_service: MemberService,
-            channel_service: ChannelService,
-            message_service: MessageService,
-            role_service: RoleService
+        self,
+        bot: Kiyomi,
+        emoji_service: EmojiService,
+        guild_service: GuildService,
+        member_service: MemberService,
+        channel_service: ChannelService,
+        message_service: MessageService,
+        role_service: RoleService,
     ):
         super().__init__(bot)
 

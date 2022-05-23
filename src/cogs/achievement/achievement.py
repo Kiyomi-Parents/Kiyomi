@@ -9,10 +9,7 @@ from src.kiyomi import Utils
 
 
 class Achievements(AchievementCog):
-    achievements = app_commands.Group(
-            name="achievements",
-            description="Achievement commands"
-    )
+    achievements = app_commands.Group(name="achievements", description="Achievement commands")
 
     @achievements.command(name="all")
     async def achievements_all(self, ctx: Interaction):

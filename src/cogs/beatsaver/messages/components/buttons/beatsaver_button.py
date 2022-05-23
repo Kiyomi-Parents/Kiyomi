@@ -15,10 +15,10 @@ class BeatSaverButton(BaseComponent[T], discord.ui.Button, Generic[T]):
 
         BaseComponent.__init__(self, bot, parent)
         discord.ui.Button.__init__(
-                self,
-                label="Beat Saver",
-                style=discord.enums.ButtonStyle.primary,
-                url=self.preview_url
+            self,
+            label="Beat Saver",
+            style=discord.enums.ButtonStyle.primary,
+            url=self.preview_url,
         )
 
     @property

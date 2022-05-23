@@ -6,7 +6,6 @@ from .achievement_generator import AchievementGenerator
 
 
 class PP(AchievementGenerator):
-
     def get_achievements(self, member: Member) -> List[Achievement]:
         achievements = []
         total = 21

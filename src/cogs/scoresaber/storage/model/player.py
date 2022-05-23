@@ -8,6 +8,7 @@ from src.kiyomi.database import Base
 
 class Player(Base):
     """Player data from ScoreSaber"""
+
     __tablename__ = "player"
 
     id = Column(String(128), primary_key=True, autoincrement=False)

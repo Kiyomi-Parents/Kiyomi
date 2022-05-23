@@ -13,8 +13,10 @@ class MemberUsingDifferentPlayerAlreadyException(ScoreSaberCogException):
         self.player_id = player_id
 
     def __str__(self):
-        return ("You are linked as %player_id% in another guild!\n"
-                "You can't have different Score Saber profiles in different guilds!")
+        return (
+            "You are linked as %player_id% in another guild!\n"
+            "You can't have different Score Saber profiles in different guilds!"
+        )
 
 
 class PlayerRegisteredInGuildAlreadyException(ScoreSaberCogException):

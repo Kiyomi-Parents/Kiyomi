@@ -1,6 +1,8 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.cogs.fancy_presence.storage.repository.presence_repository import PresenceRepository
+from src.cogs.fancy_presence.storage.repository.presence_repository import (
+    PresenceRepository,
+)
 from src.kiyomi import BaseUnitOfWork
 
 

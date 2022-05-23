@@ -9,7 +9,13 @@ from src.kiyomi import Kiyomi
 
 
 class MessageService(GeneralService):
-    def __init__(self, bot: Kiyomi, uow: UnitOfWork, guild_service: GuildService, channel_service: ChannelService):
+    def __init__(
+        self,
+        bot: Kiyomi,
+        uow: UnitOfWork,
+        guild_service: GuildService,
+        channel_service: ChannelService,
+    ):
         super().__init__(bot, uow)
 
         self.guild_service = guild_service

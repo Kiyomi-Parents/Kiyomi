@@ -8,15 +8,27 @@ from src.kiyomi import Kiyomi
 from .general_service import GeneralService
 from .guild_service import GuildService
 from .member_service import MemberService
-from ..errors import GeneralCogException, RoleNotFound, FailedToCreateRole, FailedToDeleteRole, FailedToAddToUser, \
-    FailedToRemoveFromUser
+from ..errors import (
+    GeneralCogException,
+    RoleNotFound,
+    FailedToCreateRole,
+    FailedToDeleteRole,
+    FailedToAddToUser,
+    FailedToRemoveFromUser,
+)
 from ..storage import UnitOfWork
 from ..storage.model.member_role import MemberRole
 from ..storage.model.role import Role
 
 
 class RoleService(GeneralService):
-    def __init__(self, bot: Kiyomi, uow: UnitOfWork, guild_service: GuildService, member_service: MemberService):
+    def __init__(
+        self,
+        bot: Kiyomi,
+        uow: UnitOfWork,
+        guild_service: GuildService,
+        member_service: MemberService,
+    ):
         super().__init__(bot, uow)
 
         self.guild_service = guild_service
@@ -31,9 +43,7 @@ class RoleService(GeneralService):
         async with self.uow:
             for diff_role_id in diff_role_ids:
                 member_role = await self.uow.member_roles.delete_by_guild_id_and_member_id_and_role_id(
-                        after.guild.id,
-                        after.id,
-                        diff_role_id
+                    after.guild.id, after.id, diff_role_id
                 )
 
                 if member_role is not None:

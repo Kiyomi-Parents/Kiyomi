@@ -1,12 +1,21 @@
 from typing import Type
 
 from src.cogs.beatsaver.beatsaver_cog import BeatSaverCog
-from src.cogs.beatsaver.messages.components.buttons.beatsaver_button import BeatSaverButton
-from src.cogs.beatsaver.messages.components.buttons.map_details_button import MapDetailsButton
-from src.cogs.beatsaver.messages.components.buttons.map_preview_button import MapPreviewButton
-from src.cogs.beatsaver.messages.components.selects.map_detail_characteristic_select import \
-    MapDetailCharacteristicSelect
-from src.cogs.beatsaver.messages.components.selects.map_detail_difficulty_select import MapDetailDifficultySelect
+from src.cogs.beatsaver.messages.components.buttons.beatsaver_button import (
+    BeatSaverButton,
+)
+from src.cogs.beatsaver.messages.components.buttons.map_details_button import (
+    MapDetailsButton,
+)
+from src.cogs.beatsaver.messages.components.buttons.map_preview_button import (
+    MapPreviewButton,
+)
+from src.cogs.beatsaver.messages.components.selects.map_detail_characteristic_select import (
+    MapDetailCharacteristicSelect,
+)
+from src.cogs.beatsaver.messages.components.selects.map_detail_difficulty_select import (
+    MapDetailDifficultySelect,
+)
 
 
 class BeatSaverUI(BeatSaverCog):

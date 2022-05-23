@@ -30,8 +30,8 @@ class Security:
     @staticmethod
     def owner_or_permissions(**perms):
         return commands.check_any(
-                commands.has_permissions(**perms),
-                commands.is_owner(),
-                Security.is_guild_owner(),
-                Security.is_running_tests()
+            commands.has_permissions(**perms),
+            commands.is_owner(),
+            Security.is_guild_owner(),
+            Security.is_running_tests(),
         )

@@ -26,9 +26,7 @@ class MemberService(GeneralService):
             except NotFound:
                 await self.uow.guild_members.delete_by_guild_id_and_member_id(guild_id, member_id)
 
-                raise MemberNotFoundException(
-                        f"Could not find member with id {member_id} in guild {discord_guild.name}"
-                )
+                raise MemberNotFoundException(f"Could not find member with id {member_id} in guild {discord_guild.name}")
 
         if discord_member is None:
             raise MemberNotFoundException(f"Could not find member with id {member_id} in guild {discord_guild.name}")

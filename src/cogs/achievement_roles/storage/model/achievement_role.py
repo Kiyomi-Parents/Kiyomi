@@ -6,6 +6,7 @@ from src.kiyomi.database import Base
 
 class AchievementRole(Base):
     """Discord role info"""
+
     __tablename__ = "achievement_role"
 
     id = Column(Integer, primary_key=True)
@@ -13,7 +14,11 @@ class AchievementRole(Base):
     group = Column(String(128))
     identifier = Column(String(128))
 
-    members = relationship("AchievementRoleMember", back_populates="achievement_role", cascade="all, delete")
+    members = relationship(
+        "AchievementRoleMember",
+        back_populates="achievement_role",
+        cascade="all, delete",
+    )
 
     guild_id = Column(BigInteger, ForeignKey("guild.id", ondelete="CASCADE"))
     guild = relationship("Guild")

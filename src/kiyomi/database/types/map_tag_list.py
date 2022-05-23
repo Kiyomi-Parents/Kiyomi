@@ -3,7 +3,7 @@ from typing import TypeVar, List
 import sqlalchemy.types as types
 from pybeatsaver import EMapTag
 
-T = TypeVar('T')
+T = TypeVar("T")
 
 
 class EMapTagList(types.TypeDecorator):

@@ -3,7 +3,7 @@ from typing import Generic, TypeVar
 from .database import BaseUnitOfWork
 from .kiyomi import Kiyomi
 
-T = TypeVar('T', bound=BaseUnitOfWork)
+T = TypeVar("T", bound=BaseUnitOfWork)
 
 
 class BaseService(Generic[T]):

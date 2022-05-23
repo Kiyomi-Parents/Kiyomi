@@ -22,7 +22,7 @@ async def startup(loop: AbstractEventLoop):
 
     # Init database
     database = Database(
-            f"mariadb+asyncmy://{database_user}:{database_password}@{database_ip}/{database_name}?charset=utf8mb4"
+        f"mariadb+asyncmy://{database_user}:{database_password}@{database_ip}/{database_name}?charset=utf8mb4"
     )
 
     await database.init()

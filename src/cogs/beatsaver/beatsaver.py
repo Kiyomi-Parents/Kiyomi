@@ -20,9 +20,9 @@ if TYPE_CHECKING:
 
 class BeatSaver(BeatSaverCog, name="Beat Saver"):
     def __init__(
-            self,
-            bot: Kiyomi,
-            beatmap_service: BeatmapService,
+        self,
+        bot: Kiyomi,
+        beatmap_service: BeatmapService,
     ):
         super().__init__(bot, beatmap_service)
 
@@ -30,7 +30,6 @@ class BeatSaver(BeatSaverCog, name="Beat Saver"):
         self.events()
 
     def events(self):
-
         @self.bot.events.on("on_new_leaderboards")
         async def attach_song_to_score(leaderboards: List["Leaderboard"]):
             song_hashes = [leaderboard.song_hash for leaderboard in leaderboards]
@@ -54,7 +53,7 @@ class BeatSaver(BeatSaverCog, name="Beat Saver"):
             EmojiSetting.create(self.bot, "90 Degree emoji", "90_degree_game_mode_emoji"),
             EmojiSetting.create(self.bot, "360 Degree emoji", "360_degree_game_mode_emoji"),
             EmojiSetting.create(self.bot, "Lightshow emoji", "lightshow_game_mode_emoji"),
-            EmojiSetting.create(self.bot, "Lawless emoji", "lawless_game_mode_emoji")
+            EmojiSetting.create(self.bot, "Lawless emoji", "lawless_game_mode_emoji"),
         ]
 
         self.bot.events.emit("setting_register", settings)
@@ -62,11 +61,7 @@ class BeatSaver(BeatSaverCog, name="Beat Saver"):
     @app_commands.command()
     @app_commands.rename(beatmap="key")
     @app_commands.describe(beatmap="Beatmap key (25f)")
-    async def map(
-            self,
-            ctx: Interaction,
-            beatmap: Transform[Beatmap, BeatmapKeyTransformer]
-    ):
+    async def map(self, ctx: Interaction, beatmap: Transform[Beatmap, BeatmapKeyTransformer]):
         """Displays song info."""
 
         song_view = SongView(self.bot, ctx.guild, beatmap)
