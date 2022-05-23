@@ -3,6 +3,8 @@ import os
 import twitchio
 from twitchio.ext import eventsub
 
+from .arg_resolvers.login_resolver import TwitchLoginResolver
+from .arg_resolvers.user_id_resolver import TwitchUserIdResolver
 from .services import MessageService
 from .services.event_service import EventService
 from .services.twitch_broadcaster_service import BroadcasterService
@@ -14,6 +16,9 @@ from ...log import Logger
 
 async def setup(bot: Kiyomi):
     uow = UnitOfWork(await bot.database.get_session())
+
+    bot.error_resolver.add(TwitchLoginResolver())
+    bot.error_resolver.add(TwitchUserIdResolver())
 
     twitch_client_id = os.getenv("TWITCH_CLIENT_ID")
     twitch_client_secret = os.getenv("TWITCH_CLIENT_SECRET")

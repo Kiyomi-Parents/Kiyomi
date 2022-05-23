@@ -65,7 +65,7 @@ class Twitch(TwitchCog):
         try:
             guild_twitch_streamer = await self.broadcaster_service.register_twitch_broadcaster(ctx.guild_id, ctx.user.id, login)
         except BroadcasterNotFound as e:
-            await ctx.response.send_message(str(e))
+            await ctx.response.send_message(await self.bot.error_resolver.resolve_message(e))
             return
 
         await self.event_service.register_subscription(int(guild_twitch_streamer.twitch_broadcaster_id))  # maybe we should instead refresh all subscriptions here?

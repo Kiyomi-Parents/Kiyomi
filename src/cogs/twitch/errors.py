@@ -7,20 +7,18 @@ class TwitchCogException(CogException):
 
 class BroadcasterNotFound(TwitchCogException):
     def __init__(self, login: str):
-        self.login = login
+        self.twitch_login = login
 
     def __str__(self):
-        # TODO: fancy arg resolver
-        return f"Couldn't find Twitch Broadcaster with login {self.login}!"
+        return f"Couldn't find Twitch Broadcaster with login %twitch_login%!"
 
 
 class BroadcastNotFound(TwitchCogException):
     def __init__(self, user_id: int):
-        self.user_id = user_id
+        self.twitch_user_id = user_id
 
     def __str__(self):
-        # TODO: fancy arg resolver
-        return f"Couldn't find Twitch Broadcast from user id {self.user_id}!"
+        return f"Couldn't find Twitch Broadcast from user id %twitch_user_id%!"
 
 
 class GuildTwitchBroadcasterNotFound(TwitchCogException):
