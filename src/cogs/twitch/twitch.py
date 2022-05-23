@@ -54,12 +54,13 @@ class Twitch(TwitchCog):
     )
 
     @twitch.command(name="add")
-    @app_commands.describe(login="patthehyruler")
+    @app_commands.describe(login="patthehyruler or https://www.twitch.tv/patthehyruler")
     async def twitch_add(
             self,
             ctx: Interaction,
             login: Transform[str, TwitchLoginTransformer]
     ):
+        """Link a Twitch account to yourself in this Discord guild."""
         self.bot.events.emit("register_member", ctx.user)
 
         try:

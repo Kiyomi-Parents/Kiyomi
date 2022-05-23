@@ -40,7 +40,7 @@ class MessageService(TwitchService):
         return await channel.send(embed=GoLiveEmbed(self.bot, event, guild_twitch_broadcaster, stream))
 
     async def rescind_broadcast_live_notifications(self, event: StreamOfflineData):
-        broadcasts = self.uow.twitch_broadcasts.remove_by_broadcaster_id(event.broadcaster.id)
+        broadcasts = self.uow.twitch_broadcasts.delete_by_broadcaster_id(event.broadcaster.id)
         for broadcast in broadcasts:
             for message in broadcast.messages:
                 embed = message.embeds[0]

@@ -10,9 +10,6 @@ from ..model.guild_twitch_broadcaster import GuildTwitchBroadcaster
 
 
 class GuildTwitchBroadcasterRepository(BaseRepository[GuildTwitchBroadcaster]):
-
-    # TODO: figure out what to do with orphan twitch_broadcasters
-
     def _eager_load_all(self, stmt: Executable):
         return stmt.options(
             selectinload(self._table.guild),

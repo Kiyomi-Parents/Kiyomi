@@ -23,7 +23,7 @@ class TwitchBroadcastRepository:
     def is_live(self, event: StreamOnlineData) -> bool:
         return event.broadcaster.id in [broadcast.broadcaster.id for broadcast in self._broadcasts]
 
-    def remove_by_broadcaster_id(self, broadcaster_id: int) -> List[AnnouncedBroadcast]:
+    def delete_by_broadcaster_id(self, broadcaster_id: int) -> List[AnnouncedBroadcast]:
         broadcasts = [broadcast for broadcast in self._broadcasts if broadcaster_id == broadcast.broadcaster.id]
         for broadcast in broadcasts:
             self._broadcasts.remove(broadcast)
@@ -32,6 +32,6 @@ class TwitchBroadcastRepository:
 
     def add(self, event: StreamOnlineData, messages: List[Message]):
         if self.is_live(event):
-            self.remove_by_broadcaster_id(event.broadcaster.id)
+            self.delete_by_broadcaster_id(event.broadcaster.id)
 
         self._broadcasts.append(AnnouncedBroadcast(event, messages))
