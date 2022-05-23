@@ -66,9 +66,9 @@ class SettingService(SettingsService):
 
         raise FailedToFindSetting(name)
 
-    def get(self, guild_id: int, name: str) -> AbstractSetting:
+    async def get(self, guild_id: int, name: str) -> AbstractSetting:
         registered_setting = self.find_registered_setting(name)
-        setting = self.uow.settings_repo.get_by_guild_id_and_name(guild_id, name)
+        setting = await self.uow.settings_repo.get_by_guild_id_and_name(guild_id, name)
 
         if setting is not None:
             return self.wrap_setting(registered_setting.name_human, setting)
@@ -92,30 +92,30 @@ class SettingService(SettingsService):
 
             return new_setting
 
-    def set(self, guild_id: int, name: str, value: Optional[any]) -> AbstractSetting:
-        setting = self.get(guild_id, name)
+    async def set(self, guild_id: int, name: str, value: Optional[any]) -> AbstractSetting:
+        setting = await self.get(guild_id, name)
 
         if setting.setting.id is None:
             setting.set(value)
-            setting.setting = self.uow.settings_repo.add(setting.setting)
+            setting.setting = await self.uow.settings_repo.add(setting.setting)
         else:
-            self.uow.settings_repo.set(setting.setting, value)
+            await self.uow.settings_repo.set(setting.setting, value)
 
         self.bot.events.emit("on_setting_change", setting)
 
         return setting
 
-    def get_value(self, guild_id: int, name: str) -> Optional[any]:
-        setting = self.get(guild_id, name)
+    async def get_value(self, guild_id: int, name: str) -> Optional[any]:
+        setting = await self.get(guild_id, name)
 
         if setting is None:
             return None
 
         return setting.value
 
-    def delete(self, guild_id: int, name: str) -> None:
-        setting = self.get(guild_id, name)
-        self.uow.settings_repo.remove(setting)
+    async def delete(self, guild_id: int, name: str) -> AbstractSetting:
+        setting = await self.get(guild_id, name)
+        return await self.uow.settings_repo.remove(setting)
 
     def register_settings(self, settings: List[Setting]) -> None:
         self.registered_settings += settings

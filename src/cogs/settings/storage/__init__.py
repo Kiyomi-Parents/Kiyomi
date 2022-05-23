@@ -1,4 +1,4 @@
 from .model import *
 from .repository import *
 
-from .uow import UnitOfWork
+from .unit_of_work import UnitOfWork

@@ -6,7 +6,7 @@ from .storage import UnitOfWork
 
 
 async def setup(bot: Kiyomi):
-    uow = UnitOfWork(bot.database.session)
+    uow = UnitOfWork(await bot.database.get_session())
 
     setting_service = SettingService(bot, uow)
 

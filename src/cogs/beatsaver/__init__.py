@@ -11,7 +11,9 @@ from .storage import UnitOfWork
 
 async def setup(bot: Kiyomi):
     beatsaver_api_client = pybeatsaver.BeatSaverAPI(bot.loop)
-    uow = UnitOfWork(bot.database.session)
+    await beatsaver_api_client.start()
+
+    uow = UnitOfWork(await bot.database.get_session())
     
     bot.error_resolver.add(BeatmapHashResolver(uow))
     bot.error_resolver.add(BeatmapKeyResolver(uow))

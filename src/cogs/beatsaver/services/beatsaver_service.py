@@ -9,6 +9,3 @@ class BeatSaverService(BaseService[UnitOfWork]):
         super().__init__(bot, uow)
 
         self.beatsaver = beatsaver
-
-    async def start_scoresaber_api_client(self):
-        await self.beatsaver.start()

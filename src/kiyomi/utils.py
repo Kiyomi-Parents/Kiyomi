@@ -1,7 +1,7 @@
 import asyncio
 from datetime import datetime
 from functools import wraps
-from typing import TypeVar, Type, List, Any
+from typing import TypeVar, Type, List, Any, Dict
 
 import discord
 import timeago
@@ -57,6 +57,39 @@ class Utils:
             if var in new_class.__dict__.keys():
                 if getattr(new_class, var) is not None:
                     setattr(old_class, var, getattr(new_class, var))
+
+    @staticmethod
+    def updated_class_fields(old_class, new_class) -> Dict:
+        if type(new_class) is not type(old_class):
+            raise TypeError(f"Failed to update class. {type(new_class)} is not of type {type(old_class)}")
+
+        updated_values = {}
+        for var in old_class.__dict__.keys():
+            # Ignore private variables
+            if var.startswith("_"):
+                continue
+
+            if var in new_class.__dict__.keys():
+                old_attr = getattr(old_class, var)
+                new_attr = getattr(new_class, var)
+
+                if new_attr is not None and new_attr is not old_attr:
+                    updated_values[var] = new_attr
+
+        return updated_values
+
+    @staticmethod
+    def get_class_fields(cls) -> Dict:
+        fields = {}
+
+        for var in cls.__dict__.keys():
+            # Ignore private variables
+            if var.startswith("_"):
+                continue
+
+            fields[var] = getattr(cls, var)
+
+        return fields
 
     @staticmethod
     def class_inheritors(cls: Type[TClass]) -> List[Type[TClass]]:

@@ -8,3 +8,6 @@ class BaseEmbed(Embed):
         super().__init__()
 
         self.bot = bot
+
+    async def after_init(self):
+        pass

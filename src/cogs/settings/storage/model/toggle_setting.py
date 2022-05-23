@@ -42,7 +42,7 @@ class ToggleSetting(AbstractRegularSetting[bool]):
         if value is None:
             return None
 
-        return distutils.util.strtobool(value)
+        return bool(distutils.util.strtobool(value))
 
     @staticmethod
     def from_type(value: Optional[bool]) -> Optional[str]:

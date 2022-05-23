@@ -24,10 +24,7 @@ class MemberService(GeneralService):
             try:
                 discord_member = await discord_guild.fetch_member(member_id)
             except NotFound:
-                guild_member = self.uow.guild_members.get_by_guild_id_and_member_id(guild_id, member_id)
-
-                if guild_member is not None:
-                    self.uow.guild_members.remove(guild_member)
+                await self.uow.guild_members.delete_by_guild_id_and_member_id(guild_id, member_id)
 
                 raise MemberNotFoundException(
                         f"Could not find member with id {member_id} in guild {discord_guild.name}"
@@ -38,24 +35,24 @@ class MemberService(GeneralService):
 
         return discord_member
 
-    def register_member(self, discord_member: discord.Member):
-        member = self.uow.members.get_by_id(discord_member.id)
+    async def register_member(self, guild_id: int, member_id: int) -> Member:
+        async with self.uow:
+            discord_member = await self.get_discord_member(guild_id, member_id)
+            return await self.uow.members.upsert(Member(discord_member.id, discord_member.name))
 
-        if member is None:
-            self.uow.members.add(Member(discord_member.id, discord_member.name))
-        else:
-            if member.name != discord_member.name:
-                self.uow.members.update(Member(member.id, discord_member.name))
-                self.uow.save_changes()  # TODO: Figure out if this is a good place for this
+    async def unregister_member(self, member_id: int):
+        async with self.uow:
+            return await self.uow.members.remove_by_id(member_id)
 
-    def register_guild_member(self, guild_id: int, member_id: int):
-        guild_member = self.uow.guild_members.get_by_guild_id_and_member_id(guild_id, member_id)
+    async def register_guild_member(self, guild_id: int, member_id: int) -> GuildMember:
+        async with self.uow:
+            await self.guild_service.register_guild(guild_id)
 
-        if guild_member is None:
-            self.uow.members.add(GuildMember(guild_id, member_id))
+            guild_member = await self.uow.guild_members.get_by_guild_id_and_member_id(guild_id, member_id)
 
-    def unregister_guild_member(self, guild_id: int, member_id: int):
-        guild_member = self.uow.guild_members.get_by_guild_id_and_member_id(guild_id, member_id)
+            if guild_member is None:
+                return await self.uow.members.add(GuildMember(guild_id, member_id))
 
-        if guild_member is not None:
-            self.uow.members.remove(guild_member)
+    async def unregister_guild_member(self, guild_id: int, member_id: int):
+        async with self.uow:
+            await self.uow.guild_members.delete_by_guild_id_and_member_id(guild_id, member_id)

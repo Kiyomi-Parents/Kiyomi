@@ -7,7 +7,7 @@ class ChannelIdResolver(ErrorArgResolver[int, str]):
         self.uow = uow
 
     async def resolve_detailed(self, argument: int) -> str:
-        channel = self.uow.channels.get_by_id(argument)
+        channel = await self.uow.channels.get_by_id(argument)
 
         if channel is None:
             return f"{argument} (Not in DB)"
@@ -15,7 +15,7 @@ class ChannelIdResolver(ErrorArgResolver[int, str]):
         return f"{channel}"
 
     async def resolve(self, argument: int) -> str:
-        channel = self.uow.channels.get_by_id(argument)
+        channel = await self.uow.channels.get_by_id(argument)
 
         if channel is None:
             return f"{argument}"

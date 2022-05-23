@@ -5,7 +5,6 @@ from asyncio import AbstractEventLoop
 
 import discord
 from dotenv import load_dotenv
-from sqlalchemy import create_engine
 
 from src.kiyomi import Kiyomi, Database
 from src.log import Logger
@@ -23,18 +22,10 @@ async def startup(loop: AbstractEventLoop):
 
     # Init database
     database = Database(
-            create_engine(
-                    f"mariadb+pymysql://{database_user}:{database_password}@{database_ip}/{database_name}?charset=utf8mb4",
-                    echo=False,
-                    pool_pre_ping=True,
-                    pool_recycle=3600,
-                    connect_args={"init_command": "SET time_zone = '+00:00'"}
-            )
+            f"mariadb+asyncmy://{database_user}:{database_password}@{database_ip}/{database_name}?charset=utf8mb4"
     )
 
-    # database.drop_tables()
-    # database.create_tables()
-    # database.create_schema_image()
+    await database.init()
 
     async with Kiyomi(command_prefix="!", db=database, loop=loop) as bot:
         default_guild = os.getenv("DEFAULT_GUILD")
@@ -62,6 +53,9 @@ async def startup(loop: AbstractEventLoop):
         await bot.load_extension(name="src.cogs.achievement")
         await bot.load_extension(name="src.cogs.achievement_roles")
         await bot.load_extension(name="src.cogs.emoji_echo")
+
+        # await database.drop_tables()
+        # await database.create_tables()
 
         await bot.start(token=discord_token)
 

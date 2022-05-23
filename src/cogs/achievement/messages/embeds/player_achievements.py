@@ -13,10 +13,13 @@ class PlayerAchievementsEmbed(AchievementEmbed):
 
         self.title = "Achievements"
 
-        self.description = f"```{self.get_table}```"
+        self.description = f"```Loading data...```"
+
+    async def after_init(self):
+        self.description = f"```{await self.get_table}```"
 
     @property
-    def get_table(self) -> str:
+    async def get_table(self) -> str:
         table = PrettyTable()
         table.border = False
         table.field_names = ["#", "group", "Name", "Complete"]
@@ -27,7 +30,7 @@ class PlayerAchievementsEmbed(AchievementEmbed):
                 count = f"{index + 1}"
                 group = f"{group}"
                 name = achievement.name
-                status = f"[{'X' if achievement.complete else ' '}]"
+                status = f"[{'X' if await achievement.complete else ' '}]"
                 table.add_row([count, group, name, status])
                 index += 1
 

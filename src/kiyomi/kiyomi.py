@@ -35,6 +35,10 @@ class Kiyomi(Bot):
         self.add_check(self.global_block_dms)
         self.database = db
 
+    async def start(self, token: str, *, reconnect: bool = True) -> None:
+        await super(Kiyomi, self).start(token, reconnect=reconnect)
+        await self.database.init()
+
     async def on_ready(self):
         Logger.log(self.user, "Connected to Discord!")
 

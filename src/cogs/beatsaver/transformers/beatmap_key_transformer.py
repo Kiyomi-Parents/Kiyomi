@@ -5,7 +5,6 @@ from discord.app_commands import Transformer, Choice
 from discord.ext.commands import Context
 
 from ..beatsaver_api import BeatSaverAPI
-from ..errors import BeatmapNotFound
 from ..storage.model.beatmap import Beatmap
 
 
@@ -35,8 +34,4 @@ class BeatmapKeyTransformer(Transformer):
         ctx = await Context.from_interaction(interaction)
 
         beatsaver = ctx.bot.get_cog_api(BeatSaverAPI)
-
-        try:
-            return await beatsaver.beatmap_service.get_beatmap_by_key(key)
-        except BeatmapNotFound:
-            return None
+        return await beatsaver.get_beatmap_by_key(key)

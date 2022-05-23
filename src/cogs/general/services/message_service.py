@@ -16,17 +16,12 @@ class MessageService(GeneralService):
         self.channel_service = channel_service
 
     async def register_message(self, guild_id: int, channel_id: int, message_id: int) -> Message:
-        message = self.uow.messages.get_by_id(message_id)
+        async with self.uow:
+            if not await self.uow.messages.exists(message_id):
+                await self.guild_service.register_guild(guild_id)
+                await self.channel_service.register_channel(guild_id, channel_id)
 
-        if message is None:
-            await self.guild_service.register_guild(guild_id)
-            await self.channel_service.register_channel(guild_id, channel_id)
-
-            message = self.uow.messages.add(Message(guild_id, channel_id, message_id))
-
-            self.uow.save_changes()
-
-        return message
+                return await self.uow.messages.add(Message(guild_id, channel_id, message_id))
 
     async def get_messages_in_channel(self, channel_id: int) -> List[Message]:
-        return self.uow.messages.get_by_channel_id(channel_id)
+        return await self.uow.messages.get_all_by_channel_id(channel_id)

@@ -43,7 +43,7 @@ class MemberPlayerNotFoundInGuildException(ScoreSaberCogException):
         self.player_id = player_id
 
     def __str__(self):
-        return f"You don't have a ScoreSaber profile linked to yourself."
+        return f"You don't have a Score Saber profile linked to yourself."
 
 
 class PlayerNotFoundException(ScoreSaberCogException):
@@ -51,4 +51,12 @@ class PlayerNotFoundException(ScoreSaberCogException):
         self.player_id = player_id
 
     def __str__(self):
-        return f"Couldn't find Score Saber profile with ID %player_id%!"
+        return f"Couldn't find Score Saber profile with %player_id%!"
+
+
+class PlayerAlreadyExistsException(ScoreSaberCogException):
+    def __init__(self, player_id: str):
+        self.player_id = player_id
+
+    def __str__(self):
+        return f"Score Saber profile %player_id% already exists!"

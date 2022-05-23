@@ -29,7 +29,7 @@ class MemberAchievementRoleService(AchievementRolesService):
     async def update_guild_roles(self, guild_id: int):
         general = self.bot.get_cog_api(GeneralAPI)
 
-        guild_members = general.get_members_in_guild(guild_id)
+        guild_members = await general.get_members_in_guild(guild_id)
 
         for guild_member in guild_members:
             await self.update_member_roles(guild_member.guild_id, guild_member.member_id)
@@ -38,7 +38,7 @@ class MemberAchievementRoleService(AchievementRolesService):
         settings = self.bot.get_cog_api(SettingsAPI)
 
         for role in self.roles:
-            enabled = settings.get(guild_id, role.get("setting"))
+            enabled = await settings.get(guild_id, role.get("setting"))
 
             if enabled:
                 await self.update_member_achievement_roles(guild_id, member_id, role.get("group"))
@@ -53,7 +53,7 @@ class MemberAchievementRoleService(AchievementRolesService):
         achievements = self.bot.get_cog_api(AchievementsAPI)
 
         # Get Achievement
-        achievement = achievements.get_best_achievement_in_group(group, member_id)
+        achievement = await achievements.get_best_achievement_in_group(group, member_id)
 
         if achievement is None:
             Logger.log("Achievement Roles", f"No completed achievements for group {group}")
@@ -87,7 +87,10 @@ class MemberAchievementRoleService(AchievementRolesService):
                     "Auto added by Achievement Roles"
             )
 
-            self.uow.achievement_role_members.add(AchievementRoleMember(guild_id, member_id, achievement_role.id))
+            async with self.uow:
+                await self.uow.achievement_role_members.add(
+                        AchievementRoleMember(guild_id, member_id, achievement_role.id)
+                )
         except FailedToAddToUser as error:
             await error.handle(bot=self.bot)
 
@@ -109,15 +112,16 @@ class MemberAchievementRoleService(AchievementRolesService):
         except FailedToRemoveFromUser as error:
             await error.handle(bot=self.bot)
         finally:
-            self.uow.achievement_role_members.remove(achievement_role_member)
+            async with self.uow:
+                await self.uow.achievement_role_members.remove(achievement_role_member)
 
-    def get_all_member_group_roles(self, guild_id: int, member_id: int, group: str) -> List[AchievementRoleMember]:
-        achievement_roles = self.uow.achievement_roles.get_all_by_guild_id_and_group(guild_id, group)
+    async def get_all_member_group_roles(self, guild_id: int, member_id: int, group: str) -> List[AchievementRoleMember]:
+        achievement_roles = await self.uow.achievement_roles.get_all_by_guild_id_and_group(guild_id, group)
 
         achievement_role_member = []
 
         for achievement_role in achievement_roles:
-            role_member = self.uow.achievement_role_members.get_by_all(guild_id, member_id, achievement_role.id)
+            role_member = await self.uow.achievement_role_members.get_by_all(guild_id, member_id, achievement_role.id)
 
             if role_member is not None:
                 achievement_role_member.append(role_member)
@@ -125,7 +129,7 @@ class MemberAchievementRoleService(AchievementRolesService):
         return achievement_role_member
 
     async def get_achievement_role(self, guild_id: int, group: str, achievement: Achievement) -> AchievementRole:
-        achievement_role = self.uow.achievement_roles.get_by_guild_id_and_group_and_identifier(
+        achievement_role = await self.uow.achievement_roles.get_by_guild_id_and_group_and_identifier(
                 guild_id,
                 group,
                 achievement.identifier
@@ -135,11 +139,13 @@ class MemberAchievementRoleService(AchievementRolesService):
             achievement_role = await self.create_achievement_role(guild_id, group, achievement)
 
         if not await self.exists_achievement_role(achievement_role):
-            self.uow.achievement_roles.remove(achievement_role)
-            achievement_role = await self.create_achievement_role(guild_id, group, achievement)
+            async with self.uow:
+                await self.uow.achievement_roles.remove(achievement_role)
+                achievement_role = await self.create_achievement_role(guild_id, group, achievement)
 
         if achievement_role is None:
-            self.uow.achievement_roles.remove(achievement_role)
+            async with self.uow:
+                await self.uow.achievement_roles.remove(achievement_role)
 
             raise UnableToCreateRole(guild_id, group, achievement)
 
@@ -173,7 +179,10 @@ class MemberAchievementRoleService(AchievementRolesService):
                     "Auto created by Achievement Roles"
             )
 
-            return self.uow.achievement_roles.add(AchievementRole(guild_id, role.id, group, achievement.identifier))
+            async with self.uow:
+                return await self.uow.achievement_roles.add(
+                        AchievementRole(guild_id, role.id, group, achievement.identifier)
+                )
         except FailedToCreateRole as error:
             raise UnableToCreateRole(guild_id, group, achievement) from error
 
@@ -182,13 +191,13 @@ class MemberAchievementRoleService(AchievementRolesService):
             await self.remove_all_member_group_roles(guild_id, member_id, role.get("group"))
 
     async def remove_all_member_group_roles(self, guild_id: int, member_id: int, group: str):
-        achievement_role_members = self.get_all_member_group_roles(guild_id, member_id, group)
+        achievement_role_members = await self.get_all_member_group_roles(guild_id, member_id, group)
 
         for achievement_role_member in achievement_role_members:
             await self.remove_member_role(guild_id, member_id, achievement_role_member)
 
     async def member_has_role(self, guild_id: int, member_id: int, achievement_role: AchievementRole) -> bool:
-        achievement_role_member = self.uow.achievement_role_members.get_by_all(
+        achievement_role_member = await self.uow.achievement_role_members.get_by_all(
                 guild_id,
                 member_id,
                 achievement_role.id
@@ -202,7 +211,8 @@ class MemberAchievementRoleService(AchievementRolesService):
                     member_id,
                     achievement_role.role_id
             ):
-                self.uow.achievement_role_members.remove(achievement_role_member)
+                async with self.uow:
+                    await self.uow.achievement_role_members.remove(achievement_role_member)
 
                 return False
 

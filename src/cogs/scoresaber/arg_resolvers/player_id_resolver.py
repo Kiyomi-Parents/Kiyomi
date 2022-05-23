@@ -8,7 +8,7 @@ class PlayerIdResolver(ErrorArgResolver[str, str]):
         self.uow = uow
 
     async def resolve_detailed(self, argument: TArg) -> TReturn:
-        player = self.uow.players.get_by_id(argument)
+        player = await self.uow.players.get_by_id(argument)
 
         if player is None:
             return f"{argument} (Not in DB)"
@@ -16,7 +16,7 @@ class PlayerIdResolver(ErrorArgResolver[str, str]):
         return f"{player}"
 
     async def resolve(self, argument: str) -> str:
-        player = self.uow.players.get_by_id(argument)
+        player = await self.uow.players.get_by_id(argument)
 
         if player is None:
             return f"{argument}"

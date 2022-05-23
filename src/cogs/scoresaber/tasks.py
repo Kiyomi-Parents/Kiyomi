@@ -23,7 +23,7 @@ class Tasks(BaseTasks):
     async def update_players(self):
         """Updating players"""
         players = await self.player_service.get_all_players()
-        Logger.log("task", f"Updating {len(players)} players")
+        Logger.log("Score Saber", f"Updating {len(players)} players")
 
         for player in players:
             await self.player_service.update_player(player)
@@ -35,14 +35,14 @@ class Tasks(BaseTasks):
     async def update_players_scores(self):
         """Updating scores"""
         players = await self.player_service.get_all_players()
-        Logger.log("task", f"Updating scores for {len(players)} players")
+        Logger.log("Score Saber", f"Updating scores for {len(players)} players")
 
         for player in players:
             await self.score_service.update_player_scores(player)
 
     @Utils.discord_ready
     async def init_live_score_feed(self):
-        Logger.log("Score Saber Websocket", "Started listening to live score feed!")
+        Logger.log("Score Saber", "Started listening to live score feed!")
         async for item in self.score_service.scoresaber.websocket():
             if isinstance(item, pyscoresaber.PlayerScore):
                 player_score = item

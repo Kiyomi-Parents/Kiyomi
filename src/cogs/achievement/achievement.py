@@ -17,31 +17,43 @@ class Achievements(AchievementCog):
     @achievements.command(name="all")
     async def achievements_all(self, ctx: Interaction):
         """Show all achievements"""
-        achievements = self.user_achievement_service.get_all_achievements(ctx.user.id)
+        achievements = await self.user_achievement_service.get_all_achievements(ctx.user.id)
 
-        await ctx.response.send_message(embed=PlayerAchievementsEmbed(self.bot, achievements))
+        embed = PlayerAchievementsEmbed(self.bot, achievements)
+        await embed.after_init()
+
+        await ctx.response.send_message(embed=embed)
 
     @achievements.command(name="complete")
     async def achievements_complete(self, ctx: Interaction):
         """Show all completed achievements"""
-        achievements = self.user_achievement_service.get_all_completed_achievements(ctx.user.id)
+        achievements = await self.user_achievement_service.get_all_completed_achievements(ctx.user.id)
 
-        await ctx.response.send_message(embed=PlayerAchievementsEmbed(self.bot, achievements))
+        embed = PlayerAchievementsEmbed(self.bot, achievements)
+        await embed.after_init()
+
+        await ctx.response.send_message(embed=embed)
 
     @achievements.command(name="uncomplete")
     async def achievements_uncomplete(self, ctx: Interaction):
         """Show all uncompleted achievements"""
-        achievements = self.user_achievement_service.get_all_uncompleted_achievements(ctx.user.id)
+        achievements = await self.user_achievement_service.get_all_uncompleted_achievements(ctx.user.id)
 
-        await ctx.response.send_message(embed=PlayerAchievementsEmbed(self.bot, achievements))
+        embed = PlayerAchievementsEmbed(self.bot, achievements)
+        await embed.after_init()
+
+        await ctx.response.send_message(embed=embed)
 
     @achievements.command(name="group")
     @app_commands.describe(group="Choose an achievement group")
     async def achievements_group(self, ctx: Interaction, group: str):
         """Show all uncompleted achievements"""
-        achievements = self.user_achievement_service.get_group_achievements(group, ctx.user.id)
+        achievements = await self.user_achievement_service.get_group_achievements(group, ctx.user.id)
 
-        await ctx.response.send_message(embed=PlayerAchievementsEmbed(self.bot, achievements))
+        embed = PlayerAchievementsEmbed(self.bot, achievements)
+        await embed.after_init()
+
+        await ctx.response.send_message(embed=embed)
 
     @achievements_group.autocomplete("group")
     async def get_all_groups(self, ctx: Interaction, current: str) -> List[Choice[str]]:

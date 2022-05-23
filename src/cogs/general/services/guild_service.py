@@ -1,3 +1,5 @@
+from typing import List
+
 import discord
 from discord import NotFound
 
@@ -21,14 +23,15 @@ class GuildService(GeneralService):
 
         return discord_guild
 
+    async def register_guilds(self, guilds: List[discord.Guild]):
+        for guild in guilds:
+            await self.register_guild(guild.id)
+
     async def register_guild(self, guild_id: int) -> Guild:
-        guild = self.uow.guilds.get_by_id(guild_id)
-
-        if guild is None:
+        async with self.uow:
             discord_guild = await self.get_discord_guild(guild_id)
-            guild = self.uow.guilds.add(Guild(guild_id, discord_guild.name))
-
-        return guild
+            return await self.uow.guilds.upsert(Guild(guild_id, discord_guild.name))
 
     async def unregister_guild(self, guild_id: int):
-        self.uow.guilds.remove_by_id(guild_id)
+        async with self.uow:
+            await self.uow.guilds.remove_by_id(guild_id)

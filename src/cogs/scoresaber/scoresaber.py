@@ -3,7 +3,6 @@ from typing import Optional
 import discord
 from discord import app_commands, Interaction, AppCommandType
 from discord.app_commands import Transform, CommandInvokeError
-from discord.ext import commands
 
 from src.cogs.general import GeneralAPI
 from .services import PlayerService, ScoreService
@@ -24,10 +23,6 @@ class ScoreSaber(ScoreSaberCog, name="Score Saber"):
                 callback=self.refresh,
                 type=AppCommandType.user
         ))
-
-    @commands.Cog.listener()
-    async def on_ready(self):
-        await self.player_service.start_scoresaber_api_client()
 
     player = app_commands.Group(
             name="player",
@@ -89,6 +84,7 @@ class ScoreSaber(ScoreSaberCog, name="Score Saber"):
             count: Optional[int]
     ):
         """Displays your most recent scores"""
+        # TODO: Just refactor this entire thing.
         if member is None:
             member = ctx.user
 
@@ -98,14 +94,14 @@ class ScoreSaber(ScoreSaberCog, name="Score Saber"):
             await ctx.response.send_message("Score count has to be between 0 and 3")
             return
 
-        scores = self.score_service.get_recent_scores(guild_player.player.id, count)
+        scores = await self.score_service.get_recent_scores(guild_player.player.id, count)
 
         if scores is None or len(scores) == 0:
             await ctx.response.send_message("No scores found!")
             return
 
         for score in scores:
-            previous_score = self.score_service.get_previous_score(score)
+            previous_score = await self.score_service.get_previous_score(score)
 
             score_view = ScoreView(self.bot, ctx.guild, score, previous_score)
             await score_view.respond(ctx)
@@ -148,7 +144,7 @@ class ScoreSaber(ScoreSaberCog, name="Score Saber"):
         member = await general.get_discord_member(guild_id, member_id)
         self.bot.events.emit("register_member", member)
 
-        guild_player = await self.player_service.add_player(guild_id, member_id, player_id)
+        guild_player = await self.player_service.register_player(guild_id, member_id, player_id)
 
         await ctx.response.send_message(
                 f"Successfully linked Score Saber profile {guild_player.player.name} to member {guild_player.member.name} in guild {guild_player.guild.name}",

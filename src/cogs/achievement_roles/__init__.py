@@ -6,7 +6,7 @@ from .tasks import Tasks
 
 
 async def setup(bot: Kiyomi):
-    uow = UnitOfWork(bot.database.session)
+    uow = UnitOfWork(await bot.database.get_session())
 
     member_service = MemberAchievementRoleService(bot, uow)
 

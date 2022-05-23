@@ -42,8 +42,6 @@ class BeatSaver(BeatSaverCog, name="Beat Saver"):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        await self.beatmap_service.start_scoresaber_api_client()
-
         settings = [
             EmojiSetting.create(self.bot, "Easy emoji", "easy_difficulty_emoji"),
             EmojiSetting.create(self.bot, "Normal emoji", "normal_difficulty_emoji"),

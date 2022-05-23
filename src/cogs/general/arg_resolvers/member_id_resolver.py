@@ -7,7 +7,7 @@ class MemberIdResolver(ErrorArgResolver[int, str]):
         self.uow = uow
 
     async def resolve_detailed(self, argument: int) -> str:
-        member = self.uow.members.get_by_id(argument)
+        member = await self.uow.members.get_by_id(argument)
 
         if member is None:
             return f"{argument} (Not in DB)"
@@ -15,7 +15,7 @@ class MemberIdResolver(ErrorArgResolver[int, str]):
         return f"{member}"
 
     async def resolve(self, argument: int) -> str:
-        member = self.uow.members.get_by_id(argument)
+        member = await self.uow.members.get_by_id(argument)
 
         if member is None:
             return f"{argument}"
