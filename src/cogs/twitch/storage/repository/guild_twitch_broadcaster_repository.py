@@ -39,7 +39,7 @@ class GuildTwitchBroadcasterRepository(BaseRepository[GuildTwitchBroadcaster]):
         stmt = self._eager_load_all(stmt)
         return await self._all(stmt)
 
-    async def remove_by_guild_id_and_member_id(
+    async def delete_by_guild_id_and_member_id(
             self,
             guild_id: int,
             member_id: int

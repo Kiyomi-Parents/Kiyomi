@@ -21,10 +21,10 @@ class GuildTwitchBroadcaster(Base):
         lazy="joined"
     )
 
-    def __init__(self, guild_id: int, member_id: int, twitch_streamer_id: str):
+    def __init__(self, guild_id: int, member_id: int, twitch_broadcaster_id: str):
         self.guild_id = guild_id
         self.member_id = member_id
-        self.twitch_broadcaster_id = twitch_streamer_id
+        self.twitch_broadcaster_id = twitch_broadcaster_id
 
     def __str__(self):
         return f"GuildTwitchBroadcaster {self.guild_id} {self.member_id} {self.twitch_broadcaster_id}"

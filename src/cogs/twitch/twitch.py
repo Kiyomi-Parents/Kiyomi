@@ -14,9 +14,9 @@ from ...kiyomi import Kiyomi
 
 class Twitch(TwitchCog):
 
-    def __init__(self, bot: Kiyomi, twitch_broadcaster_service: BroadcasterService,
-                 twitch_event_service: EventService, message_service: MessageService):
-        super().__init__(bot, twitch_broadcaster_service, twitch_event_service, message_service)
+    def __init__(self, bot: Kiyomi, broadcaster_service: BroadcasterService,
+                 event_service: EventService, message_service: MessageService):
+        super().__init__(bot, broadcaster_service, event_service, message_service)
         # Register events
         self.events()
 
@@ -26,9 +26,9 @@ class Twitch(TwitchCog):
             if event.type != "live":
                 return
 
-            guild_twitch_broadcasters = await self.twitch_broadcaster_service.get_guild_twitch_broadcasters_by_broadcaster_id(str(event.broadcaster.id))
+            guild_twitch_broadcasters = await self.broadcaster_service.get_all_by_broadcaster_id(str(event.broadcaster.id))
             try:
-                stream = await self.twitch_broadcaster_service.fetch_stream(event.broadcaster.id)
+                stream = await self.broadcaster_service.fetch_stream(event.broadcaster.id)
             except BroadcastNotFound:
                 stream = None
 
@@ -46,7 +46,7 @@ class Twitch(TwitchCog):
 
         self.bot.events.emit("setting_register", settings)
 
-        await self.twitch_event_service.register_subscriptions()
+        await self.event_service.register_subscriptions()
 
     twitch = app_commands.Group(
             name="twitch",
@@ -63,19 +63,19 @@ class Twitch(TwitchCog):
         self.bot.events.emit("register_member", ctx.user)
 
         try:
-            guild_twitch_streamer = await self.twitch_broadcaster_service.register_twitch_broadcaster(ctx.guild_id, ctx.user.id, login)
+            guild_twitch_streamer = await self.broadcaster_service.register_twitch_broadcaster(ctx.guild_id, ctx.user.id, login)
         except BroadcasterNotFound as e:
             await ctx.response.send_message(str(e))
             return
 
-        await self.twitch_event_service.register_subscription(int(guild_twitch_streamer.twitch_broadcaster_id))  # maybe we should instead refresh all subscriptions here?
-        await ctx.response.send_message(f"Successfully linked **{guild_twitch_streamer.twitch_broadcaster.login}** ScoreSaber profile!", ephemeral=True)
+        await self.event_service.register_subscription(int(guild_twitch_streamer.twitch_broadcaster_id))  # maybe we should instead refresh all subscriptions here?
+        await ctx.response.send_message(f"Successfully linked **{guild_twitch_streamer.twitch_broadcaster.login}** Twitch profile!", ephemeral=True)
 
     @twitch.command(name="remove")
     async def twitch_remove(self, ctx: Interaction):
         """Remove the currently linked Twitch account from yourself in this Discord guild."""
         try:
-            guild_twitch_broadcaster = await self.twitch_broadcaster_service.unregister_guild_twitch_broadcaster(ctx.guild_id, ctx.user.id)
+            guild_twitch_broadcaster = await self.broadcaster_service.unregister_guild_twitch_broadcaster(ctx.guild_id, ctx.user.id)
         except GuildTwitchBroadcasterNotFound:
             await ctx.response.send_message(f"Failed to unregister, most likely because you are already unregistered.")
             return
