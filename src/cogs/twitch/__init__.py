@@ -17,9 +17,6 @@ from ...log import Logger
 async def setup(bot: Kiyomi):
     uow = UnitOfWork(await bot.database.get_session())
 
-    bot.error_resolver.add(TwitchLoginResolver())
-    bot.error_resolver.add(TwitchUserIdResolver())
-
     twitch_client_id = os.getenv("TWITCH_CLIENT_ID")
     twitch_client_secret = os.getenv("TWITCH_CLIENT_SECRET")
     twitch_access_token = os.getenv("TWITCH_ACCESS_TOKEN")
@@ -41,6 +38,9 @@ async def setup(bot: Kiyomi):
     broadcaster_service = BroadcasterService(bot, uow, twitch_client, eventsub_client)
     event_service = EventService(bot, uow, twitch_client, eventsub_client)
     message_service = MessageService(bot, uow, twitch_client, eventsub_client)
+
+    bot.error_resolver.add(TwitchLoginResolver())
+    bot.error_resolver.add(TwitchUserIdResolver(uow, broadcaster_service))
 
     await bot.add_cog(
         Twitch(

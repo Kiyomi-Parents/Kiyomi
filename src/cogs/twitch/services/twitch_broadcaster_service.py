@@ -10,14 +10,25 @@ from ..storage.model.twitch_broadcaster import TwitchBroadcaster
 
 class BroadcasterService(TwitchService):
 
-    async def fetch_user(self, login: str) -> User:
+    async def fetch_user(self, login: str = None, user_id: int = None) -> User:
+        fetch_kwargs = {}
+        error_kwargs = {}
+        if login is not None:
+            fetch_kwargs["names"] = [login]
+            error_kwargs["login"] = login
+        elif user_id is not None:
+            fetch_kwargs["ids"] = [user_id]
+            error_kwargs["user_id"] = user_id
+        else:
+            raise BroadcasterNotFound()
+
         try:
-            users: List[User] = await self.twitch_client.fetch_users(names=[login])
+            users: List[User] = await self.twitch_client.fetch_users(**fetch_kwargs)
         except HTTPException:
-            raise BroadcasterNotFound(login)
+            users = []
 
         if len(users) == 0:
-            raise BroadcasterNotFound(login)
+            raise BroadcasterNotFound(**error_kwargs)
 
         return users[0]
 
@@ -29,7 +40,7 @@ class BroadcasterService(TwitchService):
         return guild_twitch_broadcaster
 
     async def add_twitch_broadcaster(self, login: str) -> TwitchBroadcaster:
-        user = await self.fetch_user(login)
+        user = await self.fetch_user(login=login)
 
         async with self.uow:
             return await self.uow.twitch_broadcasters.upsert(TwitchBroadcaster(user))

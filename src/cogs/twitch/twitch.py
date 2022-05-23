@@ -10,6 +10,7 @@ from .transformers.twitch_login_transformer import TwitchLoginTransformer
 from .twitch_cog import TwitchCog
 from ..settings.storage import ChannelSetting
 from ...kiyomi import Kiyomi
+from ...log import Logger
 
 
 class Twitch(TwitchCog):
@@ -29,7 +30,8 @@ class Twitch(TwitchCog):
             guild_twitch_broadcasters = await self.broadcaster_service.get_all_by_broadcaster_id(str(event.broadcaster.id))
             try:
                 stream = await self.broadcaster_service.fetch_stream(event.broadcaster.id)
-            except BroadcastNotFound:
+            except BroadcastNotFound as e:
+                Logger.log("Twitch", await self.bot.error_resolver.resolve_message(e, detailed=True))
                 stream = None
 
             await self.message_service.send_broadcast_live_notifications(event, guild_twitch_broadcasters, stream)
