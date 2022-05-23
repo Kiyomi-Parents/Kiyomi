@@ -23,13 +23,13 @@ class EventService(TwitchService):
             self.bot.events.emit("twitch_broadcast_end", event.data)
 
     async def delete_subscriptions(self):
-        # ???????
-        await self.register_subscription(1)
+        # For some reason we need to first register a subscription before we can delete any subscriptions.
+        await self.register_subscription(1)  # Register dummy subscription
         for subscription in await self.eventsub_client.get_subscriptions():
             await self.eventsub_client.delete_subscription(subscription.id)
 
     async def register_subscriptions(self):
-        await self.delete_subscriptions()  # ???????
+        await self.delete_subscriptions()
         for broadcaster in await self.registered_broadcasters():
             await self.register_subscription(broadcaster.id)
 
