@@ -7,7 +7,7 @@ timeago~=1.0.15
 termcolor~=1.1.0
 pylint==2.13.8
 prettytable==3.3.0
-pybeatsaver==0.1.9
+pybeatsaver==0.1.11
 pyscoresaber~=1.0.5
 asyncio~=3.4.3
 pyee~=9.0.4
