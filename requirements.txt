@@ -8,7 +8,7 @@ termcolor~=1.1.0
 pylint==2.13.8
 prettytable==3.3.0
 pybeatsaver==0.1.9
-pyscoresaber~=1.0.5
+pyscoresaber~=1.0.7
 asyncio~=3.4.3
 pyee~=9.0.4
 git+https://github.com/Rapptz/discord.py@master#egg=discord.py
