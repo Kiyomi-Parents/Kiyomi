@@ -41,7 +41,7 @@ Discord bot that has various functionality related to Beat Saber 💜</br>
 
 ### Code formatter
     pip install black
-    python -m black ./Kitomi.py ./src
+    python -m black ./Kiyomi.py ./src
 
 ### Generate alembic migration
     alembic revision --autogenerate -m "Change message"
