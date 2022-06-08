@@ -5,7 +5,6 @@ from src.kiyomi import BaseTasks, Kiyomi, Utils
 
 
 class Tasks(BaseTasks):
-
     def __init__(self, bot: Kiyomi, pfp_service: PFPService):
         super().__init__(bot)
 
