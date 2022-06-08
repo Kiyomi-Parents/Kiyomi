@@ -19,7 +19,6 @@ async def setup(bot: Kiyomi):
 
     twitch_client_id = os.getenv("TWITCH_CLIENT_ID")
     twitch_client_secret = os.getenv("TWITCH_CLIENT_SECRET")
-    twitch_access_token = os.getenv("TWITCH_ACCESS_TOKEN")
     twitch_webhook_secret = os.getenv("TWITCH_WEBHOOK_SECRET")
     twitch_event_sub_listener_url = os.getenv("TWITCH_EVENT_SUB_LISTENER_URL")
     twitch_event_sub_listener_port = os.getenv("TWITCH_EVENT_SUB_LISTENER_PORT")
@@ -29,7 +28,7 @@ async def setup(bot: Kiyomi):
             Logger.warn("Twitch", "Config issue, exiting")
             return
 
-    twitch_client = twitchio.Client(twitch_access_token, client_secret=twitch_client_secret, loop=bot.loop)
+    twitch_client = twitchio.Client.from_client_credentials(twitch_client_id, twitch_client_secret, loop=bot.loop)
     eventsub_client = eventsub.EventSubClient(twitch_client, twitch_webhook_secret, twitch_event_sub_listener_url)
 
     bot.loop.create_task(eventsub_client.listen(port=twitch_event_sub_listener_port))
