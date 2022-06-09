@@ -37,8 +37,6 @@ class BaseCog(commands.Cog, Generic[TServiceUOW], metaclass=CogMeta):
             f"{colored(ctx.interaction.guild.name, 'blue')}",
         )
 
-        await ctx.trigger_typing()
-
     async def cog_command_error(self, ctx: Context[Kiyomi], error: Exception):
         if isinstance(error, CommandInvokeError):
             error = error.original
