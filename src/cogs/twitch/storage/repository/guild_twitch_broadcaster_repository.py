@@ -4,17 +4,15 @@ from sqlalchemy import select, delete
 from sqlalchemy.orm import selectinload
 from sqlalchemy.sql import Executable
 
-from src.kiyomi.database import BaseRepository
+from src.kiyomi.database import BaseStorageRepository
 from src.log import Logger
 from ..model.guild_twitch_broadcaster import GuildTwitchBroadcaster
 
 
-class GuildTwitchBroadcasterRepository(BaseRepository[GuildTwitchBroadcaster]):
+class GuildTwitchBroadcasterRepository(BaseStorageRepository[GuildTwitchBroadcaster]):
     def _eager_load_all(self, stmt: Executable):
         return stmt.options(
-            selectinload(self._table.guild),
-            selectinload(self._table.member),
-            selectinload(self._table.twitch_broadcaster)
+            selectinload(self._table.guild), selectinload(self._table.member), selectinload(self._table.twitch_broadcaster)
         )
 
     @property
@@ -36,11 +34,7 @@ class GuildTwitchBroadcasterRepository(BaseRepository[GuildTwitchBroadcaster]):
         stmt = self._eager_load_all(stmt)
         return await self._all(stmt)
 
-    async def delete_by_guild_id_and_member_id(
-            self,
-            guild_id: int,
-            member_id: int
-    ) -> Optional[GuildTwitchBroadcaster]:
+    async def delete_by_guild_id_and_member_id(self, guild_id: int, member_id: int) -> Optional[GuildTwitchBroadcaster]:
         entity = await self.get_by_guild_id_and_member_id(guild_id, member_id)
         stmt = delete(self._table).where(self._table.id == entity.id)
         await self._session.execute(stmt)

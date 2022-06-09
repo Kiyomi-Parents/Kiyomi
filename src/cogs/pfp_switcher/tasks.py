@@ -1,20 +1,15 @@
 from discord.ext import tasks
 
-from src.cogs.pfp_switcher import PFPService
-from src.kiyomi import BaseTasks, Kiyomi, Utils
+from src.cogs.pfp_switcher import ServiceUnitOfWork
+from src.kiyomi import BaseTasks, Utils
 
 
-class Tasks(BaseTasks):
-    def __init__(self, bot: Kiyomi, pfp_service: PFPService):
-        super().__init__(bot)
-
-        self.pfp_service = pfp_service
-
+class Tasks(BaseTasks[ServiceUnitOfWork]):
     @tasks.loop(minutes=1)
     @Utils.discord_ready
     async def update_profile_picture(self):
         """Update Kiyomi's profile picture"""
-        profile_picture = self.pfp_service.get_pfp()
+        profile_picture = self.service_uow.profile_pictures.get_pfp()
 
-        if not self.pfp_service.is_current_pfp(profile_picture):
-            await self.pfp_service.set_pfp(profile_picture)
+        if not self.service_uow.profile_pictures.is_current_pfp(profile_picture):
+            await self.service_uow.profile_pictures.set_pfp(profile_picture)

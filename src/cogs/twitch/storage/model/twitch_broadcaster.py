@@ -8,6 +8,7 @@ from src.kiyomi.database import Base
 
 class TwitchBroadcaster(Base):
     """Broadcaster data from Twitch"""
+
     __tablename__ = "twitch_broadcaster"
 
     id = Column(String(128), primary_key=True, autoincrement=False)
@@ -16,11 +17,7 @@ class TwitchBroadcaster(Base):
     profile_image_url = Column(String(256))
     broadcaster_type = Column(String(32))
 
-    guild_twitch_broadcasters = relationship(
-        "GuildTwitchBroadcaster",
-        back_populates="twitch_broadcaster",
-        lazy="joined"
-        )
+    guild_twitch_broadcasters = relationship("GuildTwitchBroadcaster", back_populates="twitch_broadcaster", lazy="joined")
     guilds = association_proxy("guild_twitch_broadcasters", "guild")
 
     def __init__(self, user: User):

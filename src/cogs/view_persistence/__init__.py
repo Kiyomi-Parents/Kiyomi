@@ -1,12 +1,11 @@
 from src.kiyomi import Kiyomi
-from .services import MessageViewService
-from .storage import UnitOfWork
+from .services import ServiceUnitOfWork
+from .storage import StorageUnitOfWork
 from .view_persistance_api import ViewPersistenceAPI
 
 
 async def setup(bot: Kiyomi):
-    uow = UnitOfWork(await bot.database.get_session())
+    storage_uow = StorageUnitOfWork(await bot.database.get_session())
+    service_uow = ServiceUnitOfWork(bot, storage_uow)
 
-    message_view_service = MessageViewService(bot, uow)
-
-    await bot.add_cog(ViewPersistenceAPI(bot, message_view_service, uow))
+    await bot.add_cog(ViewPersistenceAPI(bot, service_uow))

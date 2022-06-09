@@ -1,11 +1,15 @@
 from typing import Type
 
-from src.cogs.scoresaber.messages.components.buttons.score_button import ScoreButton
-from src.cogs.scoresaber.messages.views.score_view import ScoreView
-from src.cogs.scoresaber.scoresaber_cog import ScoreSaberCog
+from .services import ServiceUnitOfWork
+from .messages.components.buttons.score_button import ScoreButton
+from .messages.views.score_view import ScoreView
+from src.kiyomi import BaseCog
 
 
-class ScoreSaberUI(ScoreSaberCog):
+class ScoreSaberUI(BaseCog[ServiceUnitOfWork]):
+    def register_events(self):
+        pass
+
     @property
     def button_score(self) -> Type[ScoreButton]:
         return ScoreButton

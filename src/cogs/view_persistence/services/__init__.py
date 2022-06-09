@@ -1,1 +1,1 @@
-from .message_view_service import MessageViewService
+from .service_unit_of_work import ServiceUnitOfWork

@@ -3,11 +3,11 @@ from typing import Optional, List, Type
 
 from sqlalchemy import select, desc, exists
 
-from src.kiyomi.database import BaseRepository
+from src.kiyomi.database import BaseStorageRepository
 from ..model.score import Score
 
 
-class ScoreRepository(BaseRepository[Score]):
+class ScoreRepository(BaseStorageRepository[Score]):
     @property
     def _table(self) -> Type[Score]:
         return Score

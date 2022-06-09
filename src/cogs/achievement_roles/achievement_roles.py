@@ -2,45 +2,46 @@ from discord import Permissions
 from discord.ext import commands
 
 from src.cogs.settings.storage.model.toggle_setting import ToggleSetting
-from .services.member_achievement_role_service import MemberAchievementRoleService
-from .achievement_roles_cog import AchievementRolesCog
+from .services import ServiceUnitOfWork
 from src.cogs.general.storage.model.guild_member import GuildMember
-from src.kiyomi import Kiyomi
+from src.kiyomi import BaseCog
 from ..general.storage.model.member_role import MemberRole
 from ..general.storage.model.role import Role
-from ..settings.storage import AbstractSetting
+from src.cogs.settings.storage.model.abstract_setting import AbstractSetting
 
 
-class AchievementRoles(AchievementRolesCog, name="Achievement Roles"):
-    def __init__(self, bot: Kiyomi, member_service: MemberAchievementRoleService):
-        super().__init__(bot, member_service)
-
-        # Register events
-        self.events()
-
-    def events(self):
+class AchievementRoles(BaseCog[ServiceUnitOfWork], name="Achievement Roles"):
+    def register_events(self):
         @self.bot.events.on("on_new_player")
         async def register_member(guild_member: GuildMember):
-            await self.member_service.update_member_roles(guild_member.guild_id, guild_member.member_id)
+            await self.service_uow.memberAchievementRoles.update_member_roles(guild_member.guild_id, guild_member.member_id)
+            await self.service_uow.save_changes()
 
         @self.bot.events.on("on_remove_player")
         async def unregister_member(guild_member: GuildMember):
-            await self.member_service.remove_all_member_roles(guild_member.guild_id, guild_member.member_id)
+            await self.service_uow.memberAchievementRoles.remove_all_member_roles(
+                guild_member.guild_id, guild_member.member_id
+            )
+            await self.service_uow.save_changes()
 
         @self.bot.events.on("on_setting_change")
         async def update_roles(setting: AbstractSetting):
             cog_settings = ["achievement_roles_pp", "achievement_roles_rank"]
 
             if setting.name in cog_settings:
-                await self.member_service.update_guild_roles(setting.guild_id)
+                await self.service_uow.memberAchievementRoles.update_guild_roles(setting.guild_id)
+
+            await self.service_uow.save_changes()
 
         @self.bot.events.on("on_member_role_removed")
         async def member_role_removed(member_role: MemberRole):
-            await self.member_service.update_member_roles(member_role.guild_id, member_role.member_id)
+            await self.service_uow.memberAchievementRoles.update_member_roles(member_role.guild_id, member_role.member_id)
+            await self.service_uow.save_changes()
 
         @self.bot.events.on("on_guild_role_removed")
         async def guild_role_removed(role: Role):
-            await self.member_service.update_guild_roles(role.guild_id)
+            await self.service_uow.memberAchievementRoles.update_guild_roles(role.guild_id)
+            await self.service_uow.save_changes()
 
     @commands.Cog.listener()
     async def on_ready(self):

@@ -3,13 +3,14 @@ from typing import List, Optional
 import discord
 from discord import BaseActivity
 
-from src.kiyomi import Utils
+from src.kiyomi import Utils, BaseService
 from src.log import Logger
-from .fancy_presence_service import FancyPresenceService
+from ..storage import StorageUnitOfWork
 from ..storage.model.presence import Presence
+from ..storage.repository.presence_repository import PresenceRepository
 
 
-class PresenceService(FancyPresenceService):
+class PresenceService(BaseService[Presence, PresenceRepository, StorageUnitOfWork]):
     running_tasks: List[str] = []
     static_presence: Optional[Presence] = None
 
@@ -22,7 +23,7 @@ class PresenceService(FancyPresenceService):
         return discord.Game(tasks)
 
     def get_idle_activity(self) -> BaseActivity:
-        presence = self.uow.presences.get_random()
+        presence = self.storage_uow.presences.get_random()
 
         return self.get_activity(presence)
 

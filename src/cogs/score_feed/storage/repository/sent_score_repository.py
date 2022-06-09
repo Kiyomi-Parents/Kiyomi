@@ -4,10 +4,10 @@ from sqlalchemy import select, desc
 
 from ..model.sent_score import SentScore
 from src.cogs.scoresaber.storage.model.score import Score
-from src.kiyomi.database import BaseRepository
+from src.kiyomi.database import BaseStorageRepository
 
 
-class SentScoreRepository(BaseRepository[SentScore]):
+class SentScoreRepository(BaseStorageRepository[SentScore]):
     @property
     def _table(self) -> Type[SentScore]:
         return SentScore

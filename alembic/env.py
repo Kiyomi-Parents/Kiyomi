@@ -2,8 +2,7 @@ import os
 from logging.config import fileConfig
 
 from alembic import context
-from sqlalchemy import engine_from_config
-from sqlalchemy import pool
+from sqlalchemy import engine_from_config, pool
 
 from src.kiyomi.database import Base
 # noinspection PyUnresolvedReferences
@@ -21,11 +20,15 @@ import src.cogs.general
 # noinspection PyUnresolvedReferences
 import src.cogs.leaderboard
 # noinspection PyUnresolvedReferences
+import src.cogs.pfp_switcher
+# noinspection PyUnresolvedReferences
 import src.cogs.score_feed
 # noinspection PyUnresolvedReferences
 import src.cogs.scoresaber
 # noinspection PyUnresolvedReferences
 import src.cogs.settings
+# noinspection PyUnresolvedReferences
+import src.cogs.twitch
 # noinspection PyUnresolvedReferences
 import src.cogs.view_persistence
 

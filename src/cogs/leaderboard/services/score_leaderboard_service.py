@@ -4,13 +4,14 @@ import pybeatsaver
 
 from src.cogs.beatsaver import BeatSaverAPI
 from src.cogs.beatsaver.beatsaver_utils import BeatSaverUtils
-from src.cogs.leaderboard.services.leaderboard_service import LeaderboardService
+from ..storage import StorageUnitOfWork
 from src.cogs.scoresaber import ScoreSaberAPI
 from src.cogs.scoresaber.storage.model.player import Player
 from src.cogs.scoresaber.storage.model.score import Score
+from src.kiyomi.service.base_basic_service import BaseBasicService
 
 
-class ScoreLeaderboardService(LeaderboardService):
+class ScoreLeaderboardService(BaseBasicService[StorageUnitOfWork]):
     async def get_beatmap_score_leaderboard_by_key(
         self,
         guild_id: int,

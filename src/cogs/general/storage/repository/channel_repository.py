@@ -3,10 +3,10 @@ from typing import Type, List
 from sqlalchemy import select
 
 from ..model.channel import Channel
-from src.kiyomi.database import BaseRepository
+from src.kiyomi.database import BaseStorageRepository
 
 
-class ChannelRepository(BaseRepository[Channel]):
+class ChannelRepository(BaseStorageRepository[Channel]):
     @property
     def _table(self) -> Type[Channel]:
         return Channel

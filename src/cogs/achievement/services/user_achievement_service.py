@@ -3,17 +3,17 @@ from typing import List
 from discord import Interaction
 from discord.app_commands import Choice
 
-from .achievement_service import AchievementService
+from src.kiyomi.service.base_basic_service import BaseBasicService
 from .achievements import Achievement
 from .registry_service import RegistryService, AchievementGroups
-from ..storage.unit_of_work import UnitOfWork
+from ..storage.storage_unit_of_work import StorageUnitOfWork
 from src.kiyomi import Kiyomi
 from src.cogs.general import GeneralAPI
 
 
-class UserAchievementService(AchievementService):
-    def __init__(self, bot: Kiyomi, uow: UnitOfWork, registry_service: RegistryService):
-        super().__init__(bot, uow)
+class UserAchievementService(BaseBasicService[StorageUnitOfWork]):
+    def __init__(self, bot: Kiyomi, storage_uow: StorageUnitOfWork, registry_service: RegistryService):
+        super().__init__(bot, storage_uow)
 
         self.registry_service = registry_service
 

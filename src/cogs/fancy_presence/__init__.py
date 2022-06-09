@@ -1,14 +1,13 @@
 from .fancy_presence import FancyPresence
 from .fancy_presence_api import FancyPresenceAPI
-from .services.presence_service import PresenceService
-from .storage.unit_of_work import UnitOfWork
+from .services import ServiceUnitOfWork
+from .storage.storage_unit_of_work import StorageUnitOfWork
 from src.kiyomi import Kiyomi
 
 
 async def setup(bot: Kiyomi):
-    uow = UnitOfWork(await bot.database.get_session())
+    storage_uow = StorageUnitOfWork(await bot.database.get_session())
+    service_uow = ServiceUnitOfWork(bot, storage_uow)
 
-    presence_service = PresenceService(bot, uow)
-
-    await bot.add_cog(FancyPresence(bot, presence_service))
-    await bot.add_cog(FancyPresenceAPI(bot, presence_service))
+    await bot.add_cog(FancyPresence(bot, service_uow))
+    await bot.add_cog(FancyPresenceAPI(bot, service_uow))

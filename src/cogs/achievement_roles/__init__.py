@@ -1,18 +1,15 @@
 from src.kiyomi import Kiyomi
 from .achievement_roles import AchievementRoles
-from .services import MemberAchievementRoleService
-from .storage import UnitOfWork
+from .services import ServiceUnitOfWork
+from .storage import StorageUnitOfWork
 from .tasks import Tasks
 
 
 async def setup(bot: Kiyomi):
-    uow = UnitOfWork(await bot.database.get_session())
+    storage_uow = StorageUnitOfWork(await bot.database.get_session())
+    service_uow = ServiceUnitOfWork(bot, storage_uow)
 
-    member_service = MemberAchievementRoleService(bot, uow)
+    achievement_role_tasks = Tasks(bot, service_uow)
+    achievement_role_tasks.update_member_roles.start()
 
-    achievement_role_tasks = Tasks(bot, member_service)
-
-    if not bot.running_tests:
-        achievement_role_tasks.update_member_roles.start()
-
-    await bot.add_cog(AchievementRoles(bot, member_service))
+    await bot.add_cog(AchievementRoles(bot, service_uow))

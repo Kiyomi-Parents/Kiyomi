@@ -1,1 +1,1 @@
-from .beatmap_service import BeatmapService
+from .service_unit_of_work import ServiceUnitOfWork

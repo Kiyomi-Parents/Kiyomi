@@ -15,11 +15,7 @@ class GuildTwitchBroadcaster(Base):
 
     guild = relationship("Guild", lazy="joined")
     member = relationship("Member", lazy="joined")
-    twitch_broadcaster = relationship(
-        "TwitchBroadcaster",
-        back_populates="guild_twitch_broadcasters",
-        lazy="joined"
-    )
+    twitch_broadcaster = relationship("TwitchBroadcaster", back_populates="guild_twitch_broadcasters", lazy="joined")
 
     def __init__(self, guild_id: int, member_id: int, twitch_broadcaster_id: str):
         self.guild_id = guild_id

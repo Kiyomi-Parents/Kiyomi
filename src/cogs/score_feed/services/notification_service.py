@@ -1,19 +1,18 @@
 from src.cogs.scoresaber import ScoreSaberAPI, ScoreSaberUI
 from src.cogs.settings import SettingsAPI
 from src.kiyomi import Kiyomi
+from src.kiyomi.service.base_basic_service import BaseBasicService
 from src.log import Logger
-from .score_feed_service import ScoreFeedService
 from .sent_score_service import SentScoreService
-from ..storage.unit_of_work import UnitOfWork
+from ..storage.storage_unit_of_work import StorageUnitOfWork
 from ..storage.model.sent_score import SentScore
 from src.cogs.general.storage.model.guild import Guild
-from ...scoresaber.storage.model.player import Player
+from src.cogs.scoresaber.storage.model.player import Player
 
 
-class NotificationService(ScoreFeedService):
-    def __init__(self, bot: Kiyomi, uow: UnitOfWork, sent_score_service: SentScoreService):
-        super().__init__(bot, uow)
-
+class NotificationService(BaseBasicService[StorageUnitOfWork]):
+    def __init__(self, bot: Kiyomi, storage_uow: StorageUnitOfWork, sent_score_service: SentScoreService):
+        super().__init__(bot, storage_uow)
         self.sent_score_service = sent_score_service
 
     async def send_notifications(self, guild_id: int):
@@ -47,7 +46,7 @@ class NotificationService(ScoreFeedService):
             return
 
         discord_guild = self.bot.get_guild(guild.id)
-        scores = await self.uow.sent_score_repo.get_unsent_scores(guild.id, player.id)
+        scores = await self.storage_uow.sent_scores.get_unsent_scores(guild.id, player.id)
 
         Logger.log(guild, f"{player} has {len(scores)} scores to notify")
 
@@ -58,5 +57,4 @@ class NotificationService(ScoreFeedService):
             score_view = scoresaber_ui.view_score(self.bot, discord_guild, score, previous_score)
             await score_view.send(target=channel_id)
 
-            async with self.uow:
-                await self.uow.sent_score_repo.add(SentScore(score.id, guild.id))
+            await self.storage_uow.sent_scores.add(SentScore(score.id, guild.id))

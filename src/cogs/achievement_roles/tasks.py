@@ -1,18 +1,13 @@
 from discord.ext import tasks
 
 from src.cogs.general import GeneralAPI
-from src.kiyomi import BaseTasks, Kiyomi
+from src.kiyomi import BaseTasks
 from src.kiyomi.utils import Utils
-from .services import MemberAchievementRoleService
+from .services import ServiceUnitOfWork
 from src.cogs.fancy_presence import FancyPresenceAPI
 
 
-class Tasks(BaseTasks):
-    def __init__(self, bot: Kiyomi, member_service: MemberAchievementRoleService):
-        super().__init__(bot)
-
-        self.member_service = member_service
-
+class Tasks(BaseTasks[ServiceUnitOfWork]):
     @tasks.loop(minutes=5)
     @Utils.time_task
     @Utils.discord_ready
@@ -24,4 +19,6 @@ class Tasks(BaseTasks):
         guild_members = await general.get_all_guild_members()
 
         for guild_member in guild_members:
-            await self.member_service.update_member_roles(guild_member.guild_id, guild_member.member_id)
+            await self.service_uow.memberAchievementRoles.update_member_roles(guild_member.guild_id, guild_member.member_id)
+
+        await self.service_uow.save_changes()

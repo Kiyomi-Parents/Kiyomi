@@ -1,13 +1,12 @@
-from src.kiyomi.error.error_arg_resolver import TArg, TReturn
-from ..storage.unit_of_work import UnitOfWork
+from ..storage import StorageUnitOfWork
 from src.kiyomi.error import ErrorArgResolver
 
 
 class PlayerIdResolver(ErrorArgResolver[str, str]):
-    def __init__(self, uow: UnitOfWork):
+    def __init__(self, uow: StorageUnitOfWork):
         self.uow = uow
 
-    async def resolve_detailed(self, argument: TArg) -> TReturn:
+    async def resolve_detailed(self, argument: str) -> str:
         player = await self.uow.players.get_by_id(argument)
 
         if player is None:

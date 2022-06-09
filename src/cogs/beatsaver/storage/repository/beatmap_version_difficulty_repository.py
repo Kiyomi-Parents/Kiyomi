@@ -6,10 +6,10 @@ from sqlalchemy import select
 from src.cogs.beatsaver.storage.model.beatmap_version_difficulty import (
     BeatmapVersionDifficulty,
 )
-from src.kiyomi import BaseRepository
+from src.kiyomi import BaseStorageRepository
 
 
-class BeatmapVersionDifficultyRepository(BaseRepository[BeatmapVersionDifficulty]):
+class BeatmapVersionDifficultyRepository(BaseStorageRepository[BeatmapVersionDifficulty]):
     @property
     def _table(self) -> Type[BeatmapVersionDifficulty]:
         return BeatmapVersionDifficulty

@@ -4,10 +4,10 @@ from sqlalchemy import select
 from sqlalchemy.orm import joinedload
 
 from ..model.beatmap_version import BeatmapVersion
-from src.kiyomi.database import BaseRepository
+from src.kiyomi.database import BaseStorageRepository
 
 
-class BeatmapVersionRepository(BaseRepository[BeatmapVersion]):
+class BeatmapVersionRepository(BaseStorageRepository[BeatmapVersion]):
     @property
     def _table(self) -> Type[BeatmapVersion]:
         return BeatmapVersion

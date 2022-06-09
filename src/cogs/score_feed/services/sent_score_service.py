@@ -1,12 +1,14 @@
 from src.cogs.scoresaber import ScoreSaberAPI
+from src.kiyomi import BaseService
 from src.log import Logger
-from .score_feed_service import ScoreFeedService
+from ..storage import StorageUnitOfWork
 from ..storage.model.sent_score import SentScore
 from src.cogs.general.storage.model.guild import Guild
 from src.cogs.scoresaber.storage.model.player import Player
+from ..storage.repository.sent_score_repository import SentScoreRepository
 
 
-class SentScoreService(ScoreFeedService):
+class SentScoreService(BaseService[SentScore, SentScoreRepository, StorageUnitOfWork]):
     async def mark_all_guild_scores_sent(self, guild_id: int):
         scoresaber = self.bot.get_cog_api(ScoreSaberAPI)
         guild_players = await scoresaber.get_guild_players_by_guild(guild_id)
@@ -29,7 +31,7 @@ class SentScoreService(ScoreFeedService):
             await self.mark_player_scores_sent(player, guild)
 
     async def mark_player_scores_sent(self, player: Player, guild: Guild):
-        scores = await self.uow.sent_score_repo.get_unsent_scores(guild.id, player.id)
+        scores = await self.storage_uow.sent_scores.get_unsent_scores(guild.id, player.id)
 
         Logger.log(player, f"Marking {len(scores)} scores as sent in {guild}")
 
@@ -38,12 +40,11 @@ class SentScoreService(ScoreFeedService):
             sent_scores.append(SentScore(score.id, guild.id))
 
         if len(sent_scores) != 0:
-            async with self.uow:
-                await self.uow.sent_score_repo.add_all(sent_scores)
+            await self.storage_uow.sent_scores.add_all(sent_scores)
 
     async def should_send_scores(self, guild: Guild, player: Player):
-        sent_scores = await self.uow.sent_score_repo.get_sent_scores_count(guild.id, player.id)
-        unsent_scores = await self.uow.sent_score_repo.get_unsent_scores_count(guild.id, player.id)
+        sent_scores = await self.storage_uow.sent_scores.get_sent_scores_count(guild.id, player.id)
+        unsent_scores = await self.storage_uow.sent_scores.get_unsent_scores_count(guild.id, player.id)
 
         # If there are not sent scores, then the player must be new to the system. Don't send scores
         if sent_scores == 0:

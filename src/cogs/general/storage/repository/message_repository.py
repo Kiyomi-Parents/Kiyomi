@@ -3,10 +3,10 @@ from typing import List, Type
 from sqlalchemy import select
 
 from ..model.message import Message
-from src.kiyomi.database import BaseRepository
+from src.kiyomi.database import BaseStorageRepository
 
 
-class MessageRepository(BaseRepository[Message]):
+class MessageRepository(BaseStorageRepository[Message]):
     @property
     def _table(self) -> Type[Message]:
         return Message

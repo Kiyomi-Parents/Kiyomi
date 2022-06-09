@@ -1,6 +1,6 @@
 from typing import Type
 
-from src.cogs.beatsaver.beatsaver_cog import BeatSaverCog
+from .services import ServiceUnitOfWork
 from src.cogs.beatsaver.messages.components.buttons.beatsaver_button import (
     BeatSaverButton,
 )
@@ -16,9 +16,13 @@ from src.cogs.beatsaver.messages.components.selects.map_detail_characteristic_se
 from src.cogs.beatsaver.messages.components.selects.map_detail_difficulty_select import (
     MapDetailDifficultySelect,
 )
+from src.kiyomi import BaseCog
 
 
-class BeatSaverUI(BeatSaverCog):
+class BeatSaverUI(BaseCog[ServiceUnitOfWork]):
+    def register_events(self):
+        pass
+
     @property
     def select_map_detail_characteristic(self) -> Type[MapDetailCharacteristicSelect]:
         return MapDetailCharacteristicSelect

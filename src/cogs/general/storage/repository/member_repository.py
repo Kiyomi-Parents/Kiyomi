@@ -1,10 +1,10 @@
 from typing import Type
 
 from ..model.member import Member
-from src.kiyomi.database import BaseRepository
+from src.kiyomi.database import BaseStorageRepository
 
 
-class MemberRepository(BaseRepository[Member]):
+class MemberRepository(BaseStorageRepository[Member]):
     @property
     def _table(self) -> Type[Member]:
         return Member

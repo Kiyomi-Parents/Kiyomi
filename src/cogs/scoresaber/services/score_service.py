@@ -2,19 +2,32 @@ from typing import List
 
 import pyscoresaber
 
+from src.kiyomi import BaseService, Kiyomi
 from src.log import Logger
-from .scoresaber_service import ScoreSaberService
+from ..storage import StorageUnitOfWork
 from ..storage.model.leaderboard import Leaderboard
 from ..storage.model.player import Player
 from ..storage.model.score import Score
+from ..storage.repository.score_repository import ScoreRepository
 
 
-class ScoreService(ScoreSaberService):
+class ScoreService(BaseService[Score, ScoreRepository, StorageUnitOfWork]):
+    def __init__(
+        self,
+        bot: Kiyomi,
+        repository: ScoreRepository,
+        storage_uow: StorageUnitOfWork,
+        scoresaber: pyscoresaber.ScoreSaberAPI,
+    ):
+        super().__init__(bot, repository, storage_uow)
+
+        self.scoresaber = scoresaber
+
     async def get_recent_scores(self, player_id: str, limit: int) -> List[Score]:
-        return await self.uow.scores.get_recent(player_id, limit)
+        return await self.repository.get_recent(player_id, limit)
 
     async def get_previous_score(self, score: Score) -> Score:
-        return await self.uow.scores.get_previous(score)
+        return await self.repository.get_previous(score)
 
     async def on_new_live_score_feed_score(self, player_score: pyscoresaber.PlayerScore):
         if not await self.is_player_score_new(player_score):
@@ -25,15 +38,14 @@ class ScoreService(ScoreSaberService):
             f"Got new score from Score Saber websocket",
         )
 
-        async with self.uow:
-            if not await self.uow.leaderboards.exists(player_score.leaderboard.id):
-                new_leaderboard = await self.uow.leaderboards.add(Leaderboard(player_score.leaderboard))
-                self.bot.events.emit("on_new_leaderboards", [new_leaderboard])
+        if not await self.storage_uow.leaderboards.exists(player_score.leaderboard.id):
+            new_leaderboard = await self.storage_uow.leaderboards.add(Leaderboard(player_score.leaderboard))
+            self.bot.events.emit("on_new_leaderboards", [new_leaderboard])
 
-            new_score = await self.uow.scores.add(Score(player_score))
-            self.bot.events.emit("on_new_scores", [new_score])
+        new_score = await self.repository.add(Score(player_score))
+        self.bot.events.emit("on_new_scores", [new_score])
 
-            self.bot.events.emit("on_new_score_live", new_score)
+        self.bot.events.emit("on_new_score_live", new_score)
 
     async def update_player_scores(self, player: Player):
         new_player_scores = await self.get_missing_recent_scores(player)
@@ -42,28 +54,27 @@ class ScoreService(ScoreSaberService):
         if len(new_player_scores) == 0:
             return
 
-        async with self.uow:
-            new_leaderboards = await self.get_new_leaderboards(
-                [new_player_score.leaderboard for new_player_score in new_player_scores]
-            )
-            if len(new_leaderboards) > 0:
-                await self.uow.leaderboards.add_all(new_leaderboards)
+        new_leaderboards = await self.get_new_leaderboards(
+            [new_player_score.leaderboard for new_player_score in new_player_scores]
+        )
+        if len(new_leaderboards) > 0:
+            await self.storage_uow.leaderboards.add_all(new_leaderboards)
 
-            new_scores = self.get_new_scores(player, new_player_scores)
-            if len(new_scores) > 0:
-                await self.uow.scores.add_all(new_scores)
+        new_scores = self.get_new_scores(player, new_player_scores)
+        if len(new_scores) > 0:
+            await self.repository.add_all(new_scores)
 
-            # Emit event for new leaderboards
-            self.bot.events.emit("on_new_leaderboards", new_leaderboards)
+        # Emit event for new leaderboards
+        self.bot.events.emit("on_new_leaderboards", new_leaderboards)
 
-            # Emit event for new scores
-            self.bot.events.emit("on_new_scores", new_scores)
+        # Emit event for new scores
+        self.bot.events.emit("on_new_scores", new_scores)
 
     async def get_new_leaderboards(self, leaderboards: List[pyscoresaber.LeaderboardInfo]) -> List[Leaderboard]:
         new_leaderboards = []
 
         for leaderboard in leaderboards:
-            if not await self.uow.leaderboards.exists(leaderboard.id):
+            if not await self.storage_uow.leaderboards.exists(leaderboard.id):
                 new_leaderboards.append(Leaderboard(leaderboard))
 
         return new_leaderboards
@@ -105,4 +116,4 @@ class ScoreService(ScoreSaberService):
         return new_player_scores
 
     async def is_player_score_new(self, player_score: pyscoresaber.PlayerScore) -> bool:
-        return await self.uow.scores.exists_by_score_id_and_time_set(player_score.score.id, player_score.score.time_set)
+        return await self.repository.exists_by_score_id_and_time_set(player_score.score.id, player_score.score.time_set)

@@ -3,10 +3,10 @@ from typing import Optional, List, Type
 from sqlalchemy import select, delete
 
 from ..model.emoji import Emoji
-from src.kiyomi.database import BaseRepository
+from src.kiyomi.database import BaseStorageRepository
 
 
-class EmojiRepository(BaseRepository[Emoji]):
+class EmojiRepository(BaseStorageRepository[Emoji]):
     @property
     def _table(self) -> Type[Emoji]:
         return Emoji

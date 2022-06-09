@@ -3,10 +3,10 @@ from typing import Optional, List, Type
 from sqlalchemy import select, delete
 
 from ..model.guild_member import GuildMember
-from src.kiyomi.database import BaseRepository
+from src.kiyomi.database import BaseStorageRepository
 
 
-class GuildMemberRepository(BaseRepository[GuildMember]):
+class GuildMemberRepository(BaseStorageRepository[GuildMember]):
     @property
     def _table(self) -> Type[GuildMember]:
         return GuildMember

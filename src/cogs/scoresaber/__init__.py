@@ -1,12 +1,12 @@
 import pyscoresaber
 
 from src.kiyomi import Kiyomi
-from .arg_resolvers.player_id_resolver import PlayerIdResolver
+from .arg_resolvers import *
 from .scoresaber import ScoreSaber
 from .scoresaber_api import ScoreSaberAPI
 from .scoresaber_ui import ScoreSaberUI
-from .services import PlayerService, ScoreService
-from .storage import UnitOfWork
+from .services import ServiceUnitOfWork
+from .storage import StorageUnitOfWork
 from .tasks import Tasks
 
 
@@ -15,22 +15,19 @@ async def setup(bot: Kiyomi):
     await scoresaber_api_client.start()
     await scoresaber_api_client.ws_start()
 
-    uow = UnitOfWork(await bot.database.get_session())
+    storage_uow = StorageUnitOfWork(await bot.database.get_session())
+    service_uow = ServiceUnitOfWork(bot, storage_uow, scoresaber_api_client)
 
-    bot.error_resolver.add(PlayerIdResolver(uow))
+    bot.error_resolver.add(PlayerIdResolver(storage_uow))
 
-    score_service = ScoreService(bot, uow, scoresaber_api_client)
-    player_service = PlayerService(bot, uow, scoresaber_api_client, score_service)
-
-    scoresaber_tasks = Tasks(bot, player_service, score_service)
+    scoresaber_tasks = Tasks(bot, service_uow)
 
     # Start listening to websocket
     bot.loop.create_task(scoresaber_tasks.init_live_score_feed())
 
-    if not bot.running_tests:
-        scoresaber_tasks.update_players.start()
-        scoresaber_tasks.update_players_scores.start()
+    scoresaber_tasks.update_players.start()
+    scoresaber_tasks.update_players_scores.start()
 
-    await bot.add_cog(ScoreSaber(bot, player_service, score_service))
-    await bot.add_cog(ScoreSaberAPI(bot, player_service, score_service, uow))
-    await bot.add_cog(ScoreSaberUI(bot, player_service, score_service))
+    await bot.add_cog(ScoreSaber(bot, service_uow))
+    await bot.add_cog(ScoreSaberAPI(bot, service_uow))
+    await bot.add_cog(ScoreSaberUI(bot, service_uow))

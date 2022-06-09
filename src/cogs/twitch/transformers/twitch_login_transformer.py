@@ -19,9 +19,7 @@ class TwitchLoginTransformer(Transformer):
 
     @classmethod
     async def autocomplete(
-            cls,
-            interaction: Interaction,
-            value: Union[int, float, str]
+        cls, interaction: Interaction, value: Union[int, float, str]
     ) -> List[Choice[Union[int, float, str]]]:
         return []  # There really shouldn't be an autocomplete for this
 

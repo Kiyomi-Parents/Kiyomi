@@ -2,10 +2,11 @@ import json
 from os import path
 from typing import List, Dict, Optional
 
+from src.kiyomi.base_repository import BaseRepository, TEntity
 from ..model.profile_picture import ProfilePicture
 
 
-class ProfilePictureRepository:
+class ProfilePictureRepository(BaseRepository):
     _current_pfp_file = "src/cogs/pfp_switcher/current_pfp.json"
     _config_file = "src/cogs/pfp_switcher/profile_pictures.json"
 
@@ -52,3 +53,33 @@ class ProfilePictureRepository:
         with open(self._current_pfp_file, "w+") as file:
             data = {"current": pfp_hash}
             json.dump(data, file, indent=4)
+
+    async def get_by_id(self, entity_id: int) -> Optional[TEntity]:
+        raise NotImplemented()
+
+    async def get_all(self) -> List[TEntity]:
+        raise NotImplemented()
+
+    async def exists(self, entity_id: int) -> bool:
+        raise NotImplemented()
+
+    async def add(self, entity: TEntity) -> TEntity:
+        raise NotImplemented()
+
+    async def add_all(self, entities: List[TEntity]) -> List[TEntity]:
+        raise NotImplemented()
+
+    async def remove(self, entity: TEntity) -> TEntity:
+        raise NotImplemented()
+
+    async def remove_by_id(self, entity_id: int) -> Optional[TEntity]:
+        raise NotImplemented()
+
+    async def upsert(self, entity: TEntity) -> TEntity:
+        raise NotImplemented()
+
+    async def update(self, entity_id: int, values: Dict[str, any]) -> TEntity:
+        raise NotImplemented()
+
+    async def update_entity(self, entity: TEntity) -> TEntity:
+        raise NotImplemented()

@@ -1,5 +1,7 @@
-from src.cogs.pfp_switcher.pfp_switcher_cog import PFPSwitcherCog
+from .services import ServiceUnitOfWork
+from src.kiyomi import BaseCog
 
 
-class PFPSwitcher(PFPSwitcherCog):
-    pass
+class PFPSwitcher(BaseCog[ServiceUnitOfWork]):
+    def register_events(self):
+        pass

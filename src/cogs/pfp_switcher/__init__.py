@@ -1,17 +1,17 @@
 from .pfp_switcher import PFPSwitcher
-from .services.pfp_service import PFPService
-from .storage.unit_of_work import UnitOfWork
+from .services.profile_picture_service import ProfilePictureService
+from .services.service_unit_of_work import ServiceUnitOfWork
+from .storage.storage_unit_of_work import StorageUnitOfWork
 from .tasks import Tasks
 from src.kiyomi import Kiyomi
 
 
 async def setup(bot: Kiyomi):
-    uow = UnitOfWork(await bot.database.get_session())
+    storage_uow = StorageUnitOfWork(await bot.database.get_session())
+    service_uow = ServiceUnitOfWork(bot, storage_uow)
 
-    pfp_service = PFPService(bot, uow)
-
-    pfp_switcher_tasks = Tasks(bot, pfp_service)
+    pfp_switcher_tasks = Tasks(bot, service_uow)
 
     pfp_switcher_tasks.update_profile_picture.start()
 
-    await bot.add_cog(PFPSwitcher(bot, pfp_service))
+    await bot.add_cog(PFPSwitcher(bot, service_uow))

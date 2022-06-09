@@ -4,10 +4,9 @@ from discord import app_commands, Interaction
 from discord.app_commands import Transform
 from discord.ext import commands
 
-from src.kiyomi import Kiyomi
+from src.kiyomi import BaseCog
 from src.log import Logger
-from .services import BeatmapService
-from .beatsaver_cog import BeatSaverCog
+from .services import ServiceUnitOfWork
 from .errors import BeatmapNotFound
 from .messages.views.song_view import SongView
 from src.cogs.settings.storage.model.emoji_setting import EmojiSetting
@@ -18,24 +17,15 @@ if TYPE_CHECKING:
     from src.cogs.scoresaber.storage.model.leaderboard import Leaderboard
 
 
-class BeatSaver(BeatSaverCog, name="Beat Saver"):
-    def __init__(
-        self,
-        bot: Kiyomi,
-        beatmap_service: BeatmapService,
-    ):
-        super().__init__(bot, beatmap_service)
-
-        # Register events
-        self.events()
-
-    def events(self):
+class BeatSaver(BaseCog[ServiceUnitOfWork], name="Beat Saver"):
+    def register_events(self):
         @self.bot.events.on("on_new_leaderboards")
         async def attach_song_to_score(leaderboards: List["Leaderboard"]):
             song_hashes = [leaderboard.song_hash for leaderboard in leaderboards]
 
             try:
-                await self.beatmap_service.get_beatmaps_by_hashes(list(set(song_hashes)))
+                await self.service_uow.beatmaps.get_beatmaps_by_hashes(list(set(song_hashes)))
+                await self.service_uow.save_changes()
             except BeatmapNotFound as error:
                 Logger.log("on_new_leaderboards", error)
 

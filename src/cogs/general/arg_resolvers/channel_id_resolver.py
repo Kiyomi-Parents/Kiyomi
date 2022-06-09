@@ -1,9 +1,9 @@
-from ..storage.unit_of_work import UnitOfWork
+from ..storage.storage_unit_of_work import StorageUnitOfWork
 from src.kiyomi.error import ErrorArgResolver
 
 
 class ChannelIdResolver(ErrorArgResolver[int, str]):
-    def __init__(self, uow: UnitOfWork):
+    def __init__(self, uow: StorageUnitOfWork):
         self.uow = uow
 
     async def resolve_detailed(self, argument: int) -> str:

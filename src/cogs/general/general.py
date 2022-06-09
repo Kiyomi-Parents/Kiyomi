@@ -2,53 +2,27 @@ import discord.member
 from discord import Role, app_commands, Interaction
 from discord.ext import commands
 
-from .general_cog import GeneralCog
 from .messages.views.invite_view import InviteView
 from .services import (
-    EmojiService,
-    GuildService,
-    MemberService,
-    RoleService,
-    ChannelService,
-    MessageService,
+    ServiceUnitOfWork,
 )
-from src.kiyomi import Kiyomi, permissions
+from src.kiyomi import permissions, BaseCog
 from ..settings.storage.model.emoji_setting import EmojiSetting
 
 
-class General(GeneralCog):
-    def __init__(
-        self,
-        bot: Kiyomi,
-        emoji_service: EmojiService,
-        guild_service: GuildService,
-        member_service: MemberService,
-        channel_service: ChannelService,
-        message_service: MessageService,
-        role_service: RoleService,
-    ):
-        super().__init__(
-            bot,
-            emoji_service,
-            guild_service,
-            member_service,
-            channel_service,
-            message_service,
-            role_service,
-        )
-
-        # Register events
-        self.events()
-
-    def events(self):
+class General(BaseCog[ServiceUnitOfWork]):
+    def register_events(self):
         @self.bot.events.on("register_member")
         async def register_member(member: discord.Member):
-            await self.member_service.register_member(member.guild.id, member.id)
-            await self.member_service.register_guild_member(member.guild.id, member.id)
+            discord_guild = await self.service_uow.guilds.register_guild(member.guild.id)
+            await self.service_uow.members.register_member(discord_guild, member.id)
+            await self.service_uow.members.register_guild_member(member.guild.id, member.id)
+            await self.service_uow.save_changes()
 
     @commands.Cog.listener()
     async def on_ready(self):
-        await self.guild_service.register_guilds(self.bot.guilds)
+        await self.service_uow.guilds.register_guilds(self.bot.guilds)
+        await self.service_uow.save_changes()
 
         settings = [
             # TODO: Add bot owner permissions
@@ -59,27 +33,33 @@ class General(GeneralCog):
 
     @commands.Cog.listener()
     async def on_guild_join(self, guild: discord.Guild):
-        await self.guild_service.register_guild(guild.id)
+        await self.service_uow.guilds.register_guild(guild.id)
+        await self.service_uow.save_changes()
 
     @commands.Cog.listener()
     async def on_guild_remove(self, guild: discord.Guild):
-        await self.guild_service.unregister_guild(guild.id)
+        await self.service_uow.guilds.unregister_guild(guild.id)
+        await self.service_uow.save_changes()
 
     @commands.Cog.listener()
     async def on_guild_update(self, before: discord.Guild, after: discord.Guild):
-        await self.guild_service.register_guild(after.id)
+        await self.service_uow.guilds.register_guild(after.id)
+        await self.service_uow.save_changes()
 
     @commands.Cog.listener()
     async def on_member_remove(self, member: discord.Member):
-        await self.member_service.unregister_guild_member(member.guild.id, member.id)
+        await self.service_uow.members.unregister_guild_member(member.guild.id, member.id)
+        await self.service_uow.save_changes()
 
     @commands.Cog.listener()
     async def on_member_update(self, before: discord.Member, after: discord.Member):
-        await self.role_service.on_member_update(before, after)
+        await self.service_uow.roles.on_member_update(before, after)
+        await self.service_uow.save_changes()
 
     @commands.Cog.listener()
     async def on_guild_role_delete(self, role: Role):
-        await self.role_service.on_role_delete(role)
+        await self.service_uow.roles.on_role_delete(role)
+        await self.service_uow.save_changes()
 
     @app_commands.command()
     async def invite(self, ctx: Interaction):

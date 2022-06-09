@@ -3,10 +3,10 @@ from typing import Optional, Type
 from sqlalchemy import select, delete
 
 from ..model.member_role import MemberRole
-from src.kiyomi.database import BaseRepository
+from src.kiyomi.database import BaseStorageRepository
 
 
-class MemberRoleRepository(BaseRepository[MemberRole]):
+class MemberRoleRepository(BaseStorageRepository[MemberRole]):
     @property
     def _table(self) -> Type[MemberRole]:
         return MemberRole

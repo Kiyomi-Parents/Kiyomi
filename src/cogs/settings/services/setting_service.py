@@ -1,32 +1,35 @@
-from typing import Optional, List
+from typing import Optional, List, Any
 
 from discord import Member
 
-from src.kiyomi import Kiyomi, Utils
-from .settings_service import SettingsService
+from src.kiyomi import Kiyomi, Utils, BaseService
 from ..errors import (
     FailedToCreateSetting,
     FailedToFindSetting,
     FailedToConvertSetting,
     InvalidSettingValue,
 )
-from ..storage import Setting, SettingType, AbstractSetting, UnitOfWork
+from ..storage import StorageUnitOfWork
 from ..storage.model.abstract_bot_setting import AbstractBotSetting
 from ..storage.model.abstract_regular_setting import AbstractRegularSetting
+from ..storage.model.abstract_setting import AbstractSetting
+from ..storage.model.enums.setting_type import SettingType
+from ..storage.model.setting import Setting
+from ..storage.repository.settings_repository import SettingRepository
 
 
-class SettingService(SettingsService):
-    def __init__(self, bot: Kiyomi, uow: UnitOfWork):
-        super().__init__(bot, uow)
+class SettingService(BaseService[Setting, SettingRepository, StorageUnitOfWork]):
+    def __init__(self, bot: Kiyomi, repository: SettingRepository, storage_uow: StorageUnitOfWork):
+        super().__init__(bot, repository, storage_uow)
 
         self.registered_settings: List[AbstractSetting] = []
 
     @staticmethod
-    def convert_value_to_setting_type(value: any) -> SettingType:
+    def convert_value_to_setting_type(value: Any) -> SettingType:
         return SettingType(type(value))
 
     @staticmethod
-    def convert_setting_type_to_value(setting_type: SettingType, value: str) -> any:
+    def convert_setting_type_to_value(setting_type: SettingType, value: str) -> Any:
         return setting_type.value(value)
 
     def wrap_setting(self, name_human: str, setting: Setting) -> AbstractSetting:
@@ -70,7 +73,7 @@ class SettingService(SettingsService):
 
     async def get(self, guild_id: int, name: str) -> AbstractSetting:
         registered_setting = self.find_registered_setting(name)
-        setting = await self.uow.settings_repo.get_by_guild_id_and_name(guild_id, name)
+        setting = await self.repository.get_by_guild_id_and_name(guild_id, name)
 
         if setting is not None:
             return self.wrap_setting(registered_setting.name_human, setting)
@@ -94,21 +97,20 @@ class SettingService(SettingsService):
 
             return new_setting
 
-    async def set(self, guild_id: int, name: str, value: Optional[any]) -> AbstractSetting:
+    async def set(self, guild_id: int, name: str, value: Optional[Any]) -> AbstractSetting:
         setting = await self.get(guild_id, name)
 
-        async with self.uow:
-            if setting.setting.id is None:
-                setting.set(value)
-                setting.setting = await self.uow.settings_repo.add(setting.setting)
-            else:
-                await self.uow.settings_repo.set(setting.setting, value)
+        if setting.setting.id is None:
+            setting.set(value)
+            setting.setting = await self.repository.add(setting.setting)
+        else:
+            await self.repository.set(setting.setting, value)
 
         self.bot.events.emit("on_setting_change", setting)
 
         return setting
 
-    async def get_value(self, guild_id: int, name: str) -> Optional[any]:
+    async def get_value(self, guild_id: int, name: str) -> Optional[Any]:
         setting = await self.get(guild_id, name)
 
         if setting is None:
@@ -118,7 +120,7 @@ class SettingService(SettingsService):
 
     async def delete(self, guild_id: int, name: str) -> AbstractSetting:
         setting = await self.get(guild_id, name)
-        return await self.uow.settings_repo.remove(setting)
+        return await self.repository.remove(setting)
 
     def register_settings(self, settings: List[Setting]) -> None:
         self.registered_settings += settings

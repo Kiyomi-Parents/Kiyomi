@@ -2,11 +2,11 @@ from typing import Optional, Type
 
 from sqlalchemy import select
 
-from src.kiyomi.database import BaseRepository
+from src.kiyomi.database import BaseStorageRepository
 from ..model.achievement_role_member import AchievementRoleMember
 
 
-class AchievementRoleMemberRepository(BaseRepository[AchievementRoleMember]):
+class AchievementRoleMemberRepository(BaseStorageRepository[AchievementRoleMember]):
     @property
     def _table(self) -> Type[AchievementRoleMember]:
         return AchievementRoleMember

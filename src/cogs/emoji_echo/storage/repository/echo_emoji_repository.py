@@ -3,10 +3,10 @@ from typing import Optional, List, Type
 from sqlalchemy import select
 
 from src.cogs.emoji_echo.storage.model.echo_emoji import EchoEmoji
-from src.kiyomi import BaseRepository
+from src.kiyomi import BaseStorageRepository
 
 
-class EchoEmojiRepository(BaseRepository[EchoEmoji]):
+class EchoEmojiRepository(BaseStorageRepository[EchoEmoji]):
     @property
     def _table(self) -> Type[EchoEmoji]:
         return EchoEmoji

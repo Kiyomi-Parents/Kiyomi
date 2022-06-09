@@ -1,14 +1,13 @@
 from src.kiyomi import Kiyomi
-from .services import SettingService
+from .services import ServiceUnitOfWork
 from .settings import Settings
 from .settings_api import SettingsAPI
-from .storage import UnitOfWork
+from .storage import StorageUnitOfWork
 
 
 async def setup(bot: Kiyomi):
-    uow = UnitOfWork(await bot.database.get_session())
+    storage_uow = StorageUnitOfWork(await bot.database.get_session())
+    service_uow = ServiceUnitOfWork(bot, storage_uow)
 
-    setting_service = SettingService(bot, uow)
-
-    await bot.add_cog(Settings(bot, setting_service))
-    await bot.add_cog(SettingsAPI(bot, setting_service, uow))
+    await bot.add_cog(Settings(bot, service_uow))
+    await bot.add_cog(SettingsAPI(bot, service_uow))

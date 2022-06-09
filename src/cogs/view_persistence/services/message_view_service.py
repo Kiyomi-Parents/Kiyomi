@@ -2,22 +2,23 @@ from __future__ import annotations
 
 from typing import List, TYPE_CHECKING
 
+from src.kiyomi import BaseService
 from src.log import Logger
-from .view_persistence_service import ViewPersistenceService
+from ..storage import StorageUnitOfWork
 from ..storage.model.message_view import MessageView
 from ..storage.model.persistence import Persistence
+from ..storage.repository.message_view_repository import MessageViewRepository
 
 if TYPE_CHECKING:
     from src.cogs.general import GeneralAPI
 
 
-class MessageViewService(ViewPersistenceService):
+class MessageViewService(BaseService[MessageView, MessageViewRepository, StorageUnitOfWork]):
     async def add_persistent_view(self, persistence: Persistence):
         general: "GeneralAPI" = self.bot.get_cog("GeneralAPI")
 
-        async with self.uow:
-            await general.register_message(persistence.guild_id, persistence.channel_id, persistence.message_id)
-            await self.uow.message_views.add(MessageView(persistence.message_id, persistence.view, persistence.get_params()))
+        await general.register_message(persistence.guild_id, persistence.channel_id, persistence.message_id)
+        await self.repository.add(MessageView(persistence.message_id, persistence.view, persistence.get_params()))
 
         Logger.log("View Persistence", f"Persisted view {persistence}")
 
@@ -28,7 +29,7 @@ class MessageViewService(ViewPersistenceService):
 
         persistences = []
         for message in messages:
-            message_view = await self.uow.message_views.get_by_message_id(message.id)
+            message_view = await self.repository.get_by_message_id(message.id)
 
             if message_view is not None:
                 persistences.append(

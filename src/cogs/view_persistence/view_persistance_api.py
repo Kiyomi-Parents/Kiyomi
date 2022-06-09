@@ -1,30 +1,22 @@
 from discord.ext import commands
 
-from . import MessageViewService, UnitOfWork
+from .services import ServiceUnitOfWork
 from .errors import MissingPersistentViewClass
 from .storage.model.persistence import Persistence
-from .view_persistence_cog import ViewPersistenceCog
-from src.kiyomi import Kiyomi
-from ...log import Logger
+from src.kiyomi import BaseCog
+from src.log import Logger
 
 
-class ViewPersistenceAPI(ViewPersistenceCog):
-    def __init__(self, bot: Kiyomi, message_view_service: MessageViewService, uow: UnitOfWork):
-        super().__init__(bot, message_view_service)
-
-        self.uow = uow
-
-        # Register events
-        self.events()
-
-    def events(self):
+class ViewPersistenceAPI(BaseCog[ServiceUnitOfWork]):
+    def register_events(self):
         @self.bot.events.on("on_new_view_sent")
         async def mark_scores_sent(persistence: Persistence):
-            await self.message_view_service.add_persistent_view(persistence)
+            await self.service_uow.message_views.add_persistent_view(persistence)
+            await self.service_uow.save_changes()
 
     @commands.Cog.listener()
     async def on_ready(self):
-        persistences = await self.message_view_service.get_persistent_views()
+        persistences = await self.service_uow.message_views.get_persistent_views()
 
         for persistence in persistences:
             try:

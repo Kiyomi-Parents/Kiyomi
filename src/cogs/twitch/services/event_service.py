@@ -4,15 +4,19 @@ import twitchio
 from twitchio.ext.eventsub import EventSubClient, NotificationEvent
 
 from src.kiyomi import Kiyomi
+from src.kiyomi.service.base_basic_service import BaseBasicService
 from src.log import Logger
-from .twitch_service import TwitchService
-from ..storage import UnitOfWork
+from ..storage import StorageUnitOfWork
 from ..storage.model.twitch_broadcaster import TwitchBroadcaster
 
 
-class EventService(TwitchService):
-    def __init__(self, bot: Kiyomi, uow: UnitOfWork, twitch_client: twitchio.Client, eventsub_client: EventSubClient):
-        super().__init__(bot, uow, twitch_client, eventsub_client)
+class EventService(BaseBasicService[StorageUnitOfWork]):
+    def __init__(
+        self, bot: Kiyomi, storage_uow: StorageUnitOfWork, twitch_client: twitchio.Client, eventsub_client: EventSubClient
+    ):
+        super().__init__(bot, storage_uow)
+
+        self.eventsub_client = eventsub_client
 
         @twitch_client.event()
         async def event_eventsub_notification_stream_start(event: NotificationEvent):
@@ -35,11 +39,14 @@ class EventService(TwitchService):
 
     async def register_subscription(self, streamer_id: int):
         # TODO: figure out if we need to delete any previous subscriptions to the same streamer
-        for subscribe in (self.eventsub_client.subscribe_channel_stream_start, self.eventsub_client.subscribe_channel_stream_end):
+        for subscribe in (
+            self.eventsub_client.subscribe_channel_stream_start,
+            self.eventsub_client.subscribe_channel_stream_end,
+        ):
             try:
                 await subscribe(streamer_id)
             except twitchio.errors.HTTPException as e:
                 Logger.error(str(e), e.reason)
 
     async def registered_broadcasters(self) -> List[TwitchBroadcaster]:
-        return await self.uow.twitch_broadcasters.get_all()
+        return await self.storage_uow.twitch_broadcasters.get_all()

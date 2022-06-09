@@ -4,10 +4,7 @@ import discord
 from discord import Colour, DiscordException
 
 from src.cogs.security import Security
-from src.kiyomi import Kiyomi
-from .general_service import GeneralService
-from .guild_service import GuildService
-from .member_service import MemberService
+from src.kiyomi import BaseService
 from ..errors import (
     GeneralCogException,
     RoleNotFound,
@@ -16,48 +13,34 @@ from ..errors import (
     FailedToAddToUser,
     FailedToRemoveFromUser,
 )
-from ..storage import UnitOfWork
+from ..storage import StorageUnitOfWork
 from ..storage.model.member_role import MemberRole
 from ..storage.model.role import Role
+from ..storage.repository.role_repository import RoleRepository
 
 
-class RoleService(GeneralService):
-    def __init__(
-        self,
-        bot: Kiyomi,
-        uow: UnitOfWork,
-        guild_service: GuildService,
-        member_service: MemberService,
-    ):
-        super().__init__(bot, uow)
-
-        self.guild_service = guild_service
-        self.member_service = member_service
-
+class RoleService(BaseService[Role, RoleRepository, StorageUnitOfWork]):
     async def on_member_update(self, before: discord.Member, after: discord.Member):
         before_role_ids = set([role.id for role in before.roles])
         after_role_ids = set([role.id for role in after.roles])
 
         diff_role_ids = before_role_ids - after_role_ids
 
-        async with self.uow:
-            for diff_role_id in diff_role_ids:
-                member_role = await self.uow.member_roles.delete_by_guild_id_and_member_id_and_role_id(
-                    after.guild.id, after.id, diff_role_id
-                )
+        for diff_role_id in diff_role_ids:
+            member_role = await self.storage_uow.member_roles.delete_by_guild_id_and_member_id_and_role_id(
+                after.guild.id, after.id, diff_role_id
+            )
 
-                if member_role is not None:
-                    self.bot.events.emit("on_member_role_removed", member_role)
+            if member_role is not None:
+                self.bot.events.emit("on_member_role_removed", member_role)
 
     async def on_role_delete(self, role: discord.role):
-        async with self.uow:
-            db_role = await self.uow.roles.remove_by_id(role.id)
+        db_role = await self.repository.remove_by_id(role.id)
 
-            if db_role is not None:
-                self.bot.events.emit("on_guild_role_removed", db_role)
+        if db_role is not None:
+            self.bot.events.emit("on_guild_role_removed", db_role)
 
-    async def get_discord_role(self, guild_id: int, role_id: int) -> discord.Role:
-        discord_guild = await self.guild_service.get_discord_guild(guild_id)
+    async def get_discord_role(self, discord_guild: discord.Guild, role_id: int) -> discord.Role:
         discord_role = discord_guild.get_role(role_id)
 
         if discord_role is None:
@@ -69,80 +52,67 @@ class RoleService(GeneralService):
                     break
 
         if discord_role is None:
-            async with self.uow:
-                await self.uow.roles.remove_by_id(role_id)
-
-            raise RoleNotFound(guild_id, role_id)
+            await self.repository.remove_by_id(role_id)
+            raise RoleNotFound(discord_guild.id, role_id)
 
         return discord_role
 
     @Security.can_edit_roles()
-    async def create_role(self, guild_id: int, name: str, colour: Colour, hoist: bool, reason: str) -> Role:
-        discord_guild = await self.guild_service.get_discord_guild(guild_id)
-
+    async def create_role(self, discord_guild: discord.Guild, name: str, colour: Colour, hoist: bool, reason: str) -> Role:
         try:
             role = await discord_guild.create_role(name=name, colour=colour, hoist=hoist, reason=reason)
 
-            async with self.uow:
-                return await self.uow.roles.add(Role(role.id, discord_guild.id, role.name))
+            return await self.repository.add(Role(role.id, discord_guild.id, role.name))
         except DiscordException as error:
-            raise FailedToCreateRole(guild_id, name, reason) from error
+            raise FailedToCreateRole(discord_guild.id, name, reason) from error
 
     @Security.can_edit_roles()
-    async def delete_role(self, guild_id: int, role_id: int, reason: str) -> None:
+    async def delete_role(self, discord_guild: discord.Guild, role_id: int, reason: str) -> None:
         try:
-            discord_role = await self.get_discord_role(guild_id, role_id)
+            discord_role = await self.get_discord_role(discord_guild, role_id)
         except RoleNotFound as error:
-            async with self.uow:
-                await self.uow.roles.remove_by_id(role_id)
+            await self.repository.remove_by_id(role_id)
 
             raise error
 
         try:
             await discord_role.delete(reason=reason)
         except DiscordException as error:
-            raise FailedToDeleteRole(guild_id, role_id, reason) from error
+            raise FailedToDeleteRole(discord_guild.id, role_id, reason) from error
         finally:
-            async with self.uow:
-                await self.uow.roles.remove_by_id(role_id)
+            await self.repository.remove_by_id(role_id)
 
     @Security.can_edit_roles()
-    async def add_role_to_member(self, guild_id: int, member_id: int, role_id: int, reason: str) -> MemberRole:
-        discord_member = await self.member_service.get_discord_member(guild_id, member_id)
-        discord_role = await self.get_discord_role(guild_id, role_id)
-
+    async def add_role_to_member(
+        self, discord_member: discord.Member, discord_role: discord.Role, reason: str
+    ) -> MemberRole:
         try:
             await discord_member.add_roles(discord_role, reason=reason)
 
-            async with self.uow:
-                return await self.uow.member_roles.add(MemberRole(guild_id, member_id, role_id))
+            return await self.storage_uow.member_roles.add(
+                MemberRole(discord_member.guild.id, discord_member.id, discord_role.id)
+            )
         except DiscordException as error:
-            raise FailedToAddToUser(guild_id, member_id, role_id, reason) from error
+            raise FailedToAddToUser(discord_member.guild.id, discord_member.id, discord_role.id, reason) from error
 
     @Security.can_edit_roles()
-    async def remove_role_from_member(self, guild_id: int, member_id: int, role_id: int, reason: str) -> None:
-        discord_member = await self.member_service.get_discord_member(guild_id, member_id)
-        discord_role = await self.get_discord_role(guild_id, role_id)
-
+    async def remove_role_from_member(self, discord_member: discord.Member, discord_role: discord.Role, reason: str) -> None:
         try:
             await discord_member.remove_roles(discord_role, reason=reason)
         except (DiscordException, GeneralCogException):
-            raise FailedToRemoveFromUser(guild_id, member_id, role_id, reason)
+            raise FailedToRemoveFromUser(discord_member.guild.id, discord_member.id, discord_role.id, reason)
         finally:
-            async with self.uow:
-                await self.uow.member_roles.delete_by_guild_id_and_member_id_and_role_id(guild_id, member_id, role_id)
+            await self.storage_uow.member_roles.delete_by_guild_id_and_member_id_and_role_id(
+                discord_member.guild.id, discord_member.id, discord_role.id
+            )
 
-    async def get_member_role(self, guild_id: int, member_id: int, role_id: int) -> Optional[Role]:
-        discord_member = await self.member_service.get_discord_member(guild_id, member_id)
-
+    async def get_member_role(self, discord_member: discord.Member, role_id: int) -> Optional[Role]:
         return discord_member.get_role(role_id)
 
-    async def get_member_roles(self, guild_id: int, member_id: int) -> List[Role]:
-        discord_member = await self.member_service.get_discord_member(guild_id, member_id)
-
+    async def get_member_roles(self, discord_member: discord.Member) -> List[Role]:
         return discord_member.roles
 
-    async def member_has_role(self, guild_id: int, member_id: int, role_id: int) -> bool:
-        role = await self.get_member_role(guild_id, member_id, role_id)
+    async def member_has_role(self, discord_member: discord.Member, role_id: int) -> bool:
+        role = await self.get_member_role(discord_member, role_id)
 
         return role is not None

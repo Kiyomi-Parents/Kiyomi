@@ -3,19 +3,18 @@ from discord import Permissions, app_commands, Interaction, AppCommandType
 from discord.app_commands import Transform, CommandInvokeError
 from discord.ext import commands
 
-from .services.emoji_service import EmojiService
-from .emoji_echo_cog import EmojiEchoCog
+from .services import ServiceUnitOfWork
 from .errors import NotFound
 from .transformers.available_emoji_transformer import AvailableEmojiTransformer
 from .transformers.enabled_emoji_transformer import EnabledEmojiTransformer
 from src.cogs.settings import SettingsAPI
-from src.cogs.settings.storage import ToggleSetting
-from src.kiyomi import permissions, Kiyomi
+from src.kiyomi import permissions, Kiyomi, BaseCog
+from src.cogs.settings.storage.model.toggle_setting import ToggleSetting
 
 
-class EmojiEcho(EmojiEchoCog):
-    def __init__(self, bot: Kiyomi, emoji_service: EmojiService):
-        super().__init__(bot, emoji_service)
+class EmojiEcho(BaseCog[ServiceUnitOfWork]):
+    def __init__(self, bot: Kiyomi, service_uow: ServiceUnitOfWork):
+        super().__init__(bot, service_uow)
 
         # Workaround until @app_commands.context_menu() supports self in function parameters
         self.bot.tree.add_command(
@@ -25,6 +24,9 @@ class EmojiEcho(EmojiEchoCog):
                 type=AppCommandType.message,
             )
         )
+
+    def register_events(self):
+        pass
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -51,7 +53,7 @@ class EmojiEcho(EmojiEchoCog):
         settings = self.bot.get_cog_api(SettingsAPI)
 
         if settings.get(msg.guild.id, "repost_emoji"):
-            emoji = await self.emoji_service.get_emoji_from_message(msg.guild.id, msg.content)
+            emoji = await self.service_uow.echo_emojis.get_emoji_from_message(msg.guild.id, msg.content)
 
             if emoji is not None:
                 await msg.channel.send(emoji)
@@ -63,7 +65,7 @@ class EmojiEcho(EmojiEchoCog):
 
     # @app_commands.context_menu(name="Random Reaction")
     async def random_reaction(self, ctx: Interaction, message: discord.Message):
-        emoji = await self.emoji_service.get_random_enabled_emoji()
+        emoji = await self.service_uow.echo_emojis.get_random_enabled_emoji()
 
         await ctx.response.defer()
         msg = await ctx.original_message()
@@ -74,7 +76,7 @@ class EmojiEcho(EmojiEchoCog):
     @app_commands.command(name="emoji-random")
     async def emoji_random(self, ctx: Interaction):
         """Posts a random enabled emoji"""
-        emoji = await self.emoji_service.get_random_enabled_emoji()
+        emoji = await self.service_uow.echo_emojis.get_random_enabled_emoji()
 
         await ctx.response.defer()
         msg = await ctx.original_message()
@@ -101,7 +103,9 @@ class EmojiEcho(EmojiEchoCog):
     ):
         """Allow the given emoji to be used by the bot"""
 
-        await self.emoji_service.enable_emoji(emoji.guild_id, emoji.id, emoji.name)
+        await self.service_uow.echo_emojis.enable_emoji(emoji.guild_id, emoji.id, emoji.name)
+        await self.service_uow.save_changes()
+
         await ctx.response.send_message(f"Enabled {str(emoji)}", ephemeral=True)
 
     @emoji.command(name="disable")
@@ -110,5 +114,7 @@ class EmojiEcho(EmojiEchoCog):
     async def emoji_disable(self, ctx: Interaction, emoji: Transform[discord.Emoji, EnabledEmojiTransformer]):
         """Disallow the given emoji from being used by the bot"""
 
-        await self.emoji_service.disable_emoji(emoji.id)
+        await self.service_uow.echo_emojis.disable_emoji(emoji.id)
+        await self.service_uow.save_changes()
+
         await ctx.response.send_message(f"Disabled {str(emoji)}", ephemeral=True)

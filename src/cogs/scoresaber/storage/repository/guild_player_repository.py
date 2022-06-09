@@ -4,12 +4,12 @@ from sqlalchemy import select, delete
 from sqlalchemy.orm import joinedload
 from sqlalchemy.sql import Executable
 
-from src.kiyomi.database import BaseRepository
+from src.kiyomi.database import BaseStorageRepository
 from src.log import Logger
 from ..model.guild_player import GuildPlayer
 
 
-class GuildPlayerRepository(BaseRepository[GuildPlayer]):
+class GuildPlayerRepository(BaseStorageRepository[GuildPlayer]):
     @property
     def _table(self) -> Type[GuildPlayer]:
         return GuildPlayer

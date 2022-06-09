@@ -2,12 +2,12 @@ from typing import Optional, List, Type
 
 from sqlalchemy import select
 
-from src.kiyomi.database import BaseRepository
+from src.kiyomi.database import BaseStorageRepository
 from src.log import Logger
-from ..model import Setting
+from ..model.setting import Setting
 
 
-class SettingsRepository(BaseRepository[Setting]):
+class SettingRepository(BaseStorageRepository[Setting]):
     @property
     def _table(self) -> Type[Setting]:
         return Setting

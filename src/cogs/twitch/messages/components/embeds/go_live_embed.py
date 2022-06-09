@@ -10,12 +10,18 @@ from .twitch_embed import TwitchEmbed
 
 
 class GoLiveEmbed(TwitchEmbed):
-    def __init__(self, bot: Kiyomi, event: StreamOnlineData, guild_twitch_broadcaster: GuildTwitchBroadcaster, stream: Optional[Stream]):
+    def __init__(
+        self,
+        bot: Kiyomi,
+        event: StreamOnlineData,
+        guild_twitch_broadcaster: GuildTwitchBroadcaster,
+        stream: Optional[Stream],
+    ):
         super().__init__(bot)
 
         self.set_author(
             name=f"{self.get_name(event.broadcaster.name, guild_twitch_broadcaster.member.name)} went live on Twitch!",
-            icon_url=guild_twitch_broadcaster.twitch_broadcaster.profile_image_url
+            icon_url=guild_twitch_broadcaster.twitch_broadcaster.profile_image_url,
         )
 
         unix_timestamp = calendar.timegm(event.started_at.timetuple())

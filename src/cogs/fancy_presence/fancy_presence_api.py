@@ -1,14 +1,15 @@
 from functools import wraps
 
-from src.cogs.fancy_presence.fancy_presence_cog import FancyPresenceCog
+from .services import ServiceUnitOfWork
+from src.kiyomi import BaseCog
 
 
-class FancyPresenceAPI(FancyPresenceCog):
+class FancyPresenceAPI(BaseCog[ServiceUnitOfWork]):
     async def add_task(self, task_text: str):
-        await self.presence_service.add_task(task_text)
+        await self.service_uow.presences.add_task(task_text)
 
     async def remove_task(self, task_text: str):
-        await self.presence_service.remove_task(task_text)
+        await self.service_uow.presences.remove_task(task_text)
 
     @staticmethod
     def presence_task(func):

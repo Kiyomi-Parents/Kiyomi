@@ -6,7 +6,7 @@ from discord.app_commands import Choice
 
 from src.kiyomi import Kiyomi
 from .abstract_bot_setting import AbstractBotSetting
-from .enums import SettingType
+from .enums.setting_type import SettingType
 from .setting import Setting
 from ...errors import InvalidSettingType
 

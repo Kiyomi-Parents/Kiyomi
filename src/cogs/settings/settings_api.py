@@ -1,26 +1,28 @@
 from typing import Optional
 
-from src.kiyomi import Kiyomi
-from .services import SettingService
-from .settings_cog import SettingsCog
-from .storage import AbstractSetting
-from .storage.unit_of_work import UnitOfWork
+from src.kiyomi import BaseCog
+from .services import ServiceUnitOfWork
+from .storage.model.abstract_setting import AbstractSetting
 
 
-class SettingsAPI(SettingsCog):
-    def __init__(self, bot: Kiyomi, setting_service: SettingService, uow: UnitOfWork):
-        super().__init__(bot, setting_service)
-
-        self.uow = uow
+class SettingsAPI(BaseCog[ServiceUnitOfWork]):
+    def register_events(self):
+        pass
 
     async def set(self, guild_id: int, name: str, value: any) -> AbstractSetting:
-        return await self.setting_service.set(guild_id, name, value)
+        setting = await self.service_uow.settings.set(guild_id, name, value)
+        await self.service_uow.save_changes()
+
+        return setting
 
     async def get(self, guild_id: int, name: str) -> Optional[any]:
-        return await self.setting_service.get_value(guild_id, name)
+        return await self.service_uow.settings.get_value(guild_id, name)
 
     async def delete(self, guild_id: int, name: str) -> AbstractSetting:
-        return await self.setting_service.delete(guild_id, name)
+        setting = await self.service_uow.settings.delete(guild_id, name)
+        await self.service_uow.save_changes()
+
+        return setting
 
     async def get_override_or_default(self, guild_id: Optional[int], name: Optional[str]) -> Optional[AbstractSetting]:
         if name is None:

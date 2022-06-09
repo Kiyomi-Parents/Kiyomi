@@ -4,10 +4,10 @@ import pyscoresaber
 from sqlalchemy import select
 
 from ..model.leaderboard import Leaderboard
-from src.kiyomi.database import BaseRepository
+from src.kiyomi.database import BaseStorageRepository
 
 
-class LeaderboardRepository(BaseRepository[Leaderboard]):
+class LeaderboardRepository(BaseStorageRepository[Leaderboard]):
     @property
     def _table(self) -> Type[Leaderboard]:
         return Leaderboard

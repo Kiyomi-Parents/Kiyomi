@@ -3,10 +3,10 @@ from typing import Type, Optional
 from sqlalchemy import select
 
 from src.cogs.view_persistence.storage.model.message_view import MessageView
-from src.kiyomi import BaseRepository
+from src.kiyomi import BaseStorageRepository
 
 
-class MessageViewRepository(BaseRepository[MessageView]):
+class MessageViewRepository(BaseStorageRepository[MessageView]):
     @property
     def _table(self) -> Type[MessageView]:
         return MessageView

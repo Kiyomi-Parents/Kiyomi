@@ -3,25 +3,18 @@ from typing import List
 from discord import app_commands, Interaction
 from discord.app_commands import Transform
 
-from src.kiyomi import Kiyomi
-from .services import SettingService
-from .settings_cog import SettingsCog
-from .storage import Setting
+from src.kiyomi import BaseCog
+from .services import ServiceUnitOfWork
+from .storage.model.setting import Setting
 from .transformers.setting_name_transformer import SettingNameTransformer
 from .transformers.setting_value_transformer import SettingValueTransformer
 
 
-class Settings(SettingsCog):
-    def __init__(self, bot: Kiyomi, setting_service: SettingService):
-        super().__init__(bot, setting_service)
-
-        # Register events
-        self.events()
-
-    def events(self):
+class Settings(BaseCog[ServiceUnitOfWork]):
+    def register_events(self):
         @self.bot.events.on("setting_register")
         async def register_setting(settings: List[Setting]):
-            self.setting_service.register_settings(settings)
+            self.service_uow.settings.register_settings(settings)
 
     settings = app_commands.Group(name="setting", description="Various settings", guild_only=True)
 
@@ -34,8 +27,9 @@ class Settings(SettingsCog):
         value: Transform[str, SettingValueTransformer],
     ):
         """Set setting value"""
-        abstract_setting = await self.setting_service.set(ctx.guild_id, setting, value)
-        setting_value = await self.setting_service.get_value(ctx.guild_id, setting)
+        abstract_setting = await self.service_uow.settings.set(ctx.guild_id, setting, value)
+        setting_value = await self.service_uow.settings.get_value(ctx.guild_id, setting)
+        await self.service_uow.save_changes()
 
         await ctx.response.send_message(
             f"{abstract_setting.name_human} is now set to: {setting_value}",
