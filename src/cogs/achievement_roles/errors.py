@@ -13,5 +13,7 @@ class UnableToCreateRole(AchievementRolesCogException):
         self.achievement = achievement
 
     def __str__(self):
-        return f"Unable to create Achievement Role in Guild %guild_id% with group {self.group} and identifier " \
-               f"{self.achievement.identifier}"
+        return (
+            f"Unable to create Achievement Role in Guild %guild_id% with group {self.group} and identifier "
+            f"{self.achievement.identifier}"
+        )

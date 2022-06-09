@@ -7,7 +7,7 @@ from discord.app_commands import Choice
 from .enums.setting_type import SettingType
 from .setting import Setting
 
-T = TypeVar('T')
+T = TypeVar("T")
 
 
 class AbstractSetting(ABC, Generic[T]):
@@ -16,10 +16,10 @@ class AbstractSetting(ABC, Generic[T]):
     permissions: Optional[Permissions] = None
 
     def __init__(
-            self,
-            name_human: str,
-            setting: Setting,
-            permissions: Optional[Permissions] = None
+        self,
+        name_human: str,
+        setting: Setting,
+        permissions: Optional[Permissions] = None,
     ):
         self.setting = setting
         self.name_human = name_human
@@ -61,6 +61,4 @@ class AbstractSetting(ABC, Generic[T]):
         if self.setting.value is None:
             return []
 
-        return [
-            Choice(name=f"{self.setting.value} (current)", value=self.setting.value)
-        ]
+        return [Choice(name=f"{self.setting.value} (current)", value=self.setting.value)]

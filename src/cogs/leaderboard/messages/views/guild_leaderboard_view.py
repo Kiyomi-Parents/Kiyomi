@@ -13,12 +13,12 @@ from ..components.buttons.guild_leaderboard_button import GuildLeaderboardButton
 
 class GuildLeaderboardView(PersistentView):
     def __init__(
-            self,
-            bot: Kiyomi,
-            guild: Guild,
-            beatmap: Beatmap,
-            characteristic: Optional[pybeatsaver.EDifficulty] = None,
-            difficulty: Optional[pybeatsaver.ECharacteristic] = None
+        self,
+        bot: Kiyomi,
+        guild: Guild,
+        beatmap: Beatmap,
+        characteristic: Optional[pybeatsaver.EDifficulty] = None,
+        difficulty: Optional[pybeatsaver.ECharacteristic] = None,
     ):
         self.beatmap = beatmap
 
@@ -59,13 +59,13 @@ class GuildLeaderboardView(PersistentView):
 
     async def serialize_persistence(self) -> Persistence:
         return Persistence(
-                self.guild.id,
-                self.message.channel.id,
-                self.message.id,
-                GuildLeaderboardView.__name__,
-                self.beatmap.id,
-                self._beatmap_characteristic.serialize if self._beatmap_characteristic is not None else None,
-                self._beatmap_difficulty.serialize if self._beatmap_difficulty is not None else None
+            self.guild.id,
+            self.message.channel.id,
+            self.message.id,
+            GuildLeaderboardView.__name__,
+            self.beatmap.id,
+            self._beatmap_characteristic.serialize if self._beatmap_characteristic is not None else None,
+            self._beatmap_difficulty.serialize if self._beatmap_difficulty is not None else None,
         )
 
     @staticmethod

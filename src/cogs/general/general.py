@@ -4,30 +4,37 @@ from discord.ext import commands
 
 from .general_cog import GeneralCog
 from .messages.views.invite_view import InviteView
-from .services import EmojiService, GuildService, MemberService, RoleService, ChannelService, MessageService
+from .services import (
+    EmojiService,
+    GuildService,
+    MemberService,
+    RoleService,
+    ChannelService,
+    MessageService,
+)
 from src.kiyomi import Kiyomi, permissions
 from ..settings.storage.model.emoji_setting import EmojiSetting
 
 
 class General(GeneralCog):
     def __init__(
-            self,
-            bot: Kiyomi,
-            emoji_service: EmojiService,
-            guild_service: GuildService,
-            member_service: MemberService,
-            channel_service: ChannelService,
-            message_service: MessageService,
-            role_service: RoleService
+        self,
+        bot: Kiyomi,
+        emoji_service: EmojiService,
+        guild_service: GuildService,
+        member_service: MemberService,
+        channel_service: ChannelService,
+        message_service: MessageService,
+        role_service: RoleService,
     ):
         super().__init__(
-                bot,
-                emoji_service,
-                guild_service,
-                member_service,
-                channel_service,
-                message_service,
-                role_service
+            bot,
+            emoji_service,
+            guild_service,
+            member_service,
+            channel_service,
+            message_service,
+            role_service,
         )
 
         # Register events

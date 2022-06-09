@@ -18,10 +18,10 @@ class InviteButton(BaseComponent[T], discord.ui.Button, Generic[T]):
     def __init__(self, bot: Kiyomi, parent):
         BaseComponent.__init__(self, bot, parent)
         discord.ui.Button.__init__(
-                self,
-                label="Invite Kiyomi",
-                style=discord.enums.ButtonStyle.primary,
-                url=bot.invite_url
+            self,
+            label="Invite Kiyomi",
+            style=discord.enums.ButtonStyle.primary,
+            url=bot.invite_url,
         )
 
     async def after_init(self):

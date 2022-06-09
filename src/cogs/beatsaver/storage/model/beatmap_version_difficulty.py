@@ -10,6 +10,7 @@ from ...beatsaver_utils import BeatSaverUtils
 
 class BeatmapVersionDifficulty(Base):
     """Map version difficulty data from BeatSaver"""
+
     __tablename__ = "beatmap_version_difficulty"
 
     id = Column(Integer, primary_key=True)

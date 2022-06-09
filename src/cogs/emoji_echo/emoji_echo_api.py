@@ -8,12 +8,7 @@ from src.kiyomi import Kiyomi
 
 
 class EmojiEchoAPI(EmojiEchoCog):
-    def __init__(
-            self,
-            bot: Kiyomi,
-            emoji_service: EmojiService,
-            uow: UnitOfWork
-    ):
+    def __init__(self, bot: Kiyomi, emoji_service: EmojiService, uow: UnitOfWork):
         super().__init__(bot, emoji_service)
 
         self.uow = uow

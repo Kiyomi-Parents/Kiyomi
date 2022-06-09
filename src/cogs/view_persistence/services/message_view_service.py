@@ -12,15 +12,12 @@ if TYPE_CHECKING:
 
 
 class MessageViewService(ViewPersistenceService):
-
     async def add_persistent_view(self, persistence: Persistence):
         general: "GeneralAPI" = self.bot.get_cog("GeneralAPI")
 
         async with self.uow:
             await general.register_message(persistence.guild_id, persistence.channel_id, persistence.message_id)
-            await self.uow.message_views.add(
-                    MessageView(persistence.message_id, persistence.view, persistence.get_params())
-            )
+            await self.uow.message_views.add(MessageView(persistence.message_id, persistence.view, persistence.get_params()))
 
         Logger.log("View Persistence", f"Persisted view {persistence}")
 
@@ -35,13 +32,13 @@ class MessageViewService(ViewPersistenceService):
 
             if message_view is not None:
                 persistences.append(
-                        Persistence(
-                                message.guild_id,
-                                channel_id,
-                                message.id,
-                                message_view.view_name,
-                                *message_view.view_parameters
-                        )
+                    Persistence(
+                        message.guild_id,
+                        channel_id,
+                        message.id,
+                        message_view.view_name,
+                        *message_view.view_parameters,
+                    )
                 )
 
         return persistences

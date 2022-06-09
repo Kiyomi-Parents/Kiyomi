@@ -5,7 +5,14 @@ from discord import Colour, Emoji
 
 from src.kiyomi import Kiyomi
 from .general_cog import GeneralCog
-from .services import EmojiService, GuildService, MemberService, RoleService, ChannelService, MessageService
+from .services import (
+    EmojiService,
+    GuildService,
+    MemberService,
+    RoleService,
+    ChannelService,
+    MessageService,
+)
 from .storage import UnitOfWork
 from .storage.model.channel import Channel
 from .storage.model.guild import Guild
@@ -17,24 +24,24 @@ from .storage.model.role import Role
 
 class GeneralAPI(GeneralCog):
     def __init__(
-            self,
-            bot: Kiyomi,
-            emoji_service: EmojiService,
-            guild_service: GuildService,
-            member_service: MemberService,
-            channel_service: ChannelService,
-            message_service: MessageService,
-            role_service: RoleService,
-            uow: UnitOfWork
+        self,
+        bot: Kiyomi,
+        emoji_service: EmojiService,
+        guild_service: GuildService,
+        member_service: MemberService,
+        channel_service: ChannelService,
+        message_service: MessageService,
+        role_service: RoleService,
+        uow: UnitOfWork,
     ):
         super().__init__(
-                bot,
-                emoji_service,
-                guild_service,
-                member_service,
-                channel_service,
-                message_service,
-                role_service
+            bot,
+            emoji_service,
+            guild_service,
+            member_service,
+            channel_service,
+            message_service,
+            role_service,
         )
 
         self.uow = uow
@@ -72,7 +79,7 @@ class GeneralAPI(GeneralCog):
     async def get_role(self, guild_id: int, role_id: int) -> Optional[Role]:
         return await self.role_service.get_discord_role(guild_id, role_id)
 
-    async def member_has_role(self, guild_id, member_id: int, role_id:int) -> bool:
+    async def member_has_role(self, guild_id, member_id: int, role_id: int) -> bool:
         return await self.role_service.member_has_role(guild_id, member_id, role_id)
 
     async def register_message(self, guild_id: int, channel_id: int, message_id: int) -> Message:

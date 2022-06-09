@@ -6,6 +6,7 @@ from src.kiyomi.database import Base
 
 class Guild(Base):
     """Discord guild info and settings"""
+
     __tablename__ = "guild"
 
     id = Column(BigInteger, primary_key=True, autoincrement=False)

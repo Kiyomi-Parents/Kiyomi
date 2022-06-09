@@ -7,7 +7,6 @@ from src.cogs.scoresaber.storage.model.player import Player
 
 
 class SentScoreService(ScoreFeedService):
-
     async def mark_all_guild_scores_sent(self, guild_id: int):
         scoresaber = self.bot.get_cog_api(ScoreSaberAPI)
         guild_players = await scoresaber.get_guild_players_by_guild(guild_id)
@@ -15,7 +14,10 @@ class SentScoreService(ScoreFeedService):
         if len(guild_players) == 0:
             return
 
-        Logger.log(guild_players[0].guild, f"Marking scores sent for {len(guild_players)} players")
+        Logger.log(
+            guild_players[0].guild,
+            f"Marking scores sent for {len(guild_players)} players",
+        )
 
         for guild_player in guild_players:
             await self.mark_player_scores_sent(guild_player.player, guild_player.guild)

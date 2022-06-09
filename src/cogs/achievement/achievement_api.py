@@ -5,7 +5,6 @@ from .services.achievements import Achievement
 
 
 class AchievementsAPI(AchievementCog):
-
     async def get_best_achievement_in_group(self, group: str, member_id: int) -> Optional[Achievement]:
         return await self.user_achievement_service.get_best_completed_achievement_in_group(group, member_id)
 

@@ -4,16 +4,18 @@ from discord import Member
 
 from src.kiyomi import Kiyomi, Utils
 from .settings_service import SettingsService
-from ..errors import FailedToCreateSetting, \
-    FailedToFindSetting, FailedToConvertSetting, InvalidSettingValue
-from ..storage import Setting, SettingType, AbstractSetting, \
-    UnitOfWork
+from ..errors import (
+    FailedToCreateSetting,
+    FailedToFindSetting,
+    FailedToConvertSetting,
+    InvalidSettingValue,
+)
+from ..storage import Setting, SettingType, AbstractSetting, UnitOfWork
 from ..storage.model.abstract_bot_setting import AbstractBotSetting
 from ..storage.model.abstract_regular_setting import AbstractRegularSetting
 
 
 class SettingService(SettingsService):
-
     def __init__(self, bot: Kiyomi, uow: UnitOfWork):
         super().__init__(bot, uow)
 
@@ -77,10 +79,10 @@ class SettingService(SettingsService):
 
             if isinstance(registered_setting, AbstractBotSetting):
                 new_setting = registered_setting.create(
-                        self.bot,
-                        registered_setting.name_human,
-                        name,
-                        registered_setting.value
+                    self.bot,
+                    registered_setting.name_human,
+                    name,
+                    registered_setting.value,
                 )
             elif isinstance(registered_setting, AbstractRegularSetting):
                 new_setting = registered_setting.create(registered_setting.name_human, name, registered_setting.value)

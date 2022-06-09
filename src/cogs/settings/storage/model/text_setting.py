@@ -13,18 +13,18 @@ class TextSetting(AbstractRegularSetting[str]):
 
     @staticmethod
     def create(
-            name_human: str,
-            name: str,
-            permissions: Optional[Permissions] = None,
-            default_value: Optional[str] = None
+        name_human: str,
+        name: str,
+        permissions: Optional[Permissions] = None,
+        default_value: Optional[str] = None,
     ):
         if default_value is not None:
             default_value = TextSetting.from_type(default_value)
 
         return TextSetting(
-                name_human,
-                Setting(None, SettingType.STRING, name, default_value),
-                permissions
+            name_human,
+            Setting(None, SettingType.STRING, name, default_value),
+            permissions,
         )
 
     @property
@@ -50,11 +50,7 @@ class TextSetting(AbstractRegularSetting[str]):
         return value
 
     @staticmethod
-    def get_from_setting(
-            name_human: str,
-            setting: Setting,
-            permissions: Optional[Permissions] = None
-    ):
+    def get_from_setting(name_human: str, setting: Setting, permissions: Optional[Permissions] = None):
         if setting.setting_type is not SettingType.STRING:
             raise InvalidSettingType(setting.setting_type, SettingType.STRING)
 

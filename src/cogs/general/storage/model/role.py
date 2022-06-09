@@ -6,6 +6,7 @@ from src.kiyomi.database import Base
 
 class Role(Base):
     """Discord role info"""
+
     __tablename__ = "role"
 
     id = Column(BigInteger, primary_key=True, autoincrement=False)

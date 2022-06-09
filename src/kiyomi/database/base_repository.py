@@ -11,7 +11,7 @@ from src.log import Logger
 from .database import Base
 from ..utils import Utils
 
-ENTITY = TypeVar('ENTITY', bound=Base)
+ENTITY = TypeVar("ENTITY", bound=Base)
 
 
 class BaseRepository(Generic[ENTITY], metaclass=ABCMeta):
@@ -41,8 +41,7 @@ class BaseRepository(Generic[ENTITY], metaclass=ABCMeta):
         return await self._first(stmt)
 
     async def get_all(self) -> List[ENTITY]:
-        stmt = select(self._table) \
-            .options(joinedload('*'))
+        stmt = select(self._table).options(joinedload("*"))
         return await self._all(stmt)
 
     async def exists(self, entity_id: int) -> bool:
@@ -85,9 +84,7 @@ class BaseRepository(Generic[ENTITY], metaclass=ABCMeta):
 
     async def update(self, entity_id: int, values: Dict[str, any]) -> ENTITY:
         entity = await self.get_by_id(entity_id)
-        stmt = update(self._table) \
-            .where(self._table.id == entity_id) \
-            .values(values)
+        stmt = update(self._table).where(self._table.id == entity_id).values(values)
 
         await self._session.execute(stmt)
 

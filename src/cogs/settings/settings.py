@@ -12,12 +12,7 @@ from .transformers.setting_value_transformer import SettingValueTransformer
 
 
 class Settings(SettingsCog):
-
-    def __init__(
-            self,
-            bot: Kiyomi,
-            setting_service: SettingService
-    ):
+    def __init__(self, bot: Kiyomi, setting_service: SettingService):
         super().__init__(bot, setting_service)
 
         # Register events
@@ -28,25 +23,21 @@ class Settings(SettingsCog):
         async def register_setting(settings: List[Setting]):
             self.setting_service.register_settings(settings)
 
-    settings = app_commands.Group(
-            name="setting",
-            description="Various settings",
-            guild_only=True
-    )
+    settings = app_commands.Group(name="setting", description="Various settings", guild_only=True)
 
     @settings.command(name="set")
-    @app_commands.describe(
-            setting="Setting name",
-            value="Setting value"
-    )
+    @app_commands.describe(setting="Setting name", value="Setting value")
     async def settings_set(
-            self,
-            ctx: Interaction,
-            setting: Transform[str, SettingNameTransformer],
-            value: Transform[str, SettingValueTransformer],
+        self,
+        ctx: Interaction,
+        setting: Transform[str, SettingNameTransformer],
+        value: Transform[str, SettingValueTransformer],
     ):
         """Set setting value"""
         abstract_setting = await self.setting_service.set(ctx.guild_id, setting, value)
         setting_value = await self.setting_service.get_value(ctx.guild_id, setting)
 
-        await ctx.response.send_message(f"{abstract_setting.name_human} is now set to: {setting_value}", ephemeral=True)
+        await ctx.response.send_message(
+            f"{abstract_setting.name_human} is now set to: {setting_value}",
+            ephemeral=True,
+        )

@@ -14,4 +14,4 @@ class MissingPersistentViewClass(KiyomiException):
 
     @property
     def loaded_classes(self) -> str:
-        return ', '.join([persistent_view.__name__ for persistent_view in self.loaded_cls])
+        return ", ".join([persistent_view.__name__ for persistent_view in self.loaded_cls])

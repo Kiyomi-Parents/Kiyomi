@@ -8,7 +8,6 @@ from ..model import Setting
 
 
 class SettingsRepository(BaseRepository[Setting]):
-
     @property
     def _table(self) -> Type[Setting]:
         return Setting

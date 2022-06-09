@@ -8,9 +8,9 @@ from src.kiyomi.permissions import admin_guild_list
 
 class FancyPresence(FancyPresenceCog):
     status = app_commands.Group(
-            name="status",
-            description="Commands related to Kiyomi's status",
-            guild_ids=admin_guild_list()
+        name="status",
+        description="Commands related to Kiyomi's status",
+        guild_ids=admin_guild_list(),
     )
 
     @status.command(name="update")

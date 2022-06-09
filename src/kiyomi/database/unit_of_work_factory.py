@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.kiyomi import Utils, BaseUnitOfWork
 
-TUow = TypeVar('TUow')
+TUow = TypeVar("TUow")
 
 
 class UnitOfWorkFactory:

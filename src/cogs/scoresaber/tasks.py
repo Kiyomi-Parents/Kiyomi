@@ -9,7 +9,6 @@ from src.cogs.fancy_presence import FancyPresenceAPI
 
 
 class Tasks(BaseTasks):
-
     def __init__(self, bot: Kiyomi, player_service: PlayerService, score_service: ScoreService):
         super().__init__(bot)
 

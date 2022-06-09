@@ -1,0 +1,19 @@
+{
+    "default": {
+        "name": "Kiyomi Default",
+        "file_path": "src/cogs/pfp_switcher/storage/assets/Kiyomi_default.png"
+    },
+    "seasonal": [],
+    "events": [
+        {
+            "name": "Kiyomi Birthday",
+            "file_path": "src/cogs/pfp_switcher/storage/assets/Kiyomi_birthday.png",
+            "active_zones": [
+                {
+                    "start": "20/04_00:00",
+                    "end": "23/04_00:00"
+                }
+            ]
+        }
+    ]
+}

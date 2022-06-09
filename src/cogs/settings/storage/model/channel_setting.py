@@ -16,11 +16,11 @@ class ChannelSetting(AbstractBotSetting[discord.abc.GuildChannel]):
 
     @staticmethod
     def create(
-            bot: Kiyomi,
-            name_human: str,
-            name: str,
-            permissions: Optional[Permissions] = None,
-            default_value: Optional[discord.abc.GuildChannel] = None
+        bot: Kiyomi,
+        name_human: str,
+        name: str,
+        permissions: Optional[Permissions] = None,
+        default_value: Optional[discord.abc.GuildChannel] = None,
     ):
         if permissions is None:
             permissions = Permissions(manage_channels=True)
@@ -29,10 +29,10 @@ class ChannelSetting(AbstractBotSetting[discord.abc.GuildChannel]):
             default_value = ChannelSetting.from_type(default_value)
 
         return ChannelSetting(
-                bot,
-                name_human,
-                Setting(None, SettingType.CHANNEL, name, default_value),
-                permissions
+            bot,
+            name_human,
+            Setting(None, SettingType.CHANNEL, name, default_value),
+            permissions,
         )
 
     @property
@@ -59,10 +59,10 @@ class ChannelSetting(AbstractBotSetting[discord.abc.GuildChannel]):
 
     @staticmethod
     def get_from_setting(
-            bot: Kiyomi,
-            name_human: str,
-            setting: Setting,
-            permissions: Optional[Permissions] = None
+        bot: Kiyomi,
+        name_human: str,
+        setting: Setting,
+        permissions: Optional[Permissions] = None,
     ):
         if setting.setting_type is not SettingType.CHANNEL:
             raise InvalidSettingType(setting.setting_type, SettingType.CHANNEL)
@@ -94,7 +94,7 @@ class ChannelSetting(AbstractBotSetting[discord.abc.GuildChannel]):
             label = f"#{channel.name}"
 
             if self.value is not None and self.value.id == channel.id:
-                label += ' (current)'
+                label += " (current)"
 
             text_channels.append(Choice(name=label, value=str(channel.id)))
 

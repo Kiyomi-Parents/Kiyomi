@@ -5,7 +5,9 @@ import timeago
 from discord import Colour
 from prettytable import PrettyTable
 
-from src.cogs.beatsaver.storage.model.beatmap_version_difficulty import BeatmapVersionDifficulty
+from src.cogs.beatsaver.storage.model.beatmap_version_difficulty import (
+    BeatmapVersionDifficulty,
+)
 from src.cogs.scoresaber.storage.model.score import Score
 from .leaderboard_embed import LeaderboardEmbed
 from src.kiyomi import Kiyomi
@@ -13,11 +15,11 @@ from src.kiyomi import Kiyomi
 
 class GuildLeaderboardEmbed(LeaderboardEmbed):
     def __init__(
-            self,
-            bot: Kiyomi,
-            guild_name: str,
-            beatmap_difficulty: BeatmapVersionDifficulty,
-            leaderboard: List[Score]
+        self,
+        bot: Kiyomi,
+        guild_name: str,
+        beatmap_difficulty: BeatmapVersionDifficulty,
+        leaderboard: List[Score],
     ):
         super().__init__(bot)
 
@@ -34,8 +36,8 @@ class GuildLeaderboardEmbed(LeaderboardEmbed):
         self.url = self.beatmap.beatsaver_url
 
         self.set_footer(
-                icon_url="https://share.lucker.xyz/qahu5/FoZozoBE67.png/raw.png",
-                text=self.get_scoresaber_status
+            icon_url="https://share.lucker.xyz/qahu5/FoZozoBE67.png/raw.png",
+            text=self.get_scoresaber_status,
         )
 
         if len(leaderboard) <= 0:

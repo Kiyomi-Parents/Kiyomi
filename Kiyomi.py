@@ -22,7 +22,7 @@ async def startup(loop: AbstractEventLoop):
 
     # Init database
     database = Database(
-            f"mariadb+asyncmy://{database_user}:{database_password}@{database_ip}/{database_name}?charset=utf8mb4"
+        f"mariadb+asyncmy://{database_user}:{database_password}@{database_ip}/{database_name}?charset=utf8mb4"
     )
 
     await database.init()
@@ -54,6 +54,7 @@ async def startup(loop: AbstractEventLoop):
         await bot.load_extension(name="src.cogs.achievement_roles")
         await bot.load_extension(name="src.cogs.emoji_echo")
         await bot.load_extension(name="src.cogs.twitch")
+        await bot.load_extension(name="src.cogs.pfp_switcher")
 
         # await database.drop_tables()
         # await database.create_tables()

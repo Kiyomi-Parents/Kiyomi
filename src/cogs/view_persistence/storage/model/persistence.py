@@ -6,7 +6,14 @@ from ...errors import MissingPersistentViewClass
 
 
 class Persistence:
-    def __init__(self, guild_id: int, channel_id: int, message_id: int, view: str, *view_parameters: str):
+    def __init__(
+        self,
+        guild_id: int,
+        channel_id: int,
+        message_id: int,
+        view: str,
+        *view_parameters: str,
+    ):
         self.guild_id = guild_id
         self.message_id = message_id
         self.channel_id = channel_id

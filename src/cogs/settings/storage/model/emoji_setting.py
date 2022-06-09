@@ -16,11 +16,11 @@ class EmojiSetting(AbstractBotSetting[discord.Emoji]):
 
     @staticmethod
     def create(
-            bot: Kiyomi,
-            name_human: str,
-            name: str,
-            permissions: Optional[Permissions] = None,
-            default_value: Optional[discord.Emoji] = None
+        bot: Kiyomi,
+        name_human: str,
+        name: str,
+        permissions: Optional[Permissions] = None,
+        default_value: Optional[discord.Emoji] = None,
     ):
         if permissions is None:
             permissions = Permissions(manage_emojis=True)
@@ -29,10 +29,10 @@ class EmojiSetting(AbstractBotSetting[discord.Emoji]):
             default_value = EmojiSetting.from_type(default_value)
 
         return EmojiSetting(
-                bot,
-                name_human,
-                Setting(None, SettingType.EMOJI, name, default_value),
-                permissions
+            bot,
+            name_human,
+            Setting(None, SettingType.EMOJI, name, default_value),
+            permissions,
         )
 
     @property
@@ -59,10 +59,10 @@ class EmojiSetting(AbstractBotSetting[discord.Emoji]):
 
     @staticmethod
     def get_from_setting(
-            bot: Kiyomi,
-            name_human: str,
-            setting: Setting,
-            permissions: Optional[Permissions] = None
+        bot: Kiyomi,
+        name_human: str,
+        setting: Setting,
+        permissions: Optional[Permissions] = None,
     ):
         if setting.setting_type is not SettingType.EMOJI:
             raise InvalidSettingType(setting.setting_type, SettingType.EMOJI)
@@ -91,7 +91,7 @@ class EmojiSetting(AbstractBotSetting[discord.Emoji]):
             label = f"{emoji.name}"
 
             if self.value is not None and self.value.id == emoji.id:
-                label += ' (current)'
+                label += " (current)"
 
             emojis.append(Choice(name=label, value=str(emoji.id)))
 

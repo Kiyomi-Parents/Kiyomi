@@ -6,7 +6,6 @@ from src.kiyomi import Kiyomi
 
 
 class InviteView(BaseView):
-
     def __init__(self, bot: Kiyomi, guild: Guild):
         super().__init__(bot, guild)
 

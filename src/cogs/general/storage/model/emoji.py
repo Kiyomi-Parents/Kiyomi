@@ -6,6 +6,7 @@ from src.kiyomi.database import Base
 
 class Emoji(Base):
     """Enabled emoji"""
+
     __tablename__ = "emoji"
 
     id = Column(BigInteger, primary_key=True, autoincrement=False)

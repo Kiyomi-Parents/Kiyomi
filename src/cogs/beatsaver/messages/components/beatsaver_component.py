@@ -4,7 +4,7 @@ from ...storage.model.beatmap import Beatmap
 from src.kiyomi import Kiyomi
 from src.kiyomi.base_component import BaseComponent
 
-T = TypeVar('T')
+T = TypeVar("T")
 
 
 class BeatSaverComponent(Generic[T], BaseComponent[T]):

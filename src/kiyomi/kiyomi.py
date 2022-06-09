@@ -14,7 +14,7 @@ from .database import Database
 from src.log import Logger
 from .error.error_utils import handle_global_error
 
-TCog = TypeVar('TCog')
+TCog = TypeVar("TCog")
 
 
 class Kiyomi(Bot):
@@ -77,21 +77,21 @@ class Kiyomi(Bot):
     @property
     def invite_url(self) -> str:
         return discord.utils.oauth_url(
-                self.user.id,
-                permissions=Permissions(
-                        view_channel=True,
-                        manage_roles=True,
-                        send_messages=True,
-                        embed_links=True,
-                        attach_files=True,
-                        add_reactions=True,
-                        use_external_emojis=True,
-                        use_external_stickers=True,
-                        manage_messages=True,
-                        read_message_history=True,
-                        read_messages=True
-                ),
-                scopes=('bot', 'applications.commands')
+            self.user.id,
+            permissions=Permissions(
+                view_channel=True,
+                manage_roles=True,
+                send_messages=True,
+                embed_links=True,
+                attach_files=True,
+                add_reactions=True,
+                use_external_emojis=True,
+                use_external_stickers=True,
+                manage_messages=True,
+                read_message_history=True,
+                read_messages=True,
+            ),
+            scopes=("bot", "applications.commands"),
         )
 
     @property

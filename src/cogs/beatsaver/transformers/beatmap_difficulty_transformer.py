@@ -19,9 +19,7 @@ class BeatmapDifficultyTransformer(Transformer):
 
     @classmethod
     async def autocomplete(
-            cls,
-            interaction: Interaction,
-            value: Union[int, float, str]
+        cls, interaction: Interaction, value: Union[int, float, str]
     ) -> List[Choice[Union[int, float, str]]]:
         beatmap = await BeatmapKeyTransformer.transform(interaction, interaction.namespace.key)
         if beatmap is None:
@@ -39,7 +37,10 @@ class BeatmapDifficultyTransformer(Transformer):
                 continue
 
             beatmap_difficulties.append(
-                    Choice(name=beatmap_difficulty.difficulty_text, value=beatmap_difficulty.difficulty.serialize)
+                Choice(
+                    name=beatmap_difficulty.difficulty_text,
+                    value=beatmap_difficulty.difficulty.serialize,
+                )
             )
 
         return beatmap_difficulties

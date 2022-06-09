@@ -8,6 +8,7 @@ from .enums.setting_type import SettingType
 
 class Setting(Base):
     """Settings"""
+
     __tablename__ = "setting"
 
     id = Column(Integer, primary_key=True)
@@ -17,7 +18,13 @@ class Setting(Base):
     name = Column(String(128))
     value = Column(String(1024))
 
-    def __init__(self, guild_id: Optional[int], setting_type: SettingType, name: str, value: Optional[str]):
+    def __init__(
+        self,
+        guild_id: Optional[int],
+        setting_type: SettingType,
+        name: str,
+        value: Optional[str],
+    ):
         self.guild_id = guild_id
         self.setting_type = setting_type
         self.name = name

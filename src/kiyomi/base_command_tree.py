@@ -25,4 +25,3 @@ class BaseCommandTree(CommandTree["Kiyomi"]):
 
         # Call Bot Global error handler
         await ctx.bot.on_command_error(ctx, error)
-

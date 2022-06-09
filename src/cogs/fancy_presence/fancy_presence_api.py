@@ -4,7 +4,6 @@ from src.cogs.fancy_presence.fancy_presence_cog import FancyPresenceCog
 
 
 class FancyPresenceAPI(FancyPresenceCog):
-
     async def add_task(self, task_text: str):
         await self.presence_service.add_task(task_text)
 

@@ -1,7 +1,14 @@
 from .arg_resolvers import *
 from .general import General
 from .general_api import GeneralAPI
-from .services import EmojiService, GuildService, MemberService, RoleService, ChannelService, MessageService
+from .services import (
+    EmojiService,
+    GuildService,
+    MemberService,
+    RoleService,
+    ChannelService,
+    MessageService,
+)
 from .storage import UnitOfWork
 from ...kiyomi import Kiyomi
 
@@ -24,25 +31,25 @@ async def setup(bot: Kiyomi):
     role_service = RoleService(bot, uow, guild_service, member_service)
 
     await bot.add_cog(
-            General(
-                    bot,
-                    emoji_service,
-                    guild_service,
-                    member_service,
-                    channel_service,
-                    message_service,
-                    role_service
-            )
+        General(
+            bot,
+            emoji_service,
+            guild_service,
+            member_service,
+            channel_service,
+            message_service,
+            role_service,
+        )
     )
     await bot.add_cog(
-            GeneralAPI(
-                    bot,
-                    emoji_service,
-                    guild_service,
-                    member_service,
-                    channel_service,
-                    message_service,
-                    role_service,
-                    uow
-            )
+        GeneralAPI(
+            bot,
+            emoji_service,
+            guild_service,
+            member_service,
+            channel_service,
+            message_service,
+            role_service,
+            uow,
+        )
     )

@@ -29,9 +29,7 @@ class BeatSaverUtils:
 
     @staticmethod
     async def difficulty_to_emoji(
-            bot: Kiyomi,
-            guild_id: Optional[int],
-            difficulty: pybeatsaver.EDifficulty
+        bot: Kiyomi, guild_id: Optional[int], difficulty: pybeatsaver.EDifficulty
     ) -> Optional[Emoji]:
         setting_name = None
 
@@ -52,9 +50,9 @@ class BeatSaverUtils:
 
     @staticmethod
     async def characteristic_to_emoji(
-            bot: Kiyomi,
-            guild_id: Optional[int],
-            characteristic: pybeatsaver.ECharacteristic
+        bot: Kiyomi,
+        guild_id: Optional[int],
+        characteristic: pybeatsaver.ECharacteristic,
     ) -> Optional[Emoji]:
         setting_name = None
 
@@ -78,7 +76,9 @@ class BeatSaverUtils:
         return await settings.get_override_or_default(guild_id, setting_name)
 
     @staticmethod
-    def to_scoresaber_game_mode(characteristic: pybeatsaver.ECharacteristic) -> pyscoresaber.GameMode:
+    def to_scoresaber_game_mode(
+        characteristic: pybeatsaver.ECharacteristic,
+    ) -> pyscoresaber.GameMode:
         characteristics = {
             pybeatsaver.ECharacteristic.STANDARD: pyscoresaber.GameMode.STANDARD,
             pybeatsaver.ECharacteristic.ONE_SABER: pyscoresaber.GameMode.ONE_SABER,
@@ -92,7 +92,9 @@ class BeatSaverUtils:
         return characteristics[characteristic]
 
     @staticmethod
-    def to_scoresaber_difficulty(difficulty: pybeatsaver.EDifficulty) -> pyscoresaber.BeatmapDifficulty:
+    def to_scoresaber_difficulty(
+        difficulty: pybeatsaver.EDifficulty,
+    ) -> pyscoresaber.BeatmapDifficulty:
         difficulties = {
             pybeatsaver.EDifficulty.EASY: pyscoresaber.BeatmapDifficulty.EASY,
             pybeatsaver.EDifficulty.NORMAL: pyscoresaber.BeatmapDifficulty.NORMAL,

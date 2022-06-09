@@ -5,7 +5,6 @@ from ..model.player import Player
 
 
 class PlayerRepository(BaseRepository[Player]):
-
     @property
     def _table(self) -> Type[Player]:
         return Player

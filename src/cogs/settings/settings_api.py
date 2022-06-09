@@ -8,13 +8,7 @@ from .storage.unit_of_work import UnitOfWork
 
 
 class SettingsAPI(SettingsCog):
-
-    def __init__(
-            self,
-            bot: Kiyomi,
-            setting_service: SettingService,
-            uow: UnitOfWork
-    ):
+    def __init__(self, bot: Kiyomi, setting_service: SettingService, uow: UnitOfWork):
         super().__init__(bot, setting_service)
 
         self.uow = uow
@@ -28,11 +22,7 @@ class SettingsAPI(SettingsCog):
     async def delete(self, guild_id: int, name: str) -> AbstractSetting:
         return await self.setting_service.delete(guild_id, name)
 
-    async def get_override_or_default(
-            self,
-            guild_id: Optional[int],
-            name: Optional[str]
-    ) -> Optional[AbstractSetting]:
+    async def get_override_or_default(self, guild_id: Optional[int], name: Optional[str]) -> Optional[AbstractSetting]:
         if name is None:
             return None
 

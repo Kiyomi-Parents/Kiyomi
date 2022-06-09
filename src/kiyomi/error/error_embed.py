@@ -6,7 +6,7 @@ from discord import Embed, Color
 class ErrorEmbed(Embed):
     error_images = [
         "https://share.lucker.xyz/qahu5/LOXaLeTU55.png",
-        "https://share.lucker.xyz/qahu5/tAyitEVO25.png"
+        "https://share.lucker.xyz/qahu5/tAyitEVO25.png",
     ]
 
     def __init__(self, message: str):
