@@ -29,8 +29,14 @@ async def setup(bot: Kiyomi):
     twitch_client = twitchio.Client.from_client_credentials(twitch_client_id, twitch_client_secret, loop=bot.loop)
     eventsub_client = eventsub.EventSubClient(twitch_client, twitch_webhook_secret, twitch_event_sub_listener_url)
 
+    async def connect():
+        try:
+            await twitch_client.connect()
+        except twitchio.errors.AuthenticationError as e:
+            Logger.error("Twitch", f"{e.__class__.__name__}: {e}")
+
     bot.loop.create_task(eventsub_client.listen(port=twitch_event_sub_listener_port))
-    bot.loop.create_task(twitch_client.connect())
+    bot.loop.create_task(connect())
 
     storage_uow = StorageUnitOfWork(await bot.database.get_session())
     service_uow = ServiceUnitOfWork(bot, storage_uow, twitch_client, eventsub_client)
