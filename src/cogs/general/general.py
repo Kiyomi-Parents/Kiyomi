@@ -14,7 +14,7 @@ class General(BaseCog[ServiceUnitOfWork]):
     def register_events(self):
         @self.bot.events.on("register_member")
         async def register_member(member: discord.Member):
-            discord_guild = await self.service_uow.guilds.register_guild(member.guild.id)
+            discord_guild = await self.service_uow.guilds.register_guild(member.guild)
             await self.service_uow.members.register_member(discord_guild, member.id)
             await self.service_uow.members.register_guild_member(member.guild.id, member.id)
             await self.service_uow.save_changes()
@@ -33,7 +33,7 @@ class General(BaseCog[ServiceUnitOfWork]):
 
     @commands.Cog.listener()
     async def on_guild_join(self, guild: discord.Guild):
-        await self.service_uow.guilds.register_guild(guild.id)
+        await self.service_uow.guilds.register_guild(guild)
         await self.service_uow.save_changes()
 
     @commands.Cog.listener()
@@ -43,7 +43,7 @@ class General(BaseCog[ServiceUnitOfWork]):
 
     @commands.Cog.listener()
     async def on_guild_update(self, before: discord.Guild, after: discord.Guild):
-        await self.service_uow.guilds.register_guild(after.id)
+        await self.service_uow.guilds.register_guild(after)
         await self.service_uow.save_changes()
 
     @commands.Cog.listener()
