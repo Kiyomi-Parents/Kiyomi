@@ -17,7 +17,7 @@ class SettingValueTransformer(Transformer):
         settings_api = ctx.bot.get_cog_api(SettingsAPI)
 
         setting = await SettingNameTransformer.transform(interaction, interaction.namespace.setting)
-        await settings_api.setting_service.validate_setting_value(interaction.guild_id, setting, value)
+        await settings_api.validate_setting_value(interaction.guild_id, setting, value)
 
         return value
 
@@ -31,7 +31,7 @@ class SettingValueTransformer(Transformer):
         setting_name = await SettingNameTransformer.transform(interaction, interaction.namespace.setting)
 
         try:
-            setting = await settings_api.setting_service.get(interaction.guild_id, setting_name)
+            setting = await settings_api.get_setting(interaction.guild_id, setting_name)
         except SettingsCogException:
             return []
 

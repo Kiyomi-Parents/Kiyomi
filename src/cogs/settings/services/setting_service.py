@@ -105,7 +105,7 @@ class SettingService(BaseService[Setting, SettingRepository, StorageUnitOfWork])
             setting.set(value)
             setting.setting = await self.repository.add(setting.setting)
         else:
-            await self.repository.set(setting.setting, value)
+            await self.repository.set(setting.setting.id, value)
 
         self.bot.events.emit("on_setting_change", setting)
 

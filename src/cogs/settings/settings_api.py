@@ -20,11 +20,17 @@ class SettingsAPI(BaseCog[ServiceUnitOfWork]):
     async def get(self, guild_id: int, name: str) -> Optional[any]:
         return await self.service_uow.settings.get_value(guild_id, name)
 
+    async def get_setting(self, guild_id: int, name: str) -> AbstractSetting:
+        return await self.service_uow.settings.get(guild_id, name)
+
     def get_registered(self) -> List[AbstractSetting]:
         return self.service_uow.settings.registered_settings
 
-    def has_permissions(self, name: str, discord_member: discord.Member) -> bool:
+    def has_permission(self, name: str, discord_member: discord.Member) -> bool:
         return self.service_uow.settings.has_permission(name, discord_member)
+
+    async def validate_setting_value(self, guild_id: int, name: str, value: Optional[str]):
+        return await self.service_uow.settings.validate_setting_value(guild_id, name, value)
 
     async def delete(self, guild_id: int, name: str) -> AbstractSetting:
         setting = await self.service_uow.settings.delete(guild_id, name)
