@@ -1,4 +1,6 @@
-from typing import Optional
+from typing import Optional, List
+
+import discord
 
 from src.kiyomi import BaseCog
 from .services import ServiceUnitOfWork
@@ -17,6 +19,12 @@ class SettingsAPI(BaseCog[ServiceUnitOfWork]):
 
     async def get(self, guild_id: int, name: str) -> Optional[any]:
         return await self.service_uow.settings.get_value(guild_id, name)
+
+    def get_registered(self) -> List[AbstractSetting]:
+        return self.service_uow.settings.registered_settings
+
+    def has_permissions(self, name: str, discord_member: discord.Member) -> bool:
+        return self.service_uow.settings.has_permission(name, discord_member)
 
     async def delete(self, guild_id: int, name: str) -> AbstractSetting:
         setting = await self.service_uow.settings.delete(guild_id, name)

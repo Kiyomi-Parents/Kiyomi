@@ -5,6 +5,7 @@ from discord.app_commands import Transform
 
 from src.kiyomi import BaseCog
 from .services import ServiceUnitOfWork
+from .storage.model.abstract_setting import AbstractSetting
 from .storage.model.setting import Setting
 from .transformers.setting_name_transformer import SettingNameTransformer
 from .transformers.setting_value_transformer import SettingValueTransformer
@@ -13,7 +14,7 @@ from .transformers.setting_value_transformer import SettingValueTransformer
 class Settings(BaseCog[ServiceUnitOfWork]):
     def register_events(self):
         @self.bot.events.on("setting_register")
-        async def register_setting(settings: List[Setting]):
+        async def register_setting(settings: List[AbstractSetting]):
             self.service_uow.settings.register_settings(settings)
 
     settings = app_commands.Group(name="setting", description="Various settings", guild_only=True)

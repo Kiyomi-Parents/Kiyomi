@@ -15,7 +15,7 @@ class SettingNameTransformer(Transformer):
         ctx = await Context.from_interaction(interaction)
         settings_api = ctx.bot.get_cog_api(SettingsAPI)
 
-        if not settings_api.setting_service.has_permission(value, interaction.user):
+        if not settings_api.has_permission(value, interaction.user):
             raise PermissionDenied(value)
 
         return value
@@ -29,7 +29,7 @@ class SettingNameTransformer(Transformer):
 
         settings = []
 
-        for setting in settings_api.setting_service.registered_settings:
+        for setting in settings_api.get_registered():
 
             if not setting.has_permission(interaction.user):
                 continue

@@ -1,6 +1,7 @@
 from abc import ABC
 from typing import TypeVar, Generic, Optional, List
 
+import discord
 from discord import Permissions, Member, Interaction
 from discord.app_commands import Choice
 
@@ -48,9 +49,9 @@ class AbstractSetting(ABC, Generic[T]):
     def guild_id(self) -> int:
         return self.setting.guild_id
 
-    def has_permission(self, member: Member) -> bool:
+    def has_permission(self, discord_member: discord.Member) -> bool:
         if self.permissions is not None:
-            return member.guild_permissions.is_superset(self.permissions)
+            return discord_member.guild_permissions.is_superset(self.permissions)
 
         return True
 

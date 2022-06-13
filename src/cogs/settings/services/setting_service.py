@@ -1,5 +1,6 @@
 from typing import Optional, List, Any
 
+import discord
 from discord import Member
 
 from src.kiyomi import Kiyomi, Utils, BaseService
@@ -49,10 +50,10 @@ class SettingService(BaseService[Setting, SettingRepository, StorageUnitOfWork])
 
         raise FailedToConvertSetting(setting.setting_type)
 
-    def has_permission(self, name: str, member: Member) -> bool:
+    def has_permission(self, name: str, discord_member: discord.Member) -> bool:
         registered_setting = self.find_registered_setting(name)
 
-        return registered_setting.has_permission(member)
+        return registered_setting.has_permission(discord_member)
 
     async def validate_setting_value(self, guild_id: int, name: str, value: Optional[str]):
         registered_setting = self.find_registered_setting(name)
@@ -122,5 +123,5 @@ class SettingService(BaseService[Setting, SettingRepository, StorageUnitOfWork])
         setting = await self.get(guild_id, name)
         return await self.repository.remove(setting)
 
-    def register_settings(self, settings: List[Setting]) -> None:
+    def register_settings(self, settings: List[AbstractSetting]) -> None:
         self.registered_settings += settings
