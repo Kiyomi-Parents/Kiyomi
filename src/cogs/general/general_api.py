@@ -36,6 +36,12 @@ class GeneralAPI(BaseCog[ServiceUnitOfWork]):
 
         return member
 
+    async def register_member(self, guild_id: int, member_id: int):
+        discord_guild = await self.service_uow.guilds.upsert_guild(guild_id)
+        await self.service_uow.members.upsert_member(discord_guild, member_id)
+        await self.service_uow.members.register_guild_member(guild_id, member_id)
+        await self.service_uow.save_changes()
+
     async def get_discord_member(self, guild_id: int, member_id: int) -> Optional[discord.Member]:
         discord_guild = await self.service_uow.guilds.upsert_guild(guild_id)
         discord_member = await self.service_uow.members.get_discord_member(discord_guild, member_id)

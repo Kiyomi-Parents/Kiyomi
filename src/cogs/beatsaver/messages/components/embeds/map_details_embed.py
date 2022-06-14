@@ -4,13 +4,13 @@ import pybeatsaver
 from discord import Colour, Guild
 
 from src.cogs.beatsaver.beatsaver_utils import BeatSaverUtils
-from .beatsaver_embed import BeatSaverEmbed
+from src.kiyomi.base_embed import BaseEmbed
 from ....storage.model.beatmap import Beatmap
 from ....storage.model.beatmap_version_difficulty import BeatmapVersionDifficulty
 from src.kiyomi import Kiyomi
 
 
-class MapDetailsEmbed(BeatSaverEmbed):
+class MapDetailsEmbed(BaseEmbed):
     def __init__(
         self,
         bot: Kiyomi,

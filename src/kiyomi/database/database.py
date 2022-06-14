@@ -1,4 +1,6 @@
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, AsyncEngine
+import asyncio
+
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, AsyncEngine, async_scoped_session
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
@@ -10,6 +12,7 @@ Base: declarative_base = declarative_base()
 class Database:
     _engine: AsyncEngine
     _session_maker: sessionmaker
+    session: AsyncSession
 
     def __init__(self, connection: str):
         self._connection = connection
@@ -18,8 +21,8 @@ class Database:
         self._engine = create_async_engine(self._connection, echo=False, pool_pre_ping=True, pool_recycle=3600)
         self._session_maker = sessionmaker(self._engine, class_=AsyncSession, expire_on_commit=False)
 
-    async def get_session(self) -> AsyncSession:
-        return self._session_maker()
+        # Don't change, this just works
+        self.session = async_scoped_session(self._session_maker, scopefunc=asyncio.current_task)
 
     async def create_tables(self):
         async with self._engine.begin() as connection:

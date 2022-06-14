@@ -13,14 +13,16 @@ class ScoreFeed(BaseCog[ServiceUnitOfWork], name="Score Feed"):
     def register_events(self):
         @self.bot.events.on("on_new_player")
         async def mark_scores_sent(guild_player: GuildPlayer):
-            await self.service_uow.sent_scores.mark_player_scores_sent(guild_player.player, guild_player.guild)
+            await self.service_uow.sent_scores.mark_player_scores_sent(guild_player.guild_id, guild_player.player_id)
             await self.service_uow.save_changes()
+            await self.service_uow.close()
 
         @self.bot.events.on("on_new_score_live")
         async def send_notifications_for_score(score: Score):
             for guild in score.player.guilds:
                 await self.service_uow.notifications.send_notification(guild, score.player)
                 await self.service_uow.save_changes()
+                await self.service_uow.close()
 
     @commands.Cog.listener()
     async def on_ready(self):

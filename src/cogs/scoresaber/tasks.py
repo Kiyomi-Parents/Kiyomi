@@ -23,6 +23,10 @@ class Tasks(BaseTasks[ServiceUnitOfWork]):
 
         await self.service_uow.save_changes()
 
+    @update_players.after_loop
+    async def update_players_after(self):
+        await self.service_uow.close()
+
     @tasks.loop(minutes=3)
     @Utils.time_task
     @Utils.discord_ready
@@ -36,6 +40,10 @@ class Tasks(BaseTasks[ServiceUnitOfWork]):
             await self.service_uow.scores.update_player_scores(player)
             await self.service_uow.save_changes()
 
+    @update_players_scores.after_loop
+    async def update_players_scores_after(self):
+        await self.service_uow.close()
+
     @Utils.discord_ready
     async def init_live_score_feed(self):
         Logger.log("Score Saber", "Started listening to live score feed!")
@@ -46,3 +54,5 @@ class Tasks(BaseTasks[ServiceUnitOfWork]):
                 if await self.service_uow.players.player_exists(player_score.score.leaderboard_player_info.id):
                     await self.service_uow.scores.on_new_live_score_feed_score(player_score)
                     await self.service_uow.save_changes()
+
+        await self.service_uow.close()

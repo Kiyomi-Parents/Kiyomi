@@ -9,11 +9,11 @@ from src.cogs.beatsaver.storage.model.beatmap_version_difficulty import (
     BeatmapVersionDifficulty,
 )
 from src.cogs.scoresaber.storage.model.score import Score
-from .leaderboard_embed import LeaderboardEmbed
+from src.kiyomi.base_embed import BaseEmbed
 from src.kiyomi import Kiyomi
 
 
-class GuildLeaderboardEmbed(LeaderboardEmbed):
+class GuildLeaderboardEmbed(BaseEmbed):
     def __init__(
         self,
         bot: Kiyomi,

@@ -8,10 +8,7 @@ from ..storage.model.twitch_broadcaster import TwitchBroadcaster
 from src.kiyomi.error import ErrorArgResolver
 
 
-class TwitchUserIdResolver(ErrorArgResolver[str, str]):
-    def __init__(self, service_uow: ServiceUnitOfWork):
-        self.service_uow = service_uow
-
+class TwitchUserIdResolver(ErrorArgResolver[ServiceUnitOfWork, str, str]):
     async def resolve_detailed(self, argument: int, detailed: bool = True) -> str:
         user: Optional[TwitchBroadcaster] = await self.service_uow.twitch_broadcasters.get_by_id(argument)
         if user is not None:

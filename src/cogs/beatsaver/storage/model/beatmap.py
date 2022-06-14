@@ -46,7 +46,7 @@ class Beatmap(Base):
     stats_downvotes = Column(Integer)
     stats_score = Column(Integer)
 
-    versions = relationship("BeatmapVersion", back_populates="beatmap", cascade="all, delete-orphan")
+    versions = relationship("BeatmapVersion", back_populates="beatmap", cascade="all, delete-orphan", lazy="joined")
 
     def __init__(self, map_detail: MapDetail):
         self.id = map_detail.id

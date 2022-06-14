@@ -71,7 +71,7 @@ class TwitchBroadcasterService(BaseService[TwitchBroadcaster, TwitchBroadcasterR
             GuildTwitchBroadcaster(guild_id, member_id, broadcaster_id)
         )
 
-        return await self.storage_uow.refresh(entity)
+        return entity
 
     async def unregister_guild_twitch_broadcaster(self, guild_id: int, member_id: int) -> GuildTwitchBroadcaster:
         guild_twitch_broadcaster = await self.storage_uow.guild_twitch_broadcasters.delete_by_guild_id_and_member_id(

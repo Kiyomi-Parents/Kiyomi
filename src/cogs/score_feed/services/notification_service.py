@@ -40,7 +40,7 @@ class NotificationService(BaseBasicService[StorageUnitOfWork]):
             Logger.log(guild, "Recent scores channel not found, skipping!")
             return
 
-        if not self.sent_score_service.should_send_scores(guild, player):
+        if not await self.sent_score_service.should_send_scores(guild, player):
             Logger.log(guild, "Decided not to send scores. (Spam prevention)")
             await self.sent_score_service.mark_player_scores_sent(player, guild)
             return

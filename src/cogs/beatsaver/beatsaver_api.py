@@ -19,7 +19,7 @@ class BeatSaverAPI(BaseCog[ServiceUnitOfWork]):
             beatmap = await self.service_uow.beatmaps.get_beatmap_by_key(key)
             await self.service_uow.save_changes()
 
-            return beatmap
+            return await self.service_uow.refresh(beatmap)
         except BeatmapNotFound as error:
             Logger.log(self.__class__.__name__, error)
             return None
@@ -29,7 +29,7 @@ class BeatSaverAPI(BaseCog[ServiceUnitOfWork]):
             beatmap = await self.service_uow.beatmaps.get_beatmap_by_hash(beatmap_hash)
             await self.service_uow.save_changes()
 
-            return beatmap
+            return await self.service_uow.refresh(beatmap)
         except BeatmapNotFound as error:
             Logger.log(self.__class__.__name__, error)
             return None

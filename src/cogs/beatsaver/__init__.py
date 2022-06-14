@@ -13,7 +13,7 @@ async def setup(bot: Kiyomi):
     beatsaver_api_client = pybeatsaver.BeatSaverAPI(bot.loop)
     await beatsaver_api_client.start()
 
-    storage_uow = StorageUnitOfWork(await bot.database.get_session())
+    storage_uow = StorageUnitOfWork(bot.database.session)
     service_uow = ServiceUnitOfWork(bot, storage_uow, beatsaver_api_client)
 
     bot.error_resolver.add(BeatmapHashResolver(storage_uow))

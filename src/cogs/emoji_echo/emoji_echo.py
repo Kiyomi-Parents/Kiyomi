@@ -52,7 +52,7 @@ class EmojiEcho(BaseCog[ServiceUnitOfWork]):
 
         settings = self.bot.get_cog_api(SettingsAPI)
 
-        if settings.get(msg.guild.id, "repost_emoji"):
+        if await settings.get(msg.guild.id, "repost_emoji"):
             emoji = await self.service_uow.echo_emojis.get_emoji_from_message(msg.guild.id, msg.content)
 
             if emoji is not None:
@@ -67,7 +67,7 @@ class EmojiEcho(BaseCog[ServiceUnitOfWork]):
     async def random_reaction(self, ctx: Interaction, message: discord.Message):
         emoji = await self.service_uow.echo_emojis.get_random_enabled_emoji()
 
-        await ctx.response.defer()
+        await ctx.response.defer(ephemeral=True)
         msg = await ctx.original_message()
         await msg.delete()
 
@@ -78,7 +78,7 @@ class EmojiEcho(BaseCog[ServiceUnitOfWork]):
         """Posts a random enabled emoji"""
         emoji = await self.service_uow.echo_emojis.get_random_enabled_emoji()
 
-        await ctx.response.defer()
+        await ctx.response.defer(ephemeral=True)
         msg = await ctx.original_message()
         await msg.delete()
 

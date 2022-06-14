@@ -13,6 +13,7 @@ class ViewPersistenceAPI(BaseCog[ServiceUnitOfWork]):
         async def mark_scores_sent(persistence: Persistence):
             await self.service_uow.message_views.add_persistent_view(persistence)
             await self.service_uow.save_changes()
+            await self.service_uow.close()
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -26,3 +27,4 @@ class ViewPersistenceAPI(BaseCog[ServiceUnitOfWork]):
                 await error.handle()
 
         Logger.log("View Persistence", f"Loaded {len(persistences)} persistent views")
+        await self.service_uow.close()

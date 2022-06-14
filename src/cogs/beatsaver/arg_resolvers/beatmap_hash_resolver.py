@@ -1,13 +1,10 @@
-from ..storage.storage_unit_of_work import StorageUnitOfWork
+from ..services import ServiceUnitOfWork
 from src.kiyomi.error import ErrorArgResolver
 
 
-class BeatmapHashResolver(ErrorArgResolver[int, str]):
-    def __init__(self, uow: StorageUnitOfWork):
-        self.uow = uow
-
+class BeatmapHashResolver(ErrorArgResolver[ServiceUnitOfWork, int, str]):
     async def resolve_detailed(self, argument: int) -> str:
-        beatmap_version = await self.uow.beatmap_versions.get_by_hash(argument)
+        beatmap_version = await self.service_uow.beatmap_versions.get_by_hash(argument)
 
         if beatmap_version is None:
             return f"{argument} (Not in DB)"
@@ -15,7 +12,7 @@ class BeatmapHashResolver(ErrorArgResolver[int, str]):
         return f"{beatmap_version}"
 
     async def resolve(self, argument: int) -> str:
-        beatmap_version = await self.uow.beatmap_versions.get_by_hash(argument)
+        beatmap_version = await self.service_uow.beatmap_versions.get_by_hash(argument)
 
         if beatmap_version is None:
             return f"{argument}"

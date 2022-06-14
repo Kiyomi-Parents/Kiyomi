@@ -18,11 +18,13 @@ class General(BaseCog[ServiceUnitOfWork]):
             await self.service_uow.members.register_member(discord_guild, member.id)
             await self.service_uow.members.register_guild_member(member.guild.id, member.id)
             await self.service_uow.save_changes()
+            await self.service_uow.close()
 
     @commands.Cog.listener()
     async def on_ready(self):
         await self.service_uow.guilds.register_guilds(self.bot.guilds)
         await self.service_uow.save_changes()
+        await self.service_uow.close()
 
         settings = [
             # TODO: Add bot owner permissions
@@ -35,31 +37,37 @@ class General(BaseCog[ServiceUnitOfWork]):
     async def on_guild_join(self, guild: discord.Guild):
         await self.service_uow.guilds.register_guild(guild)
         await self.service_uow.save_changes()
+        await self.service_uow.close()
 
     @commands.Cog.listener()
     async def on_guild_remove(self, guild: discord.Guild):
         await self.service_uow.guilds.unregister_guild(guild.id)
         await self.service_uow.save_changes()
+        await self.service_uow.close()
 
     @commands.Cog.listener()
     async def on_guild_update(self, before: discord.Guild, after: discord.Guild):
         await self.service_uow.guilds.register_guild(after)
         await self.service_uow.save_changes()
+        await self.service_uow.close()
 
     @commands.Cog.listener()
     async def on_member_remove(self, member: discord.Member):
         await self.service_uow.members.unregister_guild_member(member.guild.id, member.id)
         await self.service_uow.save_changes()
+        await self.service_uow.close()
 
     @commands.Cog.listener()
     async def on_member_update(self, before: discord.Member, after: discord.Member):
         await self.service_uow.roles.on_member_update(before, after)
         await self.service_uow.save_changes()
+        await self.service_uow.close()
 
     @commands.Cog.listener()
     async def on_guild_role_delete(self, role: Role):
         await self.service_uow.roles.on_role_delete(role)
         await self.service_uow.save_changes()
+        await self.service_uow.close()
 
     @app_commands.command()
     async def invite(self, ctx: Interaction):
@@ -78,7 +86,7 @@ class General(BaseCog[ServiceUnitOfWork]):
     @permissions.is_bot_owner_and_admin_guild()
     async def say(self, ctx: Interaction, text: str):
         """Kiyomi repeats what you say"""
-        await ctx.response.defer()
+        await ctx.response.defer(ephemeral=True)
 
         msg = await ctx.original_message()
         await msg.delete()

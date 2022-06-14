@@ -15,7 +15,7 @@ class GuildPlayer(Base):
 
     guild = relationship("Guild")
     member = relationship("Member")
-    player = relationship("Player", backref=backref("guild_player"))
+    player = relationship("Player", backref=backref("guild_player"), lazy="joined")
 
     def __init__(self, guild_id: int, member_id: int, player_id: str):
         self.guild_id = guild_id

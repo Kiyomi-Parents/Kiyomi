@@ -38,7 +38,7 @@ class BeatmapVersionDifficulty(Base):
     parity_warns = Column(Integer)
     parity_resets = Column(Integer)
 
-    beatmap_version = relationship("BeatmapVersion", uselist=False, back_populates="difficulties")
+    beatmap_version = relationship("BeatmapVersion", uselist=False, back_populates="difficulties", lazy="joined")
 
     def __init__(self, version_difficulty: MapDifficulty):
         self.njs = version_difficulty.njs

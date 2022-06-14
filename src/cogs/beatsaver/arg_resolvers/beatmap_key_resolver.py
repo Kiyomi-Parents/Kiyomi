@@ -1,13 +1,10 @@
-from ..storage.storage_unit_of_work import StorageUnitOfWork
+from ..services import ServiceUnitOfWork
 from src.kiyomi.error import ErrorArgResolver
 
 
-class BeatmapKeyResolver(ErrorArgResolver[int, str]):
-    def __init__(self, uow: StorageUnitOfWork):
-        self.uow = uow
-
+class BeatmapKeyResolver(ErrorArgResolver[ServiceUnitOfWork, int, str]):
     async def resolve_detailed(self, argument: int) -> str:
-        beatmap = self.uow.beatmaps.get_by_id(argument)
+        beatmap = self.service_uow.beatmaps.get_by_id(argument)
 
         if beatmap is None:
             return f"{argument} (Not in DB)"
@@ -15,7 +12,7 @@ class BeatmapKeyResolver(ErrorArgResolver[int, str]):
         return f"{beatmap}"
 
     async def resolve(self, argument: int) -> str:
-        beatmap = self.uow.beatmaps.get_by_id(argument)
+        beatmap = self.service_uow.beatmaps.get_by_id(argument)
 
         if beatmap is None:
             return f"{argument}"

@@ -1,13 +1,10 @@
-from ..storage.storage_unit_of_work import StorageUnitOfWork
+from ..services import ServiceUnitOfWork
 from src.kiyomi.error import ErrorArgResolver
 
 
-class MessageIdResolver(ErrorArgResolver[int, str]):
-    def __init__(self, uow: StorageUnitOfWork):
-        self.uow = uow
-
+class MessageIdResolver(ErrorArgResolver[ServiceUnitOfWork, int, str]):
     async def resolve_detailed(self, argument: int) -> str:
-        message = await self.uow.messages.get_by_id(argument)
+        message = await self.service_uow.messages.get_by_id(argument)
 
         if message is None:
             return f"{argument} (Not in DB)"
@@ -15,7 +12,7 @@ class MessageIdResolver(ErrorArgResolver[int, str]):
         return f"{message}"
 
     async def resolve(self, argument: int) -> str:
-        message = await self.uow.messages.get_by_id(argument)
+        message = await self.service_uow.messages.get_by_id(argument)
 
         if message is None:
             return f"{argument}"

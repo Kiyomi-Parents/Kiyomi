@@ -1,13 +1,10 @@
-from ..storage.storage_unit_of_work import StorageUnitOfWork
+from ..services import ServiceUnitOfWork
 from src.kiyomi.error import ErrorArgResolver
 
 
-class RoleIdResolver(ErrorArgResolver[int, str]):
-    def __init__(self, uow: StorageUnitOfWork):
-        self.uow = uow
-
+class RoleIdResolver(ErrorArgResolver[ServiceUnitOfWork, int, str]):
     async def resolve_detailed(self, argument: int) -> str:
-        role = await self.uow.roles.get_by_id(argument)
+        role = await self.service_uow.roles.get_by_id(argument)
 
         if role is None:
             return f"{argument} (Not in DB)"
@@ -15,7 +12,7 @@ class RoleIdResolver(ErrorArgResolver[int, str]):
         return f"{role}"
 
     async def resolve(self, argument: int) -> str:
-        role = await self.uow.roles.get_by_id(argument)
+        role = await self.service_uow.roles.get_by_id(argument)
 
         if role is None:
             return f"{argument}"

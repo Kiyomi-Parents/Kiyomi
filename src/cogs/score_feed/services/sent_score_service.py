@@ -22,22 +22,22 @@ class SentScoreService(BaseService[SentScore, SentScoreRepository, StorageUnitOf
         )
 
         for guild_player in guild_players:
-            await self.mark_player_scores_sent(guild_player.player, guild_player.guild)
+            await self.mark_player_scores_sent(guild_player.guild.id, guild_player.player.id)
 
     async def mark_all_player_scores_sent(self, player: Player):
         Logger.log(player, "Marking all scores as sent")
 
         for guild in player.guilds:
-            await self.mark_player_scores_sent(player, guild)
+            await self.mark_player_scores_sent(guild.id, int(player.id))
 
-    async def mark_player_scores_sent(self, player: Player, guild: Guild):
-        scores = await self.storage_uow.sent_scores.get_unsent_scores(guild.id, player.id)
+    async def mark_player_scores_sent(self, guild_id: int, player_id: int):
+        scores = await self.storage_uow.sent_scores.get_unsent_scores(guild_id, player_id)
 
-        Logger.log(player, f"Marking {len(scores)} scores as sent in {guild}")
+        Logger.log(player_id, f"Marking {len(scores)} scores as sent in {guild_id}")
 
         sent_scores = []
         for score in scores:
-            sent_scores.append(SentScore(score.id, guild.id))
+            sent_scores.append(SentScore(score.id, guild_id))
 
         if len(sent_scores) != 0:
             await self.storage_uow.sent_scores.add_all(sent_scores)

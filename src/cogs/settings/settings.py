@@ -16,6 +16,7 @@ class Settings(BaseCog[ServiceUnitOfWork]):
         @self.bot.events.on("setting_register")
         async def register_setting(settings: List[AbstractSetting]):
             self.service_uow.settings.register_settings(settings)
+            await self.service_uow.close()
 
     settings = app_commands.Group(name="setting", description="Various settings", guild_only=True)
 

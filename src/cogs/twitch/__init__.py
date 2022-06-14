@@ -38,10 +38,10 @@ async def setup(bot: Kiyomi):
     bot.loop.create_task(eventsub_client.listen(port=twitch_event_sub_listener_port))
     bot.loop.create_task(connect())
 
-    storage_uow = StorageUnitOfWork(await bot.database.get_session())
+    storage_uow = StorageUnitOfWork(bot.database.session)
     service_uow = ServiceUnitOfWork(bot, storage_uow, twitch_client, eventsub_client)
 
-    bot.error_resolver.add(TwitchLoginResolver())
+    bot.error_resolver.add(TwitchLoginResolver(service_uow))
     bot.error_resolver.add(TwitchUserIdResolver(service_uow))
 
     await bot.add_cog(Twitch(bot, service_uow))

@@ -17,10 +17,10 @@ class SentScoreRepository(BaseStorageRepository[SentScore]):
         return await self._first(stmt)
 
     async def get_sent_scores_count(self, guild_id: int, player_id: int) -> int:
-        player_score_ids = select(Score.c.id).where(Score.player_id == player_id).subquery()
+        player_score_ids = select(Score.id).where(Score.player_id == player_id).subquery()
 
         stmt = (
-            select(self._table.c.score_id)
+            select(self._table.score_id)
             .where(self._table.guild_id == guild_id)
             .where(self._table.score_id.in_(player_score_ids.select()))
             .count()
@@ -29,10 +29,10 @@ class SentScoreRepository(BaseStorageRepository[SentScore]):
         return await self._first(stmt)
 
     async def get_unsent_scores_count(self, guild_id: int, player_id: int) -> int:
-        player_score_ids = select(Score.c.id).where(Score.player_id == player_id).subquery()
+        player_score_ids = select(Score.id).where(Score.player_id == player_id).subquery()
 
         sent_score_ids = (
-            select(self._table.c.score_id)
+            select(self._table.score_id)
             .where(self._table.guild_id == guild_id)
             .where(self._table.score_id.in_(player_score_ids.select()))
             .subquery()
@@ -49,10 +49,10 @@ class SentScoreRepository(BaseStorageRepository[SentScore]):
         return await self._first(stmt)
 
     async def get_unsent_scores(self, guild_id: int, player_id: int) -> List[Score]:
-        player_score_ids = select(Score.c.id).where(Score.player_id == player_id).subquery()
+        player_score_ids = select(Score.id).where(Score.player_id == player_id).subquery()
 
         sent_score_ids = (
-            select(self._table.c.score_id)
+            select(self._table.score_id)
             .where(self._table.guild_id == guild_id)
             .where(self._table.score_id.in_(player_score_ids.select()))
             .subquery()

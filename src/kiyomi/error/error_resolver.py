@@ -25,17 +25,23 @@ class ErrorResolver:
     async def resolve_arg(self, arg_name: str, arg_value: any, detailed: bool = False) -> str:
         resolver = self.find_resolver(arg_name)
 
+        resolved_arg = str(arg_value)
+
         if resolver is None:
             Logger.error(
                 self.__class__.__name__,
                 f"Could not find error arg resolver for arg name {arg_name}",
             )
-            return str(arg_value)
+            return resolved_arg
 
         if detailed:
-            return await resolver.resolve_detailed(arg_value)
+            resolved_arg = await resolver.resolve_detailed(arg_value)
+        else:
+            resolved_arg = f"**{await resolver.resolve(arg_value)}**"
 
-        return f"**{await resolver.resolve(arg_value)}**"
+        await resolver.service_uow.close()
+
+        return resolved_arg
 
     async def resolve_message(
         self,

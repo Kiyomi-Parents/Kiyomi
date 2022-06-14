@@ -1,3 +1,4 @@
+import asyncio
 from typing import Optional
 
 import discord
@@ -34,10 +35,12 @@ class ScoreSaber(BaseCog[ServiceUnitOfWork], name="Score Saber"):
     @app_commands.describe(profile="Score Saber profile URL")
     async def player_add(self, ctx: Interaction, profile: Transform[str, ScoreSaberPlayerIdTransformer]):
         """Link yourself to your ScoreSaber profile."""
-        self.bot.events.emit("register_member", ctx.user)
+        general_api = self.bot.get_cog_api(GeneralAPI)
+        await general_api.register_member(ctx.guild_id, ctx.user.id)
 
         guild_player = await self.service_uow.players.add_player_with_checks(ctx.guild_id, ctx.user.id, profile)
         await self.service_uow.save_changes()
+        await self.service_uow.refresh(guild_player)
 
         await ctx.response.send_message(
             f"Successfully linked **{guild_player.player.name}** ScoreSaber profile!",
@@ -125,8 +128,7 @@ class ScoreSaber(BaseCog[ServiceUnitOfWork], name="Score Saber"):
             return
 
         general = self.bot.get_cog_api(GeneralAPI)
-        member = await general.get_discord_member(guild_id, member_id)
-        self.bot.events.emit("register_member", member)
+        await general.register_member(guild_id, member_id)
 
         guild_player = await self.service_uow.players.register_player(guild_id, member_id, player_id)
         await self.service_uow.save_changes()
@@ -176,11 +178,13 @@ class ScoreSaber(BaseCog[ServiceUnitOfWork], name="Score Saber"):
     async def refresh(self, ctx: Interaction, member: discord.Member):
         guild_player = await self.service_uow.players.get_guild_player(ctx.guild_id, member.id)
 
+        await ctx.response.defer(ephemeral=True, thinking=True)
+
         await self.service_uow.players.update_player(guild_player.player)
         await self.service_uow.scores.update_player_scores(guild_player.player)
         await self.service_uow.save_changes()
 
-        await ctx.response.send_message(
+        await ctx.followup.send_message(
             f"Updated {member.name}'s Score Saber profile ({guild_player.player.name})",
             ephemeral=True,
         )

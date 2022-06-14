@@ -15,7 +15,7 @@ async def setup(bot: Kiyomi):
     await scoresaber_api_client.start()
     await scoresaber_api_client.ws_start()
 
-    storage_uow = StorageUnitOfWork(await bot.database.get_session())
+    storage_uow = StorageUnitOfWork(bot.database.session)
     service_uow = ServiceUnitOfWork(bot, storage_uow, scoresaber_api_client)
 
     bot.error_resolver.add(PlayerIdResolver(storage_uow))

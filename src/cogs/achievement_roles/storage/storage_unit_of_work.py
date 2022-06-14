@@ -11,5 +11,5 @@ class StorageUnitOfWork(BaseStorageUnitOfWork):
     def __init__(self, session: AsyncSession):
         super().__init__(session)
 
-        self.achievement_roles = AchievementRoleRepository(session)
-        self.achievement_role_members = AchievementRoleMemberRepository(session)
+        self.achievement_roles = AchievementRoleRepository(self._session)
+        self.achievement_role_members = AchievementRoleMemberRepository(self._session)

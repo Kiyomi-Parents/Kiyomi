@@ -13,3 +13,7 @@ class Tasks(BaseTasks[ServiceUnitOfWork]):
 
         if not self.service_uow.profile_pictures.is_current_pfp(profile_picture):
             await self.service_uow.profile_pictures.set_pfp(profile_picture)
+
+    @update_profile_picture.after_loop
+    async def update_profile_picture_after(self):
+        await self.service_uow.close()

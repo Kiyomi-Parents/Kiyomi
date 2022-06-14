@@ -22,3 +22,7 @@ class Tasks(BaseTasks[ServiceUnitOfWork]):
             await self.service_uow.memberAchievementRoles.update_member_roles(guild_member.guild_id, guild_member.member_id)
 
         await self.service_uow.save_changes()
+
+    @update_member_roles.after_loop
+    async def update_member_roles_after(self):
+        await self.service_uow.close()

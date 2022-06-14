@@ -22,15 +22,6 @@ class ScoreRepository(BaseStorageRepository[Score]):
         )
         return await self._all(stmt)
 
-    #
-    # async def get_all_by_score_id(self, score_id: int) -> List[Score]:
-    #     stmt = select(self._table).where(self._table.score_id == score_id)
-    #     return await self._all(stmt)
-    #
-    # async def get_all_scores(self, scores: List[Score]):
-    #     stmt = select(self._table).where(self._table.id.in_([score.id for score in scores]))
-    #     return await self._all(stmt)
-
     async def get_previous(self, score: Score) -> Optional[Score]:
         stmt = (
             select(self._table)
@@ -40,12 +31,6 @@ class ScoreRepository(BaseStorageRepository[Score]):
             .limit(1)
         )
         return await self._first(stmt)
-
-    # def get_all_player_recent_scores(self, player_id: str) -> List[Score]:
-    #     return self.session.query(Score) \
-    #         .filter(Score.player_id == player_id) \
-    #         .order_by(Score.time_set.desc()) \
-    #         .all()
 
     async def get_recent(self, player_id: str, count: int) -> List[Score]:
         stmt = (

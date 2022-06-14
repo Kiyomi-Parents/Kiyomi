@@ -46,6 +46,10 @@ class MessageService(BaseBasicService[StorageUnitOfWork]):
 
     async def rescind_broadcast_live_notifications(self, event: StreamOfflineData):
         broadcasts = self.storage_uow.twitch_broadcasts.delete_by_broadcaster_id(event.broadcaster.id)
+
+        Logger.log(f"Twitch Feed",
+                   f"{event.broadcaster.name} went offline, updating {sum([len(broadcast.messages) for broadcast in broadcasts])} messages")
+
         for broadcast in broadcasts:
             for message in broadcast.messages:
                 embed = message.embeds[0]

@@ -24,3 +24,7 @@ class Tasks(BaseTasks[ServiceUnitOfWork]):
             for guild in player.guilds:
                 await self.service_uow.notifications.send_notification(guild, player)
                 await self.service_uow.save_changes()
+
+    @send_notifications.after_loop
+    async def send_notifications_after(self):
+        await self.service_uow.close()

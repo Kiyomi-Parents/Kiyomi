@@ -26,8 +26,12 @@ class BeatSaver(BaseCog[ServiceUnitOfWork], name="Beat Saver"):
             try:
                 await self.service_uow.beatmaps.get_beatmaps_by_hashes(list(set(song_hashes)))
                 await self.service_uow.save_changes()
+
+                Logger.log("Beatmap import", f"Imported {len(list(set(song_hashes)))} songs")
             except BeatmapNotFound as error:
                 Logger.log("on_new_leaderboards", error)
+
+            await self.service_uow.close()
 
     @commands.Cog.listener()
     async def on_ready(self):

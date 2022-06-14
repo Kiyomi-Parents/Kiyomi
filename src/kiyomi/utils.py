@@ -18,16 +18,13 @@ class Utils:
     def time_task(func):
         @wraps(func)
         async def wrapper(self, *args, **kwargs):
-            Logger.log(func.__name__, "<===> Starting task <===>")
+            Logger.log(func.__name__, "Starting task")
 
             start_time = datetime.now()
             res = await func(self, *args, **kwargs)
             end_time = datetime.now()
 
-            Logger.log(
-                func.__name__,
-                f"Finished task in {timeago.format(start_time, end_time)}\n",
-            )
+            Logger.log(func.__name__, f"Finished task {timeago.format(end_time, start_time, locale='en_short')}")
 
             return res
 

@@ -20,5 +20,8 @@ class BaseServiceUnitOfWork(BaseUnitOfWork, Generic[TStorageUnitOfWork]):
     async def rollback(self):
         await self._storage_uow.rollback()
 
+    async def close(self):
+        await self._storage_uow.close()
+
     async def save_changes(self):
         await self._storage_uow.save_changes()

@@ -1,13 +1,10 @@
-from ..storage.storage_unit_of_work import StorageUnitOfWork
+from ..services import ServiceUnitOfWork
 from src.kiyomi.error import ErrorArgResolver
 
 
-class EmojiIdResolver(ErrorArgResolver[int, str]):
-    def __init__(self, uow: StorageUnitOfWork):
-        self.uow = uow
-
+class EmojiIdResolver(ErrorArgResolver[ServiceUnitOfWork, int, str]):
     async def resolve_detailed(self, argument: int) -> str:
-        emoji = await self.uow.emojis.get_by_id(argument)
+        emoji = await self.service_uow.emojis.get_by_id(argument)
 
         if emoji is None:
             return f"{argument} (Not in DB)"
@@ -15,7 +12,7 @@ class EmojiIdResolver(ErrorArgResolver[int, str]):
         return f"{emoji}"
 
     async def resolve(self, argument: int) -> str:
-        emoji = await self.uow.emojis.get_by_id(argument)
+        emoji = await self.service_uow.emojis.get_by_id(argument)
 
         if emoji is None:
             return f"{argument}"

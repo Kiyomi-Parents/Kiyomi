@@ -7,7 +7,7 @@ from src.kiyomi import Kiyomi
 
 
 async def setup(bot: Kiyomi):
-    storage_uow = StorageUnitOfWork(await bot.database.get_session())
+    storage_uow = StorageUnitOfWork(bot.database.session)
     service_uow = ServiceUnitOfWork(bot, storage_uow)
 
     pfp_switcher_tasks = Tasks(bot, service_uow)

@@ -8,4 +8,4 @@ class StorageUnitOfWork(BaseStorageUnitOfWork):
     def __init__(self, session: AsyncSession):
         super().__init__(session)
 
-        self.sent_scores = SentScoreRepository(session)
+        self.sent_scores = SentScoreRepository(self._session)

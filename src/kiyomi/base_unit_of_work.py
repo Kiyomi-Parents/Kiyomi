@@ -18,5 +18,9 @@ class BaseUnitOfWork(metaclass=ABCMeta):
         pass
 
     @abstractmethod
+    async def close(self):
+        pass
+
+    @abstractmethod
     async def save_changes(self):
         pass

@@ -8,4 +8,4 @@ class StorageUnitOfWork(BaseStorageUnitOfWork):
     def __init__(self, session: AsyncSession):
         super().__init__(session)
 
-        self.echo_emojis = EchoEmojiRepository(session)
+        self.echo_emojis = EchoEmojiRepository(self._session)

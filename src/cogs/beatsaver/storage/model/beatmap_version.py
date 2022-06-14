@@ -22,9 +22,9 @@ class BeatmapVersion(Base):
     cover_url = Column(String(256))
     preview_url = Column(String(256))
 
-    difficulties = relationship("BeatmapVersionDifficulty", cascade="all, delete-orphan")
+    difficulties = relationship("BeatmapVersionDifficulty", cascade="all, delete-orphan", lazy="joined")
 
-    beatmap = relationship("Beatmap", uselist=False, back_populates="versions")
+    beatmap = relationship("Beatmap", uselist=False, back_populates="versions", lazy="joined")
 
     def __init__(self, map_version: pybeatsaver.MapVersion):
         self.hash = map_version.hash.lower()

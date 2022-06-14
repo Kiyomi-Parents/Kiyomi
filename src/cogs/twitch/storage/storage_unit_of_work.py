@@ -1,4 +1,4 @@
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.ext.asyncio import AsyncSession, async_scoped_session
 
 from src.kiyomi import BaseStorageUnitOfWork
 from .repository.guild_twitch_broadcaster_repository import GuildTwitchBroadcasterRepository
@@ -10,6 +10,6 @@ class StorageUnitOfWork(BaseStorageUnitOfWork):
     def __init__(self, session: AsyncSession):
         super().__init__(session)
 
-        self.twitch_broadcasters = TwitchBroadcasterRepository(session)
-        self.guild_twitch_broadcasters = GuildTwitchBroadcasterRepository(session)
+        self.twitch_broadcasters = TwitchBroadcasterRepository(self._session)
+        self.guild_twitch_broadcasters = GuildTwitchBroadcasterRepository(self._session)
         self.twitch_broadcasts = TwitchBroadcastRepository()
