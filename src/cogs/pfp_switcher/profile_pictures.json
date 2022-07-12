@@ -14,6 +14,16 @@
                     "end": "23/04_00:00"
                 }
             ]
+        },
+        {
+            "name": "Kiyomi Summer",
+            "file_path": "src/cogs/pfp_switcher/storage/assets/Kiyomi_summer.png",
+            "active_zones": [
+                {
+                    "start": "21/06_00:00",
+                    "end": "23/09_00:00"
+                }
+            ]
         }
     ]
 }
