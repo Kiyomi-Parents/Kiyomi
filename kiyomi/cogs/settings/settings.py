@@ -28,11 +28,13 @@ class Settings(BaseCog[ServiceUnitOfWork]):
         value: Transform[str, SettingValueTransformer],
     ):
         """Set setting value"""
+        await ctx.response.defer(ephemeral=True)
+
         abstract_setting = await self.service_uow.settings.set(ctx.guild_id, setting, value)
         setting_value = await self.service_uow.settings.get_value(ctx.guild_id, setting)
         await self.service_uow.save_changes()
 
-        await ctx.response.send_message(
+        await ctx.followup.send(
             f"{abstract_setting.name_human} is now set to: {setting_value}",
             ephemeral=True,
         )

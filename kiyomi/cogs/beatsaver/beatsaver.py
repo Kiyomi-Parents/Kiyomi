@@ -60,6 +60,7 @@ class BeatSaver(BaseCog[ServiceUnitOfWork], name="Beat Saver"):
     @app_commands.describe(beatmap="Beatmap key (25f)")
     async def map(self, ctx: Interaction, beatmap: Transform[Beatmap, BeatmapKeyTransformer]):
         """Displays song info."""
+        await ctx.response.defer()
 
         song_view = SongView(self.bot, ctx.guild, beatmap)
 

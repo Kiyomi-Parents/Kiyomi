@@ -66,9 +66,8 @@ class EmojiEcho(BaseCog[ServiceUnitOfWork]):
     async def random_reaction(self, ctx: Interaction, message: discord.Message):
         emoji = await self.service_uow.echo_emojis.get_random_enabled_emoji()
 
-        await ctx.response.defer(ephemeral=True)
-        msg = await ctx.original_message()
-        await msg.delete()
+        await ctx.response.send_message("give me a sec", ephemeral=True)
+        await ctx.delete_original_message()
 
         await message.add_reaction(emoji)
 
@@ -77,9 +76,8 @@ class EmojiEcho(BaseCog[ServiceUnitOfWork]):
         """Posts a random enabled emoji"""
         emoji = await self.service_uow.echo_emojis.get_random_enabled_emoji()
 
-        await ctx.response.defer(ephemeral=True)
-        msg = await ctx.original_message()
-        await msg.delete()
+        await ctx.response.send_message("give me a sec", ephemeral=True)
+        await ctx.delete_original_message()
 
         await ctx.channel.send(str(emoji))
 
@@ -101,19 +99,21 @@ class EmojiEcho(BaseCog[ServiceUnitOfWork]):
         emoji: Transform[discord.Emoji, AvailableEmojiTransformer],
     ):
         """Allow the given emoji to be used by the bot"""
+        await ctx.response.defer(ephemeral=True)
 
         await self.service_uow.echo_emojis.enable_emoji(emoji.guild_id, emoji.id, emoji.name)
         await self.service_uow.save_changes()
 
-        await ctx.response.send_message(f"Enabled {str(emoji)}", ephemeral=True)
+        await ctx.followup.send(f"Enabled {str(emoji)}", ephemeral=True)
 
     @emoji.command(name="disable")
     @app_commands.describe(emoji="Choose an emoji")
     @permissions.is_bot_owner()
     async def emoji_disable(self, ctx: Interaction, emoji: Transform[discord.Emoji, EnabledEmojiTransformer]):
         """Disallow the given emoji from being used by the bot"""
+        await ctx.response.defer(ephemeral=True)
 
         await self.service_uow.echo_emojis.disable_emoji(emoji.id)
         await self.service_uow.save_changes()
 
-        await ctx.response.send_message(f"Disabled {str(emoji)}", ephemeral=True)
+        await ctx.followup.send(f"Disabled {str(emoji)}", ephemeral=True)

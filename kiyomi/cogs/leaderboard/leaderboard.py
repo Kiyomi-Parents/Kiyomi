@@ -47,6 +47,8 @@ class Leaderboard(BaseCog[ServiceUnitOfWork]):
         difficulty: Optional[Transform[pybeatsaver.EDifficulty, BeatmapDifficultyTransformer]],
     ):
         """Displays songs guild leaderboard."""
+        await ctx.response.defer()
+
         guild_leaderboard_view = GuildLeaderboardView(self.bot, ctx.guild, beatmap, characteristic, difficulty)
 
         await guild_leaderboard_view.respond(ctx)

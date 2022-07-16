@@ -73,6 +73,7 @@ class General(BaseCog[ServiceUnitOfWork]):
     @app_commands.command()
     async def invite(self, ctx: Interaction):
         """Get the invite link"""
+        await ctx.response.defer()
         invite_view = InviteView(self.bot, ctx.guild)
 
         await invite_view.respond(ctx)
@@ -87,9 +88,7 @@ class General(BaseCog[ServiceUnitOfWork]):
     @permissions.is_bot_owner_and_admin_guild()
     async def say(self, ctx: Interaction, text: str):
         """Kiyomi repeats what you say"""
-        await ctx.response.defer(ephemeral=True)
-
-        msg = await ctx.original_message()
-        await msg.delete()
+        await ctx.response.send_message("give me a sec", ephemeral=True)
+        await ctx.delete_original_message()
 
         await ctx.channel.send(text)

@@ -20,26 +20,29 @@ class FancyPresence(BaseCog[ServiceUnitOfWork]):
     @permissions.is_bot_owner()
     async def status_update(self, ctx: Interaction):
         """Force update status"""
+        await ctx.response.defer(ephemeral=True)
 
         await self.service_uow.presences.update_status()
 
-        await ctx.response.send_message("Status force updated!", ephemeral=True)
+        await ctx.followup.send("Status force updated!", ephemeral=True)
 
     @status.command(name="set")
     @app_commands.describe(text="Text to display as status")
     @permissions.is_bot_owner()
     async def status_set(self, ctx: Interaction, text: str):
         """Force status text"""
+        await ctx.response.defer(ephemeral=True)
 
         await self.service_uow.presences.set_presence(Presence(0, text))
 
-        await ctx.response.send_message("Status updated!", ephemeral=True)
+        await ctx.followup.send("Status updated!", ephemeral=True)
 
     @status.command(name="reset")
     @permissions.is_bot_owner()
     async def status_reset(self, ctx: Interaction):
         """Reset forced status"""
+        await ctx.response.defer(ephemeral=True)
 
         await self.service_uow.presences.reset_presence()
 
-        await ctx.response.send_message("Status updated!", ephemeral=True)
+        await ctx.followup.send("Status updated!", ephemeral=True)

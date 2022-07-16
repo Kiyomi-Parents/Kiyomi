@@ -1,6 +1,6 @@
 import random
 import re
-from typing import Optional
+from typing import Optional, List
 
 from discord import Emoji
 
@@ -68,3 +68,12 @@ class EchoEmojiService(BaseService[EchoEmoji, EchoEmojiRepository, StorageUnitOf
             raise NotFound()
 
         return emoji
+
+    async def get_by_emoji_id(self, emoji_id: int) -> Optional[EchoEmoji]:
+        return await self.repository.get_by_emoji_id(emoji_id)
+
+    async def get_by_guild_id(self, guild_id: int) -> List[EchoEmoji]:
+        return await self.repository.get_by_guild_id(guild_id)
+
+    async def get_by_guild_id_and_emoji_id(self, guild_id: int, emoji_id: int) -> Optional[EchoEmoji]:
+        return await self.repository.get_by_guild_id_and_emoji_id(guild_id, emoji_id)

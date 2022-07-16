@@ -45,6 +45,8 @@ class ScoreSaber(BaseCog[ServiceUnitOfWork], name="Score Saber"):
     @app_commands.describe(profile="Score Saber profile URL")
     async def player_add(self, ctx: Interaction, profile: Transform[str, ScoreSaberPlayerIdTransformer]):
         """Link yourself to your ScoreSaber profile."""
+        await ctx.response.defer()
+
         async with self.bot.get_cog_api(GeneralAPI) as general_api:
             await general_api.register_member(ctx.guild_id, ctx.user.id)
 
@@ -52,30 +54,33 @@ class ScoreSaber(BaseCog[ServiceUnitOfWork], name="Score Saber"):
         await self.service_uow.save_changes()
         await self.service_uow.refresh(guild_player)
 
-        await ctx.response.send_message(
+        await ctx.followup.send(
             f"Successfully linked **{guild_player.player.name}** ScoreSaber profile!",
-            ephemeral=True,
         )
 
     @player.command(name="remove")
     async def player_remove(self, ctx: Interaction):
         """Remove the currently linked ScoreSaber profile from yourself."""
+        await ctx.response.defer()
+
         await self.service_uow.players.remove_player_with_checks(ctx.guild_id, ctx.user.id)
         await self.service_uow.save_changes()
 
-        await ctx.response.send_message("Successfully unlinked your ScoreSaber account!", ephemeral=True)
+        await ctx.followup.send("Successfully unlinked your ScoreSaber account!")
 
     @app_commands.command(name="showpp")
     async def show_pp(self, ctx: Interaction):
         """Gives bot permission to check the persons PP."""
+        await ctx.response.defer()
+
         guild_player = await self.service_uow.players.get_guild_player(ctx.guild.id, ctx.user.id)
 
         if guild_player.player.pp == 0:
-            await ctx.response.send_message(f"**{ctx.user.name}** doesn't have a PP")
+            await ctx.followup.send(f"**{ctx.user.name}** doesn't have a PP")
             return
 
         pp_size = round(guild_player.player.pp / 100)
-        await ctx.response.send_message(f"**{ctx.user.name}**'s PP is this big:\n8{'=' * pp_size}D")
+        await ctx.followup.send(f"**{ctx.user.name}**'s PP is this big:\n8{'=' * pp_size}D")
 
     @show_pp.error
     async def show_pp_error(self, ctx: Interaction, error: Exception):
@@ -87,6 +92,8 @@ class ScoreSaber(BaseCog[ServiceUnitOfWork], name="Score Saber"):
     @app_commands.describe(member="Discord user", count="Amount of scores to post")
     async def recent_scores(self, ctx: Interaction, member: Optional[discord.Member], count: Optional[int]):
         """Displays your most recent scores"""
+        await ctx.response.defer()
+
         # TODO: Just refactor this entire thing.
         if member is None:
             member = ctx.user
@@ -94,13 +101,13 @@ class ScoreSaber(BaseCog[ServiceUnitOfWork], name="Score Saber"):
         guild_player = await self.service_uow.players.get_guild_player(ctx.guild.id, member.id)
 
         if 0 >= count >= 3:
-            await ctx.response.send_message("Score count has to be between 0 and 3")
+            await ctx.followup.send("Score count has to be between 0 and 3")
             return
 
         scores = await self.service_uow.scores.get_recent_scores(guild_player.player.id, count)
 
         if scores is None or len(scores) == 0:
-            await ctx.response.send_message("No scores found!")
+            await ctx.followup.send("No scores found!")
             return
 
         for score in scores:
@@ -129,6 +136,7 @@ class ScoreSaber(BaseCog[ServiceUnitOfWork], name="Score Saber"):
     @permissions.is_bot_owner_and_admin_guild()
     async def manual_add_player(self, ctx: Interaction, member_id: int, player_id: str, guild_id: Optional[int]):
         """Add a Score Saber profile manually"""
+        await ctx.response.defer(ephemeral=True)
 
         if guild_id is None:
             guild_id = ctx.guild_id
@@ -143,7 +151,7 @@ class ScoreSaber(BaseCog[ServiceUnitOfWork], name="Score Saber"):
         guild_player = await self.service_uow.players.register_player(guild_id, member_id, player_id)
         await self.service_uow.save_changes()
 
-        await ctx.response.send_message(
+        await ctx.followup.send(
             f"Successfully linked Score Saber profile {guild_player.player.name} to member {guild_player.member.name} in guild {guild_player.guild.name}",
             ephemeral=True,
         )
@@ -157,17 +165,19 @@ class ScoreSaber(BaseCog[ServiceUnitOfWork], name="Score Saber"):
     @permissions.is_bot_owner_and_admin_guild()
     async def manual_remove_player(self, ctx: Interaction, member_id: int, player_id: str, guild_id: Optional[int]):
         """Remove a Score Saber profile manually"""
+        await ctx.response.defer(ephemeral=True)
+
         if guild_id is None:
             guild_id = ctx.guild_id
 
         if member_id is None:
-            await ctx.response.send_message(f"Please specify a member!", ephemeral=True)
+            await ctx.followup.send(f"Please specify a member!", ephemeral=True)
             return
 
         guild_player = await self.service_uow.players.remove_player(guild_id, member_id, player_id)
         await self.service_uow.save_changes()
 
-        await ctx.response.send_message(
+        await ctx.followup.send(
             f"Successfully unlinked Score Saber profile {guild_player.player.name} from member {guild_player.member.name} in guild {guild_player.guild.name}!",
             ephemeral=True,
         )
@@ -188,13 +198,13 @@ class ScoreSaber(BaseCog[ServiceUnitOfWork], name="Score Saber"):
     async def refresh(self, ctx: Interaction, member: discord.Member):
         guild_player = await self.service_uow.players.get_guild_player(ctx.guild_id, member.id)
 
-        await ctx.response.defer(ephemeral=True, thinking=True)
+        await ctx.response.defer(ephemeral=True)
 
         await self.service_uow.players.update_player(guild_player.player)
         await self.service_uow.scores.update_player_scores(guild_player.player)
         await self.service_uow.save_changes()
 
-        await ctx.followup.send_message(
+        await ctx.followup.send(
             f"Updated {member.name}'s Score Saber profile ({guild_player.player.name})",
             ephemeral=True,
         )

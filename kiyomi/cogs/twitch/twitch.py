@@ -52,6 +52,8 @@ class Twitch(BaseCog[ServiceUnitOfWork]):
     @app_commands.describe(login="patthehyruler or https://www.twitch.tv/patthehyruler")
     async def twitch_add(self, ctx: Interaction, login: Transform[str, TwitchLoginTransformer]):
         """Link a Twitch account to yourself in this Discord guild."""
+        await ctx.response.defer()
+
         async with self.bot.get_cog_api(GeneralAPI) as general_api:
             await general_api.register_member(ctx.guild_id, ctx.user.id)
 
@@ -60,7 +62,7 @@ class Twitch(BaseCog[ServiceUnitOfWork]):
                 ctx.guild_id, ctx.user.id, login
             )
         except BroadcasterNotFound as e:
-            await ctx.response.send_message(await self.bot.error_resolver.resolve_message(e))
+            await ctx.followup.send(await self.bot.error_resolver.resolve_message(e))
             return
 
         await self.service_uow.save_changes()
@@ -70,26 +72,27 @@ class Twitch(BaseCog[ServiceUnitOfWork]):
             int(guild_twitch_broadcaster.twitch_broadcaster_id)
         )  # maybe we should instead refresh all subscriptions here?
 
-        await ctx.response.send_message(
+        await ctx.followup.send(
             f"Successfully linked **{guild_twitch_broadcaster.twitch_broadcaster.login}** Twitch profile!", ephemeral=True
         )
 
     @twitch.command(name="remove")
     async def twitch_remove(self, ctx: Interaction):
         """Remove the currently linked Twitch account from yourself in this Discord guild."""
+        await ctx.response.defer()
+
         try:
             guild_twitch_broadcaster = await self.service_uow.twitch_broadcasters.unregister_guild_twitch_broadcaster(
                 ctx.guild_id, ctx.user.id
             )
         except GuildTwitchBroadcasterNotFound:
-            await ctx.response.send_message(f"Failed to unregister, most likely because you are already unregistered.")
+            await ctx.followup.send(f"Failed to unregister, most likely because you are already unregistered.")
             return
 
         await self.service_uow.save_changes()
 
-        await ctx.response.send_message(
+        await ctx.followup.send(
             f"Successfully unlinked {guild_twitch_broadcaster.twitch_broadcaster.login} from {ctx.user.name} in guild {ctx.guild.name}!",
-            ephemeral=True,
         )
 
         # TODO: maybe figure out a way to delete the corresponding eventsub subscription if this streamer is orphaned?
