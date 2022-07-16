@@ -49,9 +49,6 @@ class Kiyomi(Bot):
         _logger.info(self.user, f"I'm ready!")
         _logger.info(self.user, f"Invite url: {self.invite_url}")
 
-    async def on_interaction(self, interaction: discord.Interaction):
-        _logger.warning(f"Interaction", f"{interaction.data.values()}")
-
     async def on_guild_join(self, guild: discord.Guild):
         _logger.info(self.user, f"Joined new guild {guild}")
         await self.register_guild_commands(guild)

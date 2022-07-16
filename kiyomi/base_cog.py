@@ -5,6 +5,7 @@ from typing import Generic, TypeVar, TYPE_CHECKING
 from discord.app_commands import CommandInvokeError
 from discord.ext import commands
 from discord.ext.commands import Context, CogMeta
+from termcolor import colored
 
 from .service import BaseServiceUnitOfWork
 from .error import KiyomiException, CogException
@@ -28,17 +29,16 @@ class BaseCog(commands.Cog, Generic[TServiceUOW], metaclass=CogMeta):
         pass
 
     async def cog_before_invoke(self, ctx: Context["Kiyomi"]):
-        # command_args = [f"{key}: {value}" for key, value in ctx.interaction.namespace()]
-        #
-        # Logger.log(
-        #     self.qualified_name,
-        #     f"{colored(ctx.interaction.user.name, 'blue')} executed command "
-        #     f"{colored('/' + ctx.command.qualified_name, 'blue')} "
-        #     f"{colored(''.join(command_args), 'cyan')} in "
-        #     f"{colored(f'#{ctx.interaction.channel.name}', 'blue')} at "
-        #     f"{colored(ctx.interaction.guild.name, 'blue')}",
-        # )
-        pass
+        command_args = [f"{key}: {value}" for key, value in ctx.interaction.namespace]
+
+        _logger.info(
+            self.qualified_name,
+            f"{colored(ctx.interaction.user.name, 'blue')} executed command "
+            f"{colored('/' + ctx.command.qualified_name, 'blue')} "
+            f"{colored(''.join(command_args), 'cyan')} in "
+            f"{colored(f'#{ctx.interaction.channel.name}', 'blue')} at "
+            f"{colored(ctx.interaction.guild.name, 'blue')}",
+        )
 
     async def cog_after_invoke(self, ctx: Context["Kiyomi"]) -> None:
         await self.service_uow.close()
