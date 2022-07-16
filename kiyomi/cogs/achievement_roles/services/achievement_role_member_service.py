@@ -30,29 +30,26 @@ class AchievementRoleMemberService(BaseService[AchievementRoleMember, Achievemen
     ]
 
     async def update_guild_roles(self, guild_id: int):
-        general = self.bot.get_cog_api(GeneralAPI)
-
-        guild_members = await general.get_members_in_guild(guild_id)
+        async with self.bot.get_cog_api(GeneralAPI) as general:
+            guild_members = await general.get_members_in_guild(guild_id)
 
         for guild_member in guild_members:
             await self.update_member_roles(guild_member.guild_id, guild_member.member_id)
 
     async def update_member_roles(self, guild_id: int, member_id: int):
-        settings = self.bot.get_cog_api(SettingsAPI)
+        async with self.bot.get_cog_api(SettingsAPI) as settings:
+            for role in self.roles:
+                enabled = await settings.get(guild_id, role.get("setting"))
 
-        for role in self.roles:
-            enabled = await settings.get(guild_id, role.get("setting"))
-
-            if enabled:
-                await self.update_member_achievement_roles(guild_id, member_id, role.get("group"))
-            else:
-                await self.remove_all_member_group_roles(guild_id, member_id, role.get("group"))
+                if enabled:
+                    await self.update_member_achievement_roles(guild_id, member_id, role.get("group"))
+                else:
+                    await self.remove_all_member_group_roles(guild_id, member_id, role.get("group"))
 
     async def update_member_achievement_roles(self, guild_id: int, member_id: int, group: str):
-        achievements = self.bot.get_cog_api(AchievementsAPI)
-
-        # Get Achievement
-        achievement = await achievements.get_best_achievement_in_group(group, member_id)
+        async with self.bot.get_cog_api(AchievementsAPI) as achievements:
+            # Get Achievement
+            achievement = await achievements.get_best_achievement_in_group(group, member_id)
 
         if achievement is None:
             _logger.info("Achievement Roles", f"No completed achievements for group {group}")
@@ -76,15 +73,14 @@ class AchievementRoleMemberService(BaseService[AchievementRoleMember, Achievemen
         await self.give_member_role(guild_id, member_id, achievement_role)
 
     async def give_member_role(self, guild_id: int, member_id: int, achievement_role: AchievementRole):
-        general = self.bot.get_cog_api(GeneralAPI)
-
         try:
-            await general.add_role_to_member(
-                guild_id,
-                member_id,
-                achievement_role.role_id,
-                "Auto added by Achievement Roles",
-            )
+            async with self.bot.get_cog_api(GeneralAPI) as general:
+                await general.add_role_to_member(
+                    guild_id,
+                    member_id,
+                    achievement_role.role_id,
+                    "Auto added by Achievement Roles",
+                )
 
             await self.storage_uow.achievement_role_members.add(
                 AchievementRoleMember(guild_id, member_id, achievement_role.id)
@@ -98,15 +94,14 @@ class AchievementRoleMemberService(BaseService[AchievementRoleMember, Achievemen
         member_id: int,
         achievement_role_member: AchievementRoleMember,
     ) -> None:
-        general = self.bot.get_cog_api(GeneralAPI)
-
         try:
-            await general.remove_role_from_member(
-                guild_id,
-                member_id,
-                achievement_role_member.achievement_role.role_id,
-                "Auto removed by Achievement Roles",
-            )
+            async with self.bot.get_cog_api(GeneralAPI) as general:
+                await general.remove_role_from_member(
+                    guild_id,
+                    member_id,
+                    achievement_role_member.achievement_role.role_id,
+                    "Auto removed by Achievement Roles",
+                )
         except FailedToRemoveFromUser as error:
             await error.handle(bot=self.bot)
         finally:
@@ -146,10 +141,9 @@ class AchievementRoleMemberService(BaseService[AchievementRoleMember, Achievemen
         return achievement_role
 
     async def exists_achievement_role(self, achievement_role: AchievementRole) -> bool:
-        general = self.bot.get_cog_api(GeneralAPI)
-
         try:
-            await general.get_role(achievement_role.guild_id, achievement_role.role_id)
+            async with self.bot.get_cog_api(GeneralAPI) as general:
+                await general.get_role(achievement_role.guild_id, achievement_role.role_id)
             return True
         except RoleNotFound as error:
             await error.handle(
@@ -162,16 +156,15 @@ class AchievementRoleMemberService(BaseService[AchievementRoleMember, Achievemen
         return False
 
     async def create_achievement_role(self, guild_id: int, group: str, achievement: Achievement) -> AchievementRole:
-        general = self.bot.get_cog_api(GeneralAPI)
-
         try:
-            role = await general.create_role(
-                guild_id,
-                achievement.name,
-                discord.Color.random(),
-                False,
-                "Auto created by Achievement Roles",
-            )
+            async with self.bot.get_cog_api(GeneralAPI) as general:
+                role = await general.create_role(
+                    guild_id,
+                    achievement.name,
+                    discord.Color.random(),
+                    False,
+                    "Auto created by Achievement Roles",
+                )
 
             return await self.storage_uow.achievement_roles.add(
                 AchievementRole(guild_id, role.id, group, achievement.identifier)
@@ -196,10 +189,10 @@ class AchievementRoleMemberService(BaseService[AchievementRoleMember, Achievemen
 
         if achievement_role_member is not None:
             # Check if member has role on discord
-            general = self.bot.get_cog_api(GeneralAPI)
-            if not await general.member_has_role(guild_id, member_id, achievement_role.role_id):
-                await self.storage_uow.achievement_role_members.remove(achievement_role_member)
-                return False
+            async with self.bot.get_cog_api(GeneralAPI) as general:
+                if not await general.member_has_role(guild_id, member_id, achievement_role.role_id):
+                    await self.storage_uow.achievement_role_members.remove(achievement_role_member)
+                    return False
 
             return True
 

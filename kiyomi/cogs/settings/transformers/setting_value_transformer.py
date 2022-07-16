@@ -14,10 +14,11 @@ class SettingValueTransformer(Transformer):
     @classmethod
     async def transform(cls, interaction: Interaction, value: str) -> str:
         ctx = await Context.from_interaction(interaction)
-        settings_api = ctx.bot.get_cog_api(SettingsAPI)
 
         setting = await SettingNameTransformer.transform(interaction, interaction.namespace.setting)
-        await settings_api.validate_setting_value(interaction.guild_id, setting, value)
+
+        async with ctx.bot.get_cog_api(SettingsAPI) as settings_api:
+            await settings_api.validate_setting_value(interaction.guild_id, setting, value)
 
         return value
 
@@ -26,12 +27,11 @@ class SettingValueTransformer(Transformer):
         cls, interaction: Interaction, value: Union[int, float, str]
     ) -> List[Choice[Union[int, float, str]]]:
         ctx = await Context.from_interaction(interaction)
-        settings_api = ctx.bot.get_cog_api(SettingsAPI)
-
         setting_name = await SettingNameTransformer.transform(interaction, interaction.namespace.setting)
 
         try:
-            setting = await settings_api.get_setting(interaction.guild_id, setting_name)
+            async with ctx.bot.get_cog_api(SettingsAPI) as settings_api:
+                setting = await settings_api.get_setting(interaction.guild_id, setting_name)
         except SettingsCogException:
             return []
 

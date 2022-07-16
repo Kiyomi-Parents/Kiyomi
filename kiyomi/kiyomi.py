@@ -7,6 +7,7 @@ from discord.app_commands import CommandInvokeError
 from discord.ext.commands import Bot, Context
 from pyee import AsyncIOEventEmitter
 
+from .base_cog import BaseCog
 from .cogs.errors import NoPrivateMessagesException
 from .base_command_tree import BaseCommandTree
 from .error import KiyomiException
@@ -14,7 +15,7 @@ from .error.error_resolver import ErrorResolver
 from .database import Database
 from .error.error_utils import handle_global_error
 
-TCog = TypeVar("TCog")
+TCog = TypeVar("TCog", bound=BaseCog)
 _logger = logging.getLogger(__name__)
 
 
@@ -126,18 +127,22 @@ class Kiyomi(Bot):
 
         await handle_global_error(self, error, ctx=context)
 
+    # When using, please close database session. UI cogs don't need to be closed
+    # or use: async with self.bot.get_cog("SomeCog") as some_cog_api:
     def get_cog(self, name: str, /) -> TCog:
         cog = super().get_cog(name)
 
         if cog is None:
             raise TypeError(f"Expected cog type {name}, but got {type(cog)}")
 
-        return cog
+        return cast(TCog, cog)
 
+    # When using, please close database session. UI cogs don't need to be closed
+    # or use: async with self.bot.get_cog_api("SomeCog") as some_cog_api:
     def get_cog_api(self, cog_type: Type[TCog]) -> TCog:
         cog = self.get_cog(cog_type.__name__)
 
         if not isinstance(cog, cog_type):
             raise TypeError(f"Expected cog type {cog_type.__name__}, but got {type(cog)}")
 
-        return cast(TCog, cog)
+        return cog

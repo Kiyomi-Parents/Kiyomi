@@ -34,8 +34,8 @@ class ScoreSaber(BaseCog[ServiceUnitOfWork], name="Score Saber"):
     @app_commands.describe(profile="Score Saber profile URL")
     async def player_add(self, ctx: Interaction, profile: Transform[str, ScoreSaberPlayerIdTransformer]):
         """Link yourself to your ScoreSaber profile."""
-        general_api = self.bot.get_cog_api(GeneralAPI)
-        await general_api.register_member(ctx.guild_id, ctx.user.id)
+        async with self.bot.get_cog_api(GeneralAPI) as general_api:
+            await general_api.register_member(ctx.guild_id, ctx.user.id)
 
         guild_player = await self.service_uow.players.add_player_with_checks(ctx.guild_id, ctx.user.id, profile)
         await self.service_uow.save_changes()
@@ -126,8 +126,8 @@ class ScoreSaber(BaseCog[ServiceUnitOfWork], name="Score Saber"):
             await ctx.response.send_message(f"Please specify a member!", ephemeral=True)
             return
 
-        general = self.bot.get_cog_api(GeneralAPI)
-        await general.register_member(guild_id, member_id)
+        async with self.bot.get_cog_api(GeneralAPI) as general:
+            await general.register_member(guild_id, member_id)
 
         guild_player = await self.service_uow.players.register_player(guild_id, member_id, player_id)
         await self.service_uow.save_changes()

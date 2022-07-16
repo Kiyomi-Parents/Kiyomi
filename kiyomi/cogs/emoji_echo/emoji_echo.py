@@ -50,13 +50,12 @@ class EmojiEcho(BaseCog[ServiceUnitOfWork]):
         if msg.author.id == self.bot.user.id:
             return
 
-        settings = self.bot.get_cog_api(SettingsAPI)
+        async with self.bot.get_cog_api(SettingsAPI) as settings:
+            if await settings.get(msg.guild.id, "repost_emoji"):
+                emoji = await self.service_uow.echo_emojis.get_emoji_from_message(msg.guild.id, msg.content)
 
-        if await settings.get(msg.guild.id, "repost_emoji"):
-            emoji = await self.service_uow.echo_emojis.get_emoji_from_message(msg.guild.id, msg.content)
-
-            if emoji is not None:
-                await msg.channel.send(emoji)
+                if emoji is not None:
+                    await msg.channel.send(emoji)
 
     emoji = app_commands.Group(
         name="emoji",

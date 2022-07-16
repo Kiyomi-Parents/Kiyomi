@@ -14,9 +14,8 @@ class Tasks(BaseTasks[ServiceUnitOfWork]):
     @FancyPresenceAPI.presence_task
     async def update_member_roles(self):
         """Updating roles"""
-        general = self.bot.get_cog_api(GeneralAPI)
-
-        guild_members = await general.get_all_guild_members()
+        async with self.bot.get_cog_api(GeneralAPI) as general:
+            guild_members = await general.get_all_guild_members()
 
         for guild_member in guild_members:
             await self.service_uow.memberAchievementRoles.update_member_roles(guild_member.guild_id, guild_member.member_id)

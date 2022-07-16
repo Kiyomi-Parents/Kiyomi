@@ -50,9 +50,9 @@ class ScoreSaberAPI(BaseCog[ServiceUnitOfWork]):
     async def get_score_by_id(self, score_id: int) -> Optional[Score]:
         return await self.service_uow.scores.get_by_id(score_id)
 
-    def update_score_pp_weight(self, score: Score) -> Score:
-        leaderboard = self.bot.get_cog("LeaderboardAPI")
-        top_scores_leaderboard = leaderboard.get_player_top_scores_leaderboard(score.player_id)
+    async def update_score_pp_weight(self, score: Score) -> Score:
+        async with self.bot.get_cog("LeaderboardAPI") as leaderboard:
+            top_scores_leaderboard = await leaderboard.get_player_top_scores_leaderboard(score.player_id)
 
         position = 0
 

@@ -18,32 +18,32 @@ class UserAchievementService(BaseBasicService[StorageUnitOfWork]):
         self.registry_service = registry_service
 
     async def get_group_achievements(self, group: str, member_id: int) -> AchievementGroups:
-        general = self.bot.get_cog_api(GeneralAPI)
-        member = await general.get_member(member_id)
+        async with self.bot.get_cog_api(GeneralAPI) as general:
+            member = await general.get_member(member_id)
 
         return self.registry_service.get_achievements(group, member)
 
     async def get_group_completed(self, group: str, member_id: int) -> AchievementGroups:
-        general = self.bot.get_cog_api(GeneralAPI)
-        member = await general.get_member(member_id)
+        async with self.bot.get_cog_api(GeneralAPI) as general:
+            member = await general.get_member(member_id)
 
         return await self.registry_service.get_completed(group, member)
 
     async def get_all_achievements(self, member_id: int) -> AchievementGroups:
-        general = self.bot.get_cog_api(GeneralAPI)
-        member = await general.get_member(member_id)
+        async with self.bot.get_cog_api(GeneralAPI) as general:
+            member = await general.get_member(member_id)
 
         return self.registry_service.get_all_achievements(member)
 
     async def get_all_completed_achievements(self, member_id: int) -> AchievementGroups:
-        general = self.bot.get_cog_api(GeneralAPI)
-        member = await general.get_member(member_id)
+        async with self.bot.get_cog_api(GeneralAPI) as general:
+            member = await general.get_member(member_id)
 
         return await self.registry_service.get_all_completed(member)
 
     async def get_all_uncompleted_achievements(self, member_id: int) -> AchievementGroups:
-        general = self.bot.get_cog_api(GeneralAPI)
-        member = await general.get_member(member_id)
+        async with self.bot.get_cog_api(GeneralAPI) as general:
+            member = await general.get_member(member_id)
 
         return await self.registry_service.get_all_uncompleted(member)
 

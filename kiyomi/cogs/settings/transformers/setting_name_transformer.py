@@ -13,10 +13,10 @@ class SettingNameTransformer(Transformer):
     @classmethod
     async def transform(cls, interaction: Interaction, value: str) -> str:
         ctx = await Context.from_interaction(interaction)
-        settings_api = ctx.bot.get_cog_api(SettingsAPI)
 
-        if not settings_api.has_permission(value, interaction.user):
-            raise PermissionDenied(value)
+        async with ctx.bot.get_cog_api(SettingsAPI) as settings_api:
+            if not settings_api.has_permission(value, interaction.user):
+                raise PermissionDenied(value)
 
         return value
 
@@ -25,18 +25,17 @@ class SettingNameTransformer(Transformer):
         cls, interaction: Interaction, value: Union[int, float, str]
     ) -> List[Choice[Union[int, float, str]]]:
         ctx = await Context.from_interaction(interaction)
-        settings_api = ctx.bot.get_cog_api(SettingsAPI)
-
         settings = []
 
-        for setting in settings_api.get_registered():
+        async with ctx.bot.get_cog_api(SettingsAPI) as settings_api:
+            for setting in settings_api.get_registered():
 
-            if not setting.has_permission(interaction.user):
-                continue
+                if not setting.has_permission(interaction.user):
+                    continue
 
-            if value.isspace() or not setting.name_human.startswith(value.lower()):
-                continue
+                if value.isspace() or not setting.name_human.startswith(value.lower()):
+                    continue
 
-            settings.append(Choice(name=setting.name_human, value=setting.name))
+                settings.append(Choice(name=setting.name_human, value=setting.name))
 
         return Utils.limit_list(settings, 25)

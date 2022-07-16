@@ -49,20 +49,19 @@ class ScoreFeed(BaseCog[ServiceUnitOfWork], name="Score Feed"):
     @permissions.is_bot_owner()
     async def mark_sent(self, ctx: Interaction, player_id: str = None):
         """Mark all scores send for player."""
-        scoresaber = self.bot.get_cog_api(ScoreSaberAPI)
+        async with self.bot.get_cog_api(ScoreSaberAPI) as scoresaber:
+            if player_id is None:
+                players = await scoresaber.get_players()
 
-        if player_id is None:
-            players = await scoresaber.get_players()
+                for player in players:
+                    await self.service_uow.sent_scores.mark_all_player_scores_sent(player)
 
-            for player in players:
-                await self.service_uow.sent_scores.mark_all_player_scores_sent(player)
+                await self.service_uow.save_changes()
 
-            await self.service_uow.save_changes()
+                await ctx.response.send_message(f"Marked scores as sent for {len(players)} players", ephemeral=True)
+                return
 
-            await ctx.response.send_message(f"Marked scores as sent for {len(players)} players", ephemeral=True)
-            return
-
-        player = await scoresaber.get_player(player_id)
+            player = await scoresaber.get_player(player_id)
 
         if player is None:
             await ctx.response.send_message(f"Could not find player with id {player_id}", ephemeral=True)

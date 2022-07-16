@@ -14,11 +14,12 @@ if TYPE_CHECKING:
 
 _logger = logging.getLogger(__name__)
 
+
 class MessageViewService(BaseService[MessageView, MessageViewRepository, StorageUnitOfWork]):
     async def add_persistent_view(self, persistence: Persistence):
-        general: "GeneralAPI" = self.bot.get_cog("GeneralAPI")
+        async with self.bot.get_cog("GeneralAPI") as general:
+            await general.register_message(persistence.guild_id, persistence.channel_id, persistence.message_id)
 
-        await general.register_message(persistence.guild_id, persistence.channel_id, persistence.message_id)
         await self.repository.add(MessageView(persistence.message_id, persistence.view, persistence.get_params()))
 
         _logger.info("View Persistence", f"Persisted view {persistence}")
@@ -46,9 +47,8 @@ class MessageViewService(BaseService[MessageView, MessageViewRepository, Storage
         return persistences
 
     async def get_guild_persistent_views(self, guild_id: int) -> List[Persistence]:
-        general: "GeneralAPI" = self.bot.get_cog("GeneralAPI")
-
-        channels = await general.get_guild_channels(guild_id)
+        async with self.bot.get_cog("GeneralAPI") as general:
+            channels = await general.get_guild_channels(guild_id)
 
         persistences = []
         for channel in channels:
@@ -57,9 +57,8 @@ class MessageViewService(BaseService[MessageView, MessageViewRepository, Storage
         return persistences
 
     async def get_persistent_views(self) -> List[Persistence]:
-        general: "GeneralAPI" = self.bot.get_cog("GeneralAPI")
-
-        guilds = await general.get_guilds()
+        async with self.bot.get_cog("GeneralAPI") as general:
+            guilds = await general.get_guilds()
 
         persistences = []
         for guild in guilds:

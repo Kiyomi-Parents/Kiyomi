@@ -1,5 +1,6 @@
+import logging
 from abc import abstractmethod
-from typing import Generic, TypeVar
+from typing import Generic, TypeVar, TYPE_CHECKING
 
 from discord.app_commands import CommandInvokeError
 from discord.ext import commands
@@ -7,13 +8,16 @@ from discord.ext.commands import Context, CogMeta
 
 from .service import BaseServiceUnitOfWork
 from .error import KiyomiException, CogException
-from .kiyomi import Kiyomi
+
+if TYPE_CHECKING:
+    from .kiyomi import Kiyomi
 
 TServiceUOW = TypeVar("TServiceUOW", bound=BaseServiceUnitOfWork)
+_logger = logging.getLogger(__name__)
 
 
 class BaseCog(commands.Cog, Generic[TServiceUOW], metaclass=CogMeta):
-    def __init__(self, bot: Kiyomi, service_uow: TServiceUOW):
+    def __init__(self, bot: "Kiyomi", service_uow: TServiceUOW):
         self.bot = bot
         self.service_uow = service_uow
 
@@ -23,7 +27,7 @@ class BaseCog(commands.Cog, Generic[TServiceUOW], metaclass=CogMeta):
     def register_events(self):
         pass
 
-    async def cog_before_invoke(self, ctx: Context[Kiyomi]):
+    async def cog_before_invoke(self, ctx: Context["Kiyomi"]):
         # command_args = [f"{key}: {value}" for key, value in ctx.interaction.namespace()]
         #
         # Logger.log(
@@ -36,10 +40,16 @@ class BaseCog(commands.Cog, Generic[TServiceUOW], metaclass=CogMeta):
         # )
         pass
 
-    async def cog_after_invoke(self, ctx: Context[Kiyomi]) -> None:
+    async def cog_after_invoke(self, ctx: Context["Kiyomi"]) -> None:
         await self.service_uow.close()
 
-    async def cog_command_error(self, ctx: Context[Kiyomi], error: Exception):
+    async def __aenter__(self):
+        return self
+
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
+        await self.service_uow.close()
+
+    async def cog_command_error(self, ctx: Context["Kiyomi"], error: Exception):
         if isinstance(error, CommandInvokeError):
             error = error.original
 

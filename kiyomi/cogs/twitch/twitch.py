@@ -52,8 +52,8 @@ class Twitch(BaseCog[ServiceUnitOfWork]):
     @app_commands.describe(login="patthehyruler or https://www.twitch.tv/patthehyruler")
     async def twitch_add(self, ctx: Interaction, login: Transform[str, TwitchLoginTransformer]):
         """Link a Twitch account to yourself in this Discord guild."""
-        general_api = self.bot.get_cog_api(GeneralAPI)
-        await general_api.register_member(ctx.guild_id, ctx.user.id)
+        async with self.bot.get_cog_api(GeneralAPI) as general_api:
+            await general_api.register_member(ctx.guild_id, ctx.user.id)
 
         try:
             guild_twitch_broadcaster = await self.service_uow.twitch_broadcasters.register_twitch_broadcaster(

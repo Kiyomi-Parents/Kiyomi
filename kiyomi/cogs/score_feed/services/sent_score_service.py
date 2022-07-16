@@ -13,8 +13,8 @@ _logger = logging.getLogger(__name__)
 
 class SentScoreService(BaseService[SentScore, SentScoreRepository, StorageUnitOfWork]):
     async def mark_all_guild_scores_sent(self, guild_id: int):
-        scoresaber = self.bot.get_cog_api(ScoreSaberAPI)
-        guild_players = await scoresaber.get_guild_players_by_guild(guild_id)
+        async with self.bot.get_cog_api(ScoreSaberAPI) as scoresaber:
+            guild_players = await scoresaber.get_guild_players_by_guild(guild_id)
 
         if len(guild_players) == 0:
             return

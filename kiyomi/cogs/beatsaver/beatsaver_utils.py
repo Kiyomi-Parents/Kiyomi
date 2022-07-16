@@ -5,7 +5,6 @@ import pybeatsaver
 import pyscoresaber
 from discord import Emoji
 
-from kiyomi.cogs.settings import SettingsAPI
 from kiyomi import Kiyomi
 
 
@@ -44,9 +43,8 @@ class BeatSaverUtils:
         elif difficulty == pybeatsaver.EDifficulty.EXPERT_PLUS:
             setting_name = "expert_plus_difficulty_emoji"
 
-        settings: "SettingsAPI" = bot.get_cog("SettingsAPI")
-
-        return await settings.get_override_or_default(guild_id, setting_name)
+        async with bot.get_cog("SettingsAPI") as settings:
+            return await settings.get_override_or_default(guild_id, setting_name)
 
     @staticmethod
     async def characteristic_to_emoji(
@@ -71,9 +69,8 @@ class BeatSaverUtils:
         elif characteristic == pybeatsaver.ECharacteristic.LAWLESS:
             setting_name = "lawless_game_mode_emoji"
 
-        settings: "SettingsAPI" = bot.get_cog("SettingsAPI")
-
-        return await settings.get_override_or_default(guild_id, setting_name)
+        async with bot.get_cog("SettingsAPI") as settings:
+            return await settings.get_override_or_default(guild_id, setting_name)
 
     @staticmethod
     def to_scoresaber_game_mode(

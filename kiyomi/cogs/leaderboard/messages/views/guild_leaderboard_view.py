@@ -71,8 +71,8 @@ class GuildLeaderboardView(PersistentView):
     @staticmethod
     async def deserialize_persistence(bot: Kiyomi, persistence: Persistence) -> PersistentView:
         guild = bot.get_guild(persistence.guild_id)
-        beatsaver = bot.get_cog_api(BeatSaverAPI)
-        beatmap = await beatsaver.get_beatmap_by_key(persistence.get_param(0))
+        async with bot.get_cog_api(BeatSaverAPI) as beatsaver:
+            beatmap = await beatsaver.get_beatmap_by_key(persistence.get_param(0))
 
         characteristic_param = persistence.get_param(1)
         if characteristic_param is not None:

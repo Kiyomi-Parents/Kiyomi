@@ -61,12 +61,14 @@ class ScoreView(PersistentView):
     @staticmethod
     async def deserialize_persistence(bot: Kiyomi, persistence: Persistence):
         guild = bot.get_guild(persistence.guild_id)
-        scoresaber = bot.get_cog_api(ScoreSaberAPI)
-        score = scoresaber.get_score_by_id(int(persistence.get_param(0)))
-        previous_score = None
 
-        previous_score_id = persistence.get_param(1)
-        if previous_score_id is not None:
-            previous_score = scoresaber.get_score_by_id(int(previous_score_id))
+        async with bot.get_cog_api(ScoreSaberAPI) as scoresaber:
+            score = await scoresaber.get_score_by_id(int(persistence.get_param(0)))
+            previous_score = None
+
+            previous_score_id = persistence.get_param(1)
+            if previous_score_id is not None:
+                previous_score = await scoresaber.get_score_by_id(int(previous_score_id))
+                previous_score = await scoresaber.update_score_pp_weight(previous_score)
 
         return ScoreView(bot, guild, score, previous_score)

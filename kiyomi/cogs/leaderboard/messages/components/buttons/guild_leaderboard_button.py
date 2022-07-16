@@ -22,21 +22,20 @@ class GuildLeaderboardButton(LeaderboardComponent, discord.ui.Button):
         )
 
     async def get_embed(self) -> Embed:
-        leaderboard_api = self.bot.get_cog_api(LeaderboardAPI)
-        beatsaver_api = self.bot.get_cog_api(BeatSaverAPI)
+        async with self.bot.get_cog_api(BeatSaverAPI) as beatsaver_api:
+            beatmap_difficulty = await beatsaver_api.get_beatmap_difficulty_by_hash(
+                self.song_hash,
+                self.parent.beatmap_characteristic,
+                self.parent.beatmap_difficulty,
+            )
 
-        beatmap_difficulty = await beatsaver_api.get_beatmap_difficulty_by_hash(
-            self.song_hash,
-            self.parent.beatmap_characteristic,
-            self.parent.beatmap_difficulty,
-        )
-
-        leaderboard = await leaderboard_api.get_score_leaderboard(
-            self.parent.guild.id,
-            self.song_hash,
-            self.parent.beatmap_characteristic,
-            self.parent.beatmap_difficulty,
-        )
+        async with self.bot.get_cog_api(LeaderboardAPI) as leaderboard_api:
+            leaderboard = await leaderboard_api.get_score_leaderboard(
+                self.parent.guild.id,
+                self.song_hash,
+                self.parent.beatmap_characteristic,
+                self.parent.beatmap_difficulty,
+            )
 
         return GuildLeaderboardEmbed(self.bot, self.parent.guild.name, beatmap_difficulty, leaderboard)
 

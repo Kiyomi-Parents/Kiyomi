@@ -5,6 +5,5 @@ from .error import *
 from .logging import *
 
 from .base_cog import BaseCog
-from .service.base_service import BaseService
 from .base_tasks import BaseTasks
 from .kiyomi import Kiyomi

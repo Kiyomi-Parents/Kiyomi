@@ -35,11 +35,10 @@ class MessageService(BaseBasicService[StorageUnitOfWork]):
     async def send_broadcast_live_notification(
         self, event: StreamOnlineData, guild_twitch_broadcaster: GuildTwitchBroadcaster, stream: Optional[Stream]
     ) -> Optional[Message]:
-        settings = self.bot.get_cog_api(SettingsAPI)
+        async with self.bot.get_cog_api(SettingsAPI) as settings:
+            channel = await settings.get(guild_twitch_broadcaster.guild_id, "twitch_feed_channel_id")
 
         discord_guild = self.bot.get_guild(guild_twitch_broadcaster.guild_id)
-
-        channel = await settings.get(guild_twitch_broadcaster.guild_id, "twitch_feed_channel_id")
 
         if channel is None:
             _logger.info(discord_guild, "Twitch feed channel not found, skipping!")

@@ -30,8 +30,8 @@ class PP(AchievementGenerator):
             if member is None:
                 return False
 
-            scoresaber = self.bot.get_cog("ScoreSaberAPI")
-            guild_players = await scoresaber.get_guild_players_by_member_id(member.id)
+            async with self.bot.get_cog("ScoreSaberAPI") as scoresaber:
+                guild_players = await scoresaber.get_guild_players_by_member_id(member.id)
 
             for guild_player in guild_players:
                 player_pp_index = guild_player.player.pp // 1000

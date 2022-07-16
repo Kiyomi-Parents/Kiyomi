@@ -20,9 +20,10 @@ class AvailableEmojiTransformer(Transformer):
         cls, interaction: Interaction, value: Union[int, float, str]
     ) -> List[Choice[Union[int, float, str]]]:
         ctx = await Context.from_interaction(interaction)
-        echo_emojis = ctx.bot.get_cog_api(EmojiEchoAPI)
 
-        enabled_emojis = await echo_emojis.get_enabled_emojis(interaction.guild_id)
+        async with ctx.bot.get_cog_api(EmojiEchoAPI) as echo_emoji_api:
+            enabled_emojis = await echo_emoji_api.get_enabled_emojis(interaction.guild_id)
+
         emojis = []
 
         for emoji in ctx.interaction.guild.emojis:

@@ -30,8 +30,8 @@ class Rank(AchievementGenerator):
             if member is None:
                 return False
 
-            scoresaber = self.bot.get_cog_api(ScoreSaberAPI)
-            guild_players = await scoresaber.get_guild_players_by_member_id(member.id)
+            async with self.bot.get_cog_api(ScoreSaberAPI) as scoresaber:
+                guild_players = await scoresaber.get_guild_players_by_member_id(member.id)
 
             for guild_player in guild_players:
                 if guild_player.player.rank == 0:

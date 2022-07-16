@@ -14,9 +14,8 @@ from ..storage.repository.echo_emoji_repository import EchoEmojiRepository
 
 class EchoEmojiService(BaseService[EchoEmoji, EchoEmojiRepository, StorageUnitOfWork]):
     async def enable_emoji(self, guild_id: int, emoji_id: int, emoji_name: str) -> EchoEmoji:
-        general = self.bot.get_cog_api(GeneralAPI)
-
-        await general.register_emoji(guild_id, emoji_id, emoji_name)
+        async with self.bot.get_cog_api(GeneralAPI) as general:
+            await general.register_emoji(guild_id, emoji_id, emoji_name)
 
         if await self.storage_uow.echo_emojis.exists(emoji_id):
             raise AlreadyEnabled("Emoji is already enabled!")
@@ -29,9 +28,9 @@ class EchoEmojiService(BaseService[EchoEmoji, EchoEmojiRepository, StorageUnitOf
         if echo_emoji is None:
             return None
 
-        general = self.bot.get_cog_api(GeneralAPI)
+        async with self.bot.get_cog_api(GeneralAPI) as general:
+            await general.unregister_emoji(echo_emoji.guild_id, emoji_id)
 
-        await general.unregister_emoji(echo_emoji.guild_id, emoji_id)
         return echo_emoji
 
     async def get_emoji_by_id(self, guild_id: int, emoji_id: int) -> Optional[Emoji]:

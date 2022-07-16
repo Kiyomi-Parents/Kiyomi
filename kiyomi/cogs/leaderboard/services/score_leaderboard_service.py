@@ -19,9 +19,8 @@ class ScoreLeaderboardService(BaseBasicService[StorageUnitOfWork]):
         characteristic: pybeatsaver.ECharacteristic,
         difficulty: pybeatsaver.EDifficulty,
     ) -> List[Score]:
-        beatsaver = self.bot.get_cog_api(BeatSaverAPI)
-
-        beatmap_hash = await beatsaver.get_beatmap_hash_by_key(beatmap_key)
+        async with self.bot.get_cog_api(BeatSaverAPI) as beatsaver:
+            beatmap_hash = await beatsaver.get_beatmap_hash_by_key(beatmap_key)
 
         if beatmap_hash is None:
             return []
@@ -35,34 +34,32 @@ class ScoreLeaderboardService(BaseBasicService[StorageUnitOfWork]):
         characteristic: pybeatsaver.ECharacteristic,
         difficulty: pybeatsaver.EDifficulty,
     ) -> List[Score]:
-        scoresaber = self.bot.get_cog_api(ScoreSaberAPI)
+        async with self.bot.get_cog_api(ScoreSaberAPI) as scoresaber:
+            leaderboard = await scoresaber.get_leaderboard(
+                beatmap_hash,
+                BeatSaverUtils.to_scoresaber_game_mode(characteristic),
+                BeatSaverUtils.to_scoresaber_difficulty(difficulty),
+            )
 
-        leaderboard = await scoresaber.get_leaderboard(
-            beatmap_hash,
-            BeatSaverUtils.to_scoresaber_game_mode(characteristic),
-            BeatSaverUtils.to_scoresaber_difficulty(difficulty),
-        )
+            if leaderboard is None:
+                return []
 
-        if leaderboard is None:
-            return []
-
-        guild_players = await scoresaber.get_guild_players_by_guild(guild_id)
+            guild_players = await scoresaber.get_guild_players_by_guild(guild_id)
 
         return await self._get_score_leaderboard([guild_player.player for guild_player in guild_players], leaderboard.id)
 
     async def _get_score_leaderboard(self, players: List[Player], leaderboard_id: int) -> List[Score]:
-        scoresaber = self.bot.get_cog_api(ScoreSaberAPI)
-
         score_leaderboard = []
 
-        for player in players:
-            scores = await scoresaber.get_score_by_player_id_and_leaderboard_id(player.id, leaderboard_id)
-            best_score = self.get_best_score(scores)
+        async with self.bot.get_cog_api(ScoreSaberAPI) as scoresaber:
+            for player in players:
+                scores = await scoresaber.get_score_by_player_id_and_leaderboard_id(player.id, leaderboard_id)
+                best_score = self.get_best_score(scores)
 
-            if best_score is not None:
-                score_leaderboard.append(best_score)
+                if best_score is not None:
+                    score_leaderboard.append(best_score)
 
-        score_leaderboard.sort(key=lambda score: score.modified_score, reverse=True)
+            score_leaderboard.sort(key=lambda score: score.modified_score, reverse=True)
 
         return score_leaderboard
 
@@ -84,9 +81,9 @@ class ScoreLeaderboardService(BaseBasicService[StorageUnitOfWork]):
     async def get_player_top_scores_leaderboard(self, player_id: str) -> List[Score]:
         from kiyomi.cogs.scoresaber import ScoreSaberAPI
 
-        scoresaber = self.bot.get_cog_api(ScoreSaberAPI)
+        async with self.bot.get_cog_api(ScoreSaberAPI) as scoresaber:
+            scores = await scoresaber.get_player_scores_sorted_by_pp(player_id)
 
-        scores = await scoresaber.get_player_scores_sorted_by_pp(player_id)
         unique_scores = []
 
         for score in scores:

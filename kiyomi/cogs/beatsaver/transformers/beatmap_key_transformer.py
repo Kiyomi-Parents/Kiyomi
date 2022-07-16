@@ -31,5 +31,5 @@ class BeatmapKeyTransformer(Transformer):
 
         ctx = await Context.from_interaction(interaction)
 
-        beatsaver = ctx.bot.get_cog_api(BeatSaverAPI)
-        return await beatsaver.get_beatmap_by_key(key)
+        async with ctx.bot.get_cog_api(BeatSaverAPI) as beatsaver:
+            return await beatsaver.get_beatmap_by_key(key)

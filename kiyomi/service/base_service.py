@@ -1,10 +1,12 @@
-from typing import Generic, TypeVar, Dict, Optional, List, Any
+from typing import Generic, TypeVar, Dict, Optional, List, Any, TYPE_CHECKING
 
 from .base_basic_service import BaseBasicService
 from ..database.database import Base
 from ..database.base_storage_unit_of_work import BaseStorageUnitOfWork
 from ..base_repository import BaseRepository
-from kiyomi.kiyomi import Kiyomi
+
+if TYPE_CHECKING:
+    from ..kiyomi import Kiyomi
 
 TEntity = TypeVar("TEntity", bound=Base)
 TStorageUnitOfWork = TypeVar("TStorageUnitOfWork", bound=BaseStorageUnitOfWork)
@@ -14,7 +16,7 @@ TRepository = TypeVar("TRepository", bound=BaseRepository)
 class BaseService(
     Generic[TEntity, TRepository, TStorageUnitOfWork], BaseBasicService[TStorageUnitOfWork], BaseRepository[TEntity]
 ):
-    def __init__(self, bot: Kiyomi, repository: TRepository, storage_uow: TStorageUnitOfWork):
+    def __init__(self, bot: "Kiyomi", repository: TRepository, storage_uow: TStorageUnitOfWork):
         super().__init__(bot, storage_uow)
         self.repository = repository
 
