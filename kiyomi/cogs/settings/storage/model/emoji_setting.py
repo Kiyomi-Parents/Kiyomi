@@ -36,6 +36,10 @@ class EmojiSetting(AbstractBotSetting[discord.Emoji]):
         )
 
     @property
+    def value_human(self) -> str:
+        return f":{self.value.name}:"
+
+    @property
     def value(self) -> discord.Emoji:
         return self.to_type(self.bot, self.setting.value)
 
@@ -91,7 +95,7 @@ class EmojiSetting(AbstractBotSetting[discord.Emoji]):
             label = f"{emoji.name}"
 
             if self.value is not None and self.value.id == emoji.id:
-                label += " (current)"
+                label += " [Current]"
 
             emojis.append(Choice(name=label, value=str(emoji.id)))
 

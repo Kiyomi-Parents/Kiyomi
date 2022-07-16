@@ -73,6 +73,6 @@ class ToggleSetting(AbstractRegularSetting[bool]):
             return []
 
         return [
-            Choice(name=f"Enabled{' (current)' if self.value else ''}", value="True"),
-            Choice(name=f"Disabled{' (current)' if not self.value else ''}", value="False"),
+            Choice(name=f"Enabled{' [Current]' if self.value else ''}", value="True"),
+            Choice(name=f"Disabled{' [Current]' if not self.value else ''}", value="False"),
         ]

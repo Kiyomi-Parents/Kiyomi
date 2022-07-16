@@ -36,6 +36,12 @@ class SettingNameTransformer(Transformer):
                 if value.isspace() or not setting.name_human.startswith(value.lower()):
                     continue
 
-                settings.append(Choice(name=setting.name_human, value=setting.name))
+                choice_name = f"{setting.name_human}"
+                abstract_setting = await settings_api.get_setting(interaction.guild_id, setting.name)
+
+                if abstract_setting and abstract_setting.value:
+                    choice_name += f" [{abstract_setting.value_human}]"
+
+                settings.append(Choice(name=choice_name, value=setting.name))
 
         return Utils.limit_list(settings, 25)

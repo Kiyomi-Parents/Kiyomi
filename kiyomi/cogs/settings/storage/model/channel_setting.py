@@ -36,6 +36,10 @@ class ChannelSetting(AbstractBotSetting[discord.abc.GuildChannel]):
         )
 
     @property
+    def value_human(self) -> str:
+        return f"#{self.value.name}"
+
+    @property
     def value(self) -> discord.abc.GuildChannel:
         return self.to_type(self.bot, self.setting.value)
 
@@ -94,7 +98,7 @@ class ChannelSetting(AbstractBotSetting[discord.abc.GuildChannel]):
             label = f"#{channel.name}"
 
             if self.value is not None and self.value.id == channel.id:
-                label += " (current)"
+                label += " [Current]"
 
             text_channels.append(Choice(name=label, value=str(channel.id)))
 

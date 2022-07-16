@@ -2,7 +2,7 @@ from abc import ABC
 from typing import TypeVar, Generic, Optional, List
 
 import discord
-from discord import Permissions, Member, Interaction
+from discord import Permissions, Interaction
 from discord.app_commands import Choice
 
 from .enums.setting_type import SettingType
@@ -22,12 +22,16 @@ class AbstractSetting(ABC, Generic[T]):
         setting: Setting,
         permissions: Optional[Permissions] = None,
     ):
-        self.setting = setting
         self.name_human = name_human
+        self.setting = setting
         self.permissions = permissions
 
     def set(self, value: str) -> None:
         self.setting.value = value
+
+    @property
+    def value_human(self) -> str:
+        return str(self.setting.value)
 
     @property
     def value(self) -> T:
