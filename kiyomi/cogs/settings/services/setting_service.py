@@ -120,7 +120,8 @@ class SettingService(BaseService[Setting, SettingRepository, StorageUnitOfWork])
 
     async def delete(self, guild_id: int, name: str) -> AbstractSetting:
         setting = await self.get(guild_id, name)
-        return await self.repository.remove(setting)
+        await self.repository.remove_by_id(setting.setting.id)
+        return setting
 
     def register_settings(self, settings: List[AbstractSetting]) -> None:
         self.registered_settings += settings

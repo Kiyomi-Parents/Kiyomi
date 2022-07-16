@@ -38,3 +38,21 @@ class Settings(BaseCog[ServiceUnitOfWork]):
             f"{abstract_setting.name_human} is now set to: {setting_value}",
             ephemeral=True,
         )
+
+    @settings.command(name="remove")
+    @app_commands.describe(setting="Setting name")
+    async def settings_remove(
+        self,
+        ctx: Interaction,
+        setting: Transform[str, SettingNameTransformer]
+    ):
+        """Remove setting value"""
+        await ctx.response.defer(ephemeral=True)
+
+        abstract_setting = await self.service_uow.settings.delete(ctx.guild_id, setting)
+        await self.service_uow.save_changes()
+
+        await ctx.followup.send(
+            f"{abstract_setting.name_human} has been removed",
+            ephemeral=True,
+        )
