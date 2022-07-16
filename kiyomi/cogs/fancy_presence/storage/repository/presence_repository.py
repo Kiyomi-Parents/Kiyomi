@@ -11,7 +11,7 @@ class PresenceRepository(BaseRepository):
     def _load_file() -> List[Presence]:
         presences = []
 
-        with open("src/cogs/fancy_presence/activities.json", "r") as file:
+        with open("kiyomi/cogs/fancy_presence/activities.json", "r") as file:
             for item in json.load(file):
                 presences.append(Presence(**item))
 
