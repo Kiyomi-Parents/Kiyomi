@@ -1,18 +1,18 @@
 import asyncio
+import logging.handlers
 import os
 import platform
+import sys
 from asyncio import AbstractEventLoop
+from logging import StreamHandler
 
 import discord
 from dotenv import load_dotenv
 
-from src.kiyomi import Kiyomi, Database
-from src.log import Logger
+from kiyomi import ConsoleFormatter, FileFormatter, Database, Kiyomi
 
 
 async def startup(loop: AbstractEventLoop):
-    Logger.log_init()
-
     load_dotenv()
     discord_token = os.getenv("DISCORD_TOKEN")
     database_ip = os.getenv("DATABASE_IP")
@@ -37,24 +37,24 @@ async def startup(loop: AbstractEventLoop):
             bot.debug_guilds = [discord.Object(id=int(guild_id)) for guild_id in debug_guilds.split(",") if guild_id]
 
         # Base Cogs
-        await bot.load_extension(name="src.cogs.view_persistence")
+        await bot.load_extension(name="kiyomi.cogs.view_persistence")
 
         # General Function Cogs
-        await bot.load_extension(name="src.cogs.general")
-        await bot.load_extension(name="src.cogs.settings")
-        await bot.load_extension(name="src.cogs.fancy_presence")
+        await bot.load_extension(name="kiyomi.cogs.general")
+        await bot.load_extension(name="kiyomi.cogs.settings")
+        await bot.load_extension(name="kiyomi.cogs.fancy_presence")
 
         # Function Cogs
 
-        await bot.load_extension(name="src.cogs.scoresaber")
-        await bot.load_extension(name="src.cogs.beatsaver")
-        await bot.load_extension(name="src.cogs.leaderboard")
-        await bot.load_extension(name="src.cogs.score_feed")
-        await bot.load_extension(name="src.cogs.achievement")
-        await bot.load_extension(name="src.cogs.achievement_roles")
-        await bot.load_extension(name="src.cogs.emoji_echo")
-        await bot.load_extension(name="src.cogs.twitch")
-        await bot.load_extension(name="src.cogs.pfp_switcher")
+        await bot.load_extension(name="kiyomi.cogs.scoresaber")
+        await bot.load_extension(name="kiyomi.cogs.beatsaver")
+        await bot.load_extension(name="kiyomi.cogs.leaderboard")
+        await bot.load_extension(name="kiyomi.cogs.score_feed")
+        await bot.load_extension(name="kiyomi.cogs.achievement")
+        await bot.load_extension(name="kiyomi.cogs.achievement_roles")
+        await bot.load_extension(name="kiyomi.cogs.emoji_echo")
+        await bot.load_extension(name="kiyomi.cogs.twitch")
+        await bot.load_extension(name="kiyomi.cogs.pfp_switcher")
 
         # await database.drop_tables()
         # await database.create_tables()
@@ -63,6 +63,22 @@ async def startup(loop: AbstractEventLoop):
 
 
 if __name__ == "__main__":
+    logger = logging.getLogger()
+    logger.setLevel(logging.INFO)
+
+    file_handler = logging.handlers.RotatingFileHandler(
+            filename='kiyomi.log',
+            encoding='utf-8',
+            maxBytes=32 * 1024 * 1024,  # 32 MiB
+            backupCount=5,  # Rotate through 5 files
+    )
+    file_handler.setFormatter(FileFormatter())
+    logger.addHandler(file_handler)
+
+    stdout_handler = StreamHandler(sys.stdout)
+    stdout_handler.setFormatter(ConsoleFormatter())
+    logger.addHandler(stdout_handler)
+
     loop = None
 
     if platform.system() == 'Windows':

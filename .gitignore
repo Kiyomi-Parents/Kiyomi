@@ -10,5 +10,6 @@ scores.json
 schema.png
 .dmypy.json
 tmp/
+*.log
 
 src/cogs/pfp_switcher/current_pfp.json
