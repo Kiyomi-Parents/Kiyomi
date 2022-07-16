@@ -5,9 +5,6 @@ from typing import Dict
 class ActiveZone:
     _datetime_format = "%d/%m_%H:%M"
 
-    start: datetime
-    end: datetime
-
     def __init__(self, data: Dict):
         self.start = datetime.strptime(data["start"], self._datetime_format)
         self.end = datetime.strptime(data["end"], self._datetime_format)

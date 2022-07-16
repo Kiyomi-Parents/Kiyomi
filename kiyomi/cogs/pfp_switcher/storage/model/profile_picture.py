@@ -5,13 +5,11 @@ from .active_zone import ActiveZone
 
 
 class ProfilePicture:
-    name: str
-    file_path: str
-    active_zones: List[ActiveZone] = []
 
     def __init__(self, data: Dict):
         self.name = data["name"]
         self.file_path = data["file_path"]
+        self.active_zones = []
 
         if "active_zones" in data:
             for active_zone in data["active_zones"]:
