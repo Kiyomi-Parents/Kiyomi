@@ -40,7 +40,7 @@ class Twitch(BaseCog[ServiceUnitOfWork]):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        settings = [ChannelSetting.create(self.bot, "Twitch feed channel", "twitch_feed_channel_id")]
+        settings = [ChannelSetting.create(self.bot, self.__cog_name__, "Twitch feed channel", "twitch_feed_channel_id")]
 
         self.bot.events.emit("setting_register", settings)
 

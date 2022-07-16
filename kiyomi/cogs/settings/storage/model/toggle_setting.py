@@ -15,6 +15,7 @@ class ToggleSetting(AbstractRegularSetting[bool]):
 
     @staticmethod
     def create(
+        group: str,
         name_human: str,
         name: str,
         permissions: Optional[Permissions] = None,
@@ -24,6 +25,7 @@ class ToggleSetting(AbstractRegularSetting[bool]):
             default_value = ToggleSetting.from_type(default_value)
 
         return ToggleSetting(
+            group,
             name_human,
             Setting(None, SettingType.BOOLEAN, name, default_value),
             permissions,
@@ -52,11 +54,11 @@ class ToggleSetting(AbstractRegularSetting[bool]):
         return str(value)
 
     @staticmethod
-    def get_from_setting(name_human: str, setting: Setting, permissions: Optional[Permissions] = None):
+    def get_from_setting(group: str, name_human: str, setting: Setting, permissions: Optional[Permissions] = None):
         if setting.setting_type is not SettingType.BOOLEAN:
             raise InvalidSettingType(setting.setting_type, SettingType.BOOLEAN)
 
-        return ToggleSetting(name_human, setting, permissions)
+        return ToggleSetting(group, name_human, setting, permissions)
 
     @staticmethod
     async def is_valid(value: str) -> bool:

@@ -18,10 +18,12 @@ class AbstractSetting(ABC, Generic[T]):
 
     def __init__(
         self,
+        group: str,
         name_human: str,
         setting: Setting,
         permissions: Optional[Permissions] = None,
     ):
+        self.group = group
         self.name_human = name_human
         self.setting = setting
         self.permissions = permissions

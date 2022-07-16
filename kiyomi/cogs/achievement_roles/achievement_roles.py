@@ -53,8 +53,8 @@ class AchievementRoles(BaseCog[ServiceUnitOfWork], name="Achievement Roles"):
         permissions = Permissions(manage_roles=True)
 
         settings = [
-            ToggleSetting.create("Roles based on PP", "achievement_roles_pp", permissions),
-            ToggleSetting.create("Roles based on rank", "achievement_roles_rank", permissions),
+            ToggleSetting.create(self.__cog_name__, "Roles based on PP", "achievement_roles_pp", permissions),
+            ToggleSetting.create(self.__cog_name__, "Roles based on rank", "achievement_roles_rank", permissions),
         ]
 
         self.bot.events.emit("setting_register", settings)

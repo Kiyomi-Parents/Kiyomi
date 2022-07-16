@@ -27,7 +27,7 @@ class Leaderboard(BaseCog[ServiceUnitOfWork]):
     async def on_ready(self):
         settings = [
             # TODO: Add bot owner permissions
-            EmojiSetting.create(self.bot, "Guild Leaderboard emoji", "guild_leaderboard_emoji"),
+            EmojiSetting.create(self.bot, self.__cog_name__, "Guild Leaderboard emoji", "guild_leaderboard_emoji"),
         ]
 
         self.bot.events.emit("setting_register", settings)

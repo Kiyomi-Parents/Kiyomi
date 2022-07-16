@@ -13,6 +13,7 @@ class IntegerSetting(AbstractRegularSetting[int]):
 
     @staticmethod
     def create(
+        group: str,
         name_human: str,
         name: str,
         permissions: Optional[Permissions] = None,
@@ -21,7 +22,7 @@ class IntegerSetting(AbstractRegularSetting[int]):
         if default_value is not None:
             default_value = IntegerSetting.from_type(default_value)
 
-        return IntegerSetting(name_human, Setting(None, SettingType.INT, name, default_value), permissions)
+        return IntegerSetting(group, name_human, Setting(None, SettingType.INT, name, default_value), permissions)
 
     @property
     def value(self) -> int:
@@ -46,11 +47,11 @@ class IntegerSetting(AbstractRegularSetting[int]):
         return str(value)
 
     @staticmethod
-    def get_from_setting(name_human: str, setting: Setting, permissions: Optional[Permissions] = None):
+    def get_from_setting(group: str, name_human: str, setting: Setting, permissions: Optional[Permissions] = None):
         if setting.setting_type is not SettingType.INT:
             raise InvalidSettingType(setting.setting_type, SettingType.INT)
 
-        return IntegerSetting(name_human, setting, permissions)
+        return IntegerSetting(group, name_human, setting, permissions)
 
     @staticmethod
     async def is_valid(value: str) -> bool:

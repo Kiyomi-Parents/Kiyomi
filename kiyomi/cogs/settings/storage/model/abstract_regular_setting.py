@@ -18,6 +18,7 @@ class AbstractRegularSetting(AbstractSetting[T], Generic[T]):
     @staticmethod
     @abstractmethod
     def create(
+        group: str,
         name_human: str,
         name: str,
         permissions: Optional[Permissions] = None,
@@ -27,5 +28,5 @@ class AbstractRegularSetting(AbstractSetting[T], Generic[T]):
 
     @staticmethod
     @abstractmethod
-    def get_from_setting(name_human: str, setting: Setting, permissions: Optional[Permissions] = None):
+    def get_from_setting(group: str, name_human: str, setting: Setting, permissions: Optional[Permissions] = None):
         pass

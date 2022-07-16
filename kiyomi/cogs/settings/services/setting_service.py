@@ -32,7 +32,7 @@ class SettingService(BaseService[Setting, SettingRepository, StorageUnitOfWork])
     def convert_setting_type_to_value(setting_type: SettingType, value: str) -> Any:
         return setting_type.value(value)
 
-    def wrap_setting(self, name_human: str, setting: Setting) -> AbstractSetting:
+    def wrap_setting(self, group: str, name_human: str, setting: Setting) -> AbstractSetting:
         abstract_setting_classes = Utils.class_inheritors(AbstractSetting)
         setting_classes = []
 
@@ -43,9 +43,9 @@ class SettingService(BaseService[Setting, SettingRepository, StorageUnitOfWork])
             if issubclass(setting_class, AbstractSetting):
                 if setting_class.setting_type is setting.setting_type:
                     if issubclass(setting_class, AbstractRegularSetting):
-                        return setting_class.get_from_setting(name_human, setting)
+                        return setting_class.get_from_setting(group, name_human, setting)
                     elif issubclass(setting_class, AbstractBotSetting):
-                        return setting_class.get_from_setting(self.bot, name_human, setting)
+                        return setting_class.get_from_setting(self.bot, group, name_human, setting)
 
         raise FailedToConvertSetting(setting.setting_type)
 
@@ -76,19 +76,21 @@ class SettingService(BaseService[Setting, SettingRepository, StorageUnitOfWork])
         setting = await self.repository.get_by_guild_id_and_name(guild_id, name)
 
         if setting is not None:
-            return self.wrap_setting(registered_setting.name_human, setting)
+            return self.wrap_setting(registered_setting.group, registered_setting.name_human, setting)
         else:
             new_setting = None
 
             if isinstance(registered_setting, AbstractBotSetting):
                 new_setting = registered_setting.create(
                     self.bot,
+                    registered_setting.group,
                     registered_setting.name_human,
                     name,
                     registered_setting.value,
                 )
             elif isinstance(registered_setting, AbstractRegularSetting):
-                new_setting = registered_setting.create(registered_setting.name_human, name, registered_setting.value)
+                new_setting = registered_setting.create(registered_setting.group, registered_setting.name_human, name,
+                                                        registered_setting.value)
 
             if new_setting is None:
                 raise FailedToCreateSetting(name)

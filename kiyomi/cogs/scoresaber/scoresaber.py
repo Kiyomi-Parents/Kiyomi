@@ -34,7 +34,7 @@ class ScoreSaber(BaseCog[ServiceUnitOfWork], name="Score Saber"):
     async def on_ready(self):
         settings = [
             # TODO: Add bot owner permissions
-            EmojiSetting.create(self.bot, "BeatSaver emoji", "beatsaver_emoji"),
+            EmojiSetting.create(self.bot, self.__cog_name__, "BeatSaver emoji", "beatsaver_emoji"),
         ]
 
         self.bot.events.emit("setting_register", settings)

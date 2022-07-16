@@ -13,6 +13,7 @@ class TextSetting(AbstractRegularSetting[str]):
 
     @staticmethod
     def create(
+        group: str,
         name_human: str,
         name: str,
         permissions: Optional[Permissions] = None,
@@ -22,6 +23,7 @@ class TextSetting(AbstractRegularSetting[str]):
             default_value = TextSetting.from_type(default_value)
 
         return TextSetting(
+            group,
             name_human,
             Setting(None, SettingType.STRING, name, default_value),
             permissions,
@@ -50,11 +52,11 @@ class TextSetting(AbstractRegularSetting[str]):
         return value
 
     @staticmethod
-    def get_from_setting(name_human: str, setting: Setting, permissions: Optional[Permissions] = None):
+    def get_from_setting(group: str, name_human: str, setting: Setting, permissions: Optional[Permissions] = None):
         if setting.setting_type is not SettingType.STRING:
             raise InvalidSettingType(setting.setting_type, SettingType.STRING)
 
-        return TextSetting(name_human, setting, permissions)
+        return TextSetting(group, name_human, setting, permissions)
 
     @staticmethod
     async def is_valid(value: str) -> bool:

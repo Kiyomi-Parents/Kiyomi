@@ -36,7 +36,7 @@ class SettingNameTransformer(Transformer):
                 if value.isspace() or not setting.name_human.startswith(value.lower()):
                     continue
 
-                choice_name = f"{setting.name_human}"
+                choice_name = f"[{setting.group}] {setting.name_human}"
                 abstract_setting = await settings_api.get_setting(interaction.guild_id, setting.name)
 
                 if abstract_setting and abstract_setting.value:

@@ -16,11 +16,12 @@ class AbstractBotSetting(AbstractSetting[T], Generic[T]):
     def __init__(
         self,
         bot: Kiyomi,
+        group: str,
         name_human: str,
         setting: Setting,
         permissions: Optional[Permissions] = None,
     ):
-        super().__init__(name_human, setting, permissions)
+        super().__init__(group, name_human, setting, permissions)
 
         self.bot = bot
 
@@ -33,6 +34,7 @@ class AbstractBotSetting(AbstractSetting[T], Generic[T]):
     @abstractmethod
     def create(
         bot: Kiyomi,
+        group: str,
         name_human: str,
         name: str,
         permissions: Optional[Permissions] = None,
@@ -44,6 +46,7 @@ class AbstractBotSetting(AbstractSetting[T], Generic[T]):
     @abstractmethod
     def get_from_setting(
         bot: Kiyomi,
+        group: str,
         name_human: str,
         setting: Setting,
         permissions: Optional[Permissions] = None,

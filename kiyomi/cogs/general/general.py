@@ -28,8 +28,8 @@ class General(BaseCog[ServiceUnitOfWork]):
 
         settings = [
             # TODO: Add bot owner permissions
-            EmojiSetting.create(self.bot, "Invite button emoji", "invite_button_emoji"),
-            EmojiSetting.create(self.bot, "ScoreSaber emoji", "scoresaber_emoji"),
+            EmojiSetting.create(self.bot, self.__cog_name__, "Invite button emoji", "invite_button_emoji"),
+            EmojiSetting.create(self.bot, self.__cog_name__, "ScoreSaber emoji", "scoresaber_emoji"),
         ]
 
         self.bot.events.emit("setting_register", settings)

@@ -38,19 +38,19 @@ class BeatSaver(BaseCog[ServiceUnitOfWork], name="Beat Saver"):
     @commands.Cog.listener()
     async def on_ready(self):
         settings = [
-            EmojiSetting.create(self.bot, "Easy emoji", "easy_difficulty_emoji"),
-            EmojiSetting.create(self.bot, "Normal emoji", "normal_difficulty_emoji"),
-            EmojiSetting.create(self.bot, "Hard emoji", "hard_difficulty_emoji"),
-            EmojiSetting.create(self.bot, "Expert emoji", "expert_difficulty_emoji"),
-            EmojiSetting.create(self.bot, "Expert+ emoji", "expert_plus_difficulty_emoji"),
-            EmojiSetting.create(self.bot, "Standard emoji", "standard_game_mode_emoji"),
-            EmojiSetting.create(self.bot, "One Saber emoji", "one_saber_game_mode_emoji"),
-            EmojiSetting.create(self.bot, "No Arrows emoji", "no_arrows_game_mode_emoji"),
-            EmojiSetting.create(self.bot, "90 Degree emoji", "90_degree_game_mode_emoji"),
-            EmojiSetting.create(self.bot, "360 Degree emoji", "360_degree_game_mode_emoji"),
-            EmojiSetting.create(self.bot, "Lightshow emoji", "lightshow_game_mode_emoji"),
-            EmojiSetting.create(self.bot, "Lawless emoji", "lawless_game_mode_emoji"),
-            EmojiSetting.create(self.bot, "Map preview emoji", "map_preview_emoji"),
+            EmojiSetting.create(self.bot, self.__cog_name__, "Easy emoji", "easy_difficulty_emoji"),
+            EmojiSetting.create(self.bot, self.__cog_name__, "Normal emoji", "normal_difficulty_emoji"),
+            EmojiSetting.create(self.bot, self.__cog_name__, "Hard emoji", "hard_difficulty_emoji"),
+            EmojiSetting.create(self.bot, self.__cog_name__, "Expert emoji", "expert_difficulty_emoji"),
+            EmojiSetting.create(self.bot, self.__cog_name__, "Expert+ emoji", "expert_plus_difficulty_emoji"),
+            EmojiSetting.create(self.bot, self.__cog_name__, "Standard emoji", "standard_game_mode_emoji"),
+            EmojiSetting.create(self.bot, self.__cog_name__, "One Saber emoji", "one_saber_game_mode_emoji"),
+            EmojiSetting.create(self.bot, self.__cog_name__, "No Arrows emoji", "no_arrows_game_mode_emoji"),
+            EmojiSetting.create(self.bot, self.__cog_name__, "90 Degree emoji", "90_degree_game_mode_emoji"),
+            EmojiSetting.create(self.bot, self.__cog_name__, "360 Degree emoji", "360_degree_game_mode_emoji"),
+            EmojiSetting.create(self.bot, self.__cog_name__, "Lightshow emoji", "lightshow_game_mode_emoji"),
+            EmojiSetting.create(self.bot, self.__cog_name__, "Lawless emoji", "lawless_game_mode_emoji"),
+            EmojiSetting.create(self.bot, self.__cog_name__, "Map preview emoji", "map_preview_emoji"),
         ]
 
         self.bot.events.emit("setting_register", settings)

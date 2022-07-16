@@ -32,7 +32,8 @@ class EmojiEcho(BaseCog[ServiceUnitOfWork]):
     async def on_ready(self):
         settings = [
             ToggleSetting.create(
-                "let Kiyomi repost enabled emojis",
+                self.__cog_name__,
+                "Let Kiyomi repost enabled emojis",
                 "repost_emoji",
                 Permissions(manage_messages=True),
             )

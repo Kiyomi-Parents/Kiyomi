@@ -17,6 +17,7 @@ class EmojiSetting(AbstractBotSetting[discord.Emoji]):
     @staticmethod
     def create(
         bot: Kiyomi,
+        group: str,
         name_human: str,
         name: str,
         permissions: Optional[Permissions] = None,
@@ -30,6 +31,7 @@ class EmojiSetting(AbstractBotSetting[discord.Emoji]):
 
         return EmojiSetting(
             bot,
+            group,
             name_human,
             Setting(None, SettingType.EMOJI, name, default_value),
             permissions,
@@ -64,6 +66,7 @@ class EmojiSetting(AbstractBotSetting[discord.Emoji]):
     @staticmethod
     def get_from_setting(
         bot: Kiyomi,
+        group: str,
         name_human: str,
         setting: Setting,
         permissions: Optional[Permissions] = None,
@@ -71,7 +74,7 @@ class EmojiSetting(AbstractBotSetting[discord.Emoji]):
         if setting.setting_type is not SettingType.EMOJI:
             raise InvalidSettingType(setting.setting_type, SettingType.EMOJI)
 
-        return EmojiSetting(bot, name_human, setting, permissions)
+        return EmojiSetting(bot, group, name_human, setting, permissions)
 
     @staticmethod
     async def is_valid(bot: Kiyomi, guild_id: int, value: str) -> bool:
