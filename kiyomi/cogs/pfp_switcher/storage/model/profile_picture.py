@@ -18,6 +18,14 @@ class ProfilePicture:
                 self.active_zones.append(ActiveZone(active_zone))
 
     @property
+    def is_active(self) -> bool:
+        for active_zone in self.active_zones:
+            if active_zone.is_active:
+                return True
+
+        return False
+
+    @property
     def hash(self) -> str:
         with open(self.file_path, "rb") as file:
             sha1_hash = hashlib.sha1(file.read())

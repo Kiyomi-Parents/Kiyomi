@@ -7,8 +7,8 @@ from ..model.profile_picture import ProfilePicture
 
 
 class ProfilePictureRepository(BaseRepository):
-    _current_pfp_file = "src/cogs/pfp_switcher/current_pfp.json"
-    _config_file = "src/cogs/pfp_switcher/profile_pictures.json"
+    _current_pfp_file = "kiyomi/cogs/pfp_switcher/current_pfp.json"
+    _config_file = "kiyomi/cogs/pfp_switcher/profile_pictures.json"
 
     @staticmethod
     def _load_file(file_path: str) -> Dict:

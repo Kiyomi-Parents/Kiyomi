@@ -23,9 +23,8 @@ class ProfilePictureService(BaseService[ProfilePicture, ProfilePictureRepository
     @staticmethod
     def _get_active_pfp(profile_pictures: List[ProfilePicture]) -> Optional[ProfilePicture]:
         for profile_picture in profile_pictures:
-            for active_zone in profile_picture.active_zones:
-                if active_zone.is_active:
-                    return profile_picture
+            if profile_picture.is_active:
+                return profile_picture
 
         return None
 
