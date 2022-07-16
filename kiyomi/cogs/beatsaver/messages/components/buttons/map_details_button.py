@@ -17,6 +17,14 @@ class MapDetailsButton(BeatSaverComponent, discord.ui.Button):
             style=discord.enums.ButtonStyle.primary,
         )
 
+    async def after_init(self):
+        async with self.bot.get_cog("SettingsAPI") as settings:
+            emoji = await settings.get_override_or_default(self.parent.guild.id, "beatsaver_emoji")
+
+        if emoji:
+            self.label = None
+            self.emoji = emoji
+
     async def get_embed(self) -> Embed:
         if self.parent.guild is None:
             raise RuntimeError("Parent guild can not be None")

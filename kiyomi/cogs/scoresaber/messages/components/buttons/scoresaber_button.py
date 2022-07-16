@@ -25,6 +25,13 @@ class LeaderboardButton(BaseComponent[T], discord.ui.Button, Generic[T]):
         )
 
     async def after_init(self):
+        async with self.bot.get_cog("SettingsAPI") as settings:
+            emoji = await settings.get_override_or_default(self.parent.guild.id, "scoresaber_emoji")
+
+        if emoji:
+            self.label = None
+            self.emoji = emoji
+
         async with self.bot.get_cog("ScoreSaberAPI") as scoresaber_api:
             leaderboard = await scoresaber_api.get_leaderboard(self.beatmap_hash, self.game_mode, self.difficulty)
 

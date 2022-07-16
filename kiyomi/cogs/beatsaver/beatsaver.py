@@ -50,6 +50,7 @@ class BeatSaver(BaseCog[ServiceUnitOfWork], name="Beat Saver"):
             EmojiSetting.create(self.bot, "360 Degree emoji", "360_degree_game_mode_emoji"),
             EmojiSetting.create(self.bot, "Lightshow emoji", "lightshow_game_mode_emoji"),
             EmojiSetting.create(self.bot, "Lawless emoji", "lawless_game_mode_emoji"),
+            EmojiSetting.create(self.bot, "Map preview emoji", "map_preview_emoji"),
         ]
 
         self.bot.events.emit("setting_register", settings)

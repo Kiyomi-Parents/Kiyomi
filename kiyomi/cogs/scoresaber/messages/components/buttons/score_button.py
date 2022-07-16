@@ -28,6 +28,14 @@ class ScoreButton(BaseComponent[T], discord.ui.Button, Generic[T]):
             style=discord.enums.ButtonStyle.primary,
         )
 
+    async def after_init(self):
+        async with self.bot.get_cog("SettingsAPI") as settings:
+            emoji = await settings.get_override_or_default(self.parent.guild.id, "scoresaber_emoji")
+
+        if emoji:
+            self.label = None
+            self.emoji = emoji
+
     async def get_embed(self) -> Embed:
         if self.previous_score is not None:
             return ImprovementScoreEmbed(self.bot, self.parent.guild, self.score, self.previous_score)

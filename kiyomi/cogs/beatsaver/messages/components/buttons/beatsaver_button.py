@@ -21,6 +21,14 @@ class BeatSaverButton(BaseComponent[T], discord.ui.Button, Generic[T]):
             url=self.preview_url,
         )
 
+    async def after_init(self):
+        async with self.bot.get_cog("SettingsAPI") as settings:
+            emoji = await settings.get_override_or_default(self.parent.guild.id, "beatsaver_emoji")
+
+        if emoji:
+            self.label = None
+            self.emoji = emoji
+
     @property
     def preview_url(self) -> str:
         return f"https://beatsaver.com/maps/{self.beatmap_id}"

@@ -3,6 +3,7 @@ from typing import Optional
 import pybeatsaver
 from discord import app_commands, Interaction
 from discord.app_commands import Transform
+from discord.ext import commands
 
 from .services import ServiceUnitOfWork
 from .messages.views.guild_leaderboard_view import GuildLeaderboardView
@@ -15,11 +16,21 @@ from ..beatsaver.transformers.beatmap_difficulty_transformer import (
 )
 from ..beatsaver.transformers.beatmap_key_transformer import BeatmapKeyTransformer
 from kiyomi import BaseCog
+from ..settings.storage.model.emoji_setting import EmojiSetting
 
 
 class Leaderboard(BaseCog[ServiceUnitOfWork]):
     def register_events(self):
         pass
+
+    @commands.Cog.listener()
+    async def on_ready(self):
+        settings = [
+            # TODO: Add bot owner permissions
+            EmojiSetting.create(self.bot, "Guild Leaderboard emoji", "guild_leaderboard_emoji"),
+        ]
+
+        self.bot.events.emit("setting_register", settings)
 
     @app_commands.command()
     @app_commands.rename(beatmap="key", characteristic="game_mode")

@@ -3,6 +3,7 @@ from typing import Optional
 import discord
 from discord import app_commands, Interaction, AppCommandType
 from discord.app_commands import Transform, CommandInvokeError
+from discord.ext import commands
 
 from kiyomi.cogs.general import GeneralAPI
 from .services import ServiceUnitOfWork
@@ -10,6 +11,7 @@ from .errors import MemberPlayerNotFoundInGuildException
 from .messages.views.score_view import ScoreView
 from kiyomi import permissions, Kiyomi, BaseCog
 from .transformers.scoresaber_player_id_transformer import ScoreSaberPlayerIdTransformer
+from ..settings.storage.model.emoji_setting import EmojiSetting
 
 
 class ScoreSaber(BaseCog[ServiceUnitOfWork], name="Score Saber"):
@@ -27,6 +29,15 @@ class ScoreSaber(BaseCog[ServiceUnitOfWork], name="Score Saber"):
 
     def register_events(self):
         pass
+
+    @commands.Cog.listener()
+    async def on_ready(self):
+        settings = [
+            # TODO: Add bot owner permissions
+            EmojiSetting.create(self.bot, "BeatSaver emoji", "beatsaver_emoji"),
+        ]
+
+        self.bot.events.emit("setting_register", settings)
 
     player = app_commands.Group(name="player", description="Link ScoreSaber profile to Discord member")
 

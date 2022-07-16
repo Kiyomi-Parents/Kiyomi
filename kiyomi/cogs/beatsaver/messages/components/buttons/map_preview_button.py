@@ -15,6 +15,14 @@ class MapPreviewButton(BeatSaverComponent, discord.ui.Button):
             url=self.preview_url,
         )
 
+    async def after_init(self):
+        async with self.bot.get_cog("SettingsAPI") as settings:
+            emoji = await settings.get_override_or_default(self.parent.guild.id, "map_preview_emoji")
+
+        if emoji:
+            self.label = None
+            self.emoji = emoji
+
     @property
     def preview_url(self) -> str:
         result = f"https://skystudioapps.com/bs-viewer/?id={self.beatmap.id}"

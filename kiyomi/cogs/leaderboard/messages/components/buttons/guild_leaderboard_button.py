@@ -21,6 +21,14 @@ class GuildLeaderboardButton(LeaderboardComponent, discord.ui.Button):
             style=discord.enums.ButtonStyle.primary,
         )
 
+    async def after_init(self):
+        async with self.bot.get_cog("SettingsAPI") as settings:
+            emoji = await settings.get_override_or_default(self.parent.guild.id, "guild_leaderboard_emoji")
+
+        if emoji:
+            self.label = None
+            self.emoji = emoji
+
     async def get_embed(self) -> Embed:
         async with self.bot.get_cog_api(BeatSaverAPI) as beatsaver_api:
             beatmap_difficulty = await beatsaver_api.get_beatmap_difficulty_by_hash(
