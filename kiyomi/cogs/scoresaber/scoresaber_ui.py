@@ -1,5 +1,6 @@
 from typing import Type
 
+from .messages.components.buttons.scoresaber_button import LeaderboardButton
 from .services import ServiceUnitOfWork
 from .messages.components.buttons.score_button import ScoreButton
 from .messages.views.score_view import ScoreView
@@ -13,6 +14,10 @@ class ScoreSaberUI(BaseCog[ServiceUnitOfWork]):
     @property
     def button_score(self) -> Type[ScoreButton]:
         return ScoreButton
+
+    @property
+    def button_leaderboard(self) -> Type[LeaderboardButton]:
+        return LeaderboardButton
 
     @property
     def view_score(self) -> Type[ScoreView]:

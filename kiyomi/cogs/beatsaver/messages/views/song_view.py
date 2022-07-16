@@ -8,6 +8,7 @@ from kiyomi.cogs.view_persistence.storage.model.persistent_view import Persisten
 from kiyomi.base_view import BaseView
 from kiyomi import Kiyomi
 from ...beatsaver_api import BeatSaverAPI
+from ...beatsaver_utils import BeatSaverUtils
 from ...storage.model.beatmap import Beatmap
 from ..components.buttons.map_details_button import MapDetailsButton
 from ..components.buttons.map_preview_button import MapPreviewButton
@@ -57,6 +58,13 @@ class SongView(PersistentView):
 
         leaderboard_ui = self.bot.get_cog("LeaderboardUI")
         self.add_item(leaderboard_ui.button_guild_leaderboard(self.bot, self, self.beatmap.latest_version.hash))
+
+        if self.beatmap_characteristic and self.beatmap_difficulty:
+            scoresaber_ui = self.bot.get_cog("ScoreSaberUI")
+            self.add_item(scoresaber_ui.button_leaderboard(self.bot, self, self.beatmap.latest_version.hash,
+                                                           BeatSaverUtils.to_scoresaber_game_mode(
+                                                                   self.beatmap_characteristic),
+                                                           BeatSaverUtils.to_scoresaber_difficulty(self.beatmap_difficulty)))
 
         self.add_item(MapPreviewButton(self.bot, self, self.beatmap))
 
