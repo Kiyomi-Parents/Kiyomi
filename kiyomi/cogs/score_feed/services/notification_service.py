@@ -55,6 +55,7 @@ class NotificationService(BaseBasicService[StorageUnitOfWork]):
 
         for score in scores:
             previous_score = await scoresaber.get_previous_score(score)
+            previous_score = scoresaber.update_score_pp_weight(previous_score)
 
             scoresaber_ui = self.bot.get_cog_api(ScoreSaberUI)
             score_view = scoresaber_ui.view_score(self.bot, discord_guild, score, previous_score)
