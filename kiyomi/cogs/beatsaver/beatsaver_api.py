@@ -19,7 +19,6 @@ class BeatSaverAPI(BaseCog[ServiceUnitOfWork]):
     async def get_beatmap_by_key(self, key: str) -> Optional[Beatmap]:
         try:
             beatmap = await self.service_uow.beatmaps.get_beatmap_by_key(key)
-            await self.service_uow.save_changes()
 
             return await self.service_uow.refresh(beatmap)
         except BeatmapNotFound as error:
@@ -29,7 +28,6 @@ class BeatSaverAPI(BaseCog[ServiceUnitOfWork]):
     async def get_beatmap_by_hash(self, beatmap_hash: str) -> Optional[Beatmap]:
         try:
             beatmap = await self.service_uow.beatmaps.get_beatmap_by_hash(beatmap_hash)
-            await self.service_uow.save_changes()
 
             return await self.service_uow.refresh(beatmap)
         except BeatmapNotFound as error:
@@ -38,7 +36,6 @@ class BeatSaverAPI(BaseCog[ServiceUnitOfWork]):
 
     async def get_beatmap_hash_by_key(self, beatmap_key: str) -> Optional[str]:
         beatmap_hash = await self.service_uow.beatmaps.get_beatmap_hash_by_key(beatmap_key)
-        await self.service_uow.save_changes()
 
         return beatmap_hash
 
@@ -53,7 +50,6 @@ class BeatSaverAPI(BaseCog[ServiceUnitOfWork]):
         beatmap_version_difficulty = await self.service_uow.beatmaps.get_beatmap_difficulty(
             beatmap_hash, characteristic, difficulty
         )
-        await self.service_uow.save_changes()
 
         return beatmap_version_difficulty
 
@@ -66,6 +62,5 @@ class BeatSaverAPI(BaseCog[ServiceUnitOfWork]):
         beatmap_version_difficulty = await self.service_uow.beatmaps.get_beatmap_difficulty(
             beatmap_hash, characteristic, difficulty
         )
-        await self.service_uow.save_changes()
 
         return beatmap_version_difficulty
