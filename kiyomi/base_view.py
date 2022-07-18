@@ -3,11 +3,13 @@ from typing import Optional, Union, Callable, Awaitable, Any
 
 import discord
 from discord import Guild, Interaction
+from discord.app_commands import CommandInvokeError
 from discord.ext.commands import Context
 from discord.ui import Item
 
+from . import KiyomiException
 from .base_embed import BaseEmbed
-from .error.error_utils import print_error_to_console
+from .error.error_utils import handle_global_error
 from .kiyomi import Kiyomi
 
 
@@ -156,5 +158,15 @@ class BaseView(discord.ui.View, ABC):
 
     # TODO: Add error handling for views
     async def on_error(self, interaction: Interaction, error: Exception, item: Item[Any]) -> None:
-        print_error_to_console(error)
-        await super(BaseView, self).on_error(interaction, error, item)
+        ctx = await Context.from_interaction(interaction)
+
+        if isinstance(error, CommandInvokeError):
+            error = error.original
+
+        if isinstance(error, KiyomiException):
+            if error.is_handled:
+                return
+            else:
+                return await error.handle(ctx=ctx.interaction)
+
+        await handle_global_error(self.bot, error, ctx=ctx)
