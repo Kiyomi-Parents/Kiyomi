@@ -18,7 +18,8 @@ class Database:
         self._connection = connection
 
     async def init(self):
-        self._engine = create_async_engine(self._connection, echo=False, pool_pre_ping=True, pool_recycle=3600)
+        self._engine = create_async_engine(self._connection, echo=False, pool_size=20, max_overflow=10,
+                                           pool_pre_ping=True, pool_recycle=3600)
         self._session_maker = sessionmaker(self._engine, class_=AsyncSession, expire_on_commit=False)
 
         # Don't change, this just works
