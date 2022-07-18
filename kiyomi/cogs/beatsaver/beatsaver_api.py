@@ -23,7 +23,7 @@ class BeatSaverAPI(BaseCog[ServiceUnitOfWork]):
 
             return await self.service_uow.refresh(beatmap)
         except BeatmapNotFound as error:
-            _logger.info(self.__class__.__name__, error)
+            _logger.warning(self.__class__.__name__, f"Could not find beatmap with key: {key}")
             return None
 
     async def get_beatmap_by_hash(self, beatmap_hash: str) -> Optional[Beatmap]:
@@ -33,7 +33,7 @@ class BeatSaverAPI(BaseCog[ServiceUnitOfWork]):
 
             return await self.service_uow.refresh(beatmap)
         except BeatmapNotFound as error:
-            _logger.info(self.__class__.__name__, error)
+            _logger.warning(self.__class__.__name__, f"Could not find beatmap with hash: {beatmap_hash}")
             return None
 
     async def get_beatmap_hash_by_key(self, beatmap_key: str) -> Optional[str]:
