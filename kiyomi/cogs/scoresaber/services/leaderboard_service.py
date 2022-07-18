@@ -33,3 +33,5 @@ class LeaderboardService(BaseService[Leaderboard, LeaderboardRepository, Storage
             
             if not await self.storage_uow.leaderboards.exists(leaderboard.id):
                 return await self.repository.add(Leaderboard(leaderboard))
+
+        return leaderboard

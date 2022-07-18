@@ -119,3 +119,9 @@ class ScoreService(BaseService[Score, ScoreRepository, StorageUnitOfWork]):
 
     async def is_player_score_new(self, player_score: pyscoresaber.PlayerScore) -> bool:
         return await self.repository.exists_by_score_id_and_time_set(player_score.score.id, player_score.score.time_set)
+
+    async def get_all_by_player_id_and_leaderboard_id(self, player_id: str, leaderboard_id: int) -> List[Score]:
+        return await self.repository.get_all_by_player_id_and_leaderboard_id(player_id, leaderboard_id)
+
+    async def get_all_sorted_by_pp(self, player_id: str) -> List[Score]:
+        return await self.repository.get_all_sorted_by_pp(player_id)

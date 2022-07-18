@@ -18,7 +18,7 @@ class Tasks(BaseTasks[ServiceUnitOfWork]):
     @FancyPresenceAPI.presence_task
     async def update_players(self):
         """Updating players"""
-        players = await self.service_uow.players.get_all_players()
+        players = await self.service_uow.players.get_all()
         _logger.info("Score Saber", f"Updating {len(players)} players")
 
         for player in players:
@@ -36,7 +36,7 @@ class Tasks(BaseTasks[ServiceUnitOfWork]):
     @FancyPresenceAPI.presence_task
     async def update_players_scores(self):
         """Updating scores"""
-        players = await self.service_uow.players.get_all_players()
+        players = await self.service_uow.players.get_all()
         _logger.info("Score Saber", f"Updating scores for {len(players)} players")
 
         for player in players:
@@ -54,7 +54,7 @@ class Tasks(BaseTasks[ServiceUnitOfWork]):
             if isinstance(item, pyscoresaber.PlayerScore):
                 player_score = item
 
-                if await self.service_uow.players.player_exists(player_score.score.leaderboard_player_info.id):
+                if await self.service_uow.players.exists(player_score.score.leaderboard_player_info.id):
                     await self.service_uow.scores.on_new_live_score_feed_score(player_score)
                     await self.service_uow.save_changes()
 

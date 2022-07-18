@@ -1,5 +1,3 @@
-from typing import List
-
 import pyscoresaber
 
 from kiyomi import Kiyomi, BaseService
@@ -116,9 +114,3 @@ class PlayerService(BaseService[Player, PlayerRepository, StorageUnitOfWork]):
             await self.repository.update_entity(Player(new_player))
         except pyscoresaber.NotFoundException as error:
             raise PlayerNotFoundException(player.id) from error
-
-    async def get_all_players(self) -> List[Player]:
-        return await self.repository.get_all()
-
-    async def player_exists(self, player_id: str) -> bool:
-        return await self.repository.exists(player_id)

@@ -4,7 +4,7 @@ from typing import TypeVar, Optional, Type, cast, List
 import discord
 from discord import Permissions
 from discord.app_commands import CommandInvokeError
-from discord.ext.commands import Bot, Context
+from discord.ext.commands import Bot, Context, Cog
 from pyee import AsyncIOEventEmitter
 
 from .base_cog import BaseCog
@@ -126,13 +126,13 @@ class Kiyomi(Bot):
 
     # When using, please close database session. UI cogs don't need to be closed
     # or use: async with self.bot.get_cog("SomeCog") as some_cog_api:
-    def get_cog(self, name: str, /) -> TCog:
+    def get_cog(self, name: str, /) -> Cog:
         cog = super().get_cog(name)
 
         if cog is None:
             raise TypeError(f"Expected cog type {name}, but got {type(cog)}")
 
-        return cast(TCog, cog)
+        return cog
 
     # When using, please close database session. UI cogs don't need to be closed
     # or use: async with self.bot.get_cog_api("SomeCog") as some_cog_api:
@@ -142,4 +142,4 @@ class Kiyomi(Bot):
         if not isinstance(cog, cog_type):
             raise TypeError(f"Expected cog type {cog_type.__name__}, but got {type(cog)}")
 
-        return cog
+        return cast(TCog, cog)

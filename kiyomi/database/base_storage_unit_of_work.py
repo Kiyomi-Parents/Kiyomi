@@ -38,5 +38,5 @@ class BaseStorageUnitOfWork(BaseUnitOfWork):
         try:
             await self.commit()
         except Exception as error:
+            _logger.error(f"Transaction failed: {error}")
             await self.rollback()
-            raise error
