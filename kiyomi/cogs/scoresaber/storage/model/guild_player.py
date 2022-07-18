@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, ForeignKey, String, BigInteger
-from sqlalchemy.orm import relationship, backref
+from sqlalchemy.orm import relationship
 
 from kiyomi.database import Base
 
@@ -13,9 +13,9 @@ class GuildPlayer(Base):
     member_id = Column(BigInteger, ForeignKey("member.id"))
     player_id = Column(String(128), ForeignKey("player.id", ondelete="CASCADE"))
 
-    guild = relationship("Guild")
-    member = relationship("Member")
-    player = relationship("Player", backref=backref("guild_player"), lazy="joined")
+    guild = relationship("Guild", lazy="joined")
+    member = relationship("Member", lazy="joined")
+    player = relationship("Player", back_populates="guild_players", lazy="joined")
 
     def __init__(self, guild_id: int, member_id: int, player_id: str):
         self.guild_id = guild_id
