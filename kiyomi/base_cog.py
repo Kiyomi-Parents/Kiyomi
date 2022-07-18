@@ -47,6 +47,7 @@ class BaseCog(commands.Cog, Generic[TServiceUOW], metaclass=CogMeta):
         return self
 
     async def __aexit__(self, exc_type, exc_val, exc_tb):
+        await self.service_uow.save_changes()
         await self.service_uow.close()
 
     async def cog_command_error(self, ctx: Context["Kiyomi"], error: Exception):
