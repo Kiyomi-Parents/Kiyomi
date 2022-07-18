@@ -4,9 +4,6 @@ from discord import ActivityType, BaseActivity, Game, Streaming, CustomActivity
 
 
 class Presence:
-    activity_type: ActivityType
-    activity_text: str
-
     def __init__(self, activity_type: int, activity_text: str):
         self.activity_type = ActivityType(activity_type)
         self.activity_text = activity_text

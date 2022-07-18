@@ -12,11 +12,11 @@ class Guild(Base):
     id = Column(BigInteger, primary_key=True, autoincrement=False)
     name = Column(String(128))
 
-    members = relationship("GuildMember", back_populates="guild", cascade="all, delete-orphan")
-    channels = relationship("Channel", back_populates="guild", cascade="all, delete-orphan")
-    roles = relationship("Role", back_populates="guild", cascade="all, delete-orphan")
-    emojis = relationship("Emoji", back_populates="guild", cascade="all, delete-orphan")
-    messages = relationship("Message", back_populates="guild", cascade="all, delete-orphan")
+    members = relationship("GuildMember", back_populates="guild", cascade="all, delete-orphan", lazy="raise")
+    channels = relationship("Channel", back_populates="guild", cascade="all, delete-orphan", lazy="raise")
+    roles = relationship("Role", back_populates="guild", cascade="all, delete-orphan", lazy="raise")
+    emojis = relationship("Emoji", back_populates="guild", cascade="all, delete-orphan", lazy="raise")
+    messages = relationship("Message", back_populates="guild", cascade="all, delete-orphan", lazy="raise")
 
     def __init__(self, guild_id: int, guild_name: str):
         self.id = guild_id

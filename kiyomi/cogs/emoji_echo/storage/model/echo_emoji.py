@@ -10,10 +10,10 @@ class EchoEmoji(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
 
     emoji_id = Column(BigInteger, ForeignKey("emoji.id"))
-    emoji = relationship("Emoji", uselist=False)
+    emoji = relationship("Emoji", uselist=False, lazy="joined")
 
     guild_id = Column(BigInteger, ForeignKey("guild.id"))
-    guild = relationship("Guild", uselist=False)
+    guild = relationship("Guild", uselist=False, lazy="joined")
 
     def __init__(self, emoji_id: int, guild_id: int):
         self.emoji_id = emoji_id

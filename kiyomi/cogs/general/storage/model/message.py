@@ -10,10 +10,10 @@ class Message(Base):
     id = Column(BigInteger, primary_key=True, autoincrement=False)
 
     guild_id = Column(BigInteger, ForeignKey("guild.id"))
-    guild = relationship("Guild", back_populates="messages")
+    guild = relationship("Guild", back_populates="messages", lazy="raise")
 
     channel_id = Column(BigInteger, ForeignKey("channel.id"))
-    channel = relationship("Channel", back_populates="messages")
+    channel = relationship("Channel", back_populates="messages", lazy="raise")
 
     def __init__(self, guild_id: int, channel_id: int, message_id: int):
         self.guild_id = guild_id

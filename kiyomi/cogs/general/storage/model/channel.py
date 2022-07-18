@@ -11,9 +11,9 @@ class Channel(Base):
     name = Column(String(128))
 
     guild_id = Column(BigInteger, ForeignKey("guild.id", ondelete="CASCADE"))
-    guild = relationship("Guild", back_populates="channels", uselist=False)
+    guild = relationship("Guild", back_populates="channels", uselist=False, lazy="raise")
 
-    messages = relationship("Message", back_populates="channel")
+    messages = relationship("Message", back_populates="channel", lazy="raise")
 
     def __init__(self, guild_id: int, channel_id: int, channel_name: str):
         self.guild_id = guild_id

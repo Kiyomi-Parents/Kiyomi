@@ -13,9 +13,9 @@ class MemberRole(Base):
     member_id = Column(BigInteger, ForeignKey("member.id"))
     role_id = Column(BigInteger, ForeignKey("role.id", ondelete="CASCADE"))
 
-    guild = relationship("Guild")
-    member = relationship("Member", back_populates="roles")
-    role = relationship("Role", back_populates="members")
+    guild = relationship("Guild", lazy="joined")
+    member = relationship("Member", back_populates="roles", lazy="raise")
+    role = relationship("Role", back_populates="members", lazy="raise")
 
     def __init__(self, guild_id: int, member_id: int, role_id: int):
         self.guild_id = guild_id

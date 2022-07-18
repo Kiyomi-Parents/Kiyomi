@@ -12,8 +12,8 @@ class SentScore(Base):
     score_id = Column(Integer, ForeignKey("score.id"))
     guild_id = Column(BigInteger, ForeignKey("guild.id"))
 
-    score = relationship("Score")
-    guild = relationship("Guild")
+    score = relationship("Score", lazy="joined")
+    guild = relationship("Guild", lazy="joined")
 
     def __init__(self, score_id: int, guild_id: int):
         self.score_id = score_id

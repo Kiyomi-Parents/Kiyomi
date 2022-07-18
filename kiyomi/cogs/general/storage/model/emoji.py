@@ -13,7 +13,7 @@ class Emoji(Base):
     name = Column(String(128))
 
     guild_id = Column(BigInteger, ForeignKey("guild.id", ondelete="CASCADE"))
-    guild = relationship("Guild", back_populates="emojis", uselist=False)
+    guild = relationship("Guild", back_populates="emojis", uselist=False, lazy="raise")
 
     def __init__(self, guild_id: int, emoji_id: int, name: str):
         self.guild_id = guild_id

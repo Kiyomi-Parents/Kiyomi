@@ -13,9 +13,9 @@ class Role(Base):
     name = Column(String(128))
 
     guild_id = Column(BigInteger, ForeignKey("guild.id", ondelete="CASCADE"))
-    guild = relationship("Guild", back_populates="roles", uselist=False)
+    guild = relationship("Guild", back_populates="roles", uselist=False, lazy="raise")
 
-    members = relationship("MemberRole", back_populates="role", cascade="all, delete")
+    members = relationship("MemberRole", back_populates="role", cascade="all, delete", lazy="raise")
 
     def __init__(self, role_id: int, guild_id: int, name: str):
         self.id = role_id

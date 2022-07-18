@@ -11,8 +11,8 @@ class Member(Base):
 
     name = Column(String(128))
 
-    guilds = relationship("GuildMember", back_populates="member")
-    roles = relationship("MemberRole", back_populates="member")
+    guilds = relationship("GuildMember", back_populates="member", lazy="raise")
+    roles = relationship("MemberRole", back_populates="member", lazy="raise")
 
     def __init__(self, member_id: int, name: str):
         self.id = member_id

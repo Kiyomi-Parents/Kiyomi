@@ -12,8 +12,8 @@ class GuildMember(Base):
     guild_id = Column(BigInteger, ForeignKey("guild.id"))
     member_id = Column(BigInteger, ForeignKey("member.id"))
 
-    guild = relationship("Guild", back_populates="members")
-    member = relationship("Member", back_populates="guilds")
+    guild = relationship("Guild", back_populates="members", lazy="raise")
+    member = relationship("Member", back_populates="guilds", lazy="raise")
 
     def __init__(self, guild_id: int, member_id: int):
         self.guild_id = guild_id
