@@ -18,9 +18,9 @@ class Tasks(BaseTasks[ServiceUnitOfWork]):
     @FancyPresenceAPI.presence_task
     async def send_notifications(self) -> None:
         """Sending notifications"""
-        scoresaber = self.bot.get_cog_api(ScoreSaberAPI)
+        async with self.bot.get_cog_api(ScoreSaberAPI) as scoresaber:
+            players = await scoresaber.get_players()
 
-        players = await scoresaber.get_players()
         _logger.info("task", f"Sending notifications for {len(players)} players")
 
         for player in players:
