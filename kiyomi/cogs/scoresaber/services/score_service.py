@@ -1,9 +1,10 @@
 import logging
-from typing import List
+from typing import List, Optional
 
 import pyscoresaber
 
 from kiyomi import BaseService, Kiyomi
+from ..scoresaber_utils import ScoreSaberUtils
 from ..storage import StorageUnitOfWork
 from ..storage.model.leaderboard import Leaderboard
 from ..storage.model.player import Player
@@ -28,8 +29,13 @@ class ScoreService(BaseService[Score, ScoreRepository, StorageUnitOfWork]):
     async def get_recent_scores(self, player_id: str, limit: int) -> List[Score]:
         return await self.repository.get_recent(player_id, limit)
 
-    async def get_previous_score(self, score: Score) -> Score:
-        return await self.repository.get_previous(score)
+    async def get_previous_score(self, score: Score) -> Optional[Score]:
+        previous_score = await self.repository.get_previous(score)
+
+        if previous_score is None:
+            return None
+
+        return await self.update_score_pp_weight(previous_score)
 
     async def on_new_live_score_feed_score(self, player_score: pyscoresaber.PlayerScore):
         if not await self.is_player_score_new(player_score):
@@ -125,3 +131,22 @@ class ScoreService(BaseService[Score, ScoreRepository, StorageUnitOfWork]):
 
     async def get_all_sorted_by_pp(self, player_id: str) -> List[Score]:
         return await self.repository.get_all_sorted_by_pp(player_id)
+
+    async def update_score_pp_weight(self, score: Score) -> Score:
+        async with self.bot.get_cog("LeaderboardAPI") as leaderboard:
+            top_scores_leaderboard = await leaderboard.get_player_top_scores_leaderboard(score.player_id)
+
+        position = 0
+
+        for top_score in top_scores_leaderboard:
+            if top_score.score_id == score.score_id:
+                continue
+
+            position += 1
+
+            if top_score.pp < score.pp and position:
+                break
+
+        score.weight = ScoreSaberUtils.get_pp_weight_from_pos(position)
+
+        return score

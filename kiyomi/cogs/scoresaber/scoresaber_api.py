@@ -4,7 +4,6 @@ import pyscoresaber
 
 from kiyomi import BaseCog
 from .services import ServiceUnitOfWork
-from .scoresaber_utils import ScoreSaberUtils
 from .storage.model.guild_player import GuildPlayer
 from .storage.model.leaderboard import Leaderboard
 from .storage.model.player import Player
@@ -51,20 +50,4 @@ class ScoreSaberAPI(BaseCog[ServiceUnitOfWork]):
         return await self.service_uow.scores.get_by_id(score_id)
 
     async def update_score_pp_weight(self, score: Score) -> Score:
-        async with self.bot.get_cog("LeaderboardAPI") as leaderboard:
-            top_scores_leaderboard = await leaderboard.get_player_top_scores_leaderboard(score.player_id)
-
-        position = 0
-
-        for top_score in top_scores_leaderboard:
-            if top_score.score_id == score.score_id:
-                continue
-
-            position += 1
-
-            if top_score.pp < score.pp and position:
-                break
-
-        score.weight = ScoreSaberUtils.get_pp_weight_from_pos(position)
-
-        return score
+        return await self.service_uow.scores.update_score_pp_weight(score)
