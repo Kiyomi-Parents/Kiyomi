@@ -59,8 +59,15 @@ class Player(Base):
         self.score_stats_replays_watched = player_data.score_stats.replays_watched
 
     @property
-    def profile_url(self):
+    def profile_url(self) -> str:
         return f"https://scoresaber.com/u/{self.id}"
+
+    @property
+    def name_truncated(self) -> str:
+        if len(self.name) > 13:
+            return self.name[:10] + "..."
+
+        return self.name
 
     def __str__(self):
         return f"Player {self.name} ({self.id})"

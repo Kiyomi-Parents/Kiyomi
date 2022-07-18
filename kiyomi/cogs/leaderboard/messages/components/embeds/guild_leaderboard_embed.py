@@ -67,7 +67,7 @@ class GuildLeaderboardEmbed(BaseEmbed):
 
         for index, score in enumerate(self.leaderboard):
             rank = f"#{index + 1}"
-            name = score.player.name
+            name = score.player.name_truncated
             date = timeago.format(score.get_date, datetime.now(timezone.utc))
 
             if len(score.modifiers):
