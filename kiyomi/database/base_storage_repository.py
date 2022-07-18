@@ -5,7 +5,6 @@ from typing import TypeVar, Generic, Optional, List, Type, Dict
 from sqlalchemy import select, exists, delete, update
 from sqlalchemy.engine import ScalarResult
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import joinedload
 from sqlalchemy.sql import Executable
 
 from .database import Base
@@ -42,7 +41,7 @@ class BaseStorageRepository(BaseRepository[TEntity], Generic[TEntity], metaclass
         return await self._first(stmt)
 
     async def get_all(self) -> List[TEntity]:
-        stmt = select(self._table).options(joinedload("*"))
+        stmt = select(self._table)
         return await self._all(stmt)
 
     async def exists(self, entity_id: int) -> bool:
