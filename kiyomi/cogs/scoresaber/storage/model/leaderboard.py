@@ -114,5 +114,9 @@ class Leaderboard(Base):
 
         return None
 
+    @property
+    def leaderboard_url(self) -> str:
+        return f"https://scoresaber.com/leaderboard/{self.id}"
+
     def __str__(self):
         return f"Leaderboard {self.song_name} ({self.id})"

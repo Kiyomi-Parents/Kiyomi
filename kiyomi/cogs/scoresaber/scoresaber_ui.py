@@ -1,6 +1,6 @@
 from typing import Type
 
-from .messages.components.buttons.scoresaber_button import LeaderboardButton
+from .messages.components.buttons.leaderboard_button import LeaderboardButton
 from .services import ServiceUnitOfWork
 from .messages.components.buttons.score_button import ScoreButton
 from .messages.views.score_view import ScoreView

@@ -1,14 +1,10 @@
 from datetime import datetime, timezone
-from typing import List
 
 import timeago
 from discord import Colour
 from prettytable import PrettyTable
 
-from kiyomi.cogs.beatsaver.storage.model.beatmap_version_difficulty import (
-    BeatmapVersionDifficulty,
-)
-from kiyomi.cogs.scoresaber.storage.model.score import Score
+from ....storage.models.guild_leaderboard import GuildLeaderboard
 from kiyomi.base_embed import BaseEmbed
 from kiyomi import Kiyomi
 
@@ -18,29 +14,26 @@ class GuildLeaderboardEmbed(BaseEmbed):
         self,
         bot: Kiyomi,
         guild_name: str,
-        beatmap_difficulty: BeatmapVersionDifficulty,
-        leaderboard: List[Score],
+        guild_leaderboard: GuildLeaderboard,
     ):
         super().__init__(bot)
 
         self.guild_name = guild_name
-        self.beatmap_difficulty = beatmap_difficulty
-        self.beatmap = beatmap_difficulty.beatmap_version.beatmap
-        self.leaderboard = leaderboard
+        self.guild_leaderboard = guild_leaderboard
 
         self.set_author(name=self.get_title)
 
-        self.colour = Colour.random(seed=self.beatmap.uploader_id)
+        self.colour = Colour.random(seed=self.guild_leaderboard.leaderboard.id)
 
-        self.title = f"{self.beatmap.name}"
-        self.url = self.beatmap.beatsaver_url
+        self.title = f"{self.guild_leaderboard.leaderboard.song_name_full}"
+        self.url = self.guild_leaderboard.leaderboard.leaderboard_url
 
         self.set_footer(
             icon_url="https://share.lucker.xyz/qahu5/FoZozoBE67.png/raw.png",
             text=self.get_scoresaber_status,
         )
 
-        if len(leaderboard) <= 0:
+        if len(self.guild_leaderboard.scores) <= 0:
             self.description = f"```Leaderboard is empty!```"
         else:
             self.description = f"```{self.get_table()}```"
@@ -51,11 +44,10 @@ class GuildLeaderboardEmbed(BaseEmbed):
 
     @property
     def get_scoresaber_status(self) -> str:
-        if self.beatmap_difficulty.stars is not None:
-            if self.beatmap.ranked:
-                return f"Ranked {self.beatmap_difficulty.stars}★"
+        if self.guild_leaderboard.leaderboard.ranked:
+            return f"Ranked {self.guild_leaderboard.leaderboard.stars}★"
 
-        if self.beatmap.qualified:
+        if self.guild_leaderboard.leaderboard.qualified:
             return "Qualified"
 
         return "Unranked"
@@ -65,7 +57,7 @@ class GuildLeaderboardEmbed(BaseEmbed):
         table.border = False
         table.field_names = ["#", "Player", "Date", "Mods", "%", "PP"]
 
-        for index, score in enumerate(self.leaderboard):
+        for index, score in enumerate(self.guild_leaderboard.scores):
             rank = f"#{index + 1}"
             name = score.player.name_truncated
             date = timeago.format(score.get_date, datetime.now(timezone.utc))
@@ -75,7 +67,11 @@ class GuildLeaderboardEmbed(BaseEmbed):
             else:
                 mods = "-"
 
-            acc = f"{score.accuracy}%"
+            if score.accuracy is None:
+                acc = f"???"
+            else:
+                acc = f"{score.accuracy}%"
+
             pp = f"{score.pp}pp"
 
             table.add_row([rank, name, date, mods, acc, pp])

@@ -36,10 +36,6 @@ class LeaderboardButton(BaseComponent[T], discord.ui.Button, Generic[T]):
             leaderboard = await scoresaber_api.get_leaderboard(self.beatmap_hash, self.game_mode, self.difficulty)
 
         if leaderboard:
-            self.url = self.leaderboard_url(leaderboard.id)
+            self.url = leaderboard.leaderboard_url
         else:
             self.parent.remove_item(self)
-
-    @staticmethod
-    def leaderboard_url(leaderboard_id: int) -> str:
-        return f"https://scoresaber.com/leaderboard/{leaderboard_id}"

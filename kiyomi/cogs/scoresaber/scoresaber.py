@@ -94,9 +94,12 @@ class ScoreSaber(BaseCog[ServiceUnitOfWork], name="Score Saber"):
         """Displays your most recent scores"""
         await ctx.response.defer()
 
-        # TODO: Just refactor this entire thing.
+        # TODO: Somebody, please. Just refactor this entire thing. :)
         if member is None:
             member = ctx.user
+
+        if count is None:
+            count = 1
 
         guild_player = await self.service_uow.players.get_guild_player(ctx.guild.id, member.id)
 

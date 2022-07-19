@@ -9,31 +9,33 @@ from kiyomi.cogs.scoresaber.storage.model.player import Player
 from kiyomi.cogs.scoresaber.storage.model.score import Score
 from ..storage import StorageUnitOfWork
 from kiyomi.service.base_basic_service import BaseBasicService
+from ..storage.models.guild_leaderboard import GuildLeaderboard
+from ...scoresaber.storage.model.leaderboard import Leaderboard
 
 
-class ScoreLeaderboardService(BaseBasicService[StorageUnitOfWork]):
-    async def get_beatmap_score_leaderboard_by_key(
+class GuildLeaderboardService(BaseBasicService[StorageUnitOfWork]):
+    async def get_guild_leaderboard_by_key(
         self,
         guild_id: int,
         beatmap_key: str,
         characteristic: pybeatsaver.ECharacteristic,
         difficulty: pybeatsaver.EDifficulty,
-    ) -> List[Score]:
+    ) -> GuildLeaderboard:
         async with self.bot.get_cog_api(BeatSaverAPI) as beatsaver:
             beatmap_hash = await beatsaver.get_beatmap_hash_by_key(beatmap_key)
 
         if beatmap_hash is None:
-            return []
+            return GuildLeaderboard(None, [])
 
-        return await self.get_beatmap_score_leaderboard(guild_id, beatmap_hash, characteristic, difficulty)
+        return await self.get_guild_leaderboard(guild_id, beatmap_hash, characteristic, difficulty)
 
-    async def get_beatmap_score_leaderboard(
+    async def get_guild_leaderboard(
         self,
         guild_id: int,
         beatmap_hash: str,
         characteristic: pybeatsaver.ECharacteristic,
         difficulty: pybeatsaver.EDifficulty,
-    ) -> List[Score]:
+    ) -> GuildLeaderboard:
         async with self.bot.get_cog_api(ScoreSaberAPI) as scoresaber:
             leaderboard = await scoresaber.get_leaderboard(
                 beatmap_hash,
@@ -42,26 +44,24 @@ class ScoreLeaderboardService(BaseBasicService[StorageUnitOfWork]):
             )
 
             if leaderboard is None:
-                return []
+                return GuildLeaderboard(None, [])
 
             guild_players = await scoresaber.get_guild_players_by_guild(guild_id)
 
-        return await self._get_score_leaderboard([guild_player.player for guild_player in guild_players], leaderboard.id)
+        return await self._make_guild_leaderboard([guild_player.player for guild_player in guild_players], leaderboard)
 
-    async def _get_score_leaderboard(self, players: List[Player], leaderboard_id: int) -> List[Score]:
-        score_leaderboard = []
+    async def _make_guild_leaderboard(self, players: List[Player], leaderboard: Leaderboard) -> GuildLeaderboard:
+        guild_leaderboard = GuildLeaderboard(leaderboard)
 
         async with self.bot.get_cog_api(ScoreSaberAPI) as scoresaber:
             for player in players:
-                scores = await scoresaber.get_score_by_player_id_and_leaderboard_id(player.id, leaderboard_id)
+                scores = await scoresaber.get_score_by_player_id_and_leaderboard_id(player.id, leaderboard.id)
                 best_score = self.get_best_score(scores)
 
                 if best_score is not None:
-                    score_leaderboard.append(best_score)
+                    guild_leaderboard.add_score(best_score)
 
-            score_leaderboard.sort(key=lambda score: score.modified_score, reverse=True)
-
-        return score_leaderboard
+        return guild_leaderboard
 
     @staticmethod
     def get_best_score(scores: List[Score]) -> Optional[Score]:
@@ -77,17 +77,3 @@ class ScoreLeaderboardService(BaseBasicService[StorageUnitOfWork]):
                 best_score = score
 
         return best_score
-
-    async def get_player_top_scores_leaderboard(self, player_id: str) -> List[Score]:
-        from kiyomi.cogs.scoresaber import ScoreSaberAPI
-
-        async with self.bot.get_cog_api(ScoreSaberAPI) as scoresaber:
-            scores = await scoresaber.get_player_scores_sorted_by_pp(player_id)
-
-        unique_scores = []
-
-        for score in scores:
-            if score.score_id not in [unique_score.score_id for unique_score in unique_scores]:
-                unique_scores.append(score)
-
-        return unique_scores
