@@ -1,18 +1,17 @@
-import os
 from typing import List, Callable, TypeVar
 
 import discord
 from discord import Permissions, app_commands, Interaction, Client
 
-from kiyomi import OwnerOnlyCommand
+from kiyomi import OwnerOnlyCommand, Config
 
 T = TypeVar("T")
 
 
 def _admin_guilds() -> List[discord.Object]:
-    admin_guilds = os.getenv("ADMIN_GUILDS")
+    admin_guilds = Config.get().Discord.Guilds.Admin
     if admin_guilds is not None and len(admin_guilds) > 0:
-        return [discord.Object(id=int(guild_id)) for guild_id in os.getenv("ADMIN_GUILDS").split(",")]
+        return [discord.Object(id=int(guild_id)) for guild_id in admin_guilds]
     return []
 
 

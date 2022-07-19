@@ -7,34 +7,32 @@ from asyncio import AbstractEventLoop
 from logging import StreamHandler
 
 import discord
-from dotenv import load_dotenv
 
-from kiyomi import ConsoleFormatter, FileFormatter, Database, Kiyomi
+from kiyomi import ConsoleFormatter, FileFormatter, Database, Kiyomi, Config
 
 
 async def startup(loop: AbstractEventLoop):
-    load_dotenv()
-    discord_token = os.getenv("DISCORD_TOKEN")
-    database_ip = os.getenv("DATABASE_IP")
-    database_user = os.getenv("DATABASE_USER")
-    database_password = os.getenv("DATABASE_PW")
-    database_name = os.getenv("DATABASE_NAME")
+    discord_token = Config.get().Discord.Token
+    database_host = Config.get().Database.Host
+    database_user = Config.get().Database.User
+    database_password = Config.get().Database.Password
+    database_name = Config.get().Database.Name
 
     # Init database
     database = Database(
-        f"mariadb+asyncmy://{database_user}:{database_password}@{database_ip}/{database_name}?charset=utf8mb4"
+        f"mariadb+asyncmy://{database_user}:{database_password}@{database_host}/{database_name}?charset=utf8mb4"
     )
 
     await database.init()
 
     async with Kiyomi(command_prefix="!", db=database, loop=loop) as bot:
-        default_guild = os.getenv("DEFAULT_GUILD")
-        if default_guild is not None and len(default_guild) > 0:
+        default_guild = Config.get().Discord.Guilds.Default
+        if default_guild is not None:
             bot.default_guild = discord.Object(id=int(default_guild))
 
-        debug_guilds = os.getenv("DEBUG_GUILDS")
+        debug_guilds = Config.get().Discord.Guilds.Debug
         if debug_guilds is not None and len(debug_guilds) > 0:
-            bot.debug_guilds = [discord.Object(id=int(guild_id)) for guild_id in debug_guilds.split(",") if guild_id]
+            bot.debug_guilds = [discord.Object(id=int(guild_id)) for guild_id in debug_guilds if guild_id]
 
         # Base Cogs
         await bot.load_extension(name="kiyomi.cogs.view_persistence")
