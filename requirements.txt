@@ -1,13 +1,13 @@
-SQLAlchemy==1.4.37
-alembic==1.8.0
+SQLAlchemy==1.4.39
+alembic==1.8.1
 asyncmy~=0.2.5
 python-dateutil~=2.8.2
 python-dotenv~=0.20.0
 timeago~=1.0.15
 termcolor~=1.1.0
 prettytable==3.3.0
-pybeatsaver==0.1.11
-pyscoresaber==1.0.7
+pybeatsaver==0.1.12
+pyscoresaber==1.0.8
 asyncio~=3.4.3
 pyee~=9.0.4
 twitchio==2.2.0
