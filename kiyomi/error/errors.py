@@ -127,3 +127,18 @@ class CheckFailure(CommandError):
 class OwnerOnlyCommand(CheckFailure):
     def __str__(self):
         return f"This command can only be used by the bot owners!"
+
+
+class ConfigException(Exception):
+    def __init__(self, option: str):
+        self.option = option
+
+
+class MissingConfigOption(ConfigException):
+    def __str__(self):
+        return f"Option {self.option} not found in config!"
+
+
+class WhitespaceConfigOption(ConfigException):
+    def __str__(self):
+        return f"Config option {self.option} contains only whitespace!"

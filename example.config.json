@@ -1,0 +1,30 @@
+{
+  "Database": {
+    "Host": "192.168.0.11",
+    "Name": "database_name",
+    "User": "database_username",
+    "Password": "database_password"
+  },
+  "Discord": {
+    "Token": "65olk4.0yu65itry4yeg0wt34545fgev0.4terr5y640wrtRtfds",
+    "Guilds": {
+      "Default": 314159265358979323,
+      "Admin": [
+        577215664901532860
+      ],
+      "Debug": [
+        894615016574891652,
+        987465132014654216
+      ]
+    }
+  },
+  "Twitch": {
+    "ClientID": "u45gfhn14io23d5h4hfidu1htgnfi",
+    "ClientSecret": "t2guf234ghnfutygnbhfcjackjthq3bn44jt31gfna",
+    "EventSub": {
+      "ListenerHost": "https://example.com",
+      "ListenerPort": 80,
+      "WebhookSecret": "random_string_of_text"
+    }
+  }
+}

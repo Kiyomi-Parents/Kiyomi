@@ -1,5 +1,4 @@
 import logging
-import os
 
 import twitchio
 from twitchio.ext import eventsub
@@ -11,25 +10,14 @@ from .services.event_service import EventService
 from .services.twitch_broadcaster_service import TwitchBroadcasterService
 from .storage import StorageUnitOfWork
 from .twitch import Twitch
-from kiyomi import Kiyomi
+from kiyomi import Kiyomi, Config
 
 _logger = logging.getLogger(__name__)
 
 
 async def setup(bot: Kiyomi):
-    twitch_client_id = os.getenv("TWITCH_CLIENT_ID")
-    twitch_client_secret = os.getenv("TWITCH_CLIENT_SECRET")
-    twitch_webhook_secret = os.getenv("TWITCH_WEBHOOK_SECRET")
-    twitch_event_sub_listener_url = os.getenv("TWITCH_EVENT_SUB_LISTENER_URL")
-    twitch_event_sub_listener_port = os.getenv("TWITCH_EVENT_SUB_LISTENER_PORT")
-
-    for env_var in (twitch_client_id, twitch_client_secret, twitch_event_sub_listener_url, twitch_event_sub_listener_port):
-        if env_var is None or len(env_var) == 0:
-            Logger.warn("Twitch", "Config issue, exiting")
-            return
-
-    twitch_client = twitchio.Client.from_client_credentials(twitch_client_id, twitch_client_secret, loop=bot.loop)
-    eventsub_client = eventsub.EventSubClient(twitch_client, twitch_webhook_secret, twitch_event_sub_listener_url)
+    twitch_client = twitchio.Client.from_client_credentials(Config.get().Twitch.ClientID, Config.get().Twitch.ClientSecret, loop=bot.loop)
+    eventsub_client = eventsub.EventSubClient(twitch_client, Config.get().Twitch.EventSub.WebhookSecret, Config.get().Twitch.EventSub.ListenerHost)
 
     async def connect():
         try:
@@ -37,7 +25,7 @@ async def setup(bot: Kiyomi):
         except twitchio.errors.AuthenticationError as e:
             _logger.error("Twitch", f"{e.__class__.__name__}: {e}")
 
-    bot.loop.create_task(eventsub_client.listen(port=twitch_event_sub_listener_port))
+    bot.loop.create_task(eventsub_client.listen(port=Config.get().Twitch.EventSub.ListenerPort))
     bot.loop.create_task(connect())
 
     storage_uow = StorageUnitOfWork(bot.database.session)

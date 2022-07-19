@@ -65,7 +65,7 @@ class Kiyomi(Bot):
         _logger.info(self.user, f"Commands registered!")
 
     async def register_guild_commands(self, guild: discord.Guild):
-        # Logger.log(self.user, f"Clearing registered commands for {guild}")
+        # _logger.info(self.user, f"Clearing registered commands for {guild}")
         # # Remove commands from guild
         # self.tree.clear_commands(guild=guild)  # This removes all the commands registered to the guild prior by
         # commands. We shouldn't call this really....

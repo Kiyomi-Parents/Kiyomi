@@ -29,10 +29,10 @@ class Database:
         async with self._engine.begin() as connection:
             await connection.run_sync(Base.metadata.create_all)
 
-            Logger.log("Database", f"Created {len(Base.metadata.tables)} tables")
+            _logger.info("Database", f"Created {len(Base.metadata.tables)} tables")
 
     async def drop_tables(self):
         async with self._engine.begin() as connection:
             await connection.run_sync(Base.metadata.drop_all)
 
-            Logger.log("Database", f"Dropped all database tables!")
+            _logger.info("Database", f"Dropped all database tables!")
