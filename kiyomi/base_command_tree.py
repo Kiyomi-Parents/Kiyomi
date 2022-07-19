@@ -65,7 +65,7 @@ class BaseCommandTree(CommandTree["Kiyomi"]):
 
             await command._invoke_with_namespace(interaction, namespace)
         except AppCommandError as e:
-            await command._invoke_error_handler(interaction, e)
+            await command._invoke_error_handlers(interaction, e)
             await self.on_error(interaction, e)
 
         finally:
