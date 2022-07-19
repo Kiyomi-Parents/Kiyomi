@@ -1,6 +1,7 @@
 import logging
 from typing import List, TYPE_CHECKING
 
+import discord
 from discord import app_commands, Interaction
 from discord.app_commands import Transform
 from discord.ext import commands
@@ -65,3 +66,24 @@ class BeatSaver(BaseCog[ServiceUnitOfWork], name="Beat Saver"):
         song_view = SongView(self.bot, ctx.guild, beatmap)
 
         await song_view.respond(ctx)
+
+    @commands.Cog.listener()
+    async def on_message(self, msg: discord.Message):
+        """Repost emoji if enabled"""
+
+        if msg.guild is None:
+            return
+
+        if msg.author.id == self.bot.user.id:
+            return
+
+        beatmap = await self.service_uow.beatmaps_from_text.get_beatmap_from_text(msg.content)
+
+        await self.service_uow.save_changes()
+        await self.service_uow.refresh(beatmap)
+
+        if beatmap is not None:
+            song_view = SongView(self.bot, msg.guild, beatmap)
+            await song_view.reply(msg)
+
+        await self.service_uow.close()

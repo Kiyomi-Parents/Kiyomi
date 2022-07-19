@@ -40,6 +40,9 @@ class ScoreSaberAPI(BaseCog[ServiceUnitOfWork]):
     ) -> Optional[Leaderboard]:
         return await self.service_uow.leaderboards.get_by_song_hash(song_hash, song_game_mode, song_difficulty)
 
+    async def get_leaderboard_by_id(self, leaderboard_id: int) -> Optional[Leaderboard]:
+        return await self.service_uow.leaderboards.get_by_id(leaderboard_id)
+
     async def get_score_by_player_id_and_leaderboard_id(self, player_id: str, leaderboard_id: int) -> List[Score]:
         return await self.service_uow.scores.get_all_by_player_id_and_leaderboard_id(player_id, leaderboard_id)
 

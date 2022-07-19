@@ -44,3 +44,10 @@ class PersistentView(BaseView, ABC):
         self.bot.events.emit("on_new_view_sent", await self.serialize_persistence())
 
         return message
+
+    async def reply(self, msg: discord.Message) -> discord.Message:
+        message = await super(PersistentView, self).reply(msg)
+
+        self.bot.events.emit("on_new_view_sent", await self.serialize_persistence())
+
+        return message
