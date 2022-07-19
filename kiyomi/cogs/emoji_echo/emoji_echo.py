@@ -53,7 +53,7 @@ class EmojiEcho(BaseCog[ServiceUnitOfWork]):
 
         async with self.bot.get_cog_api(SettingsAPI) as settings:
             if await settings.get(msg.guild.id, "repost_emoji"):
-                emoji = await self.service_uow.echo_emojis.get_emoji_from_message(msg.guild.id, msg.content)
+                emoji = await self._service_uow.echo_emojis.get_emoji_from_message(msg.guild.id, msg.content)
 
                 if emoji is not None:
                     await msg.channel.send(emoji)
@@ -65,7 +65,7 @@ class EmojiEcho(BaseCog[ServiceUnitOfWork]):
 
     # @app_commands.context_menu(name="Random Reaction")
     async def random_reaction(self, ctx: Interaction, message: discord.Message):
-        emoji = await self.service_uow.echo_emojis.get_random_enabled_emoji()
+        emoji = await self._service_uow.echo_emojis.get_random_enabled_emoji()
 
         await ctx.response.send_message("give me a sec", ephemeral=True)
         await ctx.delete_original_message()
@@ -75,7 +75,7 @@ class EmojiEcho(BaseCog[ServiceUnitOfWork]):
     @app_commands.command(name="emoji-random")
     async def emoji_random(self, ctx: Interaction):
         """Posts a random enabled emoji"""
-        emoji = await self.service_uow.echo_emojis.get_random_enabled_emoji()
+        emoji = await self._service_uow.echo_emojis.get_random_enabled_emoji()
 
         await ctx.response.send_message("give me a sec", ephemeral=True)
         await ctx.delete_original_message()
@@ -102,8 +102,8 @@ class EmojiEcho(BaseCog[ServiceUnitOfWork]):
         """Allow the given emoji to be used by the bot"""
         await ctx.response.defer(ephemeral=True)
 
-        await self.service_uow.echo_emojis.enable_emoji(emoji.guild_id, emoji.id, emoji.name)
-        await self.service_uow.save_changes()
+        await self._service_uow.echo_emojis.enable_emoji(emoji.guild_id, emoji.id, emoji.name)
+        await self._service_uow.save_changes()
 
         await ctx.followup.send(f"Enabled {str(emoji)}", ephemeral=True)
 
@@ -114,7 +114,7 @@ class EmojiEcho(BaseCog[ServiceUnitOfWork]):
         """Disallow the given emoji from being used by the bot"""
         await ctx.response.defer(ephemeral=True)
 
-        await self.service_uow.echo_emojis.disable_emoji(emoji.id)
-        await self.service_uow.save_changes()
+        await self._service_uow.echo_emojis.disable_emoji(emoji.id)
+        await self._service_uow.save_changes()
 
         await ctx.followup.send(f"Disabled {str(emoji)}", ephemeral=True)

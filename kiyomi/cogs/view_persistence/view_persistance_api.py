@@ -14,13 +14,13 @@ class ViewPersistenceAPI(BaseCog[ServiceUnitOfWork]):
     def register_events(self):
         @self.bot.events.on("on_new_view_sent")
         async def mark_scores_sent(persistence: Persistence):
-            await self.service_uow.message_views.add_persistent_view(persistence)
-            await self.service_uow.save_changes()
-            await self.service_uow.close()
+            await self._service_uow.message_views.add_persistent_view(persistence)
+            await self._service_uow.save_changes()
+            await self._service_uow.close()
 
     @commands.Cog.listener()
     async def on_ready(self):
-        persistences = await self.service_uow.message_views.get_persistent_views()
+        persistences = await self._service_uow.message_views.get_persistent_views()
 
         for persistence in persistences:
             try:
@@ -30,4 +30,4 @@ class ViewPersistenceAPI(BaseCog[ServiceUnitOfWork]):
                 await error.handle()
 
         _logger.info("View Persistence", f"Loaded {len(persistences)} persistent views")
-        await self.service_uow.close()
+        await self._service_uow.close()

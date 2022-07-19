@@ -16,6 +16,6 @@ class LeaderboardAPI(BaseCog[ServiceUnitOfWork]):
         characteristic: pybeatsaver.ECharacteristic,
         difficulty: pybeatsaver.EDifficulty,
     ) -> GuildLeaderboard:
-        return await self.service_uow.score_leaderboards.get_guild_leaderboard(
+        return await self._service_uow.score_leaderboards.get_guild_leaderboard(
             guild_id, beatmap_hash, characteristic, difficulty
         )

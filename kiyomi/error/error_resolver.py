@@ -39,7 +39,7 @@ class ErrorResolver:
         else:
             resolved_arg = f"**{await resolver.resolve(arg_value)}**"
 
-        await resolver.service_uow.close()
+        await resolver._service_uow.close()
 
         return resolved_arg
 

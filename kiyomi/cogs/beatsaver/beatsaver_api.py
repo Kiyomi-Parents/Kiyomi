@@ -18,24 +18,24 @@ class BeatSaverAPI(BaseCog[ServiceUnitOfWork]):
 
     async def get_beatmap_by_key(self, key: str) -> Optional[Beatmap]:
         try:
-            beatmap = await self.service_uow.beatmaps.get_beatmap_by_key(key)
+            beatmap = await self._service_uow.beatmaps.get_beatmap_by_key(key)
 
-            return await self.service_uow.refresh(beatmap)
+            return await self._service_uow.refresh(beatmap)
         except BeatmapNotFound as error:
             _logger.warning(self.__class__.__name__, f"Could not find beatmap with key: {key}")
             return None
 
     async def get_beatmap_by_hash(self, beatmap_hash: str) -> Optional[Beatmap]:
         try:
-            beatmap = await self.service_uow.beatmaps.get_beatmap_by_hash(beatmap_hash)
+            beatmap = await self._service_uow.beatmaps.get_beatmap_by_hash(beatmap_hash)
 
-            return await self.service_uow.refresh(beatmap)
+            return await self._service_uow.refresh(beatmap)
         except BeatmapNotFound as error:
             _logger.warning(self.__class__.__name__, f"Could not find beatmap with hash: {beatmap_hash}")
             return None
 
     async def get_beatmap_hash_by_key(self, beatmap_key: str) -> Optional[str]:
-        beatmap_hash = await self.service_uow.beatmaps.get_beatmap_hash_by_key(beatmap_key)
+        beatmap_hash = await self._service_uow.beatmaps.get_beatmap_hash_by_key(beatmap_key)
 
         return beatmap_hash
 
@@ -45,9 +45,9 @@ class BeatSaverAPI(BaseCog[ServiceUnitOfWork]):
         characteristic: pybeatsaver.ECharacteristic,
         difficulty: pybeatsaver.EDifficulty,
     ) -> Optional[BeatmapVersionDifficulty]:
-        beatmap_hash = await self.service_uow.beatmaps.get_beatmap_hash_by_key(beatmap_key)
+        beatmap_hash = await self._service_uow.beatmaps.get_beatmap_hash_by_key(beatmap_key)
 
-        beatmap_version_difficulty = await self.service_uow.beatmaps.get_beatmap_difficulty(
+        beatmap_version_difficulty = await self._service_uow.beatmaps.get_beatmap_difficulty(
             beatmap_hash, characteristic, difficulty
         )
 
@@ -59,7 +59,7 @@ class BeatSaverAPI(BaseCog[ServiceUnitOfWork]):
         characteristic: pybeatsaver.ECharacteristic,
         difficulty: pybeatsaver.EDifficulty,
     ) -> Optional[BeatmapVersionDifficulty]:
-        beatmap_version_difficulty = await self.service_uow.beatmaps.get_beatmap_difficulty(
+        beatmap_version_difficulty = await self._service_uow.beatmaps.get_beatmap_difficulty(
             beatmap_hash, characteristic, difficulty
         )
 

@@ -14,39 +14,39 @@ class AchievementRoles(BaseCog[ServiceUnitOfWork], name="Achievement Roles"):
     def register_events(self):
         @self.bot.events.on("on_new_player")
         async def register_member(guild_member: GuildMember):
-            await self.service_uow.memberAchievementRoles.update_member_roles(guild_member.guild_id, guild_member.member_id)
-            await self.service_uow.save_changes()
-            await self.service_uow.close()
+            await self._service_uow.memberAchievementRoles.update_member_roles(guild_member.guild_id, guild_member.member_id)
+            await self._service_uow.save_changes()
+            await self._service_uow.close()
 
         @self.bot.events.on("on_remove_player")
         async def unregister_member(guild_member: GuildMember):
-            await self.service_uow.memberAchievementRoles.remove_all_member_roles(
+            await self._service_uow.memberAchievementRoles.remove_all_member_roles(
                 guild_member.guild_id, guild_member.member_id
             )
-            await self.service_uow.save_changes()
-            await self.service_uow.close()
+            await self._service_uow.save_changes()
+            await self._service_uow.close()
 
         @self.bot.events.on("on_setting_change")
         async def update_roles(setting: AbstractSetting):
             cog_settings = ["achievement_roles_pp", "achievement_roles_rank"]
 
             if setting.name in cog_settings:
-                await self.service_uow.memberAchievementRoles.update_guild_roles(setting.guild_id)
+                await self._service_uow.memberAchievementRoles.update_guild_roles(setting.guild_id)
 
-            await self.service_uow.save_changes()
-            await self.service_uow.close()
+            await self._service_uow.save_changes()
+            await self._service_uow.close()
 
         @self.bot.events.on("on_member_role_removed")
         async def member_role_removed(member_role: MemberRole):
-            await self.service_uow.memberAchievementRoles.update_member_roles(member_role.guild_id, member_role.member_id)
-            await self.service_uow.save_changes()
-            await self.service_uow.close()
+            await self._service_uow.memberAchievementRoles.update_member_roles(member_role.guild_id, member_role.member_id)
+            await self._service_uow.save_changes()
+            await self._service_uow.close()
 
         @self.bot.events.on("on_guild_role_removed")
         async def guild_role_removed(role: Role):
-            await self.service_uow.memberAchievementRoles.update_guild_roles(role.guild_id)
-            await self.service_uow.save_changes()
-            await self.service_uow.close()
+            await self._service_uow.memberAchievementRoles.update_guild_roles(role.guild_id)
+            await self._service_uow.save_changes()
+            await self._service_uow.close()
 
     @commands.Cog.listener()
     async def on_ready(self):

@@ -27,14 +27,14 @@ class BeatSaver(BaseCog[ServiceUnitOfWork], name="Beat Saver"):
             song_hashes = [leaderboard.song_hash for leaderboard in leaderboards]
 
             try:
-                await self.service_uow.beatmaps.get_beatmaps_by_hashes(list(set(song_hashes)))
-                await self.service_uow.save_changes()
+                await self._service_uow.beatmaps.get_beatmaps_by_hashes(list(set(song_hashes)))
+                await self._service_uow.save_changes()
 
                 _logger.info("Beatmap import", f"Imported {len(list(set(song_hashes)))} songs")
             except BeatmapNotFound as error:
                 _logger.info("on_new_leaderboards", error)
 
-            await self.service_uow.close()
+            await self._service_uow.close()
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -77,13 +77,13 @@ class BeatSaver(BaseCog[ServiceUnitOfWork], name="Beat Saver"):
         if msg.author.id == self.bot.user.id:
             return
 
-        beatmap = await self.service_uow.beatmaps_from_text.get_beatmap_from_text(msg.content)
+        beatmap = await self._service_uow.beatmaps_from_text.get_beatmap_from_text(msg.content)
 
-        await self.service_uow.save_changes()
-        await self.service_uow.refresh(beatmap)
+        await self._service_uow.save_changes()
+        await self._service_uow.refresh(beatmap)
 
         if beatmap is not None:
             song_view = SongView(self.bot, msg.guild, beatmap)
             await song_view.reply(msg)
 
-        await self.service_uow.close()
+        await self._service_uow.close()

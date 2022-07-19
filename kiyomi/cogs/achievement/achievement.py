@@ -19,7 +19,7 @@ class Achievements(BaseCog[ServiceUnitOfWork]):
         """Show all achievements"""
         await ctx.response.defer()
 
-        achievements = await self.service_uow.user_achievements.get_all_achievements(ctx.user.id)
+        achievements = await self._service_uow.user_achievements.get_all_achievements(ctx.user.id)
 
         embed = PlayerAchievementsEmbed(self.bot, achievements)
         await embed.after_init()
@@ -31,7 +31,7 @@ class Achievements(BaseCog[ServiceUnitOfWork]):
         """Show all completed achievements"""
         await ctx.response.defer()
 
-        achievements = await self.service_uow.user_achievements.get_all_completed_achievements(ctx.user.id)
+        achievements = await self._service_uow.user_achievements.get_all_completed_achievements(ctx.user.id)
 
         embed = PlayerAchievementsEmbed(self.bot, achievements)
         await embed.after_init()
@@ -43,7 +43,7 @@ class Achievements(BaseCog[ServiceUnitOfWork]):
         """Show all uncompleted achievements"""
         await ctx.response.defer()
 
-        achievements = await self.service_uow.user_achievements.get_all_uncompleted_achievements(ctx.user.id)
+        achievements = await self._service_uow.user_achievements.get_all_uncompleted_achievements(ctx.user.id)
 
         embed = PlayerAchievementsEmbed(self.bot, achievements)
         await embed.after_init()
@@ -56,7 +56,7 @@ class Achievements(BaseCog[ServiceUnitOfWork]):
         """Show all uncompleted achievements"""
         await ctx.response.defer()
 
-        achievements = await self.service_uow.user_achievements.get_group_achievements(group, ctx.user.id)
+        achievements = await self._service_uow.user_achievements.get_group_achievements(group, ctx.user.id)
 
         embed = PlayerAchievementsEmbed(self.bot, achievements)
         await embed.after_init()
@@ -65,6 +65,6 @@ class Achievements(BaseCog[ServiceUnitOfWork]):
 
     @achievements_group.autocomplete("group")
     async def get_all_groups(self, ctx: Interaction, current: str) -> List[Choice[str]]:
-        choices = await self.service_uow.user_achievements.get_all_groups(ctx, current)
+        choices = await self._service_uow.user_achievements.get_all_groups(ctx, current)
 
         return Utils.limit_list(choices, 25)

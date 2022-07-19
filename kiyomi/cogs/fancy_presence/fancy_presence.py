@@ -22,7 +22,7 @@ class FancyPresence(BaseCog[ServiceUnitOfWork]):
         """Force update status"""
         await ctx.response.defer(ephemeral=True)
 
-        await self.service_uow.presences.update_status()
+        await self._service_uow.presences.update_status()
 
         await ctx.followup.send("Status force updated!", ephemeral=True)
 
@@ -33,7 +33,7 @@ class FancyPresence(BaseCog[ServiceUnitOfWork]):
         """Force status text"""
         await ctx.response.defer(ephemeral=True)
 
-        await self.service_uow.presences.set_presence(Presence(0, text))
+        await self._service_uow.presences.set_presence(Presence(0, text))
 
         await ctx.followup.send("Status updated!", ephemeral=True)
 
@@ -43,6 +43,6 @@ class FancyPresence(BaseCog[ServiceUnitOfWork]):
         """Reset forced status"""
         await ctx.response.defer(ephemeral=True)
 
-        await self.service_uow.presences.reset_presence()
+        await self._service_uow.presences.reset_presence()
 
         await ctx.followup.send("Status updated!", ephemeral=True)

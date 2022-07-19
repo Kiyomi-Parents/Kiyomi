@@ -12,29 +12,29 @@ class SettingsAPI(BaseCog[ServiceUnitOfWork]):
         pass
 
     async def set(self, guild_id: int, name: str, value: any) -> AbstractSetting:
-        setting = await self.service_uow.settings.set(guild_id, name, value)
-        await self.service_uow.save_changes()
+        setting = await self._service_uow.settings.set(guild_id, name, value)
+        await self._service_uow.save_changes()
 
         return setting
 
     async def get(self, guild_id: int, name: str) -> Optional[any]:
-        return await self.service_uow.settings.get_value(guild_id, name)
+        return await self._service_uow.settings.get_value(guild_id, name)
 
     async def get_setting(self, guild_id: int, name: str) -> AbstractSetting:
-        return await self.service_uow.settings.get(guild_id, name)
+        return await self._service_uow.settings.get(guild_id, name)
 
     def get_registered(self) -> List[AbstractSetting]:
-        return self.service_uow.settings.registered_settings
+        return self._service_uow.settings.registered_settings
 
     def has_permission(self, name: str, discord_member: discord.Member) -> bool:
-        return self.service_uow.settings.has_permission(name, discord_member)
+        return self._service_uow.settings.has_permission(name, discord_member)
 
     async def validate_setting_value(self, guild_id: int, name: str, value: Optional[str]):
-        return await self.service_uow.settings.validate_setting_value(guild_id, name, value)
+        return await self._service_uow.settings.validate_setting_value(guild_id, name, value)
 
     async def delete(self, guild_id: int, name: str) -> AbstractSetting:
-        setting = await self.service_uow.settings.delete(guild_id, name)
-        await self.service_uow.save_changes()
+        setting = await self._service_uow.settings.delete(guild_id, name)
+        await self._service_uow.save_changes()
 
         return setting
 
