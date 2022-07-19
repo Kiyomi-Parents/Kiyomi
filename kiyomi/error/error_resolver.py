@@ -10,6 +10,7 @@ if TYPE_CHECKING:
 
 _logger = logging.getLogger(__name__)
 
+
 class ErrorResolver:
     _resolvers: List["ErrorArgResolver"] = []
     _arg_pattern: Pattern = re.compile(r"%(\S+)%")
@@ -39,7 +40,7 @@ class ErrorResolver:
         else:
             resolved_arg = f"**{await resolver.resolve(arg_value)}**"
 
-        await resolver._service_uow.close()
+        await resolver.service_uow.close()
 
         return resolved_arg
 
