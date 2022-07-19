@@ -10,6 +10,7 @@ if TYPE_CHECKING:
 
 _logger = logging.getLogger(__name__)
 
+
 class ErrorResolver:
     _resolvers: List["ErrorArgResolver"] = []
     _arg_pattern: Pattern = re.compile(r"%(\S+)%")
@@ -33,15 +34,17 @@ class ErrorResolver:
                 f"Could not find error arg resolver for arg name {arg_name}",
             )
             return resolved_arg
+        
+        try:
+            if detailed:
+                return await resolver.resolve_detailed(arg_value)
 
-        if detailed:
-            resolved_arg = await resolver.resolve_detailed(arg_value)
-        else:
-            resolved_arg = f"**{await resolver.resolve(arg_value)}**"
-
-        await resolver.service_uow.close()
-
-        return resolved_arg
+            return f"**{await resolver.resolve(arg_value)}**"
+        except Exception as error:
+            _logger.error(f"{resolver.__class__.__name__}", f"Failed to resolve argument. {error}")
+            return resolved_arg
+        finally:
+            await resolver.service_uow.close()
 
     async def resolve_message(
         self,

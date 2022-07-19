@@ -16,8 +16,8 @@ async def setup(bot: Kiyomi):
     storage_uow = StorageUnitOfWork(bot.database.session)
     service_uow = ServiceUnitOfWork(bot, storage_uow, beatsaver_api_client)
 
-    bot.error_resolver.add(BeatmapHashResolver(storage_uow))
-    bot.error_resolver.add(BeatmapKeyResolver(storage_uow))
+    bot.error_resolver.add(BeatmapHashResolver(service_uow))
+    bot.error_resolver.add(BeatmapKeyResolver(service_uow))
 
     await bot.add_cog(BeatSaver(bot, service_uow))
     await bot.add_cog(BeatSaverAPI(bot, service_uow))

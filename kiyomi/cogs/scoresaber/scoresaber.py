@@ -2,7 +2,7 @@ from typing import Optional
 
 import discord
 from discord import app_commands, Interaction, AppCommandType
-from discord.app_commands import Transform, CommandInvokeError
+from discord.app_commands import Transform, CommandInvokeError, AppCommandError
 from discord.ext import commands
 
 from kiyomi.cogs.general import GeneralAPI
@@ -73,7 +73,7 @@ class ScoreSaber(BaseCog[ServiceUnitOfWork], name="Score Saber"):
         """Gives bot permission to check the persons PP."""
         await ctx.response.defer()
 
-        guild_player = await self.service_uow.players.get_guild_player(ctx.guild.id, ctx.user.id)
+        guild_player = await self.service_uow.players.get_guild_player(ctx.guild_id, ctx.user.id)
 
         if guild_player.player.pp == 0:
             await ctx.followup.send(f"**{ctx.user.name}** doesn't have a PP")
@@ -83,9 +83,9 @@ class ScoreSaber(BaseCog[ServiceUnitOfWork], name="Score Saber"):
         await ctx.followup.send(f"**{ctx.user.name}**'s PP is this big:\n8{'=' * pp_size}D")
 
     @show_pp.error
-    async def show_pp_error(self, ctx: Interaction, error: Exception):
+    async def show_pp_error(self, ctx: Interaction, error: AppCommandError):
         if isinstance(error, MemberPlayerNotFoundInGuildException):
-            return await error.handle(ctx=ctx, message=f"**{ctx.user.name}** doesn't have a PP")
+            return await error.handle(bot=self.bot, ctx=ctx, message=f"**{ctx.user.name}** doesn't have a PP")
 
     @app_commands.command(name="recent")
     @app_commands.rename(member="user")
@@ -101,7 +101,7 @@ class ScoreSaber(BaseCog[ServiceUnitOfWork], name="Score Saber"):
         if count is None:
             count = 1
 
-        guild_player = await self.service_uow.players.get_guild_player(ctx.guild.id, member.id)
+        guild_player = await self.service_uow.players.get_guild_player(ctx.guild_id, member.id)
 
         if 0 >= count >= 3:
             await ctx.followup.send("Score count has to be between 0 and 3")
@@ -120,14 +120,12 @@ class ScoreSaber(BaseCog[ServiceUnitOfWork], name="Score Saber"):
             await score_view.respond(ctx)
 
     @recent_scores.error
-    async def recent_scores_error(self, ctx: Interaction, error: Exception):
-        if isinstance(error, CommandInvokeError):
-            error = error.original
-
+    async def recent_scores_error(self, ctx: Interaction, error: AppCommandError):
         if isinstance(error, MemberPlayerNotFoundInGuildException):
             return await error.handle(
-                ctx=ctx,
-                message=f"%member_id% doesn't have a Score Saber profile linked",
+                    bot=self.bot,
+                    ctx=ctx,
+                    message=f"%member_id% doesn't have a Score Saber profile linked",
             )
 
     @app_commands.command(name="manual-add")
@@ -186,12 +184,13 @@ class ScoreSaber(BaseCog[ServiceUnitOfWork], name="Score Saber"):
         )
 
     @manual_remove_player.error
-    async def manual_remove_player_error(self, ctx: Interaction, error: Exception):
+    async def manual_remove_player_error(self, ctx: Interaction, error: AppCommandError):
         if isinstance(error, CommandInvokeError):
             error = error.original
 
         if isinstance(error, MemberPlayerNotFoundInGuildException):
             return await error.handle(
+                bot=self.bot,
                 ctx=ctx,
                 message=f"%member_id% doesn't have a Score Saber profile %player_id% linked in guild %guild_id%.",
             )

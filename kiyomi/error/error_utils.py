@@ -50,7 +50,7 @@ async def send_exception(ctx: Union[Context["Kiyomi"], Interaction], **options):
         await ctx.send(**options)
     elif isinstance(ctx, Interaction):
         if ctx.is_expired() or ctx.response.is_done():
-            await ctx.followup.send_message(**options)
+            await ctx.followup.send(**options)
         else:
             await ctx.response.send_message(**options)
 
