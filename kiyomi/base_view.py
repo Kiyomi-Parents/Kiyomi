@@ -53,9 +53,9 @@ class BaseView(discord.ui.View, ABC):
         # TODO: error embed
 
     async def update(
-        self,
-        interaction: discord.Interaction,
-        button_clicked: Optional[discord.ui.Button] = None,
+            self,
+            interaction: discord.Interaction,
+            button_clicked: Optional[discord.ui.Button] = None,
     ) -> discord.Message:
         if self.message is None:
             self.message = interaction.message
@@ -73,8 +73,8 @@ class BaseView(discord.ui.View, ABC):
         # )
 
         await interaction.response.edit_message(
-                embed=await self.get_current_embed(),
-                view=self
+            embed=await self.get_current_embed(),
+            view=self
         )
 
         return self.message
@@ -97,9 +97,9 @@ class BaseView(discord.ui.View, ABC):
                 await child.after_init()
 
     async def send(
-        self,
-        ctx: Optional[Context] = None,
-        target: Optional[discord.abc.Messageable] = None,
+            self,
+            ctx: Optional[Context] = None,
+            target: Optional[discord.abc.Messageable] = None,
     ) -> discord.Message:
         if ctx is not None and not isinstance(ctx, Context):
             raise TypeError(f"expected Context not {ctx.__class__!r}")
@@ -123,9 +123,9 @@ class BaseView(discord.ui.View, ABC):
         return self.message
 
     async def respond(
-        self,
-        interaction: discord.Interaction,
-        target: Optional[discord.abc.Messageable] = None,
+            self,
+            interaction: discord.Interaction,
+            target: Optional[discord.abc.Messageable] = None,
     ) -> Union[discord.Message, discord.InteractionMessage, discord.WebhookMessage]:
         if not isinstance(interaction, discord.Interaction):
             raise TypeError(f"expected Interaction not {interaction.__class__!r}")
@@ -154,6 +154,12 @@ class BaseView(discord.ui.View, ABC):
             elif isinstance(msg, discord.Interaction):
                 self.message = await msg.original_message()
 
+        return self.message
+
+    async def reply(self, msg: discord.Message) -> discord.Message:
+        await self.run_component_after_init()
+
+        self.message = await msg.reply(embed=await self.get_current_embed(), view=self)
         return self.message
 
     # TODO: Add error handling for views
