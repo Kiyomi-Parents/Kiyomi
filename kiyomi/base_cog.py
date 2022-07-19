@@ -2,6 +2,7 @@ import logging
 from abc import abstractmethod
 from typing import Generic, TypeVar, TYPE_CHECKING
 
+from discord import Interaction, app_commands
 from discord.app_commands import CommandInvokeError
 from discord.ext import commands
 from discord.ext.commands import Context, CogMeta
@@ -49,6 +50,14 @@ class BaseCog(commands.Cog, Generic[TServiceUOW], metaclass=CogMeta):
     async def __aexit__(self, exc_type, exc_val, exc_tb):
         await self.service_uow.save_changes()
         await self.service_uow.close()
+
+    async def cog_app_command_error(self, interaction: Interaction, error: app_commands.AppCommandError) -> None:
+        if isinstance(error, KiyomiException):
+            if error.is_handled:
+                return
+
+        if isinstance(error, CogException):
+            return await error.handle(ctx=interaction, bot=self.bot)
 
     async def cog_command_error(self, ctx: Context["Kiyomi"], error: Exception):
         if isinstance(error, CommandInvokeError):
