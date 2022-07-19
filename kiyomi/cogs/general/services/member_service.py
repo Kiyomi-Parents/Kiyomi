@@ -1,3 +1,5 @@
+from typing import Optional
+
 import discord
 from discord import NotFound
 
@@ -10,6 +12,17 @@ from ..storage.repository.member_repository import MemberRepository
 
 
 class MemberService(BaseService[Member, MemberRepository, StorageUnitOfWork]):
+    async def find_discord_user(self, user_id: int) -> Optional[discord.User]:
+        discord_user = self.bot.get_user(user_id)
+
+        if discord_user is None:
+            try:
+                return await self.bot.fetch_user(user_id)
+            except NotFound:
+                return None
+
+        return discord_user
+
     async def get_discord_member(self, discord_guild: discord.Guild, member_id: int) -> discord.Member:
         discord_member = discord_guild.get_member(member_id)
 
