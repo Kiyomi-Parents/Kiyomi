@@ -1,3 +1,5 @@
+import discord
+
 from kiyomi.error import CogException
 
 
@@ -32,3 +34,13 @@ class BroadcastNotFound(TwitchCogException):
 
 class GuildTwitchBroadcasterNotFound(TwitchCogException):
     pass
+
+
+class FailedToSendTwitchFeedMessage(TwitchCogException):
+    def __init__(self, *args, original_error: Exception, channel: discord.TextChannel):
+        super().__init__(*args, message_targets=[channel.guild.owner])
+        self.original_error = original_error
+        self.channel = channel
+
+    def __str__(self):
+        return f"Failed to send Twitch feed notification in channel (<#{self.channel.id}>)\n```{self.original_error}```"
