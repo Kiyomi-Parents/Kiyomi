@@ -2,7 +2,7 @@ import logging
 from typing import List, TYPE_CHECKING
 
 import discord
-from discord import app_commands, Interaction
+from discord import app_commands, Interaction, Permissions
 from discord.app_commands import Transform
 from discord.ext import commands
 
@@ -13,6 +13,8 @@ from .errors import BeatmapNotFound
 from .messages.views.song_view import SongView
 from .storage.model.beatmap import Beatmap
 from .transformers.beatmap_key_transformer import BeatmapKeyTransformer
+from ..settings import SettingsAPI
+from ..settings.storage.model.toggle_setting import ToggleSetting
 
 if TYPE_CHECKING:
     from kiyomi.cogs.scoresaber.storage.model.leaderboard import Leaderboard
@@ -52,6 +54,7 @@ class BeatSaver(BaseCog[ServiceUnitOfWork], name="Beat Saver"):
             EmojiSetting.create(self.bot, self.__cog_name__, "Lightshow emoji", "lightshow_game_mode_emoji"),
             EmojiSetting.create(self.bot, self.__cog_name__, "Lawless emoji", "lawless_game_mode_emoji"),
             EmojiSetting.create(self.bot, self.__cog_name__, "Map preview emoji", "map_preview_emoji"),
+            ToggleSetting.create(self.__cog_name__, "Reply to beatmap links with a nice beatmap embed", "text_to_beatmap", permissions=Permissions(administrator=True), default_value=True)
         ]
 
         self.bot.events.emit("setting_register", settings)
@@ -77,13 +80,17 @@ class BeatSaver(BaseCog[ServiceUnitOfWork], name="Beat Saver"):
         if msg.author.id == self.bot.user.id:
             return
 
-        beatmap = await self._service_uow.beatmaps_from_text.get_beatmap_from_text(msg.content)
+        async with self.bot.get_cog_api(SettingsAPI) as settings:
+            text_to_beatmap_enabled = await settings.get(msg.guild.id, "text_to_beatmap")
 
-        await self._service_uow.save_changes()
-        await self._service_uow.refresh(beatmap)
+        if text_to_beatmap_enabled:
+            beatmap = await self._service_uow.beatmaps_from_text.get_beatmap_from_text(msg.content)
 
-        if beatmap is not None:
-            song_view = SongView(self.bot, msg.guild, beatmap)
-            await song_view.reply(msg)
+            await self._service_uow.save_changes()
+            await self._service_uow.refresh(beatmap)
+
+            if beatmap is not None:
+                song_view = SongView(self.bot, msg.guild, beatmap)
+                await song_view.reply(msg)
 
         await self._service_uow.close()
