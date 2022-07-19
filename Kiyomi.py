@@ -25,7 +25,7 @@ async def startup(loop: AbstractEventLoop):
 
     await database.init()
 
-    async with Kiyomi(command_prefix="!", db=database, loop=loop) as bot:
+    async with Kiyomi(command_prefix="!?#!a'", db=database, loop=loop) as bot:
         default_guild = Config.get().Discord.Guilds.Default
         if default_guild is not None:
             bot.default_guild = discord.Object(id=int(default_guild))
