@@ -1,11 +1,15 @@
+import logging
 from typing import Optional
 
 import pyscoresaber
+from pyscoresaber import NotFoundException
 
 from ..storage import StorageUnitOfWork
 from ..storage.model.leaderboard import Leaderboard
 from ..storage.repository.leaderboard_repository import LeaderboardRepository
 from kiyomi import BaseService, Kiyomi
+
+_logger = logging.getLogger(__name__)
 
 
 class LeaderboardService(BaseService[Leaderboard, LeaderboardRepository, StorageUnitOfWork]):
@@ -29,9 +33,31 @@ class LeaderboardService(BaseService[Leaderboard, LeaderboardRepository, Storage
         leaderboard = await self.repository.get_by_song_hash(song_hash, song_game_mode, song_difficulty)
 
         if not leaderboard:
-            leaderboard = await self.scoresaber.leaderboard_info_by_hash(song_hash, song_difficulty, song_game_mode)
-            
-            if not await self.storage_uow.leaderboards.exists(leaderboard.id):
-                return await self.repository.add(Leaderboard(leaderboard))
+            try:
+                leaderboard = await self.scoresaber.leaderboard_info_by_hash(song_hash, song_difficulty, song_game_mode)
+
+                if not await self.storage_uow.leaderboards.exists(leaderboard.id):
+                    return await self.repository.add(Leaderboard(leaderboard))
+            except NotFoundException as e:
+                _logger.warning("ScoreSaber", f"Could not find leaderboard with parameters: {song_hash=}, {song_game_mode=}, {song_difficulty=}")
+                return
+
+        return leaderboard
+
+    async def get_by_id(
+            self,
+            leaderboard_id: int
+    ) -> Optional[Leaderboard]:
+        leaderboard = await self.repository.get_by_id(leaderboard_id)
+
+        if not leaderboard:
+            try:
+                leaderboard = await self.scoresaber.leaderboard_info_by_id(leaderboard_id)
+
+                if not await self.storage_uow.leaderboards.exists(leaderboard.id):
+                    return await self.repository.add(Leaderboard(leaderboard))
+            except NotFoundException as e:
+                _logger.warning("ScoreSaber", f"Could not find leaderboard with parameters: {leaderboard_id=}")
+                return
 
         return leaderboard
