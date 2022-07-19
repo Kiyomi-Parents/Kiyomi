@@ -6,10 +6,10 @@ from kiyomi import BaseCog
 
 class FancyPresenceAPI(BaseCog[ServiceUnitOfWork]):
     async def add_task(self, task_text: str):
-        await self.service_uow.presences.add_task(task_text)
+        await self._service_uow.presences.add_task(task_text)
 
     async def remove_task(self, task_text: str):
-        await self.service_uow.presences.remove_task(task_text)
+        await self._service_uow.presences.remove_task(task_text)
 
     @staticmethod
     def presence_task(func):

@@ -22,21 +22,21 @@ class Twitch(BaseCog[ServiceUnitOfWork]):
             if event.type != "live":
                 return
 
-            guild_twitch_broadcasters = await self.service_uow.twitch_broadcasters.get_all_by_broadcaster_id(
+            guild_twitch_broadcasters = await self._service_uow.twitch_broadcasters.get_all_by_broadcaster_id(
                 str(event.broadcaster.id))
             try:
-                stream = await self.service_uow.twitch_broadcasters.fetch_stream(event.broadcaster.id)
+                stream = await self._service_uow.twitch_broadcasters.fetch_stream(event.broadcaster.id)
             except BroadcastNotFound as e:
                 _logger.info("Twitch", await self.bot.error_resolver.resolve_message(e, detailed=True))
                 stream = None
 
-            await self.service_uow.messages.send_broadcast_live_notifications(event, guild_twitch_broadcasters, stream)
-            await self.service_uow.close()
+            await self._service_uow.messages.send_broadcast_live_notifications(event, guild_twitch_broadcasters, stream)
+            await self._service_uow.close()
 
         @self.bot.events.on("twitch_broadcast_end")
         async def on_broadcast_end(event: StreamOfflineData):
-            await self.service_uow.messages.rescind_broadcast_live_notifications(event)
-            await self.service_uow.close()
+            await self._service_uow.messages.rescind_broadcast_live_notifications(event)
+            await self._service_uow.close()
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -44,7 +44,7 @@ class Twitch(BaseCog[ServiceUnitOfWork]):
 
         self.bot.events.emit("setting_register", settings)
 
-        await self.service_uow.events.register_subscriptions()
+        await self._service_uow.events.register_subscriptions()
 
     twitch = app_commands.Group(name="twitch", description="Twitch commands")
 
@@ -58,17 +58,17 @@ class Twitch(BaseCog[ServiceUnitOfWork]):
             await general_api.register_member(ctx.guild_id, ctx.user.id)
 
         try:
-            guild_twitch_broadcaster = await self.service_uow.twitch_broadcasters.register_twitch_broadcaster(
+            guild_twitch_broadcaster = await self._service_uow.twitch_broadcasters.register_twitch_broadcaster(
                 ctx.guild_id, ctx.user.id, login
             )
         except BroadcasterNotFound as e:
             await ctx.followup.send(await self.bot.error_resolver.resolve_message(e))
             return
 
-        await self.service_uow.save_changes()
-        await self.service_uow.refresh(guild_twitch_broadcaster)
+        await self._service_uow.save_changes()
+        await self._service_uow.refresh(guild_twitch_broadcaster)
 
-        await self.service_uow.events.register_subscription(
+        await self._service_uow.events.register_subscription(
             int(guild_twitch_broadcaster.twitch_broadcaster_id)
         )  # maybe we should instead refresh all subscriptions here?
 
@@ -82,14 +82,14 @@ class Twitch(BaseCog[ServiceUnitOfWork]):
         await ctx.response.defer()
 
         try:
-            guild_twitch_broadcaster = await self.service_uow.twitch_broadcasters.unregister_guild_twitch_broadcaster(
+            guild_twitch_broadcaster = await self._service_uow.twitch_broadcasters.unregister_guild_twitch_broadcaster(
                 ctx.guild_id, ctx.user.id
             )
         except GuildTwitchBroadcasterNotFound:
             await ctx.followup.send(f"Failed to unregister, most likely because you are already unregistered.")
             return
 
-        await self.service_uow.save_changes()
+        await self._service_uow.save_changes()
 
         await ctx.followup.send(
             f"Successfully unlinked {guild_twitch_broadcaster.twitch_broadcaster.login} from {ctx.user.name} in guild {ctx.guild.name}!",

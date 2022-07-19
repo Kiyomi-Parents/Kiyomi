@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 import logging
-from typing import Optional, Union, TYPE_CHECKING
+from typing import Optional, Union, TYPE_CHECKING, List
 
 from discord import Interaction, DiscordException
+from discord.abc import Messageable
 from discord.app_commands import AppCommandError
 from discord.ext.commands import Context
 
@@ -18,6 +19,13 @@ _logger = logging.getLogger(__name__)
 
 
 class KiyomiException(DiscordException):
+    def __init__(self, *args, message_targets: List[Messageable] = None):
+        super().__init__(*args)
+        self.message_targets = []
+        if message_targets is not None:
+            self.message_targets = message_targets
+        print(self.message_targets)
+
     is_handled: bool = False
 
     def _log(self, message: Optional[str] = None):
@@ -50,9 +58,13 @@ class KiyomiException(DiscordException):
 
         ctx: Optional[Union[Context["Kiyomi"], Interaction]] = options.pop("ctx") if "ctx" in options.keys() else None
 
+        message_simple = ErrorResolver.resolve_message_simple(self, message, True)
+
         if ctx is not None:
-            message_simple = ErrorResolver.resolve_message_simple(self, message, True)
             await self._respond(ctx, message_simple, **options)
+
+        for message_target in self.message_targets:
+            await message_target.send(message_simple)
 
         self.is_handled = True
 
@@ -78,9 +90,13 @@ class CogException(KiyomiException):
 
         ctx: Optional[Union[Context["Kiyomi"], Interaction]] = options.pop("ctx") if "ctx" in options.keys() else None
 
+        message_simple = await bot.error_resolver.resolve_message(self, message, False)
+
         if ctx is not None:
-            message_simple = await bot.error_resolver.resolve_message(self, message, False)
             await self._respond(ctx, message_simple, **options)
+
+        for message_target in self.message_targets:
+            await message_target.send(message_simple)
 
         self.is_handled = True
 

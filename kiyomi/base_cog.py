@@ -21,7 +21,7 @@ _logger = logging.getLogger(__name__)
 class BaseCog(commands.Cog, Generic[TServiceUOW], metaclass=CogMeta):
     def __init__(self, bot: "Kiyomi", service_uow: TServiceUOW):
         self.bot = bot
-        self.service_uow = service_uow
+        self._service_uow = service_uow
 
         self.register_events()
 
@@ -42,14 +42,14 @@ class BaseCog(commands.Cog, Generic[TServiceUOW], metaclass=CogMeta):
         )
 
     async def cog_after_invoke(self, ctx: Context["Kiyomi"]) -> None:
-        await self.service_uow.close()
+        await self._service_uow.close()
 
     async def __aenter__(self):
         return self
 
     async def __aexit__(self, exc_type, exc_val, exc_tb):
-        await self.service_uow.save_changes()
-        await self.service_uow.close()
+        await self._service_uow.save_changes()
+        await self._service_uow.close()
 
     async def cog_app_command_error(self, interaction: Interaction, error: app_commands.AppCommandError) -> None:
         if isinstance(error, KiyomiException):

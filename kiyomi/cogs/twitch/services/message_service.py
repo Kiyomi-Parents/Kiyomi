@@ -1,12 +1,13 @@
 import logging
 from typing import List, Optional
 
-from discord import Message
+from discord import Message, Forbidden
 from twitchio import Stream
 from twitchio.ext.eventsub import StreamOnlineData, StreamOfflineData
 
 from kiyomi.cogs.settings import SettingsAPI
 from kiyomi.service.base_basic_service import BaseBasicService
+from ..errors import FailedToSendTwitchFeedMessage
 from ..messages.components.embeds.go_live_embed import GoLiveEmbed
 from ..storage import StorageUnitOfWork
 from ..storage.model.guild_twitch_broadcaster import GuildTwitchBroadcaster
@@ -27,8 +28,11 @@ class MessageService(BaseBasicService[StorageUnitOfWork]):
         messages = []
 
         for streamer in guild_twitch_broadcasters:
-            message = await self.send_broadcast_live_notification(event, streamer, stream)
-            messages.append(message)
+            try:
+                message = await self.send_broadcast_live_notification(event, streamer, stream)
+                messages.append(message)
+            except FailedToSendTwitchFeedMessage as e:
+                await e.handle(bot=self.bot)
 
         self.storage_uow.twitch_broadcasts.add(event, messages)
 
@@ -44,7 +48,10 @@ class MessageService(BaseBasicService[StorageUnitOfWork]):
             _logger.info(discord_guild, "Twitch feed channel not found, skipping!")
             return None
 
-        return await channel.send(embed=GoLiveEmbed(self.bot, event, guild_twitch_broadcaster, stream))
+        try:
+            return await channel.send(embed=GoLiveEmbed(self.bot, event, guild_twitch_broadcaster, stream))
+        except Forbidden as e:
+            raise FailedToSendTwitchFeedMessage(channel=channel, original_error=e)
 
     async def rescind_broadcast_live_notifications(self, event: StreamOfflineData):
         broadcasts = self.storage_uow.twitch_broadcasts.delete_by_broadcaster_id(event.broadcaster.id)

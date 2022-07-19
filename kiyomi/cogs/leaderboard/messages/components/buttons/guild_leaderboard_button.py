@@ -2,6 +2,7 @@ import discord.ui
 from discord import Embed
 
 from kiyomi.base_view import BaseView
+from kiyomi.cogs.scoresaber import ScoreSaberAPI
 from ....leaderboard_api import LeaderboardAPI
 from ..embeds.guild_leaderboard_embed import GuildLeaderboardEmbed
 from ..leaderboard_component import LeaderboardComponent
@@ -27,6 +28,12 @@ class GuildLeaderboardButton(LeaderboardComponent, discord.ui.Button):
         if emoji:
             self.label = None
             self.emoji = emoji
+
+        async with self.bot.get_cog_api(ScoreSaberAPI) as scoresaber_api:
+            leaderboard = await scoresaber_api.get_leaderboard(self.song_hash, self.parent.beatmap_characteristic, self.parent.beatmap_difficulty)
+
+        if leaderboard is None:
+            self.parent.remove_item(self)
 
     async def get_embed(self) -> Embed:
         async with self.bot.get_cog_api(LeaderboardAPI) as leaderboard_api:

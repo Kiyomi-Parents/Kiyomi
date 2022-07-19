@@ -14,8 +14,8 @@ class Settings(BaseCog[ServiceUnitOfWork]):
     def register_events(self):
         @self.bot.events.on("setting_register")
         async def register_setting(settings: List[AbstractSetting]):
-            self.service_uow.settings.register_settings(settings)
-            await self.service_uow.close()
+            self._service_uow.settings.register_settings(settings)
+            await self._service_uow.close()
 
     settings = app_commands.Group(name="setting", description="Various settings", guild_only=True)
 
@@ -30,9 +30,9 @@ class Settings(BaseCog[ServiceUnitOfWork]):
         """Set setting value"""
         await ctx.response.defer(ephemeral=True)
 
-        abstract_setting = await self.service_uow.settings.set(ctx.guild_id, setting, value)
-        setting_value = await self.service_uow.settings.get_value(ctx.guild_id, setting)
-        await self.service_uow.save_changes()
+        abstract_setting = await self._service_uow.settings.set(ctx.guild_id, setting, value)
+        setting_value = await self._service_uow.settings.get_value(ctx.guild_id, setting)
+        await self._service_uow.save_changes()
 
         await ctx.followup.send(
             f"{abstract_setting.name_human} is now set to: {setting_value}",
@@ -49,8 +49,8 @@ class Settings(BaseCog[ServiceUnitOfWork]):
         """Remove setting value"""
         await ctx.response.defer(ephemeral=True)
 
-        abstract_setting = await self.service_uow.settings.delete(ctx.guild_id, setting)
-        await self.service_uow.save_changes()
+        abstract_setting = await self._service_uow.settings.delete(ctx.guild_id, setting)
+        await self._service_uow.save_changes()
 
         await ctx.followup.send(
             f"{abstract_setting.name_human} has been removed",

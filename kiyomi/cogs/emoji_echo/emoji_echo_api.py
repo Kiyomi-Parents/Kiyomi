@@ -10,4 +10,4 @@ class EmojiEchoAPI(BaseCog[ServiceUnitOfWork]):
         pass
 
     async def get_enabled_emojis(self, guild_id: int) -> List[EchoEmoji]:
-        return await self.service_uow.echo_emojis.get_by_guild_id(guild_id)
+        return await self._service_uow.echo_emojis.get_by_guild_id(guild_id)
