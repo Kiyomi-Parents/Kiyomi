@@ -16,10 +16,6 @@ class BeatmapVersionRepository(BaseStorageRepository[BeatmapVersion]):
         stmt = (
             select(self._table)
             .where(self._table.hash == beatmap_hash)
-            .options(
-                joinedload(BeatmapVersion.beatmap),
-                joinedload(BeatmapVersion.difficulties),
-            )
         )
 
         return await self._first(stmt)
@@ -28,10 +24,6 @@ class BeatmapVersionRepository(BaseStorageRepository[BeatmapVersion]):
         stmt = (
             select(self._table)
             .where(self._table.hash.in_(beatmap_hashes))
-            .options(
-                joinedload(BeatmapVersion.beatmap),
-                joinedload(BeatmapVersion.difficulties),
-            )
         )
 
         return await self._all(stmt)
@@ -40,10 +32,6 @@ class BeatmapVersionRepository(BaseStorageRepository[BeatmapVersion]):
         stmt = (
             select(self._table)
             .where(self._table.key == beatmap_key)
-            .options(
-                joinedload(BeatmapVersion.beatmap),
-                joinedload(BeatmapVersion.difficulties),
-            )
         )
 
         return await self._first(stmt)
