@@ -69,6 +69,8 @@ class ScoreView(PersistentView):
             previous_score_id = persistence.get_param(1)
             if previous_score_id is not None:
                 previous_score = await scoresaber.get_score_by_id(int(previous_score_id))
+
+            if previous_score is not None:
                 previous_score = await scoresaber.update_score_pp_weight(previous_score)
 
         return ScoreView(bot, guild, score, previous_score)
