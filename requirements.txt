@@ -10,5 +10,5 @@ pybeatsaver==0.1.12
 pyscoresaber==1.0.8
 asyncio~=3.4.3
 pyee~=9.0.4
-twitchio==2.2.0
+twitchio==2.4.0
 git+https://github.com/Rapptz/discord.py@master#egg=discord.py
