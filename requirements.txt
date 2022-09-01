@@ -3,7 +3,7 @@ alembic==1.8.1
 asyncmy~=0.2.5
 python-dateutil~=2.8.2
 python-dotenv~=0.20.0
-timeago~=1.0.15
+timeago~=1.0.16
 termcolor~=1.1.0
 prettytable==3.3.0
 pybeatsaver==0.1.12
