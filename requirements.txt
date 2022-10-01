@@ -5,7 +5,7 @@ python-dateutil~=2.8.2
 python-dotenv~=0.20.0
 timeago~=1.0.15
 termcolor~=1.1.0
-prettytable==3.3.0
+prettytable==3.4.1
 pybeatsaver==0.1.12
 pyscoresaber==1.0.8
 asyncio~=3.4.3
