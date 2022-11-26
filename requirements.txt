@@ -6,8 +6,8 @@ python-dotenv==0.21.0
 timeago~=1.0.16
 termcolor~=2.1.1
 prettytable==3.5.0
-pybeatsaver==0.1.12
-pyscoresaber==1.0.8
+pybeatsaver==0.1.13
+pyscoresaber==1.0.9
 asyncio~=3.4.3
 pyee~=9.0.4
 twitchio==2.2.0
