@@ -10,5 +10,5 @@ pybeatsaver==0.1.13
 pyscoresaber==1.0.9
 asyncio~=3.4.3
 pyee~=9.0.4
-twitchio==2.2.0
+twitchio==2.5.0
 discord.py~=2.1.0
