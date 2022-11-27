@@ -5,7 +5,6 @@ import pybeatsaver
 
 from kiyomi import BaseCog
 from .services import ServiceUnitOfWork
-from .errors import BeatmapNotFound
 from .storage.model.beatmap import Beatmap
 from .storage.model.beatmap_version_difficulty import BeatmapVersionDifficulty
 
@@ -17,27 +16,22 @@ class BeatSaverAPI(BaseCog[ServiceUnitOfWork]):
         pass
 
     async def get_beatmap_by_key(self, key: str) -> Optional[Beatmap]:
-        try:
-            beatmap = await self._service_uow.beatmaps.get_beatmap_by_key(key)
+        beatmap = await self._service_uow.beatmaps.get_beatmap_by_key(key)
+        await self._service_uow.save_changes()
 
-            return await self._service_uow.refresh(beatmap)
-        except BeatmapNotFound as error:
-            _logger.warning(self.__class__.__name__, f"Could not find beatmap with key: {key}")
-            return None
+        return await self._service_uow.refresh(beatmap)
 
     async def get_beatmap_by_hash(self, beatmap_hash: str) -> Optional[Beatmap]:
-        try:
-            beatmap = await self._service_uow.beatmaps.get_beatmap_by_hash(beatmap_hash)
+        beatmap = await self._service_uow.beatmaps.get_beatmap_by_hash(beatmap_hash)
+        await self._service_uow.save_changes()
 
-            return await self._service_uow.refresh(beatmap)
-        except BeatmapNotFound as error:
-            _logger.warning(self.__class__.__name__, f"Could not find beatmap with hash: {beatmap_hash}")
-            return None
+        return await self._service_uow.refresh(beatmap)
 
     async def get_beatmap_hash_by_key(self, beatmap_key: str) -> Optional[str]:
-        beatmap_hash = await self._service_uow.beatmaps.get_beatmap_hash_by_key(beatmap_key)
+        beatmap = await self._service_uow.beatmaps.get_beatmap_hash_by_key(beatmap_key)
+        await self._service_uow.save_changes()
 
-        return beatmap_hash
+        return await self._service_uow.refresh(beatmap)
 
     async def get_beatmap_difficulty_by_key(
         self,
@@ -51,7 +45,9 @@ class BeatSaverAPI(BaseCog[ServiceUnitOfWork]):
             beatmap_hash, characteristic, difficulty
         )
 
-        return beatmap_version_difficulty
+        await self._service_uow.save_changes()
+
+        return await self._service_uow.refresh(beatmap_version_difficulty)
 
     async def get_beatmap_difficulty_by_hash(
         self,
@@ -63,4 +59,6 @@ class BeatSaverAPI(BaseCog[ServiceUnitOfWork]):
             beatmap_hash, characteristic, difficulty
         )
 
-        return beatmap_version_difficulty
+        await self._service_uow.save_changes()
+
+        return await self._service_uow.refresh(beatmap_version_difficulty)

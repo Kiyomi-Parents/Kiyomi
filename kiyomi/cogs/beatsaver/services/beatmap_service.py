@@ -1,11 +1,11 @@
-from typing import List, Optional
+from typing import List
 
 import pybeatsaver
 from pybeatsaver import BeatSaverAPI
 
 from kiyomi import BaseService, Kiyomi
 from ..storage import StorageUnitOfWork
-from ..errors import BeatmapHashNotFound, BeatmapKeyNotFound
+from ..errors import BeatmapHashNotFound, BeatmapKeyNotFound, BeatmapDifficultyNotFound
 from ..storage.model.beatmap import Beatmap
 from ..storage.model.beatmap_version_difficulty import BeatmapVersionDifficulty
 from ..storage.repository.beatmap_repository import BeatmapRepository
@@ -18,18 +18,26 @@ class BeatmapService(BaseService[Beatmap, BeatmapRepository, StorageUnitOfWork])
         self.beatsaver = beatsaver
 
     async def get_missing_beatmaps_by_keys(self, beatmap_keys: List[str]) -> List[Beatmap]:
-        beatmaps = []
-
         try:
+            beatmaps = []
+
             async for map_detail in self.beatsaver.beatmaps_by_keys(beatmap_keys):
                 beatmaps.append(Beatmap(map_detail))
+
+            return await self.repository.add_all(beatmaps)
         except pybeatsaver.NotFoundException as error:
             raise BeatmapKeyNotFound(error.url.split("/")[-1]) from error
 
-        return await self.storage_uow.beatmaps.add_all(beatmaps)
+    async def get_missing_beatmap_by_key(self, beatmap_key: str) -> Beatmap:
+        try:
+            map_detail = await self.beatsaver.beatmap(beatmap_key)
+
+            return await self.repository.add(Beatmap(map_detail))
+        except pybeatsaver.NotFoundException as error:
+            raise BeatmapKeyNotFound(error.url.split("/")[-1]) from error
 
     async def get_beatmaps_by_keys(self, beatmap_keys: List[str]) -> List[Beatmap]:
-        beatmaps = await self.storage_uow.beatmaps.get_all_by_ids(beatmap_keys)
+        beatmaps = await self.repository.get_all_by_ids(beatmap_keys)
         missing_beatmaps_keys = beatmap_keys.copy()
 
         for beatmap in beatmaps:
@@ -42,27 +50,38 @@ class BeatmapService(BaseService[Beatmap, BeatmapRepository, StorageUnitOfWork])
         return beatmaps
 
     async def get_beatmap_by_key(self, beatmap_key: str) -> Beatmap:
-        beatmap = await self.storage_uow.beatmaps.get_by_id(beatmap_key)
+        beatmap = await self.repository.get_by_id(beatmap_key)
 
         if beatmap is None:
-            return (await self.get_missing_beatmaps_by_keys([beatmap_key]))[0]
+            return await self.get_missing_beatmap_by_key(beatmap_key)
 
         return beatmap
 
     async def get_missing_beatmaps_by_hashes(self, beatmap_hashes: List[str]) -> List[Beatmap]:
-        beatmaps = []
-
         try:
+            beatmaps = []
+
             async for map_details in self.beatsaver.beatmaps_by_hashes_all(beatmap_hashes):
                 new_beatmaps = [Beatmap(map_detail) for map_detail in map_details]
 
-                await self.storage_uow.beatmaps.add_all(new_beatmaps)
+                await self.repository.add_all(new_beatmaps)
 
                 beatmaps += new_beatmaps
+
+            return beatmaps
         except pybeatsaver.NotFoundException as error:
             raise BeatmapHashNotFound(error.url.split("/")[-1]) from error
 
-        return beatmaps
+    async def get_missing_beatmap_by_hash(self, beatmap_hash: str) -> Beatmap:
+        try:
+            map_detail = await self.beatsaver.beatmap_by_hash(beatmap_hash)
+            new_beatmap = Beatmap(map_detail)
+
+            await self.repository.add(new_beatmap.latest_version)
+
+            return new_beatmap
+        except pybeatsaver.NotFoundException as error:
+            raise BeatmapHashNotFound(error.url.split("/")[-1]) from error
 
     async def get_beatmaps_by_hashes(self, beatmap_hashes: List[str]) -> List[Beatmap]:
         beatmaps = []
@@ -83,11 +102,11 @@ class BeatmapService(BaseService[Beatmap, BeatmapRepository, StorageUnitOfWork])
         beatmap_version = await self.storage_uow.beatmap_versions.get_by_hash(beatmap_hash)
 
         if beatmap_version is None:
-            return (await self.get_missing_beatmaps_by_hashes([beatmap_hash]))[0]
+            return await self.get_missing_beatmap_by_hash(beatmap_hash)
 
         return beatmap_version.beatmap
 
-    async def get_beatmap_hash_by_key(self, beatmap_key: str) -> Optional[str]:
+    async def get_beatmap_hash_by_key(self, beatmap_key: str) -> str:
         beatmap_hash = await self.storage_uow.beatmap_versions.get_hash_by_key(beatmap_key)
 
         if beatmap_hash is None:
@@ -108,13 +127,27 @@ class BeatmapService(BaseService[Beatmap, BeatmapRepository, StorageUnitOfWork])
             )
         )
 
-        if beatmap_difficulty is None:
-            await self.get_beatmap_by_hash(beatmap_hash)
+        if beatmap_difficulty is not None:
+            return beatmap_difficulty
 
-            beatmap_difficulty = (
-                await self.storage_uow.beatmap_version_difficulties.get_by_hash_and_characteristic_and_difficulty(
-                    beatmap_hash, characteristic, difficulty
-                )
-            )
+        new_beatmap = await self.get_beatmap_by_hash(beatmap_hash)
 
-        return beatmap_difficulty
+        for new_version in new_beatmap.versions:
+            if new_version.hash is not beatmap_hash:
+                continue
+
+            for new_difficulty in new_version.difficulties:
+                if new_difficulty.characteristic is not characteristic:
+                    continue
+
+                if new_difficulty.difficulty is not difficulty:
+                    continue
+
+                return new_difficulty
+
+        raise BeatmapDifficultyNotFound(beatmap_hash, characteristic, difficulty)
+
+    async def add(self, beatmap: Beatmap) -> Beatmap:
+        self.repository.exists(beatmap.id)
+
+        return await self.repository.add(beatmap)

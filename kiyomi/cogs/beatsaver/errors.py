@@ -1,3 +1,5 @@
+import pybeatsaver
+
 from kiyomi.error import CogException
 
 
@@ -23,3 +25,19 @@ class BeatmapHashNotFound(BeatmapNotFound):
 
     def __str__(self):
         return f"Could not find a beatmap using hash %beatmap_hash%"
+
+
+class BeatmapDifficultyNotFound(BeatmapNotFound):
+    def __init__(
+        self,
+        beatmap_hash: str,
+        characteristic: pybeatsaver.ECharacteristic,
+        difficulty: pybeatsaver.EDifficulty
+    ):
+        self.beatmap_hash = beatmap_hash
+        self.characteristic = characteristic
+        self.difficulty = difficulty
+
+    def __str__(self):
+        return f"Could not find a beatmap difficulty using hash %beatmap_hash%, characteristic %characteristic% and " \
+               f"difficulty %difficulty%"

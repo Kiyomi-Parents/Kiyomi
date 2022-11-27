@@ -9,15 +9,13 @@ from ..storage.model.beatmap import Beatmap
 
 
 class BeatmapKeyTransformer(Transformer):
-    @classmethod
-    async def transform(cls, interaction: Interaction, value: str) -> Optional[Beatmap]:
-        return await cls.get_beatmap_by_key(interaction, value)
+    async def transform(self, interaction: Interaction, value: str) -> Optional[Beatmap]:
+        return await self.get_beatmap_by_key(interaction, value)
 
-    @classmethod
     async def autocomplete(
-        cls, interaction: Interaction, value: Union[int, float, str]
+            self, interaction: Interaction, value: Union[int, float, str]
     ) -> List[Choice[Union[int, float, str]]]:
-        beatmap = await cls.get_beatmap_by_key(interaction, value)
+        beatmap = await self.get_beatmap_by_key(interaction, value)
 
         if beatmap is not None:
             return [Choice(name=beatmap.name, value=beatmap.id)]
