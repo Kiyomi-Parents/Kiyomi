@@ -10,8 +10,8 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import mysql
 
 # revision identifiers, used by Alembic.
-from src.kiyomi import EMapTagList
-from src.kiyomi.database.types.string_list import StringList
+from kiyomi import EMapTagList
+from kiyomi.database.types.string_list import StringList
 
 revision = '26478de04700'
 down_revision = 'a52babf8eefa'
