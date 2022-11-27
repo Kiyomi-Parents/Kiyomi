@@ -1,6 +1,6 @@
 from typing import Optional, List, Type
 
-from sqlalchemy import select, desc
+from sqlalchemy import select, desc, func
 
 from kiyomi.cogs.scoresaber.storage.model.score import Score
 from ..model.sent_score import SentScore
@@ -20,15 +20,15 @@ class SentScoreRepository(BaseStorageRepository[SentScore]):
         player_score_ids = select(Score.id).where(Score.player_id == player_id).subquery()
 
         stmt = (
-            select(self._table.score_id)
+            select([func.count()])
+            .select_from(self._table)
             .where(self._table.guild_id == guild_id)
             .where(self._table.score_id.in_(player_score_ids.select()))
-            .count()
         )
 
         return await self._first(stmt)
 
-    async def get_unsent_scores_count(self, guild_id: int, player_id: int) -> int:
+    async def get_unsent_scores_count(self, guild_id: int, player_id: str) -> int:
         player_score_ids = select(Score.id).where(Score.player_id == player_id).subquery()
 
         sent_score_ids = (
@@ -39,11 +39,11 @@ class SentScoreRepository(BaseStorageRepository[SentScore]):
         )
 
         stmt = (
-            select(Score)
+            select([func.count()])
+            .select_from(Score)
             .where(Score.player_id == player_id)
             .where(Score.id.not_in(sent_score_ids.select()))
             .order_by(desc(Score.time_set))
-            .count()
         )
 
         return await self._first(stmt)
