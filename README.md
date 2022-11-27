@@ -6,6 +6,21 @@
   <br>
 </h1>
 
+<p align="center">
+  <a href="https://github.com/Kiyomi-Parents/Kiyomi/blob/master/LICENSE">
+    <img src="https://img.shields.io/github/license/Kiyomi-Parents/Kiyomi?style=for-the-badge" alt="MIT license">
+  </a>
+	
+  <a href="https://discord.com/api/oauth2/authorize?client_id=834048194085650462&permissions=139855260736&scope=bot%20applications.commands">
+    <img src="https://img.shields.io/badge/Kiyomi-Invite-green?style=for-the-badge" alt="Invite Kiyomi">
+  </a>
+	
+  <a href="https://github.com/Kiyomi-Parents/Kiyomi">
+    <img src="https://img.shields.io/badge/python-3.9-blue?style=for-the-badge" alt="Python 3.9">
+  </a>
+</p>
+
+
 # Overview
 
 Discord bot that has various functionality related to Beat Saber 💜</br>

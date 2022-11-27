@@ -119,7 +119,7 @@ class ImprovementScoreEmbed(ScoreEmbed):
         if improvement_output is None:
             return f"**{output}**"
 
-        return f"**{output}** {number_improvement}"
+        return f"**{output}** {improvement_output}"
 
     @property
     def get_bad_cuts(self) -> Optional[str]:
