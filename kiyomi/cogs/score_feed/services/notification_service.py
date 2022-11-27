@@ -43,7 +43,7 @@ class NotificationService(BaseBasicService[StorageUnitOfWork]):
 
             if not await self.sent_score_service.should_send_scores(guild, player):
                 _logger.info(guild, "Decided not to send scores. (Spam prevention)")
-                await self.sent_score_service.mark_player_scores_sent(player, guild)
+                await self.sent_score_service.mark_player_scores_sent(guild.id, player.id)
                 return
 
             discord_guild = self.bot.get_guild(guild.id)

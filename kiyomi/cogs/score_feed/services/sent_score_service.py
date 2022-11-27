@@ -31,9 +31,9 @@ class SentScoreService(BaseService[SentScore, SentScoreRepository, StorageUnitOf
         _logger.info(player, "Marking all scores as sent")
 
         for guild in player.guilds:
-            await self.mark_player_scores_sent(guild.id, int(player.id))
+            await self.mark_player_scores_sent(guild.id, player.id)
 
-    async def mark_player_scores_sent(self, guild_id: int, player_id: int):
+    async def mark_player_scores_sent(self, guild_id: int, player_id: str):
         scores = await self.storage_uow.sent_scores.get_unsent_scores(guild_id, player_id)
 
         _logger.info(player_id, f"Marking {len(scores)} scores as sent in {guild_id}")
