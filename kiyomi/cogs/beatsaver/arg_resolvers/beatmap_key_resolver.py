@@ -4,7 +4,7 @@ from kiyomi.error import ErrorArgResolver
 
 class BeatmapKeyResolver(ErrorArgResolver[ServiceUnitOfWork, int, str]):
     async def resolve_detailed(self, argument: int) -> str:
-        beatmap = self.service_uow.beatmaps.get_by_id(argument)
+        beatmap = await self.service_uow.beatmaps.get_by_id(argument)
 
         if beatmap is None:
             return f"{argument} (Not in DB)"
@@ -12,7 +12,7 @@ class BeatmapKeyResolver(ErrorArgResolver[ServiceUnitOfWork, int, str]):
         return f"{beatmap}"
 
     async def resolve(self, argument: int) -> str:
-        beatmap = self.service_uow.beatmaps.get_by_id(argument)
+        beatmap = await self.service_uow.beatmaps.get_by_id(argument)
 
         if beatmap is None:
             return f"{argument}"

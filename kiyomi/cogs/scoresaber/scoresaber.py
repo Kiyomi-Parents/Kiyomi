@@ -107,7 +107,7 @@ class ScoreSaber(BaseCog[ServiceUnitOfWork], name="Score Saber"):
             await ctx.followup.send("Score count has to be between 0 and 3")
             return
 
-        scores = await self._service_uow.scores.get_recent_scores(guild_player.player.id, count)
+        scores = await self._service_uow.scores.get_recent_scores(guild_player.player_id, count)
 
         if scores is None or len(scores) == 0:
             await ctx.followup.send("No scores found!")

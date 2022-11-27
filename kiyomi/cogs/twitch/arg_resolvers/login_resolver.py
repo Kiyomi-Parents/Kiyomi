@@ -1,10 +1,9 @@
 from ..services import ServiceUnitOfWork
-from kiyomi.error.error_arg_resolver import TArg, TReturn
 from kiyomi.error import ErrorArgResolver
 
 
 class TwitchLoginResolver(ErrorArgResolver[ServiceUnitOfWork, str, str]):
-    async def resolve_detailed(self, argument: TArg) -> TReturn:
+    async def resolve_detailed(self, argument: str) -> str:
         return await self.resolve(argument)
 
     async def resolve(self, argument: str) -> str:

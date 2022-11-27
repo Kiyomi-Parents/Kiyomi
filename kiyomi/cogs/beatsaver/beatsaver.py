@@ -1,5 +1,5 @@
 import logging
-from typing import List, TYPE_CHECKING
+from typing import List, TYPE_CHECKING, Optional
 
 import discord
 from discord import app_commands, Interaction, Permissions
@@ -62,7 +62,7 @@ class BeatSaver(BaseCog[ServiceUnitOfWork], name="Beat Saver"):
     @app_commands.command()
     @app_commands.rename(beatmap="key")
     @app_commands.describe(beatmap="Beatmap key (25f)")
-    async def map(self, ctx: Interaction, beatmap: Transform[Beatmap, BeatmapKeyTransformer]):
+    async def map(self, ctx: Interaction, beatmap: Transform[Optional[Beatmap], BeatmapKeyTransformer]):
         """Displays song info."""
         await ctx.response.defer()
 

@@ -26,8 +26,9 @@ class BaseCommandTree(CommandTree["Kiyomi"]):
         # Call Bot Global error handler
         await ctx.bot.on_command_error(ctx, error)
 
-    async def call(self, interaction: Interaction) -> None:
+    async def _call(self, interaction: Interaction) -> None:
         if not await self.interaction_check(interaction):
+            interaction.command_failed = True
             return
 
         data: ApplicationCommandInteractionData = interaction.data  # type: ignore
@@ -65,8 +66,12 @@ class BaseCommandTree(CommandTree["Kiyomi"]):
 
             await command._invoke_with_namespace(interaction, namespace)
         except AppCommandError as e:
+            interaction.command_failed = True
             await command._invoke_error_handlers(interaction, e)
             await self.on_error(interaction, e)
+        else:
+            if not interaction.command_failed:
+                self.client.dispatch('app_command_completion', interaction, command)
 
         finally:
             if cog is not None and isinstance(cog, Cog):

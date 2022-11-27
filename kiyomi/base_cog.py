@@ -3,7 +3,7 @@ from abc import abstractmethod
 from typing import Generic, TypeVar, TYPE_CHECKING
 
 from discord import Interaction, app_commands
-from discord.app_commands import CommandInvokeError
+from discord.app_commands import CommandInvokeError, TransformerError
 from discord.ext import commands
 from discord.ext.commands import Context, CogMeta
 from termcolor import colored
@@ -60,6 +60,9 @@ class BaseCog(commands.Cog, Generic[TServiceUOW], metaclass=CogMeta):
             return await error.handle(ctx=interaction, bot=self.bot)
 
     async def cog_command_error(self, ctx: Context["Kiyomi"], error: Exception):
+        if isinstance(error, TransformerError):
+            error = error.__cause__
+
         if isinstance(error, CommandInvokeError):
             error = error.original
 
