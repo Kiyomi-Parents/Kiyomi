@@ -1,0 +1,30 @@
+{
+    "default": {
+        "name": "Kiyomi Default",
+        "file_path": "kiyomi/cogs/pfp_switcher/storage/assets/Kiyomi_default.png"
+    },
+    "seasonal": [
+        {
+            "name": "Kiyomi Summer",
+            "file_path": "kiyomi/cogs/pfp_switcher/storage/assets/Kiyomi_summer.png",
+            "active_zones": [
+                {
+                    "start": "21/06_00:00",
+                    "end": "23/09_00:00"
+                }
+            ]
+        }
+    ],
+    "events": [
+        {
+            "name": "Kiyomi Birthday",
+            "file_path": "kiyomi/cogs/pfp_switcher/storage/assets/Kiyomi_birthday.png",
+            "active_zones": [
+                {
+                    "start": "20/04_00:00",
+                    "end": "23/04_00:00"
+                }
+            ]
+        }
+    ]
+}

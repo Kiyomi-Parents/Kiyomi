@@ -33,16 +33,7 @@ Discord bot that has various functionality related to Beat Saber 💜</br>
 	python3 -m pip install -r requirements.txt  
 
 ### Starting Kiyomi
-    # Set environment variables manually
-    # Alternatively rename .env.example to .env and fill out the configuration there instead
-	export DISCORD_TOKEN=<Discord bot token>
-    export DATABASE_IP=<MySql/MariaDB host ip>
-    export DATABASE_USER=<Database username>
-    export DATABASE_PW=<Database password>
-    export DATABASE_NAME=<Database name>
-    export DEFAULT_GUILD=<Default guild ID. Used for fallback if something isn't found/overridden on the current guild>
-    export ADMIN_GUILDS=<Comma seperated list of guild ids. This is for bot owner commands.>
-    export DEBUG_GUILDS=<Comma seperated list of guild ids. This is for development only. Leave empty on production>
+    rename example.config.json to config.json and fill in your configuration details.
 
     # Run database migrations
     alembic upgrade head
@@ -53,6 +44,10 @@ Discord bot that has various functionality related to Beat Saber 💜</br>
 ### Lint
     # Run pylint
     pylint Kiyomi.py src
+
+### Code formatter
+    pip install black
+    python -m black ./Kiyomi.py ./src
 
 ### Generate alembic migration
     alembic revision --autogenerate -m "Change message"

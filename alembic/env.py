@@ -2,32 +2,36 @@ import os
 from logging.config import fileConfig
 
 from alembic import context
-from sqlalchemy import engine_from_config
-from sqlalchemy import pool
+from sqlalchemy import engine_from_config, pool
 
-from src.kiyomi.database import Base
+from kiyomi import Config
+from kiyomi.database import Base
 # noinspection PyUnresolvedReferences
-import src.cogs.achievement
+import kiyomi.cogs.achievement
 # noinspection PyUnresolvedReferences
-import src.cogs.achievement_roles
+import kiyomi.cogs.achievement_roles
 # noinspection PyUnresolvedReferences
-import src.cogs.beatsaver
+import kiyomi.cogs.beatsaver
 # noinspection PyUnresolvedReferences
-import src.cogs.emoji_echo
+import kiyomi.cogs.emoji_echo
 # noinspection PyUnresolvedReferences
-import src.cogs.fancy_presence
+import kiyomi.cogs.fancy_presence
 # noinspection PyUnresolvedReferences
-import src.cogs.general
+import kiyomi.cogs.general
 # noinspection PyUnresolvedReferences
-import src.cogs.leaderboard
+import kiyomi.cogs.leaderboard
 # noinspection PyUnresolvedReferences
-import src.cogs.score_feed
+import kiyomi.cogs.pfp_switcher
 # noinspection PyUnresolvedReferences
-import src.cogs.scoresaber
+import kiyomi.cogs.score_feed
 # noinspection PyUnresolvedReferences
-import src.cogs.settings
+import kiyomi.cogs.scoresaber
 # noinspection PyUnresolvedReferences
-import src.cogs.view_persistence
+import kiyomi.cogs.settings
+# noinspection PyUnresolvedReferences
+import kiyomi.cogs.twitch
+# noinspection PyUnresolvedReferences
+import kiyomi.cogs.view_persistence
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -50,10 +54,10 @@ target_metadata = Base.metadata
 # ... etc.
 section = config.config_ini_section
 
-config.set_section_option(section, "DB_USER", os.getenv("DATABASE_USER"))
-config.set_section_option(section, "DB_PW", os.getenv("DATABASE_PW"))
-config.set_section_option(section, "DB_IP", os.getenv("DATABASE_IP"))
-config.set_section_option(section, "DB_NAME", os.getenv("DATABASE_NAME"))
+config.set_section_option(section, "DB_USER", Config.get().Database.User)
+config.set_section_option(section, "DB_PW", Config.get().Database.Password)
+config.set_section_option(section, "DB_HOST", Config.get().Database.Host)
+config.set_section_option(section, "DB_NAME", Config.get().Database.Name)
 
 
 def run_migrations_offline():
