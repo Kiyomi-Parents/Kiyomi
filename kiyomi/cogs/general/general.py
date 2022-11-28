@@ -2,7 +2,6 @@ import discord.member
 from discord import Role, app_commands, Interaction
 from discord.ext import commands
 
-from .messages.views.invite_view import InviteView
 from .services import (
     ServiceUnitOfWork,
 )
@@ -69,14 +68,6 @@ class General(BaseCog[ServiceUnitOfWork]):
         await self._service_uow.roles.on_role_delete(role)
         await self._service_uow.save_changes()
         await self._service_uow.close()
-
-    @app_commands.command()
-    async def invite(self, ctx: Interaction):
-        """Get the invite link"""
-        await ctx.response.defer()
-        invite_view = InviteView(self.bot, ctx.guild)
-
-        await invite_view.respond(ctx)
 
     @app_commands.command()
     async def ping(self, ctx: Interaction):
