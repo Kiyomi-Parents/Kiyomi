@@ -42,7 +42,11 @@ class BaseStorageRepository(BaseRepository[TEntity], Generic[TEntity], metaclass
 
     async def get_all(self) -> List[TEntity]:
         stmt = select(self._table)
-        return await self._all(stmt)
+        results = await self._all(stmt)
+
+        _logger.warning(self._table.__name__, f"Returning {len(results)} rows of results")
+
+        return results
 
     async def exists(self, entity_id: int) -> bool:
         stmt = select(self._table).where(self._table.id == entity_id)
