@@ -2,7 +2,7 @@ from typing import Type, Optional, List
 
 from .persistent_view import PersistentView
 from kiyomi import Utils, Kiyomi
-from ...errors import MissingPersistentViewClass
+from ...errors import MissingPersistentViewClass, FailedToLoadPersistentView
 
 
 class Persistence:
@@ -31,7 +31,10 @@ class Persistence:
         raise MissingPersistentViewClass(self.view, persistent_views)
 
     async def get_view(self, bot: Kiyomi) -> PersistentView:
-        return await self.view_class.deserialize_persistence(bot, self)
+        try:
+            return await self.view_class.deserialize_persistence(bot, self)
+        except Exception as error:
+            raise FailedToLoadPersistentView(self) from error
 
     def get_params(self) -> List[Optional[str]]:
         return self._view_parameters

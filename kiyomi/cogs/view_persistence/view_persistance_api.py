@@ -3,7 +3,7 @@ import logging
 from discord.ext import commands
 
 from .services import ServiceUnitOfWork
-from .errors import MissingPersistentViewClass
+from .errors import MissingPersistentViewClass, FailedToLoadPersistentView
 from .storage.model.persistence import Persistence
 from kiyomi import BaseCog
 
@@ -27,6 +27,8 @@ class ViewPersistenceAPI(BaseCog[ServiceUnitOfWork]):
                 view = await persistence.get_view(self.bot)
                 self.bot.add_view(view=view, message_id=persistence.message_id)
             except MissingPersistentViewClass as error:
+                await error.handle()
+            except FailedToLoadPersistentView as error:
                 await error.handle()
 
         _logger.info("View Persistence", f"Loaded {len(persistences)} persistent views")
