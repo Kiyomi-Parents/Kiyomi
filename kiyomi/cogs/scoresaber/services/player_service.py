@@ -110,10 +110,16 @@ class PlayerService(BaseService[Player, PlayerRepository, StorageUnitOfWork]):
 
         return guild_player
 
-    async def update_player(self, player: Player):
+    async def update_player(self, player: str):
         try:
-            new_player = await self.scoresaber.player_full(int(player.id))
+            new_player = await self.scoresaber.player_full(int(player))
 
             await self.repository.update_entity(Player(new_player))
         except pyscoresaber.NotFoundException as error:
-            raise PlayerNotFoundException(player.id) from error
+            raise PlayerNotFoundException(player) from error
+
+    async def get_all_player_ids(self):
+        return await self.repository.get_all_player_ids()
+
+    async def get_all_players(self):
+        return await self.repository.get_all_player()

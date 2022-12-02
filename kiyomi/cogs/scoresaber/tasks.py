@@ -18,7 +18,7 @@ class Tasks(BaseTasks[ServiceUnitOfWork]):
     @FancyPresenceAPI.presence_task
     async def update_players(self):
         """Updating players"""
-        players = await self.service_uow.players.get_all()
+        players = await self.service_uow.players.get_all_player_ids()
         _logger.info("Score Saber", f"Updating {len(players)} players")
 
         for player in players:
@@ -36,7 +36,7 @@ class Tasks(BaseTasks[ServiceUnitOfWork]):
     @FancyPresenceAPI.presence_task
     async def update_players_scores(self):
         """Updating scores"""
-        players = await self.service_uow.players.get_all()
+        players = await self.service_uow.players.get_all_players()
         _logger.info("Score Saber", f"Updating scores for {len(players)} players")
 
         for player in players:
