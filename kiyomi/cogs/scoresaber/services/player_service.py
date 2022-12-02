@@ -84,7 +84,10 @@ class PlayerService(BaseService[Player, PlayerRepository, StorageUnitOfWork]):
         return await self.storage_uow.guild_players.add(GuildPlayer(guild_id, member_id, player_id))
 
     async def register_player(self, guild_id: int, member_id: int, player_id: str) -> GuildPlayer:
-        await self.add_player(player_id)
+        try:
+            await self.add_player(player_id)
+        except PlayerAlreadyExistsException:
+            pass
         guild_player = await self.add_guild_player(guild_id, member_id, player_id)
 
         self.bot.events.emit("on_new_player", guild_player)
