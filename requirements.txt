@@ -1,5 +1,5 @@
 SQLAlchemy~=1.4.44
-alembic~=1.8.1
+alembic~=1.9.4
 asyncmy~=0.2.5
 python-dateutil~=2.8.2
 timeago~=1.0.16
