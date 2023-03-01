@@ -1,4 +1,4 @@
-SQLAlchemy~=1.4.44
+SQLAlchemy~=2.0.4
 alembic~=1.8.1
 asyncmy~=0.2.5
 python-dateutil~=2.8.2
