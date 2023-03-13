@@ -4,7 +4,7 @@ asyncmy~=0.2.5
 python-dateutil~=2.8.2
 timeago~=1.0.16
 termcolor~=2.2.0
-prettytable~=3.5.0
+prettytable~=3.6.0
 pybeatsaver==0.1.15
 pyscoresaber==1.0.10
 asyncio~=3.4.3
