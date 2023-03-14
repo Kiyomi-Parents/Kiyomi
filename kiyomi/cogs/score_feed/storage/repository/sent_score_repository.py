@@ -20,7 +20,7 @@ class SentScoreRepository(BaseStorageRepository[SentScore]):
         player_score_ids = select(Score.id).where(Score.player_id == player_id).subquery()
 
         stmt = (
-            select([func.count()])
+            select(func.count("*"))
             .select_from(self._table)
             .where(self._table.guild_id == guild_id)
             .where(self._table.score_id.in_(player_score_ids.select()))
@@ -39,11 +39,10 @@ class SentScoreRepository(BaseStorageRepository[SentScore]):
         )
 
         stmt = (
-            select([func.count()])
+            select(func.count("*"))
             .select_from(Score)
             .where(Score.player_id == player_id)
             .where(Score.id.not_in(sent_score_ids.select()))
-            .order_by(desc(Score.time_set))
         )
 
         return await self._first(stmt)
