@@ -39,10 +39,10 @@ class Score(Base):
     time_set = Column(DateTime(timezone=True))
 
     leaderboard_id = Column(Integer, ForeignKey("leaderboard.id", ondelete="CASCADE"))
-    leaderboard = relationship("Leaderboard", uselist=False, lazy="joined")
+    leaderboard = relationship("Leaderboard", uselist=False, lazy="selectin")
 
     player_id = Column(String(128), ForeignKey("player.id", ondelete="CASCADE"))
-    player = relationship("Player", uselist=False, back_populates="scores", lazy="joined")
+    player = relationship("Player", uselist=False, back_populates="scores", lazy="selectin")
 
     def __init__(self, player_score: pyscoresaber.PlayerScore):
         self.score_id = player_score.score.id

@@ -10,4 +10,4 @@ pyscoresaber==1.0.10
 asyncio~=3.4.3
 pyee~=9.0.4
 twitchio==2.5.0
-discord.py~=2.1.0
+discord.py~=2.2.2

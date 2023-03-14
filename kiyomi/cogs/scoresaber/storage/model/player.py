@@ -31,9 +31,9 @@ class Player(Base):
     score_stats_ranked_play_count = Column(Integer)
     score_stats_replays_watched = Column(Integer)
 
-    scores = relationship("Score", back_populates="player", cascade="all, delete-orphan", lazy="joined")
+    scores = relationship("Score", back_populates="player", cascade="all, delete-orphan", lazy="selectin")
 
-    guild_players = relationship("GuildPlayer", back_populates="player", cascade="all, delete-orphan", lazy="joined")
+    guild_players = relationship("GuildPlayer", back_populates="player", cascade="all, delete-orphan", lazy="selectin")
     guilds = association_proxy("guild_players", "guild")
     members = association_proxy("guild_players", "member")
 
