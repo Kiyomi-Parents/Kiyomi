@@ -50,7 +50,7 @@ class Leaderboard(Base):
         primaryjoin="BeatmapVersion.hash == Leaderboard.song_hash",
         foreign_keys=[song_hash],
         uselist=False,
-        lazy="joined"
+        lazy="selectin"
     )
 
     def __init__(self, leaderboard: pyscoresaber.LeaderboardInfo):
