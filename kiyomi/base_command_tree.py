@@ -7,7 +7,7 @@ from discord.app_commands import CommandTree, AppCommandError, Namespace
 from discord.ext.commands import Context, Cog
 
 if TYPE_CHECKING:
-    pass
+    from .kiyomi import Kiyomi
 
 
 class BaseCommandTree(CommandTree["Kiyomi"]):
@@ -26,7 +26,7 @@ class BaseCommandTree(CommandTree["Kiyomi"]):
         # Call Bot Global error handler
         await ctx.bot.on_command_error(ctx, error)
 
-    async def _call(self, interaction: Interaction) -> None:
+    async def _call(self, interaction: Interaction["Kiyomi"]) -> None:
         if not await self.interaction_check(interaction):
             interaction.command_failed = True
             return
@@ -55,7 +55,13 @@ class BaseCommandTree(CommandTree["Kiyomi"]):
             focused = next((opt['name'] for opt in options if opt.get('focused')), None)
             if focused is None:
                 raise AppCommandError('This should not happen, but there is no focused element. This is a Discord bug.')
-            await command._invoke_autocomplete(interaction, focused, namespace)
+
+            try:
+                await command._invoke_autocomplete(interaction, focused, namespace)
+            except Exception:
+                # Suppress exception since it can't be handled anyway.
+                pass
+
             return
 
         cog = command.binding
