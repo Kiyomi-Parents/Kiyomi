@@ -13,9 +13,9 @@ class AchievementRoleMember(Base):
     member_id = Column(BigInteger, ForeignKey("member.id"))
     achievement_role_id = Column(Integer, ForeignKey("achievement_role.id"))
 
-    member = relationship("Member", lazy="joined")
-    guild = relationship("Guild", lazy="joined")
-    achievement_role = relationship("AchievementRole", back_populates="members", lazy="joined")
+    member = relationship("Member", lazy="selectin")
+    guild = relationship("Guild", lazy="selectin")
+    achievement_role = relationship("AchievementRole", back_populates="members", lazy="selectin")
 
     def __init__(self, guild_id: int, member_id: int, achievement_role_id: int):
         self.guild_id = guild_id
