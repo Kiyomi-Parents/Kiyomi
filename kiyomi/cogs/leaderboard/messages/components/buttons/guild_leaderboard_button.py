@@ -31,9 +31,10 @@ class GuildLeaderboardButton(LeaderboardComponent, discord.ui.Button):
             self.emoji = emoji
 
         async with self.bot.get_cog_api(ScoreSaberAPI) as scoresaber_api:
-            leaderboard = await scoresaber_api.get_leaderboard(self.song_hash, BeatSaverUtils.to_scoresaber_game_mode(self.parent.beatmap_characteristic), BeatSaverUtils.to_scoresaber_difficulty(self.parent.beatmap_difficulty))
+            has_leaderboard = await scoresaber_api.exists_leaderboard(self.song_hash,
+                                                                   BeatSaverUtils.to_scoresaber_game_mode(self.parent.beatmap_characteristic), BeatSaverUtils.to_scoresaber_difficulty(self.parent.beatmap_difficulty))
 
-        if leaderboard is None:
+        if not has_leaderboard:
             self.parent.remove_item(self)
 
     async def get_embed(self) -> Embed:

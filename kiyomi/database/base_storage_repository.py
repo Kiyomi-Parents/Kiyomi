@@ -44,8 +44,6 @@ class BaseStorageRepository(BaseRepository[TEntity], Generic[TEntity], metaclass
         stmt = select(self._table)
         results = await self._all(stmt)
 
-        _logger.warning(self._table.__name__, f"Returning {len(results)} rows of results")
-
         return results
 
     async def exists(self, entity_id: int) -> bool:

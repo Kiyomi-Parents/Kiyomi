@@ -40,6 +40,14 @@ class ScoreSaberAPI(BaseCog[ServiceUnitOfWork]):
     ) -> Optional[Leaderboard]:
         return await self._service_uow.leaderboards.get_by_song_hash(song_hash, song_game_mode, song_difficulty)
 
+    async def exists_leaderboard(
+        self,
+        song_hash: str,
+        song_game_mode: pyscoresaber.GameMode,
+        song_difficulty: pyscoresaber.BeatmapDifficulty,
+    ) -> Optional[Leaderboard]:
+        return await self._service_uow.leaderboards.exists_by_song_hash(song_hash, song_game_mode, song_difficulty)
+
     async def get_leaderboard_by_id(self, leaderboard_id: int) -> Optional[Leaderboard]:
         return await self._service_uow.leaderboards.get_by_id(leaderboard_id)
 

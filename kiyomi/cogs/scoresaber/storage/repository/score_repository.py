@@ -2,8 +2,10 @@ from datetime import datetime
 from typing import Optional, List, Type
 
 from sqlalchemy import select, desc, exists
+from sqlalchemy.orm import selectinload, raiseload
 
 from kiyomi.database import BaseStorageRepository
+from ..model.player import Player
 from ..model.score import Score
 
 
@@ -18,7 +20,15 @@ class ScoreRepository(BaseStorageRepository[Score]):
 
     async def get_all_by_player_id_and_leaderboard_id(self, player_id: str, leaderboard_id: int) -> List[Score]:
         stmt = (
-            select(self._table).where(self._table.player_id == player_id).where(self._table.leaderboard_id == leaderboard_id)
+            select(self._table)
+            .where(self._table.player_id == player_id)
+            .where(self._table.leaderboard_id == leaderboard_id)
+            .options(
+                    selectinload(self._table.player),
+                    selectinload(self._table.player).raiseload(Player.guild_players),
+                    selectinload(self._table.player).raiseload(Player.scores),
+                    raiseload(self._table.leaderboard)
+            )
         )
         return await self._all(stmt)
 
