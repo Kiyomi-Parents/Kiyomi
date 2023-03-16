@@ -1,16 +1,13 @@
 from __future__ import annotations
 
 import logging
-from typing import List, TYPE_CHECKING
+from typing import List
 
 from kiyomi import BaseService
 from ..storage import StorageUnitOfWork
 from ..storage.model.message_view import MessageView
 from ..storage.model.persistence import Persistence
 from ..storage.repository.message_view_repository import MessageViewRepository
-
-if TYPE_CHECKING:
-    from kiyomi.cogs.general import GeneralAPI
 
 _logger = logging.getLogger(__name__)
 
@@ -24,25 +21,20 @@ class MessageViewService(BaseService[MessageView, MessageViewRepository, Storage
 
         _logger.info("View Persistence", f"Persisted view {persistence}")
 
-    async def get_guild_channel_persistent_views(self, channel_id: int) -> List[Persistence]:
-        general: "GeneralAPI" = self.bot.get_cog("GeneralAPI")
-
-        messages = await general.get_channel_messages(channel_id)
+    async def get_guild_channel_persistent_views(self, guild_id: int, channel_id: int) -> List[Persistence]:
+        message_view = await self.repository.get_by_channel_id(channel_id)
 
         persistences = []
-        for message in messages:
-            message_view = await self.repository.get_by_message_id(message.id)
-
-            if message_view is not None:
-                persistences.append(
-                    Persistence(
-                        message.guild_id,
-                        channel_id,
-                        message.id,
-                        message_view.view_name,
-                        *message_view.view_parameters,
-                    )
+        if message_view is not None:
+            persistences.append(
+                Persistence(
+                    guild_id,
+                    channel_id,
+                    message_view.message_id,
+                    message_view.view_name,
+                    *message_view.view_parameters,
                 )
+            )
 
         return persistences
 
@@ -52,7 +44,7 @@ class MessageViewService(BaseService[MessageView, MessageViewRepository, Storage
 
         persistences = []
         for channel in channels:
-            persistences += await self.get_guild_channel_persistent_views(channel.id)
+            persistences += await self.get_guild_channel_persistent_views(guild_id, channel.id)
 
         return persistences
 

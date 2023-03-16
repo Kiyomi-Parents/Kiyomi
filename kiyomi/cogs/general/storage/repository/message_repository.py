@@ -12,6 +12,11 @@ class MessageRepository(BaseStorageRepository[Message]):
         return Message
 
     async def get_all_by_channel_id(self, channel_id: int) -> List[Message]:
-        stmt = select(self._table).where(self._table.channel_id == channel_id)
+        stmt = (
+            select(self._table)
+            .where(self._table.channel_id == channel_id)
+            .order_by(self._table.id.desc())
+            .limit(50)
+        )
         result = await self._execute_scalars(stmt)
         return result.all()
