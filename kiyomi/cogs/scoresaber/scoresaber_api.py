@@ -54,7 +54,11 @@ class ScoreSaberAPI(BaseCog[ServiceUnitOfWork]):
     async def get_score_by_player_id_and_leaderboard_id(self, player_id: str, leaderboard_id: int) -> List[Score]:
         return await self._service_uow.scores.get_all_by_player_id_and_leaderboard_id(player_id, leaderboard_id)
 
-    async def get_best_score_by_player_id_and_leaderboard_id(self, player_id: str, leaderboard_id: int) -> List[Score]:
+    async def get_best_score_by_player_id_and_leaderboard_id(
+            self,
+            player_id: str,
+            leaderboard_id: int
+    ) -> Optional[Score]:
         return await self._service_uow.scores.get_best_score_by_player_id_and_leaderboard_id(player_id, leaderboard_id)
 
     async def get_score_by_id(self, score_id: int) -> Optional[Score]:

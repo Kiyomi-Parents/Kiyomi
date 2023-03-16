@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 from typing import Optional, Type
 
 import pyscoresaber
@@ -12,6 +13,10 @@ class LeaderboardRepository(BaseCacheableRepository[Leaderboard]):
     @property
     def _table(self) -> Type[Leaderboard]:
         return Leaderboard
+
+    @property
+    def _expire_threshold(self) -> datetime:
+        return datetime.today() - timedelta(days=7)
 
     async def get_by_song_hash(
         self,

@@ -4,7 +4,9 @@ from typing import Optional, List, Type
 from sqlalchemy import select, desc, exists
 from sqlalchemy.orm import selectinload, raiseload
 
+from kiyomi.cogs.beatsaver.storage.model.beatmap_version import BeatmapVersion
 from kiyomi.database import BaseStorageRepository
+from ..model.leaderboard import Leaderboard
 from ..model.player import Player
 from ..model.score import Score
 
@@ -43,7 +45,19 @@ class ScoreRepository(BaseStorageRepository[Score]):
                     selectinload(self._table.player),
                     selectinload(self._table.player).raiseload(Player.guild_players),
                     selectinload(self._table.player).raiseload(Player.scores),
-                    raiseload(self._table.leaderboard)
+
+                    selectinload(self._table.leaderboard),
+
+                    selectinload(self._table.leaderboard)
+                    .selectinload(Leaderboard.beatmap_version),
+
+                    selectinload(self._table.leaderboard)
+                    .selectinload(Leaderboard.beatmap_version)
+                    .raiseload(BeatmapVersion.beatmap),
+
+                    selectinload(self._table.leaderboard)
+                    .selectinload(Leaderboard.beatmap_version)
+                    .selectinload(BeatmapVersion.difficulties)
             )
         )
         return await self._first(stmt)

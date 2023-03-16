@@ -1,13 +1,14 @@
 import re
-from typing import Optional
+from typing import Optional, TYPE_CHECKING
 
 from kiyomi import Kiyomi
 from kiyomi.service.base_basic_service import BaseBasicService
 from .beatmap_service import BeatmapService
 from ..storage import StorageUnitOfWork
 from ..storage.model.beatmap import Beatmap
-from ...scoresaber import ScoreSaberAPI
-from ...scoresaber.storage.model.leaderboard import Leaderboard
+
+if TYPE_CHECKING:
+    from ...scoresaber.storage.model.leaderboard import Leaderboard
 
 
 class TextToBeatmapService(BaseBasicService[StorageUnitOfWork]):
@@ -30,8 +31,8 @@ class TextToBeatmapService(BaseBasicService[StorageUnitOfWork]):
 
         if scoresaber_match:
             leaderboard_id = scoresaber_match.group(2)
-            async with self.bot.get_cog_api(ScoreSaberAPI) as scoresaber:
-                leaderboard: Optional[Leaderboard] = await scoresaber.get_leaderboard_by_id(leaderboard_id)
+            async with self.bot.get_cog_api("ScoreSaberAPI") as scoresaber:
+                leaderboard: Optional["Leaderboard"] = await scoresaber.get_leaderboard_by_id(leaderboard_id)
             if leaderboard is not None:
                 return await self.beatmaps.get_beatmap_by_hash(leaderboard.song_hash)
 
