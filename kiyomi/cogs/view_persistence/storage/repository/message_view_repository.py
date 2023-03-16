@@ -12,6 +12,9 @@ class MessageViewRepository(BaseStorageRepository[MessageView]):
         return MessageView
 
     async def get_by_message_id(self, message_id: int) -> Optional[MessageView]:
-        stmt = select(self._table).where(self._table.message_id == message_id)
+        stmt = (select(self._table)
+                .where(self._table.message_id == message_id)
+                .order_by(self._table.id.desc())
+                .limit(1000))
         result = await self._execute_scalars(stmt)
         return result.first()
