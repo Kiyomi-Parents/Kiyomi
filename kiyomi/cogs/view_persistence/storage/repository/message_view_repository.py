@@ -22,8 +22,8 @@ class MessageViewRepository(BaseStorageRepository[MessageView]):
             select(self._table)
             .join(Message, self._table.message_id == Message.id, isouter=True)
             .where(Message.channel_id == channel_id)
-            # .order_by(self._table.id.desc())
-            # .limit(50)
+            .order_by(self._table.id.desc())
+            .limit(50)
         )
 
         result = await self._execute_scalars(stmt)
