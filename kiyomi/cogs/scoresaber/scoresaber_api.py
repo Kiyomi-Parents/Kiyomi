@@ -51,3 +51,6 @@ class ScoreSaberAPI(BaseCog[ServiceUnitOfWork]):
 
     async def update_score_pp_weight(self, score: Score) -> Score:
         return await self._service_uow.scores.update_score_pp_weight(score)
+
+    async def get_players_with_guild(self) -> List[Player]:
+        return await self._service_uow.players.get_players_with_guild()

@@ -1,3 +1,5 @@
+from typing import List
+
 import pyscoresaber
 
 from kiyomi import Kiyomi, BaseService
@@ -118,8 +120,11 @@ class PlayerService(BaseService[Player, PlayerRepository, StorageUnitOfWork]):
         except pyscoresaber.NotFoundException as error:
             raise PlayerNotFoundException(player) from error
 
-    async def get_all_player_ids(self):
+    async def get_all_player_ids(self) -> List[int]:
         return await self.repository.get_all_player_ids()
 
-    async def get_all_players(self):
+    async def get_all_players(self) -> List[Player]:
         return await self.repository.get_all_player()
+
+    async def get_players_with_guild(self) -> List[Player]:
+        return await self.repository.get_players_with_guild();

@@ -19,7 +19,7 @@ class Tasks(BaseTasks[ServiceUnitOfWork]):
     async def send_notifications(self) -> None:
         """Sending notifications"""
         async with self.bot.get_cog_api(ScoreSaberAPI) as scoresaber:
-            players = await scoresaber.get_players()
+            players = await scoresaber.get_players_with_guild()
 
         _logger.info("task", f"Sending notifications for {len(players)} players")
 
