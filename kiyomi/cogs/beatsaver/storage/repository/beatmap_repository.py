@@ -1,12 +1,14 @@
+import logging
 from typing import List, Type
 
 from sqlalchemy import select
 
+from kiyomi.database.base_cacheable_repository import BaseCacheableRepository
 from ..model.beatmap import Beatmap
-from kiyomi.database import BaseStorageRepository
 
+_logger = logging.getLogger(__name__)
 
-class BeatmapRepository(BaseStorageRepository[Beatmap]):
+class BeatmapRepository(BaseCacheableRepository[Beatmap]):
     @property
     def _table(self) -> Type[Beatmap]:
         return Beatmap
@@ -15,5 +17,6 @@ class BeatmapRepository(BaseStorageRepository[Beatmap]):
         stmt = (
             select(self._table)
             .where(self._table.id.in_(beatmap_keys))
+            .where(self._table.cached_at >= self._expire_threshold)
         )
         return await self._all(stmt)

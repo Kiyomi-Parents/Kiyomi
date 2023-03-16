@@ -1,13 +1,15 @@
+import logging
 from typing import Optional, List, Type
 
 from sqlalchemy import select
 from sqlalchemy.orm import joinedload
 
+from kiyomi.database.base_cacheable_repository import BaseCacheableRepository
 from ..model.beatmap_version import BeatmapVersion
-from kiyomi.database import BaseStorageRepository
 
+_logger = logging.getLogger(__name__)
 
-class BeatmapVersionRepository(BaseStorageRepository[BeatmapVersion]):
+class BeatmapVersionRepository(BaseCacheableRepository[BeatmapVersion]):
     @property
     def _table(self) -> Type[BeatmapVersion]:
         return BeatmapVersion
@@ -16,6 +18,7 @@ class BeatmapVersionRepository(BaseStorageRepository[BeatmapVersion]):
         stmt = (
             select(self._table)
             .where(self._table.hash == beatmap_hash)
+            .where(self._table.cached_at >= self._expire_threshold)
         )
 
         return await self._first(stmt)
@@ -24,6 +27,7 @@ class BeatmapVersionRepository(BaseStorageRepository[BeatmapVersion]):
         stmt = (
             select(self._table)
             .where(self._table.hash.in_(beatmap_hashes))
+            .where(self._table.cached_at >= self._expire_threshold)
         )
 
         return await self._all(stmt)
@@ -32,6 +36,7 @@ class BeatmapVersionRepository(BaseStorageRepository[BeatmapVersion]):
         stmt = (
             select(self._table)
             .where(self._table.key == beatmap_key)
+            .where(self._table.cached_at >= self._expire_threshold)
         )
 
         return await self._first(stmt)
@@ -41,5 +46,6 @@ class BeatmapVersionRepository(BaseStorageRepository[BeatmapVersion]):
             select(self._table.c.hash)
             .options(joinedload(BeatmapVersion.beatmap))
             .where(self._table.beatmap.id == beatmap_key)
+            .where(self._table.cached_at >= self._expire_threshold)
         )
         return await self._first(stmt)

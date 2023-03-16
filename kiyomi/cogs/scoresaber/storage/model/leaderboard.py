@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import datetime
 from typing import Optional, TYPE_CHECKING
 
 import pyscoresaber
@@ -53,6 +54,8 @@ class Leaderboard(Base):
         lazy="selectin"
     )
 
+    cached_at = Column(DateTime(timezone=True), nullable=False)
+
     def __init__(self, leaderboard: pyscoresaber.LeaderboardInfo):
         self.id = leaderboard.id
         self.song_hash = leaderboard.song_hash.lower()
@@ -78,6 +81,8 @@ class Leaderboard(Base):
         self.difficulty_raw = leaderboard.difficulty.difficulty_raw
         self.game_mode = leaderboard.difficulty.game_mode
         self.difficulty = leaderboard.difficulty.difficulty
+
+        self.cached_at = datetime.utcnow()
 
     @property
     def song_name_full(self):

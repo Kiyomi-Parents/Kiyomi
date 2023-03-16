@@ -86,7 +86,10 @@ class Utils:
             if var.startswith("_"):
                 continue
 
-            fields[var] = getattr(cls, var)
+            attr = getattr(cls, var)
+            
+            if not isinstance(attr, list):
+                fields[var] = getattr(cls, var)
 
         return fields
 

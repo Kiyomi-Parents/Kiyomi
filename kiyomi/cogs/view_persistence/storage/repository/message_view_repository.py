@@ -22,7 +22,7 @@ class MessageViewRepository(BaseStorageRepository[MessageView]):
             select(self._table)
             .join(Message, self._table.message_id == Message.id, isouter=True)
             .where(Message.channel_id == channel_id)
-            .order_by(self._table.id.desc())
+            .order_by(self._table.created_at.desc())
             .limit(50)
         )
 

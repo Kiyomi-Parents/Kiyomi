@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import pybeatsaver
 from sqlalchemy import Integer, Column, String, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
@@ -26,6 +28,8 @@ class BeatmapVersion(Base):
 
     beatmap = relationship("Beatmap", uselist=False, back_populates="versions", lazy="selectin")
 
+    cached_at = Column(DateTime(timezone=True), nullable=False)
+
     def __init__(self, map_version: pybeatsaver.MapVersion):
         self.hash = map_version.hash.lower()
         self.key = map_version.key
@@ -40,3 +44,5 @@ class BeatmapVersion(Base):
 
         for version_diff in map_version.diffs:
             self.difficulties.append(BeatmapVersionDifficulty(version_diff))
+
+        self.cached_at = datetime.utcnow()

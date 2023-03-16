@@ -1,7 +1,9 @@
+from datetime import datetime
+
 import pybeatsaver.models.enum
 import pyscoresaber.models.enum
 from pybeatsaver import MapDifficulty
-from sqlalchemy import Column, String, ForeignKey, Integer, Float, Boolean, Enum
+from sqlalchemy import Column, String, ForeignKey, Integer, Float, Boolean, Enum, DateTime
 from sqlalchemy.orm import relationship
 
 from kiyomi.database import Base
@@ -40,6 +42,8 @@ class BeatmapVersionDifficulty(Base):
 
     beatmap_version = relationship("BeatmapVersion", uselist=False, back_populates="difficulties", lazy="selectin")
 
+    cached_at = Column(DateTime(timezone=True), nullable=False)
+
     def __init__(self, version_difficulty: MapDifficulty):
         self.njs = version_difficulty.njs
         self.offset = version_difficulty.offset
@@ -61,6 +65,8 @@ class BeatmapVersionDifficulty(Base):
         self.parity_errors = version_difficulty.parity_summary.errors
         self.parity_warns = version_difficulty.parity_summary.warns
         self.parity_resets = version_difficulty.parity_summary.resets
+
+        self.cached_at = datetime.utcnow()
 
     @property
     def max_score(self) -> Integer:

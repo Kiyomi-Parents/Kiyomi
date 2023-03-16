@@ -1,6 +1,7 @@
+from datetime import datetime
 from typing import List
 
-from sqlalchemy import Column, Integer, ForeignKey, String, BigInteger
+from sqlalchemy import Column, Integer, ForeignKey, String, BigInteger, DateTime
 from sqlalchemy.orm import relationship
 
 from kiyomi.database import Base
@@ -17,10 +18,13 @@ class MessageView(Base):
     message_id = Column(BigInteger, ForeignKey("message.id"))
     message = relationship("Message", uselist=False, lazy="raise")
 
+    created_at = Column(DateTime(timezone=True), nullable=False)
+
     def __init__(self, message_id: int, view_name: str, view_parameters: List[str]):
         self.message_id = message_id
         self.view_name = view_name
         self.view_parameters = view_parameters
+        self.created_at = datetime.utcnow()
 
     def __str__(self):
         return f"Message View {self.view_name}({', '.join(self.view_parameters)}) ({self.id})"

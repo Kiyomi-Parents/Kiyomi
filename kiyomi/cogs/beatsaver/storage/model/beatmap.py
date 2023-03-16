@@ -1,4 +1,5 @@
 import time
+from datetime import datetime
 from typing import List, Optional
 
 from pybeatsaver import MapDetail
@@ -48,6 +49,8 @@ class Beatmap(Base):
 
     versions = relationship("BeatmapVersion", back_populates="beatmap", cascade="all, delete-orphan", lazy="selectin", join_depth=4)
 
+    cached_at = Column(DateTime(timezone=True), nullable=False)
+
     def __init__(self, map_detail: MapDetail):
         self.id = map_detail.id
         self.name = map_detail.name
@@ -80,6 +83,8 @@ class Beatmap(Base):
 
         for map_version in map_detail.versions:
             self.versions.append(BeatmapVersion(map_version))
+
+        self.cached_at = datetime.utcnow()
 
     @property
     def latest_version(self) -> Optional[BeatmapVersion]:

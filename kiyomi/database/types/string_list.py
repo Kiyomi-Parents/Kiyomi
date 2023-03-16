@@ -5,6 +5,7 @@ from sqlalchemy import types
 
 class StringList(types.TypeDecorator):
     impl = types.JSON
+    cache_ok = True
 
     def process_literal_param(self, value, dialect):
         pass

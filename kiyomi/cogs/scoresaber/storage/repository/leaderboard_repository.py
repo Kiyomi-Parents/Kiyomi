@@ -4,11 +4,11 @@ import pyscoresaber
 from sqlalchemy import select, exists
 from sqlalchemy.orm import raiseload
 
+from kiyomi.database.base_cacheable_repository import BaseCacheableRepository
 from ..model.leaderboard import Leaderboard
-from kiyomi.database import BaseStorageRepository
 
 
-class LeaderboardRepository(BaseStorageRepository[Leaderboard]):
+class LeaderboardRepository(BaseCacheableRepository[Leaderboard]):
     @property
     def _table(self) -> Type[Leaderboard]:
         return Leaderboard
@@ -24,6 +24,7 @@ class LeaderboardRepository(BaseStorageRepository[Leaderboard]):
             .where(self._table.song_hash == song_hash)
             .where(self._table.game_mode == song_game_mode.name)
             .where(self._table.difficulty == song_difficulty.name)
+            .where(self._table.cached_at >= self._expire_threshold)
             .options(
                     raiseload(self._table.beatmap_version)
             )
@@ -41,6 +42,7 @@ class LeaderboardRepository(BaseStorageRepository[Leaderboard]):
             .where(self._table.song_hash == song_hash)
             .where(self._table.game_mode == song_game_mode.name)
             .where(self._table.difficulty == song_difficulty.name)
+            .where(self._table.cached_at >= self._expire_threshold)
             .options(
                     raiseload(self._table.beatmap_version)
             )
