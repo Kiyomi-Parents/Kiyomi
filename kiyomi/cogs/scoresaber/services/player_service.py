@@ -127,4 +127,7 @@ class PlayerService(BaseService[Player, PlayerRepository, StorageUnitOfWork]):
         return await self.repository.get_all_player()
 
     async def get_players_with_guild(self) -> List[Player]:
-        return await self.repository.get_players_with_guild();
+        return await self.repository.get_players_with_guild()
+
+    async def get_all_player_ids_by_guild_id(self, guild_id: int) -> List[int]:
+        return await self.repository.get_all_player_ids_by_guild_id(guild_id)

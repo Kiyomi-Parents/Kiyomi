@@ -129,6 +129,9 @@ class ScoreService(BaseService[Score, ScoreRepository, StorageUnitOfWork]):
     async def get_all_by_player_id_and_leaderboard_id(self, player_id: str, leaderboard_id: int) -> List[Score]:
         return await self.repository.get_all_by_player_id_and_leaderboard_id(player_id, leaderboard_id)
 
+    async def get_best_score_by_player_id_and_leaderboard_id(self, player_id: str, leaderboard_id: int) -> Optional[Score]:
+        return await self.repository.get_best_score_by_player_id_and_leaderboard_id(player_id, leaderboard_id)
+
     async def get_player_top_scores(self, player_id: str) -> List[Score]:
         scores = await self.repository.get_all_sorted_by_pp(player_id)
         unique_scores = []

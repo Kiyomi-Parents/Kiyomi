@@ -1,12 +1,10 @@
-from typing import List, Optional
+from typing import List
 
 import pybeatsaver
 
 from kiyomi.cogs.beatsaver import BeatSaverAPI
 from kiyomi.cogs.beatsaver.beatsaver_utils import BeatSaverUtils
 from kiyomi.cogs.scoresaber import ScoreSaberAPI
-from kiyomi.cogs.scoresaber.storage.model.player import Player
-from kiyomi.cogs.scoresaber.storage.model.score import Score
 from ..storage import StorageUnitOfWork
 from kiyomi.service.base_basic_service import BaseBasicService
 from ..storage.models.guild_leaderboard import GuildLeaderboard
@@ -46,34 +44,19 @@ class GuildLeaderboardService(BaseBasicService[StorageUnitOfWork]):
             if leaderboard is None:
                 return GuildLeaderboard(None, [])
 
-            guild_players = await scoresaber.get_guild_players_by_guild(guild_id)
+            player_ids = await scoresaber.get_player_ids_by_guild(guild_id)
 
-        return await self._make_guild_leaderboard([guild_player.player for guild_player in guild_players], leaderboard)
+        return await self._make_guild_leaderboard(player_ids, leaderboard)
 
-    async def _make_guild_leaderboard(self, players: List[Player], leaderboard: Leaderboard) -> GuildLeaderboard:
+    async def _make_guild_leaderboard(self, player_ids: List[int], leaderboard: Leaderboard) -> GuildLeaderboard:
         guild_leaderboard = GuildLeaderboard(leaderboard)
 
         async with self.bot.get_cog_api(ScoreSaberAPI) as scoresaber:
-            for player in players:
-                scores = await scoresaber.get_score_by_player_id_and_leaderboard_id(player.id, leaderboard.id)
-                best_score = self.get_best_score(scores)
+            for player_id in player_ids:
+                best_score = await scoresaber.get_best_score_by_player_id_and_leaderboard_id(player_id, leaderboard.id)
 
                 if best_score is not None:
                     guild_leaderboard.add_score(best_score)
 
         return guild_leaderboard
 
-    @staticmethod
-    def get_best_score(scores: List[Score]) -> Optional[Score]:
-        best_score = None
-
-        for score in scores:
-            if best_score is None:
-                best_score = score
-                continue
-
-            # Not sure if modified_score is the best thing to use here
-            if score.modified_score > best_score.modified_score:
-                best_score = score
-
-        return best_score

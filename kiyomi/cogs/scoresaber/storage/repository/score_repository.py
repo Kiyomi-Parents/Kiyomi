@@ -32,6 +32,22 @@ class ScoreRepository(BaseStorageRepository[Score]):
         )
         return await self._all(stmt)
 
+    async def get_best_score_by_player_id_and_leaderboard_id(self, player_id: str, leaderboard_id: int) -> Optional[Score]:
+        stmt = (
+            select(self._table)
+            .where(self._table.player_id == player_id)
+            .where(self._table.leaderboard_id == leaderboard_id)
+            .order_by(self._table.modified_score.desc())
+            .limit(1)
+            .options(
+                    selectinload(self._table.player),
+                    selectinload(self._table.player).raiseload(Player.guild_players),
+                    selectinload(self._table.player).raiseload(Player.scores),
+                    raiseload(self._table.leaderboard)
+            )
+        )
+        return await self._first(stmt)
+
     async def get_previous(self, score: Score) -> Optional[Score]:
         stmt = (
             select(self._table)

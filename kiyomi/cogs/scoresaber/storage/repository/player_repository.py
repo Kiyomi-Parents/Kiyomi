@@ -32,4 +32,13 @@ class PlayerRepository(BaseStorageRepository[Player]):
             )
         )
         return await self._all(stmt)
-    
+
+    async def get_all_player_ids_by_guild_id(self, guild_id: int) -> List[int]:
+        stmt = (
+            select(self._table.id)
+            .join(GuildPlayer, GuildPlayer.player_id == self._table.id, isouter=True)
+            .where(GuildPlayer.guild_id == guild_id)
+            .options(noload("*"))
+        )
+
+        return await self._all(stmt)
