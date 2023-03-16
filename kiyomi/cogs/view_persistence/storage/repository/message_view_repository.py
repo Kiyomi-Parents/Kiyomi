@@ -1,4 +1,4 @@
-from typing import Type, Optional
+from typing import Type, Optional, List
 
 from sqlalchemy import select
 
@@ -17,14 +17,14 @@ class MessageViewRepository(BaseStorageRepository[MessageView]):
         result = await self._execute_scalars(stmt)
         return result.first()
 
-    async def get_by_channel_id(self, channel_id: int) -> Optional[MessageView]:
+    async def get_by_channel_id(self, channel_id: int) -> List[MessageView]:
         stmt = (
             select(self._table)
             .join(Message, self._table.message_id == Message.id, isouter=True)
             .where(Message.channel_id == channel_id)
-            .order_by(self._table.id.desc())
-            .limit(50)
+            # .order_by(self._table.id.desc())
+            # .limit(50)
         )
 
         result = await self._execute_scalars(stmt)
-        return result.first()
+        return result.all()

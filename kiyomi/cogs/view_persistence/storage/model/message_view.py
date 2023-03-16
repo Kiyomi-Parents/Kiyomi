@@ -15,7 +15,7 @@ class MessageView(Base):
     view_parameters = Column(StringList)
 
     message_id = Column(BigInteger, ForeignKey("message.id"))
-    message = relationship("Message", uselist=False, lazy="selectin")
+    message = relationship("Message", uselist=False, lazy="raise")
 
     def __init__(self, message_id: int, view_name: str, view_parameters: List[str]):
         self.message_id = message_id

@@ -22,19 +22,20 @@ class MessageViewService(BaseService[MessageView, MessageViewRepository, Storage
         _logger.info("View Persistence", f"Persisted view {persistence}")
 
     async def get_guild_channel_persistent_views(self, guild_id: int, channel_id: int) -> List[Persistence]:
-        message_view = await self.repository.get_by_channel_id(channel_id)
+        message_views = await self.repository.get_by_channel_id(channel_id)
 
         persistences = []
-        if message_view is not None:
-            persistences.append(
-                Persistence(
-                    guild_id,
-                    channel_id,
-                    message_view.message_id,
-                    message_view.view_name,
-                    *message_view.view_parameters,
+        for message_view in message_views:
+            if message_view is not None:
+                persistences.append(
+                    Persistence(
+                        guild_id,
+                        channel_id,
+                        message_view.message_id,
+                        message_view.view_name,
+                        *message_view.view_parameters,
+                    )
                 )
-            )
 
         return persistences
 
@@ -54,6 +55,9 @@ class MessageViewService(BaseService[MessageView, MessageViewRepository, Storage
 
         persistences = []
         for guild in guilds:
-            persistences += await self.get_guild_persistent_views(guild.id)
+            guild_persistences = await self.get_guild_persistent_views(guild.id)
+
+            _logger.info("View Persistence", f"Loaded {len(guild_persistences)} for {guild}")
+            persistences += guild_persistences
 
         return persistences
