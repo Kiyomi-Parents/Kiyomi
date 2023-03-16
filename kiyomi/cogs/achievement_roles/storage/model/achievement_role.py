@@ -18,14 +18,14 @@ class AchievementRole(Base):
         "AchievementRoleMember",
         back_populates="achievement_role",
         cascade="all, delete",
-        lazy="selectin"
+        lazy="raise"
     )
 
     guild_id = Column(BigInteger, ForeignKey("guild.id", ondelete="CASCADE"))
-    guild = relationship("Guild", lazy="selectin")
+    guild = relationship("Guild", lazy="raise")
 
     role_id = Column(BigInteger, ForeignKey("role.id", ondelete="CASCADE"))
-    role = relationship("Role", cascade="all, delete", lazy="selectin")
+    role = relationship("Role", cascade="all, delete", lazy="raise")
 
     def __init__(self, guild_id: int, role_id: int, group: str, identifier: str):
         self.guild_id = guild_id
