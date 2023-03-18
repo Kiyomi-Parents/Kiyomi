@@ -1,9 +1,14 @@
+import logging
+from datetime import datetime
 from typing import Type, Optional, List
+
+import timeago
 
 from .persistent_view import PersistentView
 from kiyomi import Utils, Kiyomi
 from ...errors import MissingPersistentViewClass, FailedToLoadPersistentView
 
+_logger = logging.getLogger(__name__)
 
 class Persistence:
     def __init__(
@@ -32,7 +37,12 @@ class Persistence:
 
     async def get_view(self, bot: Kiyomi) -> PersistentView:
         try:
-            return await self.view_class.deserialize_persistence(bot, self)
+            start_time = datetime.now()
+            view = await self.view_class.deserialize_persistence(bot, self)
+            end_time = datetime.now()
+            _logger.info(self, f"Finished loading in {timeago.format(end_time, start_time, locale='en_short')}")
+
+            return view
         except Exception as error:
             raise FailedToLoadPersistentView(self) from error
 
