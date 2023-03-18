@@ -133,14 +133,7 @@ class ScoreService(BaseService[Score, ScoreRepository, StorageUnitOfWork]):
         return await self.repository.get_best_score_by_player_id_and_leaderboard_id(player_id, leaderboard_id)
 
     async def get_player_top_scores(self, player_id: str) -> List[Score]:
-        scores = await self.repository.get_all_sorted_by_pp(player_id)
-        unique_scores = []
-
-        for score in scores:
-            if score.score_id not in [unique_score.score_id for unique_score in unique_scores]:
-                unique_scores.append(score)
-
-        return unique_scores
+        return await self.repository.get_all_sorted_by_pp(player_id)
 
     async def update_score_pp_weight(self, score: Score) -> Score:
         top_scores = await self.get_player_top_scores(score.player_id)

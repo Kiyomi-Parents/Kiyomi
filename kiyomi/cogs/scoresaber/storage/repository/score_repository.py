@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Optional, List, Type
 
-from sqlalchemy import select, desc, exists
+from sqlalchemy import select, desc, exists, func
 from sqlalchemy.orm import selectinload, raiseload
 
 from kiyomi.cogs.beatsaver.storage.model.beatmap_version import BeatmapVersion
@@ -85,5 +85,16 @@ class ScoreRepository(BaseStorageRepository[Score]):
         return result.one()
 
     async def get_all_sorted_by_pp(self, player_id: str) -> List[Score]:
-        stmt = select(self._table).where(self._table.player_id == player_id).order_by(desc(self._table.pp))
+        latest_scores = (
+            select(self._table.id, self._table.score_id, func.max(self._table.time_set))
+            .where(self._table.player_id == player_id)
+            .group_by(self._table.score_id)
+        )
+
+        stmt = (
+            select(self._table)
+            .where(self._table.id.in_(latest_scores.select(self._table.id)))
+            .order_by(desc(self._table.pp))
+         )
+
         return await self._all(stmt)
