@@ -1,17 +1,17 @@
 import asyncio
 import logging.handlers
-import os
 import platform
 import sys
 from asyncio import AbstractEventLoop
-from logging import StreamHandler
+from logging import StreamHandler, Logger
+from typing import Optional
 
 import discord
 
 from kiyomi import ConsoleFormatter, FileFormatter, Database, Kiyomi, Config
 
 
-async def startup(loop: AbstractEventLoop):
+async def startup(loop: Optional[AbstractEventLoop], logging: Logger):
     discord_token = Config.get().Discord.Token
     database_host = Config.get().Database.Host
     database_user = Config.get().Database.User
@@ -25,7 +25,7 @@ async def startup(loop: AbstractEventLoop):
 
     await database.init()
 
-    async with Kiyomi(command_prefix="!?#!a'", db=database, loop=loop) as bot:
+    async with Kiyomi(command_prefix="!?#!a'", db=database, loop=loop, logging=logging) as bot:
         default_guild = Config.get().Discord.Guilds.Default
         if default_guild is not None:
             bot.default_guild = discord.Object(id=int(default_guild))
@@ -85,6 +85,6 @@ if __name__ == "__main__":
         asyncio.set_event_loop(loop)
 
     try:
-        asyncio.run(startup(loop=loop))
+        asyncio.run(startup(loop=loop, logging=logger))
     except KeyboardInterrupt:
         pass
