@@ -17,7 +17,28 @@ class ScoreRepository(BaseStorageRepository[Score]):
         return Score
 
     async def get_by_score_id(self, score_id: int) -> Optional[Score]:
-        stmt = select(self._table).where(self._table.score_id == score_id)
+        stmt = (
+            select(self._table)
+            .where(self._table.score_id == score_id)
+            .options(
+                    selectinload(self._table.player),
+                    selectinload(self._table.player).raiseload(Player.guild_players),
+                    selectinload(self._table.player).raiseload(Player.scores),
+
+                    selectinload(self._table.leaderboard),
+
+                    selectinload(self._table.leaderboard)
+                    .selectinload(Leaderboard.beatmap_version),
+
+                    selectinload(self._table.leaderboard)
+                    .selectinload(Leaderboard.beatmap_version)
+                    .raiseload(BeatmapVersion.beatmap),
+
+                    selectinload(self._table.leaderboard)
+                    .selectinload(Leaderboard.beatmap_version)
+                    .selectinload(BeatmapVersion.difficulties)
+            )
+        )
         return await self._first(stmt)
 
     async def get_all_by_player_id_and_leaderboard_id(self, player_id: str, leaderboard_id: int) -> List[Score]:
@@ -74,7 +95,28 @@ class ScoreRepository(BaseStorageRepository[Score]):
 
     async def get_recent(self, player_id: str, count: int) -> List[Score]:
         stmt = (
-            select(self._table).where(self._table.player_id == player_id).order_by(desc(self._table.time_set)).limit(count)
+            select(self._table)
+            .where(self._table.player_id == player_id)
+            .order_by(desc(self._table.time_set))
+            .limit(count)
+            .options(
+                    selectinload(self._table.player),
+                    selectinload(self._table.player).raiseload(Player.guild_players),
+                    selectinload(self._table.player).raiseload(Player.scores),
+
+                    selectinload(self._table.leaderboard),
+
+                    selectinload(self._table.leaderboard)
+                    .selectinload(Leaderboard.beatmap_version),
+
+                    selectinload(self._table.leaderboard)
+                    .selectinload(Leaderboard.beatmap_version)
+                    .raiseload(BeatmapVersion.beatmap),
+
+                    selectinload(self._table.leaderboard)
+                    .selectinload(Leaderboard.beatmap_version)
+                    .selectinload(BeatmapVersion.difficulties)
+            )
         )
         return await self._all(stmt)
 
@@ -96,6 +138,24 @@ class ScoreRepository(BaseStorageRepository[Score]):
             select(self._table)
             .where(self._table.id.in_(select(latest_scores.c.id)))
             .order_by(desc(self._table.pp))
+            .options(
+                    selectinload(self._table.player),
+                    selectinload(self._table.player).raiseload(Player.guild_players),
+                    selectinload(self._table.player).raiseload(Player.scores),
+
+                    selectinload(self._table.leaderboard),
+
+                    selectinload(self._table.leaderboard)
+                    .selectinload(Leaderboard.beatmap_version),
+
+                    selectinload(self._table.leaderboard)
+                    .selectinload(Leaderboard.beatmap_version)
+                    .raiseload(BeatmapVersion.beatmap),
+
+                    selectinload(self._table.leaderboard)
+                    .selectinload(Leaderboard.beatmap_version)
+                    .selectinload(BeatmapVersion.difficulties)
+            )
          )
 
         return await self._all(stmt)
