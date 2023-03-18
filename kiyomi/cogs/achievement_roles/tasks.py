@@ -1,3 +1,5 @@
+import asyncio
+
 from discord.ext import tasks
 
 from kiyomi.cogs.general import GeneralAPI
@@ -17,8 +19,15 @@ class Tasks(BaseTasks[ServiceUnitOfWork]):
         async with self.bot.get_cog_api(GeneralAPI) as general:
             guild_members = await general.get_all_guild_members()
 
+        await_list = []
         for guild_member in guild_members:
-            await self.service_uow.memberAchievementRoles.update_member_roles(guild_member.guild_id, guild_member.member_id)
+            await_list.append(
+                    self.service_uow.memberAchievementRoles.update_member_roles(
+                            guild_member.guild_id,
+                            guild_member.member_id
+                    )
+            )
+        await asyncio.gather(*await_list)
 
         await self.service_uow.save_changes()
 
