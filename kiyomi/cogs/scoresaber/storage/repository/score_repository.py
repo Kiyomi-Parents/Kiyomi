@@ -94,7 +94,7 @@ class ScoreRepository(BaseStorageRepository[Score]):
 
         stmt = (
             select(self._table)
-            .where(self._table.id.in_(latest_scores.select(latest_scores.c.id)))
+            .where(self._table.id.in_(select(latest_scores.c.id)))
             .order_by(desc(self._table.pp))
          )
 
