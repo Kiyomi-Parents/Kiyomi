@@ -89,6 +89,7 @@ class ScoreRepository(BaseStorageRepository[Score]):
             select(self._table.id, self._table.score_id, func.max(self._table.time_set))
             .where(self._table.player_id == player_id)
             .group_by(self._table.score_id)
+            .subquery()
         )
 
         stmt = (
