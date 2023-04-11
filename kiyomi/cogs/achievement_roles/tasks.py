@@ -7,6 +7,7 @@ from kiyomi.cogs.fancy_presence import FancyPresenceAPI
 from kiyomi.utils import Utils
 from kiyomi import BaseTasks
 from .services import ServiceUnitOfWork
+from kiyomi.error.error_utils import handle_global_error
 
 
 class Tasks(BaseTasks[ServiceUnitOfWork]):
@@ -30,6 +31,10 @@ class Tasks(BaseTasks[ServiceUnitOfWork]):
         await asyncio.gather(*await_list)
 
         await self.service_uow.save_changes()
+
+    @update_member_roles.error
+    async def update_member_roles_error(self, error: Exception):
+        await handle_global_error(self.bot, error)
 
     @update_member_roles.after_loop
     async def update_member_roles_after(self):
