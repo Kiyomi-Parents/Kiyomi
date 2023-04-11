@@ -1,6 +1,8 @@
 import logging
+from datetime import datetime
 
 import pyscoresaber
+import timeago
 from discord.ext import tasks
 
 from kiyomi.cogs.fancy_presence import FancyPresenceAPI
@@ -40,7 +42,12 @@ class Tasks(BaseTasks[ServiceUnitOfWork]):
         _logger.info("Score Saber", f"Updating scores for {len(players)} players")
 
         for player in players:
+            start_time = datetime.now()
             await self.service_uow.scores.update_player_scores(player)
+            end_time = datetime.now()
+            _logger.info("Score Saber", f"Finished updating {player} scores in"
+                                        f" {timeago.format(end_time, start_time, locale='en_short')}")
+
             await self.service_uow.save_changes()
 
     @update_players_scores.after_loop
