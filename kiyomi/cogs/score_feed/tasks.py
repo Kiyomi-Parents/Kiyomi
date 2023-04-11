@@ -7,7 +7,6 @@ from kiyomi.cogs.fancy_presence import FancyPresenceAPI
 from kiyomi.utils import Utils
 from kiyomi import BaseTasks
 from .services import ServiceUnitOfWork
-from kiyomi.error.error_utils import handle_global_error
 
 _logger = logging.getLogger(__name__)
 
@@ -28,12 +27,3 @@ class Tasks(BaseTasks[ServiceUnitOfWork]):
             for guild in player.guilds:
                 await self.service_uow.notifications.send_notification(guild, player)
                 await self.service_uow.save_changes()
-
-
-    @send_notifications.error
-    async def send_notifications_error(self, error: Exception):
-        await handle_global_error(self.bot, error)
-
-    @send_notifications.after_loop
-    async def send_notifications_after(self):
-        await self.service_uow.close()

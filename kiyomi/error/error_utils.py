@@ -16,8 +16,11 @@ async def handle_global_error(
     bot: "Kiyomi",
     error: Exception,
     ctx: Optional[Union[Context["Kiyomi"], Interaction]] = None,
+    print_to_console: Optional[bool] = False
 ):
-    print_error_to_console(error)
+    if print_to_console:
+        print_error_to_console(error)
+
     await send_owners_dm_with_stacktrace(bot, error)
 
     if ctx is not None:

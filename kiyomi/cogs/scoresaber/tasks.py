@@ -9,7 +9,6 @@ from kiyomi.cogs.fancy_presence import FancyPresenceAPI
 from kiyomi.utils import Utils
 from kiyomi import BaseTasks
 from .services import ServiceUnitOfWork
-from kiyomi.error.error_utils import handle_global_error
 
 _logger = logging.getLogger(__name__)
 
@@ -29,14 +28,6 @@ class Tasks(BaseTasks[ServiceUnitOfWork]):
 
         await self.service_uow.save_changes()
 
-    @update_players.error
-    async def update_players_error(self, error: Exception):
-        await handle_global_error(self.bot, error)
-
-    @update_players.after_loop
-    async def update_players_after(self):
-        await self.service_uow.close()
-
     @tasks.loop(minutes=3)
     @Utils.time_task
     @Utils.discord_ready
@@ -54,14 +45,6 @@ class Tasks(BaseTasks[ServiceUnitOfWork]):
                                         f" {timeago.format(end_time, start_time, locale='en_short')}")
 
             await self.service_uow.save_changes()
-
-    @update_players.error
-    async def update_players_scores_error(self, error: Exception):
-        await handle_global_error(self.bot, error)
-
-    @update_players_scores.after_loop
-    async def update_players_scores_after(self):
-        await self.service_uow.close()
 
     @Utils.discord_ready
     async def init_live_score_feed(self):
