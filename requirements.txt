@@ -8,6 +8,6 @@ prettytable~=3.6.0
 pybeatsaver==0.1.15
 pyscoresaber==1.0.10
 asyncio~=3.4.3
-pyee~=9.0.4
+pyee~=9.1.0
 twitchio==2.5.0
 discord.py~=2.2.2
