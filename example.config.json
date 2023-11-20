@@ -26,5 +26,10 @@
       "ListenerPort": 80,
       "WebhookSecret": "random_string_of_text"
     }
+  },
+    "Sentry": {
+    "Enabled": false,
+    "DSN": "Sentry_DSN_URL",
+    "Environment": "development"
   }
 }

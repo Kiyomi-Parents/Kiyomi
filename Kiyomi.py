@@ -7,9 +7,37 @@ from logging import StreamHandler, Logger
 from typing import Optional
 
 import discord
+import sentry_sdk
+from sentry_sdk.integrations.aiohttp import AioHttpIntegration
+from sentry_sdk.integrations.asyncio import AsyncioIntegration
+from sentry_sdk.integrations.logging import LoggingIntegration
+from sentry_sdk.integrations.sqlalchemy import SqlalchemyIntegration
 
-from kiyomi import ConsoleFormatter, FileFormatter, Database, Kiyomi, Config
+from kiyomi import ConsoleFormatter, FileFormatter, Database, Kiyomi, Config, SentryFormatter
 
+
+def initialize_sentry():
+    if Config.get().Sentry.Enabled is not True:
+        return
+
+    moddedLoggingIntegration = LoggingIntegration()
+    moddedLoggingIntegration._breadcrumb_handler.setFormatter(SentryFormatter())
+    moddedLoggingIntegration._handler.setFormatter(SentryFormatter())
+
+    sentry_sdk.init(
+            dsn=Config.get().Sentry.DSN,
+            environment=Config.get().Sentry.Environment,
+            enable_tracing=True,
+            send_default_pii=True,
+            traces_sample_rate=1.0,
+            profiles_sample_rate=1.0,
+            integrations=[
+                AsyncioIntegration(),
+                AioHttpIntegration(),
+                SqlalchemyIntegration(),
+                moddedLoggingIntegration
+            ]
+    )
 
 async def startup(loop: Optional[AbstractEventLoop], logging: Logger):
     discord_token = Config.get().Discord.Token
@@ -59,7 +87,6 @@ async def startup(loop: Optional[AbstractEventLoop], logging: Logger):
 
         await bot.start(token=discord_token)
 
-
 if __name__ == "__main__":
     logger = logging.getLogger()
     logger.setLevel(logging.INFO)
@@ -76,6 +103,8 @@ if __name__ == "__main__":
     stdout_handler = StreamHandler(sys.stdout)
     stdout_handler.setFormatter(ConsoleFormatter())
     logger.addHandler(stdout_handler)
+
+    initialize_sentry()
 
     loop = None
 

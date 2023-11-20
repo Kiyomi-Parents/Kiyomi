@@ -7,6 +7,7 @@ from typing import TypeVar, Type, List, Any, Dict
 import discord
 import timeago
 from discord.ext import tasks
+from sentry_sdk import set_measurement, trace
 
 from .timer import Timer
 
@@ -26,10 +27,11 @@ class Utils:
             end_time = datetime.now()
 
             _logger.info(func.__name__, f"Finished task {timeago.format(end_time, start_time, locale='en_short')}")
+            set_measurement(func.__name__, (end_time - start_time).total_seconds(), 'second')
 
             return res
 
-        return wrapper
+        return trace(wrapper)
 
     @staticmethod
     def discord_ready(func):

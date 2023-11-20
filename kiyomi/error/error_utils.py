@@ -2,6 +2,7 @@ import sys
 import traceback
 from typing import Union, Optional, TYPE_CHECKING
 
+import sentry_sdk
 from discord import Interaction
 from discord.ext.commands import Context
 
@@ -25,6 +26,8 @@ async def handle_global_error(
 
     if ctx is not None:
         await send_unexpected_exception(ctx)
+
+    sentry_sdk.capture_exception(error)
 
 
 def get_formatted_exception(error: Exception):
