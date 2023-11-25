@@ -29,6 +29,9 @@ def initialize_sentry():
             environment=Config.get().Sentry.Environment,
             enable_tracing=True,
             send_default_pii=True,
+            attach_stacktrace=True,
+            auto_enabling_integrations=True,
+            auto_session_tracking=True,
             traces_sample_rate=1.0,
             profiles_sample_rate=1.0,
             integrations=[
@@ -40,52 +43,53 @@ def initialize_sentry():
     )
 
 async def startup(loop: Optional[AbstractEventLoop], logging: Logger):
-    discord_token = Config.get().Discord.Token
-    database_host = Config.get().Database.Host
-    database_user = Config.get().Database.User
-    database_password = Config.get().Database.Password
-    database_name = Config.get().Database.Name
+    with sentry_sdk.start_transaction(name="Kiyomi"):
+        discord_token = Config.get().Discord.Token
+        database_host = Config.get().Database.Host
+        database_user = Config.get().Database.User
+        database_password = Config.get().Database.Password
+        database_name = Config.get().Database.Name
 
-    # Init database
-    database = Database(
-        f"mariadb+asyncmy://{database_user}:{database_password}@{database_host}/{database_name}?charset=utf8mb4"
-    )
+        # Init database
+        database = Database(
+            f"mariadb+asyncmy://{database_user}:{database_password}@{database_host}/{database_name}?charset=utf8mb4"
+        )
 
-    await database.init()
+        await database.init()
 
-    async with Kiyomi(command_prefix="!?#!a'", db=database, loop=loop, logging=logging) as bot:
-        default_guild = Config.get().Discord.Guilds.Default
-        if default_guild is not None:
-            bot.default_guild = discord.Object(id=int(default_guild))
+        async with Kiyomi(command_prefix="!?#!a'", db=database, loop=loop, logging=logging) as bot:
+            default_guild = Config.get().Discord.Guilds.Default
+            if default_guild is not None:
+                bot.default_guild = discord.Object(id=int(default_guild))
 
-        debug_guilds = Config.get().Discord.Guilds.Debug
-        if debug_guilds is not None and len(debug_guilds) > 0:
-            bot.debug_guilds = [discord.Object(id=int(guild_id)) for guild_id in debug_guilds if guild_id]
+            debug_guilds = Config.get().Discord.Guilds.Debug
+            if debug_guilds is not None and len(debug_guilds) > 0:
+                bot.debug_guilds = [discord.Object(id=int(guild_id)) for guild_id in debug_guilds if guild_id]
 
-        # Base Cogs
-        await bot.load_extension(name="kiyomi.cogs.view_persistence")
+            # Base Cogs
+            await bot.load_extension(name="kiyomi.cogs.view_persistence")
 
-        # General Function Cogs
-        await bot.load_extension(name="kiyomi.cogs.general")
-        await bot.load_extension(name="kiyomi.cogs.settings")
-        await bot.load_extension(name="kiyomi.cogs.fancy_presence")
+            # General Function Cogs
+            await bot.load_extension(name="kiyomi.cogs.general")
+            await bot.load_extension(name="kiyomi.cogs.settings")
+            await bot.load_extension(name="kiyomi.cogs.fancy_presence")
 
-        # Function Cogs
+            # Function Cogs
 
-        await bot.load_extension(name="kiyomi.cogs.scoresaber")
-        await bot.load_extension(name="kiyomi.cogs.beatsaver")
-        await bot.load_extension(name="kiyomi.cogs.leaderboard")
-        await bot.load_extension(name="kiyomi.cogs.score_feed")
-        await bot.load_extension(name="kiyomi.cogs.achievement")
-        await bot.load_extension(name="kiyomi.cogs.achievement_roles")
-        await bot.load_extension(name="kiyomi.cogs.emoji_echo")
-        await bot.load_extension(name="kiyomi.cogs.twitch")
-        await bot.load_extension(name="kiyomi.cogs.pfp_switcher")
+            await bot.load_extension(name="kiyomi.cogs.scoresaber")
+            await bot.load_extension(name="kiyomi.cogs.beatsaver")
+            await bot.load_extension(name="kiyomi.cogs.leaderboard")
+            await bot.load_extension(name="kiyomi.cogs.score_feed")
+            await bot.load_extension(name="kiyomi.cogs.achievement")
+            await bot.load_extension(name="kiyomi.cogs.achievement_roles")
+            await bot.load_extension(name="kiyomi.cogs.emoji_echo")
+            # await bot.load_extension(name="kiyomi.cogs.twitch")
+            await bot.load_extension(name="kiyomi.cogs.pfp_switcher")
 
-        # await database.drop_tables()
-        # await database.create_tables()
+            # await database.drop_tables()
+            # await database.create_tables()
 
-        await bot.start(token=discord_token)
+            await bot.start(token=discord_token)
 
 if __name__ == "__main__":
     logger = logging.getLogger()

@@ -2,6 +2,7 @@ import logging
 from abc import abstractmethod
 from typing import Generic, TypeVar, TYPE_CHECKING
 
+import sentry_sdk
 from discord import Interaction, app_commands
 from discord.app_commands import CommandInvokeError, TransformerError
 from discord.ext import commands
@@ -30,6 +31,7 @@ class BaseCog(commands.Cog, Generic[TServiceUOW], metaclass=CogMeta):
         pass
 
     async def cog_before_invoke(self, ctx: Context["Kiyomi"]):
+        sentry_sdk.start_transaction(name=ctx.command.qualified_name)
         command_args = [f"{key}: {value}" for key, value in ctx.interaction.namespace]
 
         _logger.info(

@@ -1,5 +1,6 @@
 import logging
 
+import sentry_sdk
 import twitchio
 from twitchio.ext import eventsub
 
@@ -16,15 +17,16 @@ _logger = logging.getLogger(__name__)
 
 
 async def setup(bot: Kiyomi):
-    twitch_client = twitchio.Client.from_client_credentials(Config.get().Twitch.ClientID, Config.get().Twitch.ClientSecret, loop=bot.loop)
-    eventsub_client = eventsub.EventSubClient(twitch_client, Config.get().Twitch.EventSub.WebhookSecret, Config.get().Twitch.EventSub.ListenerHost)
+    with sentry_sdk.start_transaction(name="Twitch"):
+        twitch_client = twitchio.Client.from_client_credentials(Config.get().Twitch.ClientID, Config.get().Twitch.ClientSecret, loop=bot.loop)
+        eventsub_client = eventsub.EventSubClient(twitch_client, Config.get().Twitch.EventSub.WebhookSecret, Config.get().Twitch.EventSub.ListenerHost)
 
-    bot.loop.create_task(eventsub_client.listen(port=Config.get().Twitch.EventSub.ListenerPort))
+        bot.loop.create_task(eventsub_client.listen(port=Config.get().Twitch.EventSub.ListenerPort))
 
-    storage_uow = StorageUnitOfWork(bot.database.session)
-    service_uow = ServiceUnitOfWork(bot, storage_uow, twitch_client, eventsub_client)
+        storage_uow = StorageUnitOfWork(bot.database.session)
+        service_uow = ServiceUnitOfWork(bot, storage_uow, twitch_client, eventsub_client)
 
-    bot.error_resolver.add(TwitchLoginResolver(service_uow))
-    bot.error_resolver.add(TwitchUserIdResolver(service_uow))
+        bot.error_resolver.add(TwitchLoginResolver(service_uow))
+        bot.error_resolver.add(TwitchUserIdResolver(service_uow))
 
-    await bot.add_cog(Twitch(bot, service_uow))
+        await bot.add_cog(Twitch(bot, service_uow))
